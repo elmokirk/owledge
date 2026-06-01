@@ -1,0 +1,33 @@
+{
+  "name": "pi-agent-workspace",
+  "version": "0.1.0",
+  "description": "Optional PI Agent adapter for Agent Memory workspace quality, planning questions, and ideation checks.",
+  "author": {
+    "name": "Agent Memory Kit"
+  },
+  "license": "MIT",
+  "keywords": [
+    "pi-agent",
+    "agent-memory",
+    "workspace-quality",
+    "global-intelligence",
+    "parallels",
+    "recurring-errors",
+    "red-team",
+    "evaluation",
+    "scorecard",
+    "ideation",
+    "planning"
+  ],
+  "skills": "./skills/",
+  "commands": [
+    "./commands/pi-workspace-check.md",
+    "./commands/pi-intelligence-report.md",
+    "./commands/pi-redteam-evaluate.md"
+  ],
+  "interface": {
+    "display_name": "PI Agent Workspace",
+    "short_description": "Workspace quality and ideation adapter for Agent Memory.",
+    "default_prompt": "Check this workspace and ask the next useful project-quality question."
+  }
+}

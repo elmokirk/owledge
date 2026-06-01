@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WorkPackage",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["id", "type", "status", "tenant_id", "customer_id", "project_id", "epic_id", "max_parallelism"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^wp-" },
+    "type": { "const": "WorkPackage" },
+    "status": { "type": "string", "enum": ["draft", "ready", "active", "blocked", "done", "archived"] },
+    "tenant_id": { "type": "string", "minLength": 1 },
+    "customer_id": { "type": "string", "minLength": 1 },
+    "project_id": { "type": "string", "minLength": 1 },
+    "epic_id": { "type": "string", "pattern": "^epic-" },
+    "max_parallelism": { "type": "integer", "minimum": 1, "maximum": 20 }
+  }
+}

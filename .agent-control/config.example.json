@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "host": "127.0.0.1",
+  "port": 8765,
+  "heartbeat_interval_seconds": 60,
+  "lease_ttl_seconds": 900,
+  "max_parallel_agents": 50,
+  "max_parallel_per_project": 8,
+  "sqlite_busy_timeout_ms": 30000,
+  "worker_context_budget_chars": 24000,
+  "planner_context_budget_chars": 40000,
+  "remote_requires_bearer_token": true
+}

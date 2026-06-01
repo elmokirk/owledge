@@ -1,0 +1,43 @@
+{
+  "name": "agent-memory-cowork",
+  "version": "0.3.0",
+  "description": "Codex-facing host-project adapter for Markdown-first Agent Memory skills, commands, diagnostics, and reports. Claude hooks are packaged separately in the Claude manifest.",
+  "author": {
+    "name": "Agent Memory Kit"
+  },
+  "license": "MIT",
+  "keywords": [
+    "agent-memory",
+    "codex",
+    "claude",
+    "cowork",
+    "lightrag"
+  ],
+  "homepage": "https://github.com/agent-memory-kit/agent-memory-standalone",
+  "repository": "https://github.com/agent-memory-kit/agent-memory-standalone",
+  "commands": [
+    "./commands/memory-init.md",
+    "./commands/memory-status.md",
+    "./commands/memory-doctor.md",
+    "./commands/memory-report.md"
+  ],
+  "agents": "./agents/",
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Agent Memory Cowork",
+    "shortDescription": "Capture agent sessions into Markdown memory.",
+    "longDescription": "Captures Claude/Cowork and Codex-adjacent runtime events as private Markdown-first session memory, then prepares reviewed summaries for RAG, LightRAG, and GraphRAG exports.",
+    "developerName": "Agent Memory Kit",
+    "category": "Productivity",
+    "capabilities": [
+      "Write",
+      "Automation"
+    ],
+    "defaultPrompt": [
+      "Run memory-status for this project.",
+      "Run memory-doctor and summarize risks.",
+      "Create a project-dashboard memory report."
+    ],
+    "brandColor": "#2563EB"
+  }
+}

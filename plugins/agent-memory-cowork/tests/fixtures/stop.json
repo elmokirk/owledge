@@ -1,0 +1,6 @@
+{
+  "hook_event_name": "Stop",
+  "session_id": "cowork-demo-session",
+  "message": "Session completed after validating plugin capture behavior.",
+  "source": "claude-cowork"
+}

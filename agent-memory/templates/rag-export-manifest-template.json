@@ -1,0 +1,10 @@
+{
+  "generated_at": "YYYY-MM-DDTHH:MM:SSZ",
+  "corpus_type": "private",
+  "tenant_id": "TENANT_ID",
+  "customer_id": "CUSTOMER_ID",
+  "project_id": "PROJECT_ID",
+  "document_count": 0,
+  "source_hash": "",
+  "documents": []
+}

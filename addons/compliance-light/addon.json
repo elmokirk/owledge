@@ -1,0 +1,60 @@
+{
+  "name": "compliance-light",
+  "version": "0.1.0",
+  "description": "Optional Markdown-first compliance-support add-on for Agent Memory Kit projects.",
+  "install_directories": [
+    "agent-memory/compliance/registers",
+    "agent-memory/compliance/dpia",
+    "agent-memory/compliance/ai-systems",
+    "agent-memory/compliance/incidents",
+    "agent-memory/compliance/requests",
+    "agent-memory/compliance/policies",
+    "agent-memory/exports/compliance"
+  ],
+  "install_files": [
+    {
+      "source": "starter/agent-memory/compliance/profile.md",
+      "target": "agent-memory/compliance/profile.md"
+    },
+    {
+      "source": "templates/processing-activity-template.md",
+      "target": "agent-memory/templates/processing-activity-template.md"
+    },
+    {
+      "source": "templates/ai-system-template.md",
+      "target": "agent-memory/templates/ai-system-template.md"
+    },
+    {
+      "source": "templates/provider-registry-template.md",
+      "target": "agent-memory/templates/provider-registry-template.md"
+    },
+    {
+      "source": "templates/dpia-trigger-template.md",
+      "target": "agent-memory/templates/dpia-trigger-template.md"
+    },
+    {
+      "source": "templates/data-subject-request-template.md",
+      "target": "agent-memory/templates/data-subject-request-template.md"
+    },
+    {
+      "source": "templates/security-incident-template.md",
+      "target": "agent-memory/templates/security-incident-template.md"
+    },
+    {
+      "source": "schemas/compliance-record.schema.json",
+      "target": "agent-memory/schemas/compliance-record.schema.json"
+    },
+    {
+      "source": "tools/compliance-doctor.ps1",
+      "target": "tools/compliance-doctor.ps1"
+    },
+    {
+      "source": "tools/run-compliance-gates.ps1",
+      "target": "tools/run-compliance-gates.ps1"
+    },
+    {
+      "source": "docs/compliance-light.md",
+      "target": "docs/compliance-light.md"
+    }
+  ]
+}

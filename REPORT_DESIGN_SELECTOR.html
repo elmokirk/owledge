@@ -1,0 +1,757 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Agent Memory Report Design Themes</title>
+  <style>
+    :root {
+      --page-bg: #f4f6f8;
+      --page-ink: #14171c;
+      --page-muted: #626b76;
+      --page-line: #d6dce5;
+      --page-panel: #ffffff;
+      --page-accent: #245c88;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--page-bg);
+      color: var(--page-ink);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: 0;
+    }
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 520px);
+      gap: 28px;
+      padding: 36px min(5vw, 72px) 24px;
+      border-bottom: 1px solid var(--page-line);
+      background: linear-gradient(135deg, color-mix(in srgb, var(--page-accent) 12%, transparent), transparent 40%), var(--page-panel);
+    }
+    h1 {
+      max-width: 980px;
+      margin: 0;
+      font-size: clamp(40px, 6.6vw, 90px);
+      line-height: 0.96;
+      letter-spacing: 0;
+    }
+    h2, h3, h4, p { margin-top: 0; }
+    p { color: var(--page-muted); line-height: 1.55; }
+    code { font-size: 0.92em; }
+    button, input, select, textarea { font: inherit; }
+    button {
+      border: 1px solid var(--page-line);
+      border-radius: 8px;
+      padding: 10px 13px;
+      background: var(--page-ink);
+      color: var(--page-panel);
+      cursor: pointer;
+      font-weight: 800;
+    }
+    button.secondary {
+      background: var(--page-panel);
+      color: var(--page-ink);
+    }
+    label {
+      display: grid;
+      gap: 6px;
+      color: var(--page-muted);
+      font-size: 12px;
+      font-weight: 850;
+      text-transform: uppercase;
+    }
+    input[type="color"] {
+      width: 100%;
+      min-height: 40px;
+      border: 1px solid var(--page-line);
+      border-radius: 8px;
+      background: transparent;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--page-accent);
+    }
+    select, textarea {
+      width: 100%;
+      border: 1px solid var(--page-line);
+      border-radius: 8px;
+      background: var(--page-panel);
+      color: var(--page-ink);
+      padding: 10px;
+    }
+    textarea {
+      min-height: 250px;
+      resize: vertical;
+      font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .topline {
+      display: inline-flex;
+      width: fit-content;
+      margin-bottom: 16px;
+      padding: 7px 10px;
+      border: 1px solid var(--page-line);
+      border-radius: 999px;
+      color: var(--page-accent);
+      background: color-mix(in srgb, var(--page-panel) 86%, transparent);
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+    .intro-card, .editor-panel {
+      border: 1px solid var(--page-line);
+      border-radius: 10px;
+      background: var(--page-panel);
+      padding: 18px;
+      box-shadow: 0 18px 60px rgba(20, 27, 38, 0.10);
+    }
+    .meta-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .meta-row div {
+      border: 1px solid var(--page-line);
+      border-radius: 8px;
+      padding: 12px;
+    }
+    .meta-row strong {
+      display: block;
+      font-size: 28px;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(360px, 440px);
+      gap: 22px;
+      padding: 26px min(5vw, 72px) 64px;
+      align-items: start;
+    }
+    .theme-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 20px;
+      align-items: stretch;
+    }
+    .card {
+      --bg: #f6f7f9;
+      --surface: #ffffff;
+      --foreground: #17191d;
+      --muted: #626b78;
+      --line: #d9dee7;
+      --accent: #245c88;
+      --accent-2: #83a9c4;
+      --button-bg: var(--accent);
+      --button-fg: var(--surface);
+      --secondary-bg: transparent;
+      --secondary-fg: var(--foreground);
+      --radius: 8px;
+      --button-radius: 8px;
+      --border-width: 1px;
+      --border-style: solid;
+      --density: 18px;
+      --shadow: 0 18px 50px rgba(20, 24, 30, 0.13);
+      --font-stack: ui-sans-serif, system-ui, sans-serif;
+      position: relative;
+      min-height: 620px;
+      overflow: hidden;
+      border: var(--border-width) var(--border-style) var(--line);
+      border-radius: var(--radius);
+      background: var(--bg);
+      color: var(--foreground);
+      box-shadow: var(--shadow);
+      font-family: var(--font-stack);
+    }
+    .card.is-selected {
+      outline: 4px solid color-mix(in srgb, var(--accent) 36%, transparent);
+      outline-offset: 4px;
+    }
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: var(--ornament);
+      opacity: var(--ornament-opacity, 0.7);
+      background-size: var(--ornament-size, auto);
+    }
+    .card-inner {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      min-height: 100%;
+      padding: var(--density);
+      gap: 14px;
+    }
+    .card-head {
+      padding: calc(var(--density) - 2px);
+      border: var(--border-width) var(--border-style) var(--line);
+      border-radius: calc(var(--radius) - 3px);
+      background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 16%, var(--surface)), var(--surface));
+    }
+    .theme-token {
+      display: inline-flex;
+      width: fit-content;
+      margin-bottom: 12px;
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 950;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .headline {
+      margin: 0 0 8px;
+      color: var(--foreground);
+      font-size: clamp(28px, 4vw, 44px);
+      line-height: 1.02;
+      letter-spacing: 0;
+    }
+    .subline {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.42;
+    }
+    .text {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+    .style-strip {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+    }
+    .swatch {
+      min-height: 30px;
+      border: var(--border-width) var(--border-style) var(--line);
+      border-radius: calc(var(--button-radius) * 0.72);
+      background: var(--swatch);
+    }
+    .sample-panel {
+      display: grid;
+      gap: 12px;
+      padding: calc(var(--density) - 2px);
+      border: var(--border-width) var(--border-style) var(--line);
+      border-radius: calc(var(--radius) - 3px);
+      background: var(--surface);
+    }
+    .sample-topline {
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 950;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .sample-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .outline {
+      border: var(--border-width) var(--border-style) var(--line);
+      border-radius: calc(var(--radius) - 5px);
+      padding: 12px;
+      background: color-mix(in srgb, var(--surface) 86%, var(--bg));
+    }
+    .outline strong {
+      display: block;
+      color: var(--foreground);
+      font-size: 26px;
+      line-height: 1;
+    }
+    .outline span {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+    }
+    .button-primary, .button-secondary {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 38px;
+      border: var(--border-width) var(--border-style) var(--line);
+      border-radius: var(--button-radius);
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: var(--button-weight, 850);
+      text-transform: var(--button-case, none);
+    }
+    .button-primary {
+      background: var(--button-bg);
+      color: var(--button-fg);
+      border-color: color-mix(in srgb, var(--button-bg) 72%, var(--line));
+    }
+    .button-secondary {
+      background: var(--secondary-bg);
+      color: var(--secondary-fg);
+    }
+    .sample-slider {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+    .sample-slider input { accent-color: var(--accent); }
+    .element-stack {
+      display: grid;
+      gap: 8px;
+    }
+    .element-line {
+      height: 10px;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--accent) var(--fill), var(--line));
+    }
+    .select-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: auto;
+    }
+    .select-row .mini {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+    .select-theme {
+      border-radius: var(--button-radius);
+      border: var(--border-width) var(--border-style) var(--line);
+      background: var(--foreground);
+      color: var(--surface);
+      padding: 9px 11px;
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .editor-panel {
+      position: sticky;
+      top: 18px;
+      display: grid;
+      gap: 16px;
+    }
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .controls.wide {
+      grid-template-columns: 1fr;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .note {
+      margin: 0;
+      color: var(--page-muted);
+      font-size: 13px;
+    }
+    @media (max-width: 1100px) {
+      header, .layout { grid-template-columns: 1fr; }
+      .editor-panel { position: static; }
+    }
+    @media (max-width: 680px) {
+      header, .layout { padding-left: 16px; padding-right: 16px; }
+      .theme-grid { grid-template-columns: 1fr; }
+      .controls, .sample-grid, .meta-row { grid-template-columns: 1fr; }
+      .card { min-height: auto; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <section>
+      <span class="topline">Agent Memory HTML Reporting</span>
+      <h1>Pick the reporting design system that will be written into DESIGN.md.</h1>
+      <p>The cards below are real theme renderings. Each one owns its colors, borders, buttons, slider style, foreground/background contrast, and report surface tokens.</p>
+    </section>
+    <aside class="intro-card">
+      <h2 id="selectedTitle">Atlas Command</h2>
+      <p id="selectedEffect">Operational clarity for enterprise agent work.</p>
+      <div class="meta-row">
+        <div><strong>15</strong><span>themes</span></div>
+        <div><strong>1</strong><span>global default</span></div>
+        <div><strong>many</strong><span>future profiles</span></div>
+      </div>
+    </aside>
+  </header>
+
+  <main class="layout">
+    <section>
+      <h2>Theme Grid</h2>
+      <div id="themeGrid" class="theme-grid" aria-label="Report design theme grid"></div>
+    </section>
+
+    <aside class="editor-panel" aria-label="Design token editor">
+      <section>
+        <h2>Selected Theme</h2>
+        <p class="note">Edit tokens here. Changes update the selected card and the generated DESIGN.md block.</p>
+      </section>
+
+      <div class="controls">
+        <label>Background <input id="background" data-token="background" type="color"></label>
+        <label>Surface <input id="surface" data-token="surface" type="color"></label>
+        <label>Foreground <input id="foreground" data-token="foreground" type="color"></label>
+        <label>Muted Text <input id="muted" data-token="muted" type="color"></label>
+        <label>Border <input id="line" data-token="line" type="color"></label>
+        <label>Accent <input id="accent" data-token="accent" type="color"></label>
+        <label>Accent 2 <input id="accent2" data-token="accent2" type="color"></label>
+        <label>Button BG <input id="buttonBg" data-token="buttonBg" type="color"></label>
+        <label>Button FG <input id="buttonFg" data-token="buttonFg" type="color"></label>
+        <label>Secondary BG <input id="secondaryBg" data-token="secondaryBg" type="color"></label>
+        <label>Secondary FG <input id="secondaryFg" data-token="secondaryFg" type="color"></label>
+        <label>Shadow <input id="shadowColor" data-token="shadowColor" type="color"></label>
+      </div>
+
+      <div class="controls">
+        <label>Radius <input id="radius" data-token="radius" type="range" min="0" max="24"></label>
+        <label>Button Radius <input id="buttonRadius" data-token="buttonRadius" type="range" min="0" max="28"></label>
+        <label>Density <input id="density" data-token="densityPx" type="range" min="12" max="30"></label>
+        <label>Border Width <input id="borderWidth" data-token="borderWidth" type="range" min="1" max="5"></label>
+        <label>Button Weight <input id="buttonWeight" data-token="buttonWeight" type="range" min="500" max="950" step="50"></label>
+        <label>Shadow Strength <input id="shadowStrength" data-token="shadowStrength" type="range" min="0" max="40"></label>
+      </div>
+
+      <div class="controls">
+        <label>Border Style
+          <select id="borderStyle" data-token="borderStyle">
+            <option>solid</option>
+            <option>dashed</option>
+            <option>dotted</option>
+            <option>double</option>
+          </select>
+        </label>
+        <label>Button Case
+          <select id="buttonCase" data-token="buttonCase">
+            <option value="none">none</option>
+            <option value="uppercase">uppercase</option>
+            <option value="capitalize">capitalize</option>
+          </select>
+        </label>
+        <label>Font Mode
+          <select id="fontMode" data-token="fontMode">
+            <option>system</option>
+            <option>editorial</option>
+            <option>mono</option>
+            <option>hybrid</option>
+          </select>
+        </label>
+        <label>Ornament
+          <select id="ornamentMode" data-token="ornamentMode">
+            <option>none</option>
+            <option>grid</option>
+            <option>beam</option>
+            <option>ledger</option>
+            <option>radial</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="controls wide">
+        <label>Custom Brand Kit / DESIGN.md Input
+          <textarea id="customInput" placeholder="selected_report_design: client-a&#10;Selected design name: Client A Reports&#10;report.background: #f8fafc&#10;report.panel: #ffffff&#10;report.ink: #101828&#10;report.accent: #155eef"></textarea>
+        </label>
+      </div>
+
+      <div class="actions">
+        <button id="loadCustom" type="button">Preview Custom</button>
+        <button id="copyMarkdown" class="secondary" type="button">Copy DESIGN.md</button>
+        <button id="downloadMarkdown" class="secondary" type="button">Download DESIGN.md</button>
+      </div>
+
+      <label>Generated DESIGN.md
+        <textarea id="designMarkdown" readonly></textarea>
+      </label>
+    </aside>
+  </main>
+
+  <script>
+    const baseThemes = [
+      ["atlas-command", "Atlas Command", "Operational clarity for enterprise agent work.", "Dense dashboards, RAG readiness, and multi-agent status reporting.", "#f6f7f9", "#ffffff", "#17191d", "#626b78", "#d9dee7", "#245c88", "#83a9c4", "solid", 8, 18, "system", "beam"],
+      ["glass-ledger", "Glass Ledger", "Transparent governance with calm precision.", "Audit-friendly decisions, client-safe review, and traceable evidence.", "#eef5f3", "#fbfffd", "#13211f", "#5f716c", "#c8d9d4", "#317873", "#9cc8bf", "solid", 14, 20, "system", "radial"],
+      ["signal-grid", "Signal Grid", "Metric-first reporting with sharp technical signal.", "Retrieval evals, benchmark tables, and performance comparisons.", "#111418", "#181d23", "#f5f2ea", "#adb4bd", "#343b45", "#b36b00", "#f0b35a", "dashed", 4, 16, "mono", "grid"],
+      ["courtroom-brief", "Courtroom Brief", "Formal evidence hierarchy for hard decisions.", "ADRs, risk tradeoffs, evidence chains, and approval packets.", "#fbf7ef", "#fffdf7", "#241a14", "#735f53", "#e3d5c6", "#7a3b1f", "#c98f63", "double", 3, 20, "editorial", "ledger"],
+      ["mission-control", "Mission Control", "Live command surface for delegated agent work.", "Task routing, orchestration, status boards, and handoff monitoring.", "#071117", "#0e1c24", "#edfaff", "#9db4bf", "#23404d", "#35b7d8", "#79e2f2", "solid", 8, 16, "hybrid", "radial"],
+      ["blueprint-studio", "Blueprint Studio", "Architectural planning with technical annotation.", "System design, API contracts, UI systems, and implementation plans.", "#edf7fb", "#fbfdff", "#112834", "#607782", "#bdd9e6", "#1178a8", "#69b7d8", "dashed", 2, 20, "system", "grid"],
+      ["executive-ledger", "Executive Ledger", "Quiet premium summaries for leadership.", "Client updates, management reports, and strategic steering notes.", "#faf8f1", "#fffdf8", "#171b26", "#6f6b61", "#e4dcc8", "#9b7a2f", "#cdb66e", "solid", 6, 24, "editorial", "ledger"],
+      ["graph-aurora", "Graph Aurora", "Semantic relationship reporting with depth.", "GraphRAG, cross-project parallels, and reusable pattern discovery.", "#10151f", "#171d2a", "#f2fff8", "#aebbc9", "#30394a", "#78d6a3", "#8fb7ff", "solid", 16, 20, "hybrid", "radial"],
+      ["monolith-minimal", "Monolith Minimal", "Brutal technical clarity with no decoration.", "Source-heavy reviews, dense engineering reports, and strict QA.", "#f3f3f0", "#ffffff", "#0a0a0a", "#5d5d58", "#cfcfca", "#111111", "#767676", "solid", 0, 16, "system", "none"],
+      ["workshop-canvas", "Workshop Canvas", "Collaborative planning that stays readable.", "PM to dev handoffs, planning sessions, and workshop outputs.", "#fffaf2", "#fffefa", "#24211b", "#756b5c", "#eadcc7", "#d66a28", "#f0ba6a", "dashed", 10, 20, "system", "grid"],
+      ["neon-console", "Neon Console", "Runtime visibility for technical demos.", "Agent activity, logs, smoke checks, and developer-facing progress.", "#050806", "#0b120d", "#eaffef", "#9db7a6", "#214d31", "#39ff88", "#4ed8ff", "dotted", 5, 16, "mono", "beam"],
+      ["nordic-clarity", "Nordic Clarity", "Customer-safe readability with calm structure.", "Documentation, handoffs, stakeholder reports, and clean summaries.", "#f7faf9", "#ffffff", "#18211f", "#64706d", "#d7e2df", "#3f8f95", "#91c4bd", "solid", 8, 24, "system", "none"],
+      ["evidence-vault", "Evidence Vault", "Secure provenance for gates and audit views.", "QA reports, evidence packages, source hashes, and approval trails.", "#111820", "#18222d", "#f8fbff", "#aeb8c5", "#354456", "#d24b35", "#f09a6d", "solid", 7, 16, "hybrid", "ledger"],
+      ["product-lab", "Product Lab", "Experimentation surface for product and UI decisions.", "Design tokens, brand tests, UI choices, and visual tradeoffs.", "#fff6f8", "#ffffff", "#24151b", "#76636a", "#f0ccd7", "#e24d7b", "#7c5cff", "solid", 12, 20, "system", "radial"],
+      ["zeus-celestial", "Zeus Celestial", "High-contrast strategic narrative for AI agencies.", "Vision reports, Zeus demos, and high-level AI agency storytelling.", "#080b13", "#111827", "#f4f8ff", "#a9b4c4", "#2a3447", "#65a9ff", "#c4d7ff", "solid", 14, 24, "editorial", "radial"]
+    ];
+
+    const themes = baseThemes.map(([id, name, effect, description, background, surface, foreground, muted, line, accent, accent2, borderStyle, radius, densityPx, fontMode, ornamentMode]) => ({
+      id, name, effect, description, background, surface, foreground, muted, line, accent, accent2, borderStyle,
+      radius, densityPx, fontMode, ornamentMode,
+      buttonBg: accent,
+      buttonFg: surface,
+      secondaryBg: "transparent",
+      secondaryFg: foreground,
+      buttonRadius: Math.max(0, radius - 1),
+      borderWidth: borderStyle === "double" ? 3 : 1,
+      buttonWeight: 850,
+      buttonCase: id === "signal-grid" || id === "neon-console" ? "uppercase" : "none",
+      shadowColor: "#141b26",
+      shadowStrength: id.includes("minimal") ? 0 : 18
+    }));
+
+    const themeGrid = document.getElementById("themeGrid");
+    const markdown = document.getElementById("designMarkdown");
+    let selectedId = localStorage.getItem("agent-memory-report-design") || "atlas-command";
+
+    function className(id) {
+      return id.replace(/[^a-z0-9-]/g, "-");
+    }
+
+    function fontStack(mode) {
+      if (mode === "mono") return "ui-monospace, SFMono-Regular, Consolas, Liberation Mono, monospace";
+      if (mode === "editorial") return "Georgia, Times New Roman, serif";
+      return "ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif";
+    }
+
+    function ornament(theme) {
+      if (theme.ornamentMode === "grid") return "linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px)";
+      if (theme.ornamentMode === "beam") return "linear-gradient(115deg, color-mix(in srgb, var(--accent) 18%, transparent), transparent 36%)";
+      if (theme.ornamentMode === "ledger") return "linear-gradient(90deg, color-mix(in srgb, var(--accent) 22%, transparent) 0 6px, transparent 6px)";
+      if (theme.ornamentMode === "radial") return "radial-gradient(circle at 82% 12%, color-mix(in srgb, var(--accent) 26%, transparent), transparent 30%)";
+      return "none";
+    }
+
+    function cardStyle(theme) {
+      const shadow = `0 ${theme.shadowStrength}px ${theme.shadowStrength * 3}px color-mix(in srgb, ${theme.shadowColor} ${Math.min(32, theme.shadowStrength + 8)}%, transparent)`;
+      return [
+        `--bg:${theme.background}`,
+        `--surface:${theme.surface}`,
+        `--foreground:${theme.foreground}`,
+        `--muted:${theme.muted}`,
+        `--line:${theme.line}`,
+        `--accent:${theme.accent}`,
+        `--accent-2:${theme.accent2}`,
+        `--button-bg:${theme.buttonBg}`,
+        `--button-fg:${theme.buttonFg}`,
+        `--secondary-bg:${theme.secondaryBg}`,
+        `--secondary-fg:${theme.secondaryFg}`,
+        `--radius:${theme.radius}px`,
+        `--button-radius:${theme.buttonRadius}px`,
+        `--border-width:${theme.borderWidth}px`,
+        `--border-style:${theme.borderStyle}`,
+        `--density:${theme.densityPx}px`,
+        `--shadow:${shadow}`,
+        `--button-weight:${theme.buttonWeight}`,
+        `--button-case:${theme.buttonCase}`,
+        `--font-stack:${fontStack(theme.fontMode)}`,
+        `--ornament:${ornament(theme)}`,
+        `--ornament-size:${theme.ornamentMode === "grid" ? "18px 18px" : "auto"}`,
+        `--ornament-opacity:${theme.ornamentMode === "none" ? "0" : "0.72"}`
+      ].join(";");
+    }
+
+    function render() {
+      themeGrid.innerHTML = themes.map((theme) => `
+        <article class="card theme-${className(theme.id)} ${theme.id === selectedId ? "is-selected" : ""}" data-theme-id="${theme.id}" style="${cardStyle(theme)}">
+          <div class="card-inner">
+            <section class="card-head">
+              <span class="theme-token">${theme.id}</span>
+              <h3 class="headline">${theme.name}</h3>
+              <p class="subline">${theme.effect}</p>
+            </section>
+            <p class="text">${theme.description}</p>
+            <div class="style-strip" aria-label="${theme.name} color tokens">
+              <span class="swatch" style="--swatch:${theme.background}"></span>
+              <span class="swatch" style="--swatch:${theme.surface}"></span>
+              <span class="swatch" style="--swatch:${theme.foreground}"></span>
+              <span class="swatch" style="--swatch:${theme.muted}"></span>
+              <span class="swatch" style="--swatch:${theme.line}"></span>
+              <span class="swatch" style="--swatch:${theme.accent}"></span>
+              <span class="swatch" style="--swatch:${theme.accent2}"></span>
+            </div>
+            <section class="sample-panel">
+              <span class="sample-topline">Report sample / ${theme.fontMode}</span>
+              <h4 class="headline">Decision Quality</h4>
+              <p class="subline">Validated source links, gate state, and agent handoff clarity.</p>
+              <div class="sample-grid">
+                <div class="outline"><strong>97</strong><span>Readiness</span></div>
+                <div class="outline"><strong>24k</strong><span>Context</span></div>
+              </div>
+              <p class="text">This paragraph previews flowing text, muted hierarchy, spacing density, and contrast across a realistic report section.</p>
+              <div class="button-row">
+                <span class="button-primary">Primary Action</span>
+                <span class="button-secondary">Secondary</span>
+              </div>
+              <label class="sample-slider">Slider
+                <input type="range" min="0" max="100" value="72" disabled>
+              </label>
+              <div class="element-stack" aria-hidden="true">
+                <span class="element-line" style="--fill:82%"></span>
+                <span class="element-line" style="--fill:54%"></span>
+                <span class="element-line" style="--fill:31%"></span>
+              </div>
+            </section>
+            <div class="select-row">
+              <span class="mini">${theme.borderWidth}px ${theme.borderStyle} / radius ${theme.radius}</span>
+              <button class="select-theme" type="button" data-select="${theme.id}">${theme.id === selectedId ? "Selected" : "Use Theme"}</button>
+            </div>
+          </div>
+        </article>
+      `).join("");
+      themeGrid.querySelectorAll("[data-select]").forEach((button) => {
+        button.addEventListener("click", () => selectTheme(button.dataset.select));
+      });
+      syncEditor();
+    }
+
+    function current() {
+      return themes.find((theme) => theme.id === selectedId) || themes[0];
+    }
+
+    function syncEditor() {
+      const theme = current();
+      document.getElementById("selectedTitle").textContent = theme.name;
+      document.getElementById("selectedEffect").textContent = theme.effect;
+      document.querySelectorAll("[data-token]").forEach((input) => {
+        const token = input.dataset.token;
+        input.value = theme[token];
+      });
+      markdown.value = generatedMarkdown(theme);
+    }
+
+    function selectTheme(id) {
+      selectedId = id;
+      localStorage.setItem("agent-memory-report-design", id);
+      render();
+    }
+
+    document.querySelectorAll("[data-token]").forEach((input) => {
+      input.addEventListener("input", () => {
+        const theme = current();
+        const key = input.dataset.token;
+        theme[key] = input.type === "range" ? Number(input.value) : input.value;
+        render();
+      });
+    });
+
+    function generatedMarkdown(theme) {
+      return `---
+selected_report_design: "${theme.id}"
+design_catalog_version: "0.2.0"
+status: "active"
+updated_at: "${new Date().toISOString().slice(0, 10)}"
+source_of_truth: "DESIGN.md"
+applies_to:
+  - decision
+  - handoff
+  - rag-readiness
+  - agent-activity
+  - project-dashboard
+  - website-ui
+---
+
+# Report Design System
+
+## Selected Design
+
+| Field | Value |
+| --- | --- |
+| Selected design id | \`${theme.id}\` |
+| Selected design name | ${theme.name} |
+| Effect | ${theme.effect} |
+| Description | ${theme.description} |
+
+## Tokens
+
+| Token | Value |
+| --- | --- |
+| \`report.background\` | \`${theme.background}\` |
+| \`report.panel\` | \`${theme.surface}\` |
+| \`report.foreground\` | \`${theme.foreground}\` |
+| \`report.muted\` | \`${theme.muted}\` |
+| \`report.line\` | \`${theme.line}\` |
+| \`report.accent\` | \`${theme.accent}\` |
+| \`report.accent_2\` | \`${theme.accent2}\` |
+| \`report.radius\` | \`${theme.radius}px\` |
+| \`report.density\` | \`${theme.densityPx}px\` |
+| \`report.border_width\` | \`${theme.borderWidth}px\` |
+| \`report.border_style\` | \`${theme.borderStyle}\` |
+| \`report.font_mode\` | \`${theme.fontMode}\` |
+| \`button.primary_bg\` | \`${theme.buttonBg}\` |
+| \`button.primary_fg\` | \`${theme.buttonFg}\` |
+| \`button.secondary_bg\` | \`${theme.secondaryBg}\` |
+| \`button.secondary_fg\` | \`${theme.secondaryFg}\` |
+| \`button.radius\` | \`${theme.buttonRadius}px\` |
+| \`button.weight\` | \`${theme.buttonWeight}\` |
+| \`button.case\` | \`${theme.buttonCase}\` |
+| \`ornament.mode\` | \`${theme.ornamentMode}\` |
+| \`shadow.color\` | \`${theme.shadowColor}\` |
+| \`shadow.strength\` | \`${theme.shadowStrength}\` |
+`;
+    }
+
+    function valueFromText(text, keys, fallback) {
+      for (const key of keys) {
+        const escaped = key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        const match = text.match(new RegExp(`${escaped}\\s*[:=]\\s*["']?([^"'\\n]+)`, "i"));
+        if (match) return match[1].trim();
+      }
+      return fallback;
+    }
+
+    document.getElementById("loadCustom").addEventListener("click", () => {
+      const text = document.getElementById("customInput").value;
+      if (!text.trim()) return;
+      const custom = {
+        ...current(),
+        id: className(valueFromText(text, ["selected_report_design", "design_id", "id", "slug"], "custom-reporting")),
+        name: valueFromText(text, ["Selected design name", "name", "brand_name", "title"], "Custom Reporting"),
+        effect: "Custom reporting system from supplied brand notes.",
+        description: "Imported from custom markdown or brand-kit input. Review before persisting to DESIGN.md.",
+        background: valueFromText(text, ["report.background", "background", "bg"], "#f8fafc"),
+        surface: valueFromText(text, ["report.panel", "report.surface", "panel", "surface"], "#ffffff"),
+        foreground: valueFromText(text, ["report.foreground", "report.ink", "foreground", "ink", "text"], "#101828"),
+        muted: valueFromText(text, ["report.muted", "muted", "secondary"], "#667085"),
+        line: valueFromText(text, ["report.line", "line", "border"], "#d0d5dd"),
+        accent: valueFromText(text, ["report.accent", "accent", "primary", "brand_primary"], "#155eef")
+      };
+      custom.accent2 = valueFromText(text, ["report.accent_2", "accent_2", "accent2"], custom.accent2);
+      custom.buttonBg = valueFromText(text, ["button.primary_bg", "button_bg"], custom.accent);
+      custom.buttonFg = valueFromText(text, ["button.primary_fg", "button_fg"], custom.surface);
+      const index = themes.findIndex((theme) => theme.id === custom.id);
+      if (index >= 0) themes[index] = custom;
+      else themes.push(custom);
+      selectTheme(custom.id);
+    });
+
+    document.getElementById("copyMarkdown").addEventListener("click", async () => {
+      await navigator.clipboard.writeText(markdown.value);
+    });
+
+    document.getElementById("downloadMarkdown").addEventListener("click", () => {
+      const blob = new Blob([markdown.value], { type: "text/markdown" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "DESIGN.md";
+      link.click();
+      URL.revokeObjectURL(link.href);
+    });
+
+    render();
+  </script>
+</body>
+</html>

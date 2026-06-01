@@ -1,0 +1,12 @@
+{
+  "hook_event_name": "PostToolUse",
+  "session_id": "cowork-demo-session",
+  "tool_name": "Edit",
+  "tool_input": {
+    "file_path": "README.md"
+  },
+  "tool_response": {
+    "status": "success"
+  },
+  "source": "claude-cowork"
+}

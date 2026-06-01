@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Promotion",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["promotion_id", "tenant_id", "customer_id", "project_id", "source_path", "target_path", "review_path", "status"],
+  "properties": {
+    "promotion_id": { "type": "string", "minLength": 1 },
+    "tenant_id": { "type": "string", "minLength": 1 },
+    "customer_id": { "type": "string", "minLength": 1 },
+    "project_id": { "type": "string", "minLength": 1 },
+    "source_path": { "type": "string", "minLength": 1 },
+    "target_path": { "type": "string", "minLength": 1 },
+    "review_path": { "type": "string", "minLength": 1 },
+    "status": { "type": "string", "enum": ["proposed", "promoted", "blocked"] }
+  }
+}

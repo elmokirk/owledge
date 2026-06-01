@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Compliance Light Record",
+  "type": "object",
+  "properties": {
+    "compliance_record_type": {
+      "type": "string",
+      "enum": [
+        "processing_activity",
+        "ai_system",
+        "provider",
+        "dpia_trigger",
+        "data_subject_request",
+        "security_incident"
+      ]
+    },
+    "status": { "type": "string" },
+    "owner": { "type": "string" },
+    "review_status": { "type": "string" },
+    "created_at": { "type": "string" },
+    "updated_at": { "type": "string" }
+  },
+  "required": ["compliance_record_type", "status", "owner", "review_status"]
+}

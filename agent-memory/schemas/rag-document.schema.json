@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RagDocument",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["memory_id", "metadata", "content", "relationships", "source_path", "source_hash"],
+  "properties": {
+    "memory_id": { "type": "string", "pattern": "^mem:" },
+    "metadata": { "type": "object" },
+    "content": { "type": "string" },
+    "relationships": { "type": "array", "items": { "$ref": "edge.schema.json" } },
+    "source_path": { "type": "string" },
+    "source_hash": { "type": "string" }
+  }
+}

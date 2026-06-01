@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MemoryEdge",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["type", "target"],
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": ["relates_to", "depends_on", "supersedes", "superseded_by", "derived_from", "evidence_for", "implements", "blocks", "unblocks", "validates", "contradicts", "similar_to", "shared_lesson_for"]
+    },
+    "target": { "type": "string", "minLength": 1 },
+    "reason": { "type": "string" },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "source": { "type": "string" },
+    "external": { "type": "boolean" }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "name": "agent-memory-cowork",
+  "version": "0.3.0",
+  "description": "Host-project adapter for Markdown-first Agent Memory; captures private Claude/Cowork runtime events and helps initialize, diagnose, report, and curate project memory.",
+  "author": {
+    "name": "Agent Memory Kit"
+  },
+  "license": "MIT",
+  "keywords": [
+    "agent-memory",
+    "claude-code",
+    "cowork",
+    "rag",
+    "multi-agent"
+  ],
+  "homepage": "https://github.com/agent-memory-kit/agent-memory-standalone",
+  "repository": "https://github.com/agent-memory-kit/agent-memory-standalone",
+  "commands": [
+    "./commands/memory-init.md",
+    "./commands/memory-status.md",
+    "./commands/memory-doctor.md",
+    "./commands/memory-report.md"
+  ],
+  "agents": "./agents/",
+  "skills": "./skills/",
+  "hooks": "./hooks/hooks.json"
+}

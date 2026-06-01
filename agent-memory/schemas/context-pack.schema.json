@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ContextPack",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["context_pack_id", "tenant_id", "customer_id", "project_id", "task_id", "agent_role", "budget_chars", "content", "included_sources", "excluded_sources"],
+  "properties": {
+    "context_pack_id": { "type": "string", "minLength": 1 },
+    "tenant_id": { "type": "string", "minLength": 1 },
+    "customer_id": { "type": "string", "minLength": 1 },
+    "project_id": { "type": "string", "minLength": 1 },
+    "task_id": { "type": "string", "minLength": 1 },
+    "agent_role": { "type": "string", "minLength": 1 },
+    "budget_chars": { "type": "integer", "minimum": 1000 },
+    "content": { "type": "string" },
+    "included_sources": { "type": "array", "items": { "type": "object" } },
+    "excluded_sources": { "type": "array", "items": { "type": "object" } }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TaskCard",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["id", "type", "status", "tenant_id", "customer_id", "project_id", "epic_id", "workpackage_id", "priority"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^task-" },
+    "type": { "const": "TaskCard" },
+    "status": {
+      "type": "string",
+      "enum": ["backlog", "ready", "claimed", "in_progress", "blocked", "review", "qa", "done", "rejected", "archived"]
+    },
+    "tenant_id": { "type": "string", "minLength": 1 },
+    "customer_id": { "type": "string", "minLength": 1 },
+    "project_id": { "type": "string", "minLength": 1 },
+    "epic_id": { "type": "string", "pattern": "^epic-" },
+    "workpackage_id": { "type": "string", "pattern": "^wp-" },
+    "priority": { "type": "string", "enum": ["low", "normal", "high", "critical"] },
+    "qa_gate_ids": { "type": "array", "items": { "type": "string" } }
+  }
+}

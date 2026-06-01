@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "allOf": [
+    { "$ref": "frontmatter.schema.json" },
+    {
+      "properties": {
+        "doc_type": { "const": "lesson" },
+        "visibility": { "const": "shared" },
+        "review_status": { "const": "approved" },
+        "sanitization_status": { "const": "approved" }
+      }
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "hook_event_name": "UserPromptSubmit",
+  "session_id": "cowork-demo-session",
+  "prompt": "Create a small memory capture test and verify that raw events do not enter shared RAG.",
+  "cwd": "C:/Users/Kirk/Documents/Playground/agent-memory-standalone",
+  "source": "claude-cowork"
+}
