@@ -16,6 +16,13 @@ or Superpowers-style execution when you want agents to keep MVP plans grounded,
 handoff work cleanly, and make project progress auditable without adopting a
 hosted platform or migrating your vault.
 
+## The Name
+
+**Owledge** blends **owl** and **knowledge**. The owl motif is intentional:
+Owledge is designed as a quiet knowledge guardian for agentic projects, helping
+agents preserve context, trace evidence, and find the thread again when work
+moves across sessions or tools.
+
 ## Why Owledge Kit
 
 - **Keep context durable:** Agents can resume from reviewed Markdown records
