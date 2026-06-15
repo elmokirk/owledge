@@ -1,7 +1,7 @@
 # Performance And Scale Notes
 
-Agent Memory Kit optimizes for local, reviewable Markdown workflows rather than
-large opaque databases.
+Owledge Kit optimizes for local, reviewable Markdown workflows rather than large
+opaque databases.
 
 ## Current Scale Controls
 
@@ -12,7 +12,7 @@ large opaque databases.
 - Large generated or dependency directories are skipped, including `.git`,
   `.obsidian`, `.agent-control`, `node_modules`, `.venv`, `.next`, `dist`,
   `build`, `coverage`, `target`, and `vendor`.
-- Mapped mode excludes generated Agent Memory output folders from source scans.
+- Mapped mode excludes generated Owledge output folders from source scans.
 
 ## Token Efficiency
 

@@ -1,9 +1,9 @@
 {
   "name": "agent-memory-cowork",
   "version": "0.3.0",
-  "description": "Codex-facing host-project adapter for Markdown-first Agent Memory skills, commands, diagnostics, and reports. Claude hooks are packaged separately in the Claude manifest.",
+  "description": "Codex-facing host-project adapter for Owledge Kit's Markdown-first agent memory skills, commands, diagnostics, and reports. Claude hooks are packaged separately in the Claude manifest.",
   "author": {
-    "name": "Agent Memory Kit"
+    "name": "Owledge Kit"
   },
   "license": "MIT",
   "keywords": [
@@ -13,8 +13,8 @@
     "cowork",
     "lightrag"
   ],
-  "homepage": "https://github.com/agent-memory-kit/agent-memory-standalone",
-  "repository": "https://github.com/agent-memory-kit/agent-memory-standalone",
+  "homepage": "https://github.com/elmokirk/owledge",
+  "repository": "https://github.com/elmokirk/owledge",
   "commands": [
     "./commands/memory-init.md",
     "./commands/memory-status.md",
@@ -24,10 +24,10 @@
   "agents": "./agents/",
   "skills": "./skills/",
   "interface": {
-    "displayName": "Agent Memory Cowork",
-    "shortDescription": "Capture agent sessions into Markdown memory.",
-    "longDescription": "Captures Claude/Cowork and Codex-adjacent runtime events as private Markdown-first session memory, then prepares reviewed summaries for RAG, LightRAG, and GraphRAG exports.",
-    "developerName": "Agent Memory Kit",
+    "displayName": "Owledge Kit",
+    "shortDescription": "Give agents durable Markdown project memory.",
+    "longDescription": "Keeps plans, evidence, reviews, handoffs, and session context durable as private Markdown-first project memory, then prepares reviewed summaries for RAG, LightRAG, and GraphRAG exports.",
+    "developerName": "Owledge Kit",
     "category": "Productivity",
     "capabilities": [
       "Write",

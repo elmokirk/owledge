@@ -23,7 +23,7 @@ Rules:
 
 ## What The Agent Should Do
 
-1. Read or clone the Agent Memory Kit repo.
+1. Read or clone the Owledge Kit repo.
 2. Inspect the target knowledgebase root.
 3. If `agent-memory-map.json` exists, validate it and use its mapped folders.
 4. Run the local drop-in builder from the kit repo:
@@ -166,7 +166,7 @@ changing the existing vault.
 
 ## If The User Already Uses Superpowers
 
-Use Superpowers for coding execution workflows and Agent Memory Kit for durable
+Use Superpowers for coding execution workflows and Owledge Kit for durable
 project memory.
 
 Agent behavior:

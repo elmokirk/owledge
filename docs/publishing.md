@@ -43,12 +43,13 @@ and fixes required by release gates.
 
 ## Suggested GitHub Description
 
-Markdown-first persistent memory and project-planning layer for agentic development workflows, existing LLM wikis, Obsidian vaults, Codex, Claude/Cowork, and Superpowers-style execution.
+Owledge Kit gives AI agents durable project memory in Markdown: plans, evidence, reviews, handoffs, and decisions that stay readable across sessions, tools, teams, and existing knowledgebases.
 
 ## Suggested Topics
 
 | Topic |
 | --- |
+| owledge |
 | agent-memory |
 | multi-agent |
 | markdown |
@@ -100,7 +101,7 @@ git init
 git status --short
 git add .agent-control .gitignore AGENTS.md AGENTS.template.md CHANGELOG.md CLAUDE.md CLAUDE.template.md DESIGN.md LICENSE PRIVACY.md PROJECT_CONTEXT.template.md README.md REPORT_DESIGN_SELECTOR.html ROADMAP.md SECURITY.md VERSION agent-memory docs plugins shared skills tools
 git status --short
-git commit -m "Release Agent Memory Kit v0.5.0"
+git commit -m "Release Owledge Kit v0.5.0"
 git branch -M main
 git remote add origin <repo-url>
 git push -u origin main
@@ -110,8 +111,7 @@ Do not use `git add .` after running exports or reports. Generated export snapsh
 
 ## Release Positioning
 
-Do not position this project as a Superpowers replacement. Superpowers is an
-execution methodology for coding agents. Agent Memory Kit is the persistent
-Markdown memory and planning layer that keeps project knowledge, evidence,
-handoffs, reviews, and session continuity durable across agents and
-knowledgebases.
+Do not position Owledge Kit as a Superpowers replacement. Superpowers is an
+execution methodology for coding agents. Owledge Kit is the persistent Markdown
+memory and planning layer that keeps project knowledge, evidence, handoffs,
+reviews, and session continuity durable across agents and knowledgebases.

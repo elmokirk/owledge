@@ -1,6 +1,6 @@
-# Agent Memory Cowork Adapter
+# Owledge Cowork Adapter
 
-Host-project adapter for the Markdown-first Agent Memory Kit.
+Host-project adapter for Owledge Kit's Markdown-first agent memory layer.
 
 ## Purpose
 
@@ -18,7 +18,7 @@ RAG/LightRAG = consumers of reviewed exports
 - PowerShell on Windows.
 - Python available as `python` on Windows or `python3` on macOS/Linux. `AGENT_MEMORY_PYTHON` is only an optional override.
 - A host project initialized with `agent-memory/` and `PROJECT_CONTEXT.md`.
-- Either local `tools/agent_memory_cli.py` in the host project or `AGENT_MEMORY_KIT_ROOT` pointing to the Agent Memory Kit root.
+- Either local `tools/agent_memory_cli.py` in the host project or `AGENT_MEMORY_KIT_ROOT` pointing to the Owledge Kit root.
 
 ## Environment Variables
 

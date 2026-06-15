@@ -1,9 +1,9 @@
 {
   "name": "agent-memory-cowork",
   "version": "0.3.0",
-  "description": "Host-project adapter for Markdown-first Agent Memory; captures private Claude/Cowork runtime events and helps initialize, diagnose, report, and curate project memory.",
+  "description": "Host-project adapter for Owledge Kit's Markdown-first agent memory layer; captures private Claude/Cowork runtime events and helps initialize, diagnose, report, and curate project memory.",
   "author": {
-    "name": "Agent Memory Kit"
+    "name": "Owledge Kit"
   },
   "license": "MIT",
   "keywords": [
@@ -13,8 +13,8 @@
     "rag",
     "multi-agent"
   ],
-  "homepage": "https://github.com/agent-memory-kit/agent-memory-standalone",
-  "repository": "https://github.com/agent-memory-kit/agent-memory-standalone",
+  "homepage": "https://github.com/elmokirk/owledge",
+  "repository": "https://github.com/elmokirk/owledge",
   "commands": [
     "./commands/memory-init.md",
     "./commands/memory-status.md",

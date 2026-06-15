@@ -2,7 +2,7 @@
 
 ## Goal
 
-Use the Agent Memory Kit inside a project while keeping Markdown as the source of truth.
+Use Owledge Kit inside a project while keeping Markdown as the source of truth.
 
 This is the safe path from a GitHub link to a working host project.
 

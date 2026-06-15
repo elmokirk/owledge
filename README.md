@@ -1,10 +1,10 @@
 ---
-title: "Standalone Agent Memory Kit"
+title: "Owledge Kit"
 date: "2026-05-08"
 version: "0.5.0"
 status: "active"
 owner: "github/elmokirk"
-project: "standalone-agent-memory-kit"
+project: "owledge"
 type: "standalone-readme"
 session_id: "YYYY-MM-DD-short-task-title"
 agent_id: "orchestrator"
@@ -19,21 +19,25 @@ tags:
   - multi-agent
 ---
 
-# Standalone Agent Memory Kit
+# Owledge Kit
 
-A Markdown-first persistent memory and project-planning layer for agentic
-development workflows. Use it alongside Superpowers, Codex, Claude, Cowork,
-Obsidian, or your existing LLM wiki to keep plans, evidence, reviews, and
-handoffs durable and auditable.
+Owledge Kit gives AI agents a durable project memory they can actually use:
+it turns plans, evidence, reviews, handoffs, and decisions into local Markdown
+records that stay readable across sessions, tools, teams, and existing
+knowledgebases.
+
+Use it alongside Superpowers, Codex, Claude, Cowork, Obsidian, or your existing
+LLM wiki when you want agents to stop losing context, keep MVP plans grounded,
+and make project progress auditable without adopting a hosted platform.
 
 Copy this folder's templates and tools into any coding or agent-coding project that needs durable multi-session context, RAG-ready knowledge, graph edges, multi-agent handoffs, QA gates, and future runtime adapters.
 
 This release is a **concept-validated local/project utility kit**. It is not a regulated Enterprise Server, RBAC platform, hosted RAG database, or DSGVO/AI-Act-certified system.
 
-If you already use `obra/superpowers`, treat this kit as a complementary memory
-layer: Superpowers helps agents execute coding work with planning, TDD, review,
-and subagents; Agent Memory Kit keeps project knowledge, evidence, handoffs,
-and reviews durable across sessions, agents, teams, and Markdown knowledgebases.
+If you already use `obra/superpowers`, treat Owledge Kit as the complementary
+memory layer: Superpowers helps agents execute coding work with planning, TDD,
+review, and subagents; Owledge keeps project knowledge, evidence, handoffs, and
+reviews durable across sessions, agents, teams, and Markdown knowledgebases.
 
 ## Start In 5 Minutes
 
@@ -497,10 +501,10 @@ file.
 
 `obra/superpowers` is a software-development methodology and skills framework
 for planning, TDD, debugging, review, branch finishing, and subagent-driven
-execution. Agent Memory Kit is the persistent Markdown memory layer around that
-work. It can index Superpowers plans under `docs/superpowers/plans/` read-only,
-reference them as evidence, and write Agent Memory handoffs, reviews, and
-project continuity records without rewriting Superpowers artifacts. See
+execution. Owledge Kit is the persistent Markdown memory layer around that work.
+It can index Superpowers plans under `docs/superpowers/plans/` read-only,
+reference them as evidence, and write Owledge handoffs, reviews, and project
+continuity records without rewriting Superpowers artifacts. See
 `docs/superpowers-integration.md`.
 
 ### Claude/Cowork Plugin
