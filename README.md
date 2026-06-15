@@ -1,36 +1,33 @@
----
-title: "Owledge Kit"
-date: "2026-05-08"
-version: "0.5.0"
-status: "active"
-owner: "github/elmokirk"
-project: "owledge"
-type: "standalone-readme"
-session_id: "YYYY-MM-DD-short-task-title"
-agent_id: "orchestrator"
-parent_session: ""
-related_files:
-  - "PROJECT_CONTEXT.template.md"
-  - "AGENTS.template.md"
-  - "CLAUDE.template.md"
-tags:
-  - standalone
-  - agent-memory
-  - multi-agent
----
-
 # Owledge Kit
 
-Owledge Kit gives AI agents a durable project memory they can actually use:
-it turns plans, evidence, reviews, handoffs, and decisions into local Markdown
-records that stay readable across sessions, tools, teams, and existing
-knowledgebases.
+**Durable Markdown project memory for AI agents.**
 
-Use it alongside Superpowers, Codex, Claude, Cowork, Obsidian, or your existing
-LLM wiki when you want agents to stop losing context, keep MVP plans grounded,
-and make project progress auditable without adopting a hosted platform.
+[![Version](https://img.shields.io/badge/version-0.5.0-blue)](VERSION)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Markdown-first](https://img.shields.io/badge/storage-Markdown-black)](#why-owledge-kit)
+[![Agent workflows](https://img.shields.io/badge/workflows-Codex%20%7C%20Claude%20%7C%20Cowork%20%7C%20Superpowers-orange)](#use-with-superpowers)
 
-Copy this folder's templates and tools into any coding or agent-coding project that needs durable multi-session context, RAG-ready knowledge, graph edges, multi-agent handoffs, QA gates, and future runtime adapters.
+Owledge Kit gives AI agents a project memory they can actually use: plans,
+evidence, reviews, handoffs, and decisions are written as local Markdown records
+so context survives across sessions, tools, teams, and existing knowledgebases.
+
+Use it alongside Codex, Claude/Cowork, Claude Code, Obsidian, existing LLM wikis,
+or Superpowers-style execution when you want agents to keep MVP plans grounded,
+handoff work cleanly, and make project progress auditable without adopting a
+hosted platform or migrating your vault.
+
+## Why Owledge Kit
+
+- **Keep context durable:** Agents can resume from reviewed Markdown records
+  instead of rebuilding project state from chat history.
+- **Stay MVP-focused:** Plans track goals, non-goals, evidence, acceptance
+  criteria, reviews, and handoffs.
+- **Fit existing knowledgebases:** Use the default module folder or map writes
+  into an existing Markdown, Obsidian, or LLM-wiki structure.
+- **Work with agent stacks:** Use it as a memory layer around Codex, Claude,
+  Cowork, Claude Code, generic CLI agents, and Superpowers workflows.
+- **Stay local and inspectable:** No hosted database, no forced environment
+  variables, and no automatic rewrite of existing notes or wiki links.
 
 This release is a **concept-validated local/project utility kit**. It is not a regulated Enterprise Server, RBAC platform, hosted RAG database, or DSGVO/AI-Act-certified system.
 
