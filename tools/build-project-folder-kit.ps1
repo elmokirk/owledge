@@ -131,6 +131,9 @@ $tools = @(
   "build-project-folder-kit.ps1",
   "build-project-folder-kit.sh",
   "build_project_folder_kit.py",
+  "build-kb-module.ps1",
+  "build-kb-module.sh",
+  "build_kb_module.py",
   "compact-sessions.ps1",
   "eval-memory-retrieval.ps1",
   "export-graphrag.ps1",
@@ -146,6 +149,9 @@ $tools = @(
   "run-memory-evals.ps1",
   "run-review-workflow.ps1",
   "start-agent-control-plane.ps1",
+  "test-agent-memory-principles-scenarios.ps1",
+  "test-agent-memory-principles-skill.ps1",
+  "test-kb-module.ps1",
   "validate-memory.ps1",
   "validate-memory.sh",
   "verify-host-install.ps1",
@@ -158,6 +164,7 @@ foreach ($tool in $tools) {
   Copy-FileSafe -Source (Join-Path $source "tools/$tool") -Destination (Join-Path $target "tools/$tool")
 }
 
+Copy-TreeFiltered -SourceRoot (Join-Path $source "skills/agent-memory-principles") -DestinationRoot (Join-Path $target "skills/agent-memory-principles")
 Copy-TreeFiltered -SourceRoot (Join-Path $source "skills/agent-memory-runtime-bridge") -DestinationRoot (Join-Path $target "skills/agent-memory-runtime-bridge")
 Copy-TreeFiltered -SourceRoot (Join-Path $source "skills/review-evaluation-workflow") -DestinationRoot (Join-Path $target "skills/review-evaluation-workflow")
 Copy-TreeFiltered -SourceRoot (Join-Path $source "skills/render-memory-report") -DestinationRoot (Join-Path $target "skills/render-memory-report")

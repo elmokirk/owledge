@@ -53,7 +53,9 @@ plugins/agent-memory-cowork/
 |-- agents/
 |   `-- memory-curator.md
 |-- skills/
+|   |-- agent-memory-principles/
 |   |-- agent-memory-runtime-bridge/
+|   |-- review-evaluation-workflow/
 |   `-- render-memory-report/
 |-- hooks/hooks.json
 |-- hooks/hooks.unix.json
@@ -71,6 +73,11 @@ plugins/agent-memory-cowork/
 ```
 
 Claude/Cowork uses hooks. Codex uses the skills and commands; Claude hook wiring is intentionally not advertised through the Codex manifest.
+
+Use `agent-memory-principles` as the primary entrypoint when an agent should
+connect to an existing Markdown knowledgebase, Obsidian vault, or LLM wiki
+without forcing the preset folder structure. It supports a zero-env,
+principles-first workflow with an optional local `agent-memory-map.json`.
 
 ## macOS And Linux
 

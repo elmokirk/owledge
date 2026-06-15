@@ -107,6 +107,9 @@ CORE_TOOLS = [
     "build-project-folder-kit.ps1",
     "build-project-folder-kit.sh",
     "build_project_folder_kit.py",
+    "build-kb-module.ps1",
+    "build-kb-module.sh",
+    "build_kb_module.py",
     "compact-sessions.ps1",
     "eval-memory-retrieval.ps1",
     "export-graphrag.ps1",
@@ -122,6 +125,9 @@ CORE_TOOLS = [
     "run-memory-evals.ps1",
     "run-review-workflow.ps1",
     "start-agent-control-plane.ps1",
+    "test-agent-memory-principles-scenarios.ps1",
+    "test-agent-memory-principles-skill.ps1",
+    "test-kb-module.ps1",
     "validate-memory.ps1",
     "validate-memory.sh",
     "verify-host-install.ps1",
@@ -132,6 +138,7 @@ CORE_TOOLS = [
 ]
 
 SKILL_DIRS = [
+    "skills/agent-memory-principles",
     "skills/agent-memory-runtime-bridge",
     "skills/review-evaluation-workflow",
     "skills/render-memory-report",

@@ -43,6 +43,8 @@ function Run-Gate {
 }
 
 Run-Gate "python-compile" { python -m py_compile (Join-Path $root "tools\agent_memory_cli.py") }
+Run-Gate "principles-skill" { & (Join-Path $root "tools\test-agent-memory-principles-skill.ps1") -ProjectRoot $root }
+Run-Gate "principles-scenarios" { & (Join-Path $root "tools\test-agent-memory-principles-scenarios.ps1") -ProjectRoot $root }
 Run-Gate "contracts" { & (Join-Path $root "tools\test-agent-memory-contracts.ps1") -ProjectRoot $root }
 Run-Gate "doctor" { & (Join-Path $root "tools\memory-doctor.ps1") -ProjectRoot $root }
 Run-Gate "validate" { & (Join-Path $root "tools\validate-memory.ps1") -ProjectRoot $root }
@@ -54,6 +56,7 @@ Run-Gate "sensitive-scan" { & (Join-Path $root "tools\scan-memory-sensitive-data
 Run-Gate "runtime-adapters" { & (Join-Path $root "tools\test-runtime-adapters.ps1") -ProjectRoot $root }
 Run-Gate "memory-evals" { & (Join-Path $root "tools\run-memory-evals.ps1") -ProjectRoot $root }
 Run-Gate "retrieval-fixture" { & (Join-Path $root "tools\eval-memory-retrieval.ps1") -ProjectRoot $root -ProjectRoots (Join-Path $root "tests\fixtures\retrieval-corpus") -QueriesFile (Join-Path $root "tests\fixtures\retrieval-queries.json") -MinOverallScore 85 -MinSafetyScore 100 }
+Run-Gate "kb-module" { & (Join-Path $root "tools\test-kb-module.ps1") -ProjectRoot $root }
 Run-Gate "project-folder-kit" { & (Join-Path $root "tools\build-project-folder-kit.ps1") -ProjectRoot $root -OutputPath $projectKitOutput -Force -Verify }
 if ($IncludeCompliance) {
   Run-Gate "compliance-addon-source" {

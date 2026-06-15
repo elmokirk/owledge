@@ -21,9 +21,19 @@ tags:
 
 # Standalone Agent Memory Kit
 
+A Markdown-first persistent memory and project-planning layer for agentic
+development workflows. Use it alongside Superpowers, Codex, Claude, Cowork,
+Obsidian, or your existing LLM wiki to keep plans, evidence, reviews, and
+handoffs durable and auditable.
+
 Copy this folder's templates and tools into any coding or agent-coding project that needs durable multi-session context, RAG-ready knowledge, graph edges, multi-agent handoffs, QA gates, and future runtime adapters.
 
-This release is a **concept-validated local/project kit**. It is not yet a regulated Enterprise Server, RBAC platform, or DSGVO/AI-Act-certified system.
+This release is a **concept-validated local/project utility kit**. It is not a regulated Enterprise Server, RBAC platform, hosted RAG database, or DSGVO/AI-Act-certified system.
+
+If you already use `obra/superpowers`, treat this kit as a complementary memory
+layer: Superpowers helps agents execute coding work with planning, TDD, review,
+and subagents; Agent Memory Kit keeps project knowledge, evidence, handoffs,
+and reviews durable across sessions, agents, teams, and Markdown knowledgebases.
 
 ## Start In 5 Minutes
 
@@ -117,6 +127,12 @@ Optional next docs:
 - Compliance implementation plan: `docs/compliance-implementation-plan.md`
 - Optional Compliance Light add-on: `addons/compliance-light/README.md`
 - Cross-platform lean setup: `docs/cross-platform-lean-setup.md`
+- Agent integration guide for existing Markdown KBs: `docs/agent-integration-guide.md`
+- Superpowers comparison and integration: `docs/superpowers-integration.md`
+- Harness and plugin matrix: `docs/harness-plugin-matrix.md`
+- MVP plan example: `docs/mvp-plan-example.md`
+- Team and long-running project guide: `docs/team-long-running-project-guide.md`
+- Performance and scale notes: `docs/performance-scale-notes.md`
 - Global user knowledge layer: `docs/global-user-knowledge-layer.md`
 - Agentic memory architecture: `docs/agentic-memory-architecture.md`
 - Reusable review and evaluation templates: `docs/reusable-review-evaluation-templates.md`
@@ -176,6 +192,7 @@ agent-memory/ -> agent-memory/
 global-memory/ -> global-memory/ (private opt-in user layer)
 tools/ -> tools/
 plugins/agent-memory-cowork/ -> optional Claude/Cowork + Codex plugin adapter
+skills/agent-memory-principles/ -> principles-first planning and vault integration skill
 skills/render-memory-report/ -> optional visual HTML reporting skill
 skills/pi-agent-workspace-quality/ -> optional PI Agent workspace quality skill
 skills/pi-agent-global-intelligence/ -> optional PI Agent global knowledge skill
@@ -445,6 +462,46 @@ Global user-memory export is privacy-first: reviewed `user_context`, `preference
 ## Optional Runtime Adapters
 
 SQLite, HTTP APIs, leases, MCP servers, and runtime plugins can be built on top of this core. They must treat Markdown files as canonical and generated indexes/exports as disposable views.
+
+### Drop-In Module For Existing Markdown Knowledgebases
+
+Power users with an existing Markdown knowledgebase, Obsidian vault, or LLM wiki
+can add a small local planning module without changing their current structure,
+frontmatter, wiki links, or OS environment variables.
+
+Windows:
+
+```powershell
+tools\build-kb-module.ps1 -KnowledgebaseRoot C:\path\to\knowledgebase -IncludeCli
+```
+
+macOS/Linux:
+
+```bash
+python3 tools/build_kb_module.py --knowledgebase-root /path/to/knowledgebase --include-cli
+```
+
+The default output is `agent-memory-module/` inside the target KB. It contains
+`AGENT_MEMORY_MODULE.md`, planning/handoff/evidence/review folders, and a
+generated read-only scan index. Existing notes and `[[Wiki Links]]` are not
+rewritten. See `docs/agent-integration-guide.md`.
+
+For power users who already have a mature vault taxonomy, use the
+`agent-memory-principles` skill with an optional `agent-memory-map.json` to map
+plans, evidence, handoffs, reviews, and indexes to existing folders. Invalid
+map paths fail closed. In mapped mode, generated module docs and indexes stay
+inside the mapped `indexes` folder rather than adding a new root-level start
+file.
+
+### Use With Superpowers
+
+`obra/superpowers` is a software-development methodology and skills framework
+for planning, TDD, debugging, review, branch finishing, and subagent-driven
+execution. Agent Memory Kit is the persistent Markdown memory layer around that
+work. It can index Superpowers plans under `docs/superpowers/plans/` read-only,
+reference them as evidence, and write Agent Memory handoffs, reviews, and
+project continuity records without rewriting Superpowers artifacts. See
+`docs/superpowers-integration.md`.
 
 ### Claude/Cowork Plugin
 

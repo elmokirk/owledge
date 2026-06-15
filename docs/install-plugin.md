@@ -4,6 +4,10 @@
 
 Use the kit globally while every project keeps its own Markdown memory.
 
+For a quick status view across Codex, Claude Code, Claude/Cowork-compatible
+runtimes, generic agents, Superpowers users, and Markdown/Obsidian KBs, see
+`docs/harness-plugin-matrix.md`.
+
 ## Mental Model
 
 | Layer | Location | Writes |
@@ -109,6 +113,7 @@ bash tools/verify-host-install.sh --project-root .
 | Skill | Use |
 | --- | --- |
 | `bootstrap-agent-memory` | Initialize missing host-project memory |
+| `agent-memory-principles` | Apply Agent Memory principles to existing Markdown KBs without forcing the preset folder structure |
 | `agent-memory-runtime-bridge` | Tell agents how to read/write memory safely |
 | `render-memory-report` | Create HTML reports from Markdown truth |
 | `pi-agent-workspace-quality` | Workspace and planning quality checks |

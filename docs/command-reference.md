@@ -27,8 +27,13 @@ Use PowerShell with `-NoProfile -ExecutionPolicy Bypass -File` on Windows when e
 | `tools\run-memory-evals.ps1` | Yes, temp DB | Run control-plane concurrency eval |
 | `tools\eval-memory-retrieval.ps1` | Yes | Run retrieval calibration and write eval reports |
 | `tools\test-runtime-adapters.ps1` | Yes, temp project | Run Claude/Cowork plus generic CLI runtime smoke fixtures |
+| `tools\test-agent-memory-principles-skill.ps1` | No | Validate the principles skill frontmatter, references, concision, and plugin mirror |
+| `tools\test-agent-memory-principles-scenarios.ps1` | Yes, temp KBs | Exercise large-codebase, existing-KB, skill-bloat, subagent-boundary, and edge-case scenarios |
 | `tools\build-project-folder-kit.ps1` | Yes | Generate a minimal project-folder-only kit |
 | `tools/build_project_folder_kit.py` | Yes | Cross-platform generator for macOS/Linux project-folder-only kits |
+| `tools\build-kb-module.ps1` | Yes | Add a drop-in Agent Memory module to an existing Markdown KB without env vars |
+| `tools/build_kb_module.py` | Yes | Cross-platform drop-in KB module generator |
+| `tools\test-kb-module.ps1` | Yes, temp KB | Smoke-test KB module install without modifying existing notes |
 | `tools/*.sh` | Mixed | macOS/Linux convenience wrappers for verify, doctor, validate, index, and context packs |
 | `tools\run-finalization-gates.ps1` | Yes | Run the v0.5 release gate chain |
 
@@ -145,6 +150,58 @@ tools\build-project-folder-kit.ps1 -OutputPath C:\tmp\agent-memory-project-kit-c
 Without `-IncludeCompliance`, no `agent-memory\compliance\` folder and no
 Compliance Light commands are included.
 
+## Existing Markdown Knowledgebase Module
+
+Add Agent Memory planning support to an existing Markdown KB, Obsidian vault, or
+LLM wiki without changing existing notes, wiki links, frontmatter, or OS
+environment variables:
+
+```powershell
+tools\build-kb-module.ps1 -KnowledgebaseRoot C:\path\to\knowledgebase -IncludeCli
+```
+
+macOS/Linux:
+
+```bash
+python3 tools/build_kb_module.py --knowledgebase-root /path/to/knowledgebase --include-cli
+```
+
+Default output:
+
+```text
+agent-memory-module/
+|-- AGENT_MEMORY_MODULE.md
+|-- agent-memory/plans/
+|-- agent-memory/handoffs/
+|-- agent-memory/evidence/
+|-- agent-memory/reviews/
+`-- agent-memory/indexes/
+```
+
+The builder scans Markdown files read-only, preserves existing `[[Wiki Links]]`,
+and writes module-owned status/index artifacts under
+`agent-memory-module\agent-memory\indexes\`. Use `--layout flat` only when the
+user explicitly wants module files at the KB root.
+
+To use existing vault folders instead of the default module structure, create
+`agent-memory-map.json` in the KB and run:
+
+```powershell
+tools\build-kb-module.ps1 -KnowledgebaseRoot C:\path\to\knowledgebase -MapFile agent-memory-map.json
+```
+
+Mapped paths must be relative existing directories inside the KB. Traversal,
+absolute paths, symlinks, junctions, and missing targets fail closed.
+In mapped mode, generated module docs, status, and indexes stay under the mapped
+`indexes` folder; the builder does not create a root-level
+`AGENT_MEMORY_MODULE.md`.
+
+Smoke test:
+
+```powershell
+tools\test-kb-module.ps1 -ProjectRoot .
+```
+
 ## Finalization Gates
 
 Use the combined release gate before publishing:
@@ -154,9 +211,10 @@ tools\run-finalization-gates.ps1 -ProjectRoot .
 tools\run-redteam-qa.ps1 -ProjectRoot .
 ```
 
-`run-finalization-gates` executes compile, contracts, doctor, validation, full
-and incremental indexes, lifecycle checks, runtime smoke tests, memory evals,
-retrieval fixture eval, and project-folder-only verification. Add
+`run-finalization-gates` executes compile, principles-skill validation,
+principles scenario tests, contracts, doctor, validation, full and incremental
+indexes, lifecycle checks, runtime smoke tests, memory evals, retrieval fixture
+eval, KB-module safety checks, and project-folder-only verification. Add
 `-IncludeExports` when you also want shared export/report generation in the
 same run. Add `-IncludeCompliance` to verify the optional Compliance Light
 add-on through a separate generated project kit. The latest machine-readable

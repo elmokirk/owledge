@@ -10,11 +10,16 @@ and fixes required by release gates.
 
 | Item | Status |
 | --- | --- |
-| README | Ready |
+| README positioning | Ready |
 | License | Ready |
 | Security policy | Ready |
 | Privacy notice | Ready |
 | Quickstart | Ready |
+| Superpowers comparison and integration | Ready |
+| Harness/plugin matrix | Ready |
+| MVP plan example | Ready |
+| Team and long-running project guide | Ready |
+| Performance and scale notes | Ready |
 | Project-folder-only quickstart | Ready |
 | Agentic memory architecture | Ready |
 | Plugin install docs | Ready |
@@ -32,12 +37,13 @@ and fixes required by release gates.
 | Changelog | Ready |
 | Version file | Ready |
 | Tests ignored | Ready |
+| Superpowers coexistence scenario gate | Ready |
 | Git remote | Not set in this workspace |
 | GitHub release | Manual next step |
 
 ## Suggested GitHub Description
 
-Markdown-first Agent Memory Kit for multi-agent coding workflows, RAG, GraphRAG, LightRAG, Claude/Cowork, Codex, and enterprise knowledge hubs.
+Markdown-first persistent memory and project-planning layer for agentic development workflows, existing LLM wikis, Obsidian vaults, Codex, Claude/Cowork, and Superpowers-style execution.
 
 ## Suggested Topics
 
@@ -51,6 +57,8 @@ Markdown-first Agent Memory Kit for multi-agent coding workflows, RAG, GraphRAG,
 | lightrag |
 | codex |
 | claude-code |
+| superpowers |
+| obsidian |
 | knowledgebase |
 | ai-agents |
 
@@ -74,12 +82,13 @@ For optional Compliance Light add-on validation, add `-IncludeCompliance`:
 powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run-finalization-gates.ps1 -ProjectRoot . -IncludeCompliance
 ```
 
-The finalization gate includes compile, contracts, doctor, validation, full and
-incremental indexes, retention audit, conflict review, sensitive-data scan,
-runtime adapter smoke tests, memory evals, retrieval fixture eval, and minimal
-project-folder verification. `-IncludeCompliance` validates the add-on through
-a separate generated project folder; the default gate stays compliance-add-on
-free.
+The finalization gate includes compile, principles skill validation,
+principles scenarios including Superpowers coexistence, contracts, doctor,
+validation, full and incremental indexes, retention audit, conflict review,
+sensitive-data scan, runtime adapter smoke tests, memory evals, retrieval
+fixture eval, KB module safety, and minimal project-folder verification.
+`-IncludeCompliance` validates the add-on through a separate generated project
+folder; the default gate stays compliance-add-on free.
 
 For manual release debugging, the equivalent individual commands are listed in
 `docs/command-reference.md`.
@@ -98,3 +107,11 @@ git push -u origin main
 ```
 
 Do not use `git add .` after running exports or reports. Generated export snapshots, indexes, PI reports, private sessions, local secrets, and test output are ignored or should remain untracked.
+
+## Release Positioning
+
+Do not position this project as a Superpowers replacement. Superpowers is an
+execution methodology for coding agents. Agent Memory Kit is the persistent
+Markdown memory and planning layer that keeps project knowledge, evidence,
+handoffs, reviews, and session continuity durable across agents and
+knowledgebases.
