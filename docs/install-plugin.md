@@ -12,7 +12,7 @@ runtimes, generic agents, Superpowers users, and Markdown/Obsidian KBs, see
 
 | Layer | Location | Writes |
 | --- | --- | --- |
-| Kit | explicit `-KitRoot` or `AGENT_MEMORY_KIT_ROOT` fallback | Templates, tools, plugins, skills |
+| Kit | explicit local path | Templates, tools, plugins, skills |
 | Host project | active repo | `PROJECT_CONTEXT.md`, `agent-memory/`, reports, exports |
 | Claude skills | `%USERPROFILE%\.claude\skills` | Skill instructions only |
 | Codex skills | `%USERPROFILE%\.codex\skills` | Skill instructions only |
@@ -21,7 +21,7 @@ runtimes, generic agents, Superpowers users, and Markdown/Obsidian KBs, see
 
 The kit supports two setup modes.
 
-### Explicit Path, No Global Variable
+### Explicit Path
 
 Use this for one-off setup, CI checks, customer machines, or agent-driven bootstraps:
 
@@ -36,33 +36,22 @@ macOS/Linux project-folder-only equivalent:
 python3 ~/AgentMemoryKit/tools/build_project_folder_kit.py --output-path /tmp/agent-memory-project-kit --verify
 ```
 
-### Optional Convenience Environment
-
-```powershell
-[Environment]::SetEnvironmentVariable("AGENT_MEMORY_KIT_ROOT", "C:\AgentMemoryKit", "User")
-$env:AGENT_MEMORY_KIT_ROOT = "C:\AgentMemoryKit"
-```
-
-Optional Python override:
-
-```powershell
-[Environment]::SetEnvironmentVariable("AGENT_MEMORY_PYTHON", "python", "User")
-```
-
 ## Copy Skills Globally
 
 Codex:
 
 ```powershell
-New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.codex\skills" | Out-Null
-Copy-Item -Recurse -Force "$env:AGENT_MEMORY_KIT_ROOT\skills\*" "$env:USERPROFILE\.codex\skills\"
+$kitRoot = "C:\AgentMemoryKit"
+New-Item -ItemType Directory -Force -Path "C:\Users\YOUR_USER\.codex\skills" | Out-Null
+Copy-Item -Recurse -Force "$kitRoot\skills\*" "C:\Users\YOUR_USER\.codex\skills\"
 ```
 
 Claude:
 
 ```powershell
-New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.claude\skills" | Out-Null
-Copy-Item -Recurse -Force "$env:AGENT_MEMORY_KIT_ROOT\skills\*" "$env:USERPROFILE\.claude\skills\"
+$kitRoot = "C:\AgentMemoryKit"
+New-Item -ItemType Directory -Force -Path "C:\Users\YOUR_USER\.claude\skills" | Out-Null
+Copy-Item -Recurse -Force "$kitRoot\skills\*" "C:\Users\YOUR_USER\.claude\skills\"
 ```
 
 ## Use The Cowork Plugin Bundle
@@ -73,14 +62,11 @@ The plugin bundle lives at:
 plugins/agent-memory-cowork/
 ```
 
-Use the runtime's plugin installer if available. If the runtime only supports manual plugin folders, copy the whole directory and keep the host project explicit:
-
-```powershell
-$env:AGENT_MEMORY_PROJECT_ROOT = "C:\path\to\your-project"
-$env:AGENT_MEMORY_CAPTURE_MODE = "standard"
-```
-
-Set `AGENT_MEMORY_KIT_ROOT` only when the plugin must resolve tools from the global kit instead of the bootstrapped host project.
+Use the runtime's plugin installer if available. If the runtime only supports
+manual plugin folders, copy the whole directory and start the runtime from the
+initialized host project whenever possible. If your harness starts elsewhere,
+configure the project root in that harness or generated hook profile. Avoid
+system-wide environment variables for normal installs.
 
 On macOS/Linux, use the Unix hook profile before installing or generate the
 project folder with `--include-plugin-adapter --plugin-hook-profile unix`:
@@ -90,7 +76,7 @@ cp plugins/agent-memory-cowork/hooks/hooks.unix.json plugins/agent-memory-cowork
 ```
 
 If Claude/Cowork starts from the initialized project root, the plugin hooks can
-discover the root without `AGENT_MEMORY_PROJECT_ROOT`.
+discover the root without additional global settings.
 
 ## Smoke Test In A Host Project
 

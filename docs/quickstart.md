@@ -23,17 +23,10 @@ cd ~/AgentMemoryKit
 
 Use another directory if preferred.
 
-You can use the kit without a global environment variable by passing the kit path explicitly:
+Use the kit without a global environment variable by passing the kit path explicitly:
 
 ```powershell
 $kitRoot = "C:\AgentMemoryKit"
-```
-
-Optional convenience for repeated local use:
-
-```powershell
-[Environment]::SetEnvironmentVariable("AGENT_MEMORY_KIT_ROOT", "C:\AgentMemoryKit", "User")
-$env:AGENT_MEMORY_KIT_ROOT = "C:\AgentMemoryKit"
 ```
 
 ## 2. Bootstrap A Host Project
@@ -44,12 +37,6 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "$kitRoot\tools\bootstrap-ag
 ```
 
 This creates missing files without overwriting existing project memory.
-
-If you chose the optional environment variable, this equivalent command also works:
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File "$env:AGENT_MEMORY_KIT_ROOT\tools\bootstrap-agent-memory.ps1" -ProjectRoot .
-```
 
 ## 3. Verify The Host Project
 
@@ -67,7 +54,7 @@ bash tools/verify-host-install.sh --project-root .
 
 Expected result: `doctor` and strict validation pass.
 
-## Minimal Project Folder Only
+## Advanced Project Folder Generator
 
 For a disposable test or a project-local kit without plugins and release assets:
 
@@ -158,14 +145,10 @@ Install the plugin globally, but point it at the active project. See `docs/insta
 
 When Claude/Cowork starts from the initialized project root, the hooks can find
 `PROJECT_CONTEXT.md`, `agent-memory/`, and the local CLI without environment
-variables. Use an explicit project root only when the runtime starts elsewhere.
-
-```powershell
-$env:AGENT_MEMORY_PROJECT_ROOT = "C:\path\to\project"
-$env:AGENT_MEMORY_CAPTURE_MODE = "standard"
-```
-
-`AGENT_MEMORY_KIT_ROOT` is optional for a bootstrapped project because the host project already contains `tools/agent_memory_cli.py`. Set it only when the plugin must fall back to the global kit tools.
+variables. Use an explicit project root in the runtime or generated hook
+configuration only when the runtime starts outside the initialized project
+folder. Environment variables remain compatibility fallbacks for custom
+harnesses, not the normal setup path.
 
 On macOS/Linux, use the Unix hook profile or generate the folder with
 `--include-plugin-adapter --plugin-hook-profile unix`.

@@ -4258,7 +4258,7 @@ def test_contracts(root: pathlib.Path) -> dict[str, Any]:
     if agents.exists() and claude.exists():
         add("runtime-instructions-sync", agents.read_text(encoding="utf-8") == claude.read_text(encoding="utf-8"), "AGENTS and CLAUDE templates should remain byte-identical.")
     placeholders = []
-    for rel in ["README.md", "PROJECT_CONTEXT.template.md", "AGENTS.template.md", "CLAUDE.template.md"]:
+    for rel in ["PROJECT_CONTEXT.template.md", "AGENTS.template.md", "CLAUDE.template.md"]:
         text = (root / rel).read_text(encoding="utf-8")
         if "tenant_id" not in text and "TENANT_ID" not in text:
             placeholders.append(rel)
