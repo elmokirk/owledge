@@ -2153,7 +2153,7 @@ def memory_doctor(root: pathlib.Path, mode: str = "auto") -> dict[str, Any]:
         add("claude-md", (root / "CLAUDE.md").exists(), "warning", "CLAUDE.md is present.", "Copy CLAUDE.template.md if Claude/Cowork is used.")
     add("agent-memory-dir", (root / "agent-memory").is_dir(), "error", "agent-memory directory is present.", "Run init-agent-memory for this repo.")
     add("design-md", (root / "DESIGN.md").exists(), "warning", "DESIGN.md is present.", "Copy DESIGN.md from the kit if visual reports are used.")
-    add("cli-local", (root / "tools" / "agent_memory_cli.py").exists(), "warning", "Local CLI exists.", "Set AGENT_MEMORY_KIT_ROOT when using only a global adapter.")
+    add("cli-local", (root / "tools" / "agent_memory_cli.py").exists(), "warning", "Local CLI exists.", "Copy tools/agent_memory_cli.py into the project or run from an Owledge repo checkout when local tooling is missing.")
     add("raw-events-ignored", bool(_gitignore_contains(root, "agent-memory/sessions/**/events.jsonl")), "warning", "Raw runtime event logs are ignored by git.", "Add agent-memory/sessions/**/events.jsonl to .gitignore for privacy.")
     validation = validate_memory(root)
     add("memory-validation", bool(validation["passed"]), "error", f"Memory validation: {validation['failedChecks']} failed of {validation['totalChecks']}.", "Run tools/validate-memory.ps1 and fix reported frontmatter/edge issues.")

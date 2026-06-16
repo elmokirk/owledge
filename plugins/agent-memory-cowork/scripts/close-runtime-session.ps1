@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-  [string]$ProjectRoot = $env:AGENT_MEMORY_PROJECT_ROOT,
+  [string]$ProjectRoot = "",
   [Parameter(ValueFromPipeline=$true)]
   [string]$PipedPayload = ""
 )
@@ -27,15 +27,15 @@ function Find-AgentMemoryRoot {
   param([string]$Start)
   if ($ProjectRoot) {
     $resolved = (Resolve-Path -LiteralPath $ProjectRoot).Path
-    if (-not (Test-Path -LiteralPath (Join-Path $resolved "agent-memory"))) { throw "AGENT_MEMORY_PROJECT_ROOT does not contain agent-memory: $resolved" }
-    if (-not (Test-Path -LiteralPath (Join-Path $resolved "PROJECT_CONTEXT.md")) -and -not $env:AGENT_MEMORY_PROJECT_ROOT_ALLOW_UNINITIALIZED) { throw "AGENT_MEMORY_PROJECT_ROOT is not initialized. Missing PROJECT_CONTEXT.md: $resolved" }
+    if (-not (Test-Path -LiteralPath (Join-Path $resolved "agent-memory"))) { throw "ProjectRoot does not contain agent-memory: $resolved" }
+    if (-not (Test-Path -LiteralPath (Join-Path $resolved "PROJECT_CONTEXT.md"))) { throw "ProjectRoot is not initialized. Missing PROJECT_CONTEXT.md: $resolved" }
     return $resolved
   }
   $current = (Resolve-Path -LiteralPath $Start).Path
   while ($true) {
     if ((Test-Path -LiteralPath (Join-Path $current "PROJECT_CONTEXT.md")) -and (Test-Path -LiteralPath (Join-Path $current "agent-memory"))) { return $current }
     $parent = Split-Path -Parent $current
-    if (-not $parent -or $parent -eq $current) { throw "Could not find Agent Memory project root. Set AGENT_MEMORY_PROJECT_ROOT." }
+    if (-not $parent -or $parent -eq $current) { throw "Could not find Agent Memory project root. Start the runtime from the initialized project root or pass -ProjectRoot." }
     $current = $parent
   }
 }
@@ -44,15 +44,11 @@ function Resolve-AgentMemoryCli {
   param([string]$Root)
   $local = Join-Path $Root "tools\agent_memory_cli.py"
   if (Test-Path -LiteralPath $local) { return $local }
-  if ($env:AGENT_MEMORY_KIT_ROOT) {
-    $kitCli = Join-Path $env:AGENT_MEMORY_KIT_ROOT "tools\agent_memory_cli.py"
-    if (Test-Path -LiteralPath $kitCli) { return $kitCli }
-  }
   $pluginRoot = Split-Path -Parent $PSScriptRoot
   $repoCandidate = Split-Path -Parent (Split-Path -Parent $pluginRoot)
   $repoCli = Join-Path $repoCandidate "tools\agent_memory_cli.py"
   if (Test-Path -LiteralPath $repoCli) { return $repoCli }
-  throw "Missing Agent Memory CLI. Set AGENT_MEMORY_KIT_ROOT or copy tools\agent_memory_cli.py into the project."
+  throw "Missing Agent Memory CLI. Copy tools\agent_memory_cli.py into the project or run from the Owledge repo checkout."
 }
 
 function Get-SessionIdFromPayload {

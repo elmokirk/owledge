@@ -8,16 +8,14 @@ Prefer:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File tools\memory-doctor.ps1 -ProjectRoot .
-$python = if ($env:AGENT_MEMORY_PYTHON) { $env:AGENT_MEMORY_PYTHON } else { "python" }
-& $python tools\agent_memory_cli.py --project-root . test-contracts
+python tools\agent_memory_cli.py --project-root . test-contracts
 ```
 
-If local tools are missing and `AGENT_MEMORY_KIT_ROOT` is set:
+If local tools are missing, ask for the Owledge Kit path and use it explicitly:
 
 ```powershell
-$python = if ($env:AGENT_MEMORY_PYTHON) { $env:AGENT_MEMORY_PYTHON } else { "python" }
-& $python "$env:AGENT_MEMORY_KIT_ROOT\tools\agent_memory_cli.py" --project-root . doctor
-& $python "$env:AGENT_MEMORY_KIT_ROOT\tools\agent_memory_cli.py" --project-root . test-contracts
+python "C:\AgentMemoryKit\tools\agent_memory_cli.py" --project-root . doctor
+python "C:\AgentMemoryKit\tools\agent_memory_cli.py" --project-root . test-contracts
 ```
 
 Inspect and report:

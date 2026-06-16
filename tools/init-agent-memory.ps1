@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
   [string]$ProjectRoot = (Get-Location).Path,
-  [string]$KitRoot = $env:AGENT_MEMORY_KIT_ROOT,
+  [string]$KitRoot = "",
   [switch]$Force,
   [switch]$IncludeCompliance,
   [switch]$RuntimeOnly

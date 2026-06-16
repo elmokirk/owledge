@@ -9,10 +9,11 @@ Give an agent a repository and the Agent Memory Kit path. The agent initializes 
 | Input | Required | Example |
 | --- | --- | --- |
 | Host project root | Yes | `C:\work\customer-app` |
-| Kit root | Yes unless `AGENT_MEMORY_KIT_ROOT` is set | `C:\AgentMemoryKit` |
+| Kit root | Yes | `C:\AgentMemoryKit` |
 | Force overwrite | No | Only when the owner explicitly asks |
 
-Do not require a system-wide environment variable. Prefer the explicit `-KitRoot` argument for one-off setup.
+Do not require a system-wide environment variable. Use the explicit `-KitRoot`
+argument for one-off setup.
 
 ## Agent Procedure
 
@@ -82,11 +83,11 @@ Some operations are outside the project repository and should be shown to the us
 | --- | --- |
 | Codex | Install or copy the `skills/` folder into the configured Codex skills directory when global skills are desired. |
 | Claude/Cowork | Install or copy `plugins/agent-memory-cowork/` into the runtime's plugin folder if the runtime does not have a plugin installer. |
-| Claude/Cowork hooks | Set `AGENT_MEMORY_PROJECT_ROOT` only for sessions where the runtime is not launched from the project root. Use `hooks.unix.json` on macOS/Linux. |
+| Claude/Cowork hooks | Launch from the initialized project root when possible. Use `hooks.unix.json` on macOS/Linux. |
 | Shared machine | Keep tenant/customer/project IDs filled in before exports or customer reports. |
 | Personal/global layer | Keep `USER_CONTEXT.md` and `global-memory/**/*.md` private unless the user explicitly creates a private global vault. |
 
-For a bootstrapped project, the plugin can use local `tools/agent_memory_cli.py`; `AGENT_MEMORY_KIT_ROOT` is only a fallback.
+For a bootstrapped project, the plugin should use local `tools/agent_memory_cli.py`.
 
 ## Smoke Test Prompt
 

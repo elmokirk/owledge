@@ -65,9 +65,8 @@ python3 tools/agent_memory_cli.py --project-root . validate-memory --strict
 python3 tools/agent_memory_cli.py --project-root . build-memory-index
 ```
 
-No `AGENT_MEMORY_KIT_ROOT` is required after generation. `AGENT_MEMORY_PYTHON`
-remains an optional override only when the default `python3` command is not the
-desired interpreter.
+No global kit setting is required after generation. The generated project folder
+contains its own CLI and wrappers.
 
 ## Agents
 
@@ -105,12 +104,11 @@ The plugin includes a Unix hook profile:
 
 The Python project-folder generator automatically copies `hooks.unix.json` over
 `hooks.json` when `--include-plugin-adapter --plugin-hook-profile unix` is used.
-The Unix hooks call small shell launchers, which choose `AGENT_MEMORY_PYTHON`,
-then `python3`, then `python`.
+The Unix hooks call small shell launchers that use the project-local CLI.
 
 Claude/Cowork sessions should be launched from the project root when possible.
-If the runtime starts elsewhere, `AGENT_MEMORY_PROJECT_ROOT` can still be used as
-an optional explicit override, but it is not required for the normal lean path.
+If the runtime starts elsewhere, configure the project root in the harness or
+hook profile rather than relying on OS-wide settings.
 
 ## Hermes Agent And OpenClaw Fit
 

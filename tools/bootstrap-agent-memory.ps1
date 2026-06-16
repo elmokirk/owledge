@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
   [string]$ProjectRoot = (Get-Location).Path,
-  [string]$KitRoot = $env:AGENT_MEMORY_KIT_ROOT,
+  [string]$KitRoot = "",
   [switch]$Force,
   [switch]$IncludeCompliance
 )
@@ -15,7 +15,7 @@ function Resolve-RequiredPath {
     [string]$Name
   )
   if ([string]::IsNullOrWhiteSpace($Path)) {
-    throw "$Name is required. Set AGENT_MEMORY_KIT_ROOT or pass -KitRoot."
+    throw "$Name is required. Pass -KitRoot with the local Owledge Kit path."
   }
   return (Resolve-Path -LiteralPath $Path).Path
 }

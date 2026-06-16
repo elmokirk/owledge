@@ -16,16 +16,22 @@ or existing LLM wikis when you want agents to keep MVP plans grounded, hand off
 work cleanly, and make project progress auditable without adopting a hosted
 platform or migrating your vault.
 
+**Release proof:** 19 finalization gates · `failed: 0` · ~13.92s local gate
+runtime · Red-Team QA score 95 · metadata-only KB scan · additive writes by
+default.
+
 ## Table Of Contents
 
 - [The Name](#the-name)
 - [Why Owledge Kit](#why-owledge-kit)
 - [Quickstart](#quickstart)
 - [Core Workflows](#core-workflows)
+- [Performance And Token Profile](#performance-and-token-profile)
 - [Agent And Harness Support](#agent-and-harness-support)
 - [Safety Model](#safety-model)
 - [Repository Map](#repository-map)
 - [Quality Gates](#quality-gates)
+- [Development](#development)
 - [Documentation](#documentation)
 
 ## The Name
@@ -109,6 +115,32 @@ advanced guides linked in [Documentation](#documentation).
 | Review and QA | Evidence-backed reviews, sensitive-data checks, retention checks, conflict checks, and release gates. |
 | RAG readiness | Reviewed Markdown can be exported to neutral RAG, LightRAG, or GraphRAG formats. |
 
+## Performance And Token Profile
+
+Owledge is built to avoid the expensive “load the whole vault into context”
+failure mode. It scans metadata first, writes small indexes, and asks agents to
+load full note bodies only when a task needs the source.
+
+```mermaid
+flowchart LR
+    A["Existing Markdown KB"] --> B["Metadata-only scan"]
+    B --> C["Paths, hashes, titles, frontmatter, wiki-link refs"]
+    C --> D["Small task context pack"]
+    D --> E["Agent loads only relevant source files"]
+    E --> F["Plan / evidence / handoff / review"]
+```
+
+| Area | Current Release Behavior |
+| --- | --- |
+| Finalization gates | 19 local gates, `failed: 0`, ~13.92s on this Windows workspace |
+| KB scan | Metadata-only by default; no raw note body copy into indexes |
+| Token strategy | Source paths and hashes first; full bodies only on demand |
+| Scale guard | `--max-files`, truncation status, excluded generated/dependency dirs |
+| Write policy | Additive module/mapped writes; existing notes unchanged by default |
+
+See [docs/performance-scale-notes.md](docs/performance-scale-notes.md) for the
+scale model and benchmark notes.
+
 ## Agent And Harness Support
 
 Owledge is designed as a memory layer around agent runtimes, not as a replacement
@@ -118,12 +150,32 @@ for the runtimes themselves.
 | --- | --- |
 | Codex | Repo instructions, skills, local CLI, and optional plugin adapter. |
 | Claude Code | Skill/plugin copy path plus Markdown-first handoff and review rules. |
+| Cowork / Claude-compatible | Ready-to-use plugin folder at `plugins/agent-memory-cowork/`. |
 | OpenCode / OpenCode-style agents | Generic repo-link integration through the agent integration guide. |
 | PI agents | Optional workspace-quality, project-intelligence, and red-team evaluation artifacts. |
 | Custom harnesses | Use local scripts and generated Markdown contracts; no hosted service required. |
 | Superpowers-style workflows | Companion mode only: Owledge can read execution plans as evidence and write memory artifacts separately. |
 
 See [docs/harness-plugin-matrix.md](docs/harness-plugin-matrix.md) for details.
+
+### Cowork Plugin
+
+Yes, the repo already ships a Cowork/Claude-compatible plugin:
+
+```text
+plugins/agent-memory-cowork/
+|-- .claude-plugin/plugin.json
+|-- .codex-plugin/plugin.json
+|-- commands/
+|-- hooks/
+|-- skills/
+`-- agents/
+```
+
+Install it through the runtime's plugin flow or copy the plugin folder into the
+runtime's plugin directory. Start the runtime from the initialized project root
+when possible; the plugin is designed to use project-local Markdown and local
+tools instead of OS-wide setup.
 
 ## Safety Model
 
@@ -162,6 +214,24 @@ The finalization gate covers skill validation, scenario tests, contract checks,
 doctor checks, memory validation, index generation, retention, conflict review,
 sensitive-data scanning, runtime adapter smoke tests, retrieval fixtures,
 KB-module safety, project-folder generation, and optional Compliance Light gates.
+
+## Development
+
+Run the core checks before publishing changes:
+
+```powershell
+python -m py_compile tools\agent_memory_cli.py tools\build_kb_module.py tools\build_project_folder_kit.py
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\test-agent-memory-contracts.ps1 -ProjectRoot .
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\test-agent-memory-principles-skill.ps1 -ProjectRoot .
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\test-kb-module.ps1 -ProjectRoot .
+```
+
+Run the full release gate when changing public docs, contracts, plugin metadata,
+or packaging behavior:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\run-finalization-gates.ps1 -ProjectRoot . -IncludeCompliance
+```
 
 ## Documentation
 

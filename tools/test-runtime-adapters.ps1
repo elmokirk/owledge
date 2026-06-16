@@ -27,23 +27,24 @@ $tmpBase = if (Test-WritableDirectory "C:\tmp") { "C:\tmp" } else { Join-Path $r
 New-Item -ItemType Directory -Force -Path $tmpBase | Out-Null
 $tmpRoot = Join-Path $tmpBase ("agent-memory-runtime-smoke-" + [Guid]::NewGuid().ToString("N"))
 
-$previousProjectRoot = $env:AGENT_MEMORY_PROJECT_ROOT
-$previousKitRoot = $env:AGENT_MEMORY_KIT_ROOT
 $previousCaptureMode = $env:AGENT_MEMORY_CAPTURE_MODE
 $python = if ($env:AGENT_MEMORY_PYTHON) { $env:AGENT_MEMORY_PYTHON } else { "python" }
 try {
   & (Join-Path $root "tools\build-project-folder-kit.ps1") -ProjectRoot $root -OutputPath $tmpRoot -Force -IncludePluginAdapter | Out-Null
-  $env:AGENT_MEMORY_PROJECT_ROOT = $tmpRoot
-  $env:AGENT_MEMORY_KIT_ROOT = $tmpRoot
   $env:AGENT_MEMORY_CAPTURE_MODE = "standard"
 
   $capture = Join-Path $root "plugins\agent-memory-cowork\scripts\capture-claude-event.ps1"
   $close = Join-Path $root "plugins\agent-memory-cowork\scripts\close-runtime-session.ps1"
 
-  foreach ($fixture in @("session-start.json", "user-prompt.json", "post-tool-use.json")) {
-    Get-Content -LiteralPath (Join-Path $fixtures $fixture) -Raw | & $capture | Out-Null
+  Push-Location $tmpRoot
+  try {
+    foreach ($fixture in @("session-start.json", "user-prompt.json", "post-tool-use.json")) {
+      Get-Content -LiteralPath (Join-Path $fixtures $fixture) -Raw | & $capture | Out-Null
+    }
+    Get-Content -LiteralPath (Join-Path $fixtures "stop.json") -Raw | & $close | Out-Null
+  } finally {
+    Pop-Location
   }
-  Get-Content -LiteralPath (Join-Path $fixtures "stop.json") -Raw | & $close | Out-Null
 
   $sessionDir = Join-Path $tmpRoot "agent-memory\sessions\cowork-demo-session"
   $required = @("events.jsonl", "session.md", "summary.md")
@@ -56,8 +57,6 @@ try {
   $summary = Get-Content -LiteralPath (Join-Path $sessionDir "summary.md") -Raw
   if ($summary -notmatch 'visibility: "private"' -and $summary -notmatch "visibility: private") { throw "Runtime summary is not private." }
 
-  $env:AGENT_MEMORY_PROJECT_ROOT = $null
-  $env:AGENT_MEMORY_KIT_ROOT = $null
   $capturePy = Join-Path $tmpRoot "plugins\agent-memory-cowork\scripts\capture-claude-event.py"
   $closePy = Join-Path $tmpRoot "plugins\agent-memory-cowork\scripts\close-runtime-session.py"
   Push-Location $tmpRoot
@@ -80,7 +79,5 @@ try {
     checked_unix_python_hooks = $true
   } | ConvertTo-Json -Depth 5
 } finally {
-  $env:AGENT_MEMORY_PROJECT_ROOT = $previousProjectRoot
-  $env:AGENT_MEMORY_KIT_ROOT = $previousKitRoot
   $env:AGENT_MEMORY_CAPTURE_MODE = $previousCaptureMode
 }

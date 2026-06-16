@@ -13,12 +13,7 @@ $root = (Resolve-Path -LiteralPath $ProjectRoot).Path
 $cli = Join-Path $root "tools\agent_memory_cli.py"
 $python = if ($env:AGENT_MEMORY_PYTHON) { $env:AGENT_MEMORY_PYTHON } else { "python" }
 if (-not (Test-Path -LiteralPath $cli)) {
-  $kitCli = Join-Path $env:AGENT_MEMORY_KIT_ROOT "tools\agent_memory_cli.py"
-  if (Test-Path -LiteralPath $kitCli) {
-    $cli = $kitCli
-  } else {
-    throw "Could not find agent_memory_cli.py in project or AGENT_MEMORY_KIT_ROOT."
-  }
+  throw "Could not find tools\agent_memory_cli.py in the project root. Copy the local CLI into the project or run this check from the Owledge repo checkout."
 }
 
 function Invoke-JsonStep {

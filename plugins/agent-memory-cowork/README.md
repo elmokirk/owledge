@@ -16,19 +16,22 @@ RAG/LightRAG = consumers of reviewed exports
 ## Requirements
 
 - PowerShell on Windows.
-- Python available as `python` on Windows or `python3` on macOS/Linux. `AGENT_MEMORY_PYTHON` is only an optional override.
+- Python available as `python` on Windows or `python3` on macOS/Linux.
 - A host project initialized with `agent-memory/` and `PROJECT_CONTEXT.md`.
-- Either local `tools/agent_memory_cli.py` in the host project or `AGENT_MEMORY_KIT_ROOT` pointing to the Owledge Kit root.
+- Local `tools/agent_memory_cli.py` in the host project.
 
-## Environment Variables
+## Configuration
 
-| Variable | Purpose |
-| --- | --- |
-| `AGENT_MEMORY_PROJECT_ROOT` | Explicit host project root. Recommended for Claude/Cowork sessions. |
-| `AGENT_MEMORY_KIT_ROOT` | Fallback root that contains `tools/agent_memory_cli.py`. |
-| `AGENT_MEMORY_PYTHON` | Optional Python executable override. |
-| `AGENT_MEMORY_CAPTURE_MODE` | `minimal`, `standard`, or `full-private`. Default: `standard`. |
-| `AGENT_MEMORY_STRICT_HOOKS` | Set `1` only when hook failures should fail the runtime. Default hooks are fail-soft. |
+The normal path is project-local:
+
+1. Start Claude/Cowork from the initialized project root.
+2. Keep `PROJECT_CONTEXT.md`, `agent-memory/`, and `tools/agent_memory_cli.py`
+   in that project.
+3. Let the hooks discover the project root by walking upward from the current
+   directory.
+
+Environment variables are compatibility fallbacks for unusual harnesses only,
+not the default install path.
 
 ## Capture Policy
 
@@ -100,9 +103,9 @@ python3 tools/build_project_folder_kit.py \
 
 The Unix hooks use shell launchers that try `AGENT_MEMORY_PYTHON`, then
 `python3`, then `python`. When Claude/Cowork runs from the initialized project
-root, no `AGENT_MEMORY_PROJECT_ROOT` or `AGENT_MEMORY_KIT_ROOT` variable is
-required because the hook finds `PROJECT_CONTEXT.md`, `agent-memory/`, and the
-local CLI by walking upward from the current directory.
+root, no project or kit environment variable is required because the hook finds
+`PROJECT_CONTEXT.md`, `agent-memory/`, and the local CLI by walking upward from
+the current directory.
 
 ## Commands
 
@@ -120,9 +123,6 @@ For enterprise hubs, pass tenant/customer/project scope to exports and reports w
 Use a temporary copy or a private test project.
 
 ```powershell
-$env:AGENT_MEMORY_PROJECT_ROOT = (Get-Location).Path
-$env:AGENT_MEMORY_KIT_ROOT = (Get-Location).Path
-
 Get-Content plugins\agent-memory-cowork\tests\fixtures\session-start.json -Raw |
   powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File plugins\agent-memory-cowork\scripts\capture-claude-event.ps1
 

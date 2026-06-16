@@ -1,6 +1,6 @@
 ---
 name: bootstrap-agent-memory
-description: Initialize Agent Memory automatically at session start or when a repo lacks PROJECT_CONTEXT.md, AGENTS.md, CLAUDE.md, DESIGN.md, tools, or agent-memory. Use for Claude/Cowork and Codex first-run project setup from an explicit or global Agent Memory Kit path.
+description: Initialize Agent Memory automatically at session start or when a repo lacks PROJECT_CONTEXT.md, AGENTS.md, CLAUDE.md, DESIGN.md, tools, or agent-memory. Use for Claude/Cowork and Codex first-run project setup from an explicit Owledge Kit path.
 ---
 
 # Bootstrap Agent Memory
@@ -11,12 +11,6 @@ If anything is missing, run:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File "C:\AgentMemoryKit\tools\bootstrap-agent-memory.ps1" -ProjectRoot . -KitRoot "C:\AgentMemoryKit"
-```
-
-If `AGENT_MEMORY_KIT_ROOT` is set, this equivalent command also works:
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File "$env:AGENT_MEMORY_KIT_ROOT\tools\bootstrap-agent-memory.ps1" -ProjectRoot .
 ```
 
 macOS/Linux users can generate a project-local folder without environment

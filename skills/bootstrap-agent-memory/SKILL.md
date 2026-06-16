@@ -23,9 +23,10 @@ Use this skill at the beginning of a session when the project may not yet contai
 
 ## Kit Root Resolution
 
-Prefer an explicit kit path when the user or runtime provides one. The bootstrap script accepts `-KitRoot`, so a system-wide environment variable is not required.
-
-Use `AGENT_MEMORY_KIT_ROOT` as a convenience fallback. If neither `-KitRoot` nor `AGENT_MEMORY_KIT_ROOT` is available, ask the user for the kit root once. Do not guess outside the current workspace.
+Prefer an explicit kit path when the user or runtime provides one. The
+bootstrap script accepts `-KitRoot`, so a system-wide environment variable is
+not required. If no kit path is available, ask the user for the kit root once.
+Do not guess outside the current workspace.
 
 ## Preferred Bootstrap Command
 
@@ -33,12 +34,6 @@ Run from the target project:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File "C:\AgentMemoryKit\tools\bootstrap-agent-memory.ps1" -ProjectRoot . -KitRoot "C:\AgentMemoryKit"
-```
-
-Optional environment-variable equivalent:
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File "$env:AGENT_MEMORY_KIT_ROOT\tools\bootstrap-agent-memory.ps1" -ProjectRoot .
 ```
 
 macOS/Linux project-folder-only setup:

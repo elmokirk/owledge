@@ -35,21 +35,12 @@ def write_error(message: str, root: pathlib.Path | None = None) -> None:
 
 
 def find_project_root(start: pathlib.Path) -> pathlib.Path:
-    explicit = os.environ.get("AGENT_MEMORY_PROJECT_ROOT")
-    if explicit:
-        root = pathlib.Path(explicit).expanduser().resolve()
-        if not (root / "agent-memory").exists():
-            raise RuntimeError(f"AGENT_MEMORY_PROJECT_ROOT does not contain agent-memory: {root}")
-        if not (root / "PROJECT_CONTEXT.md").exists() and not os.environ.get("AGENT_MEMORY_PROJECT_ROOT_ALLOW_UNINITIALIZED"):
-            raise RuntimeError(f"AGENT_MEMORY_PROJECT_ROOT is not initialized. Missing PROJECT_CONTEXT.md: {root}")
-        return root
-
     current = start.resolve()
     while True:
         if (current / "PROJECT_CONTEXT.md").exists() and (current / "agent-memory").exists():
             return current
         if current.parent == current:
-            raise RuntimeError("Could not find Agent Memory project root. Run from the project root or set AGENT_MEMORY_PROJECT_ROOT.")
+            raise RuntimeError("Could not find Agent Memory project root. Run from the initialized project root or pass an explicit project root.")
         current = current.parent
 
 
@@ -57,17 +48,12 @@ def resolve_cli(root: pathlib.Path) -> pathlib.Path:
     local = root / "tools" / "agent_memory_cli.py"
     if local.exists():
         return local
-    kit_root = os.environ.get("AGENT_MEMORY_KIT_ROOT")
-    if kit_root:
-        kit_cli = pathlib.Path(kit_root).expanduser().resolve() / "tools" / "agent_memory_cli.py"
-        if kit_cli.exists():
-            return kit_cli
     plugin_root = pathlib.Path(__file__).resolve().parents[1]
     repo_candidate = plugin_root.parents[1] if len(plugin_root.parents) > 1 else plugin_root
     repo_cli = repo_candidate / "tools" / "agent_memory_cli.py"
     if repo_cli.exists():
         return repo_cli
-    raise RuntimeError("Missing Agent Memory CLI. Copy tools/agent_memory_cli.py into the project or set AGENT_MEMORY_KIT_ROOT.")
+    raise RuntimeError("Missing Agent Memory CLI. Copy tools/agent_memory_cli.py into the project or run from the Owledge repo checkout.")
 
 
 def normalized_payload(payload: str, capture_mode: str) -> str:

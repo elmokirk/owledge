@@ -19,16 +19,12 @@ If the project already has Agent Memory, do not overwrite it. Prefer an explicit
 powershell -NoProfile -ExecutionPolicy Bypass -File "C:\AgentMemoryKit\tools\bootstrap-agent-memory.ps1" -ProjectRoot . -KitRoot "C:\AgentMemoryKit"
 ```
 
-If `AGENT_MEMORY_KIT_ROOT` is set, this equivalent command also works:
+If the local tools folder already exists, this also works with an explicit kit
+path because `init-agent-memory.ps1` delegates to bootstrap when it can resolve
+the kit root:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File "$env:AGENT_MEMORY_KIT_ROOT\tools\bootstrap-agent-memory.ps1" -ProjectRoot . -KitRoot "$env:AGENT_MEMORY_KIT_ROOT"
-```
-
-If the local tools folder already exists, this also works because `init-agent-memory.ps1` delegates to bootstrap when it can resolve the kit root:
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File tools\init-agent-memory.ps1 -ProjectRoot . -KitRoot "$env:AGENT_MEMORY_KIT_ROOT"
+powershell -NoProfile -ExecutionPolicy Bypass -File tools\init-agent-memory.ps1 -ProjectRoot . -KitRoot "C:\AgentMemoryKit"
 ```
 
 After init, run:
