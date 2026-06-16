@@ -26,7 +26,7 @@ Publish v0.5 as a project-ready Markdown-first Agent Memory Kit with lifecycle c
 
 ## Compliance Roadmap
 
-The compliance plan must be expanded before regulated production use. See `docs/compliance-roadmap.md`.
+The compliance plan must be expanded before regulated production use. See `docs/archive/compliance-roadmap.md`.
 
 ## Global User Knowledge Layer Roadmap
 
@@ -42,7 +42,7 @@ The global user layer is optional and privacy-first. It sits above project memor
 
 ## Dashboard Add-On Roadmap
 
-The dashboard is a later P4 extension and must not block the current Markdown-first release. It should start read-only and consume generated indexes, RAG exports, PI reports, red-team scorecards, and HTML reports. See `docs/dashboard-extension-plan.md`.
+The dashboard is a later P4 extension and must not block the current Markdown-first release. It should start read-only and consume generated indexes, RAG exports, PI reports, red-team scorecards, and HTML reports. See `docs/archive/dashboard-extension-plan.md`.
 
 | Phase | Goal |
 | --- | --- |

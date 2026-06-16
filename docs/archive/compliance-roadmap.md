@@ -171,7 +171,7 @@ The roadmap is final for implementation when these statements are true:
 | Known roadmap gaps are explicit and mapped to controls | Done |
 | The roadmap distinguishes prototype, agency, enterprise and regulated maturity | Done |
 | Future legal changes are handled through watch artifacts and trigger-based controls | Done |
-| A separate implementation plan exists with phases, files, tooling and acceptance tests | Done once `docs/compliance-implementation-plan.md` is present |
+| A separate implementation plan exists with phases, files, tooling and acceptance tests | Done once `docs/archive/compliance-implementation-plan.md` is present |
 
 ## Non-Negotiable Production Gates
 

@@ -1,248 +1,170 @@
-# Owledge Kit
+# Owledge
 
-**Durable Markdown project memory for AI agents.**
+**A Markdown-first persistent memory and project-planning layer for AI agents, existing knowledgebases, and multi-agent delivery workflows.**
 
 [![Version](https://img.shields.io/badge/version-0.5.0-blue)](VERSION)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Markdown-first](https://img.shields.io/badge/storage-Markdown-black)](#why-owledge-kit)
-[![Agent workflows](https://img.shields.io/badge/workflows-Codex%20%7C%20Claude%20Code%20%7C%20OpenCode-orange)](#agent-and-harness-support)
+[![Storage: Markdown](https://img.shields.io/badge/storage-Markdown-black)](docs/quickstart.md)
+[![Runtime support](https://img.shields.io/badge/runtimes-Codex%20%7C%20Claude%20Code%20%7C%20Cowork%20%7C%20OpenCode-orange)](docs/harness-plugin-matrix.md)
+[![Release gates](https://img.shields.io/badge/release_gates-passing-brightgreen)](docs/README.md)
 
-Owledge Kit gives AI agents a project memory they can actually use: plans,
-evidence, reviews, handoffs, and decisions are written as local Markdown records
-so context survives across sessions, tools, teams, and existing knowledgebases.
+Owledge gives agents durable project memory in local Markdown: plans, evidence, reviews, handoffs, and decisions that stay readable across sessions, tools, teams, and existing vaults.
 
-Use it with Codex, Claude Code, OpenCode, PI agents, custom harnesses, Obsidian,
-or existing LLM wikis when you want agents to keep MVP plans grounded, hand off
-work cleanly, and make project progress auditable without adopting a hosted
-platform or migrating your vault.
+> Use Superpowers to execute. Use Owledge to remember, hand off, review, and keep project knowledge durable.  
+> Use Ponytail to reduce code. Use Owledge to preserve context, evidence, and planning discipline.
 
-**Release proof:** 19 finalization gates · `failed: 0` · ~13.92s local gate
-runtime · Red-Team QA score 95 · metadata-only KB scan · additive writes by
-default.
+**Release proof:** 20 release gates passing locally, additive writes by default, private runtime capture, metadata-first KB scan, and no required OS-wide setup.
 
 ## Table Of Contents
 
-- [The Name](#the-name)
-- [Why Owledge Kit](#why-owledge-kit)
-- [Quickstart](#quickstart)
-- [Core Workflows](#core-workflows)
-- [Performance And Token Profile](#performance-and-token-profile)
-- [Agent And Harness Support](#agent-and-harness-support)
-- [Safety Model](#safety-model)
-- [Repository Map](#repository-map)
+- [Why It Exists](#why-it-exists)
+- [Quickstart Paths](#quickstart-paths)
+- [Before / After](#before--after)
+- [Harness Support](#harness-support)
+- [Performance And Token Model](#performance-and-token-model)
+- [Not This](#not-this)
 - [Quality Gates](#quality-gates)
-- [Development](#development)
 - [Documentation](#documentation)
 
-## The Name
+## Why It Exists
 
-**Owledge** blends **owl** and **knowledge**. The owl motif is intentional:
-Owledge is designed as a quiet knowledge guardian for agentic projects, helping
-agents preserve context, trace evidence, and find the thread again when work
-moves across sessions or tools.
+Owledge is for teams and power users who already work in Markdown, Obsidian, LLM wikis, or agent-driven coding repos and need project context to survive beyond one chat session.
 
-## Why Owledge Kit
+- Keep context durable instead of rebuilding it from transcript history.
+- Keep MVP plans grounded with evidence, cutlines, reviews, and handoffs.
+- Fit existing knowledgebases without rewriting wiki links or note structure.
+- Let multiple agents coordinate through explicit artifacts instead of raw logs.
+- Stay local, inspectable, and repo-friendly.
 
-- **Keep context durable:** Agents can resume from reviewed Markdown records
-  instead of rebuilding project state from chat history.
-- **Stay MVP-focused:** Plans track goals, non-goals, evidence, acceptance
-  criteria, reviews, and handoffs.
-- **Fit existing knowledgebases:** Use the default module folder or map writes
-  into an existing Markdown, Obsidian, or LLM-wiki structure.
-- **Support multi-agent work:** Orchestrators, workers, reviewers, curators, and
-  PI agents can share context through explicit artifacts instead of raw logs.
-- **Stay local and inspectable:** No hosted database, no required OS-wide
-  environment variables, and no automatic rewrite of existing notes or wiki
-  links.
+## Quickstart Paths
 
-This release is a **concept-validated local/project utility kit**. It is not a
-regulated Enterprise Server, RBAC platform, hosted RAG database, or
-DSGVO/AI-Act-certified system.
+### 1. Existing Markdown Knowledgebase
 
-## Quickstart
-
-Clone the repo:
-
-```bash
-git clone https://github.com/elmokirk/owledge.git
-cd owledge
-```
-
-Run a local kit check:
-
-```bash
-python tools/agent_memory_cli.py --project-root . doctor --mode kit
-```
-
-Add Owledge to an existing Markdown knowledgebase or Obsidian vault:
+Add Owledge as a small additive module inside an existing vault:
 
 ```bash
 python tools/build_kb_module.py --knowledgebase-root /path/to/your/vault --include-cli
 ```
 
-Windows equivalent:
+Windows:
 
 ```powershell
 py -3 tools\build_kb_module.py --knowledgebase-root C:\path\to\your\vault --include-cli
 ```
 
-This creates a small additive module inside the target knowledgebase:
+Best next read: [Drop-in agent integration guide](docs/agent-integration-guide.md)
 
-```text
-agent-memory-module/
-|-- AGENT_MEMORY_MODULE.md
-`-- agent-memory/
-    |-- plans/
-    |-- handoffs/
-    |-- evidence/
-    |-- reviews/
-    `-- indexes/
+### 2. Existing Coding Project
+
+Bootstrap a host project from your local Owledge clone:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\bootstrap-agent-memory.ps1 -ProjectRoot C:\path\to\your-project -KitRoot .
 ```
 
-Existing notes, frontmatter, and `[[Wiki Links]]` are not rewritten.
+Best next read: [Project quickstart](docs/quickstart.md)
 
-For a full project-local kit, plugin adapter, or compliance add-on, use the
-advanced guides linked in [Documentation](#documentation).
+### 3. Plugin / Harness Setup
 
-## Core Workflows
-
-| Workflow | What Owledge Adds |
-| --- | --- |
-| MVP planning | Goals, non-goals, cutlines, evidence paths, acceptance criteria, and review gates. |
-| Session continuity | Durable handoffs and context packs so future agents can resume without reading full chat history. |
-| Multi-agent execution | Role boundaries for orchestrators, workers, reviewers, curators, and PI agents. |
-| Existing KB integration | Additive Markdown module or explicit `agent-memory-map.json` for mature vault structures. |
-| Review and QA | Evidence-backed reviews, sensitive-data checks, retention checks, conflict checks, and release gates. |
-| RAG readiness | Reviewed Markdown can be exported to neutral RAG, LightRAG, or GraphRAG formats. |
-
-## Performance And Token Profile
-
-Owledge is built to avoid the expensive “load the whole vault into context”
-failure mode. It scans metadata first, writes small indexes, and asks agents to
-load full note bodies only when a task needs the source.
-
-```mermaid
-flowchart LR
-    A["Existing Markdown KB"] --> B["Metadata-only scan"]
-    B --> C["Paths, hashes, titles, frontmatter, wiki-link refs"]
-    C --> D["Small task context pack"]
-    D --> E["Agent loads only relevant source files"]
-    E --> F["Plan / evidence / handoff / review"]
-```
-
-| Area | Current Release Behavior |
-| --- | --- |
-| Finalization gates | 19 local gates, `failed: 0`, ~13.92s on this Windows workspace |
-| KB scan | Metadata-only by default; no raw note body copy into indexes |
-| Token strategy | Source paths and hashes first; full bodies only on demand |
-| Scale guard | `--max-files`, truncation status, excluded generated/dependency dirs |
-| Write policy | Additive module/mapped writes; existing notes unchanged by default |
-
-See [docs/performance-scale-notes.md](docs/performance-scale-notes.md) for the
-scale model and benchmark notes.
-
-## Agent And Harness Support
-
-Owledge is designed as a memory layer around agent runtimes, not as a replacement
-for the runtimes themselves.
-
-| Harness | Current Shape |
-| --- | --- |
-| Codex | Repo instructions, skills, local CLI, and optional plugin adapter. |
-| Claude Code | Skill/plugin copy path plus Markdown-first handoff and review rules. |
-| Cowork / Claude-compatible | Ready-to-use plugin folder at `plugins/agent-memory-cowork/`. |
-| OpenCode / OpenCode-style agents | Generic repo-link integration through the agent integration guide. |
-| PI agents | Optional workspace-quality, project-intelligence, and red-team evaluation artifacts. |
-| Custom harnesses | Use local scripts and generated Markdown contracts; no hosted service required. |
-| Superpowers-style workflows | Companion mode only: Owledge can read execution plans as evidence and write memory artifacts separately. |
-
-See [docs/harness-plugin-matrix.md](docs/harness-plugin-matrix.md) for details.
-
-### Cowork Plugin
-
-Yes, the repo already ships a Cowork/Claude-compatible plugin:
+Use the ready-to-install Cowork / Claude-compatible plugin bundle:
 
 ```text
 plugins/agent-memory-cowork/
-|-- .claude-plugin/plugin.json
-|-- .codex-plugin/plugin.json
-|-- commands/
-|-- hooks/
-|-- skills/
-`-- agents/
 ```
 
-Install it through the runtime's plugin flow or copy the plugin folder into the
-runtime's plugin directory. Start the runtime from the initialized project root
-when possible; the plugin is designed to use project-local Markdown and local
-tools instead of OS-wide setup.
+Best next read: [Plugin install guide](docs/install-plugin.md)
 
-## Safety Model
+## Before / After
 
-Owledge keeps the default path conservative:
+Without Owledge:
 
-- Writes are additive by default.
-- Existing vault files are not modified unless the user explicitly asks.
-- Wiki links and frontmatter are read as context, not converted.
-- Path mapping fails closed on ambiguous or unsafe targets.
-- Raw runtime logs are private working memory, not shared RAG input.
-- Shared exports require reviewed and sanitized records.
-- Environment variables are compatibility fallbacks, not the normal setup path.
+- a plan lives in chat
+- evidence is scattered across notes and commits
+- a second agent has to reconstruct the project state
+- handoffs depend on whoever remembers the context
 
-## Repository Map
+With Owledge:
 
-| Path | Purpose |
+- plans live in Markdown
+- evidence paths are explicit
+- handoffs and reviews are durable artifacts
+- future agents can resume from scoped files instead of entire chat logs
+
+## Harness Support
+
+Owledge is a memory layer around agent runtimes. It does not replace the runtime or its execution methodology.
+
+| Harness | Current shape | Install path |
+| --- | --- | --- |
+| Codex | Ready | Local CLI, skills, optional plugin adapter |
+| Claude Code | Ready | Skill/plugin copy path plus project-local memory rules |
+| Cowork / Claude-compatible | Ready | `plugins/agent-memory-cowork/` |
+| OpenCode-style agents | Ready | Repo-link integration via `AGENTS.md` and local scripts |
+| Existing Markdown / Obsidian KBs | Ready | `tools/build_kb_module.py` or `agent-memory-map.json` |
+| PI agents | Optional | Candidate-only QA, workspace checks, and intelligence artifacts |
+
+Full matrix: [Harness and plugin matrix](docs/harness-plugin-matrix.md)
+
+## Performance And Token Model
+
+Owledge is designed to avoid the "load the whole vault into context" failure mode.
+
+```mermaid
+flowchart LR
+    A["Existing repo or vault"] --> B["Metadata-first scan"]
+    B --> C["Paths, titles, hashes, refs"]
+    C --> D["Scoped context pack"]
+    D --> E["Agent loads only relevant source files"]
+    E --> F["Plan, evidence, handoff, review"]
+```
+
+| Area | Current release behavior |
 | --- | --- |
-| `skills/agent-memory-principles/` | Principles-first entrypoint for agents working with existing KBs and project plans. |
-| `tools/build_kb_module.py` | Drop-in Markdown/Obsidian/LLM-wiki module builder. |
-| `tools/build_project_folder_kit.py` | Advanced project-local kit generator. |
-| `tools/agent_memory_cli.py` | Local CLI for validation, indexes, exports, reports, and memory operations. |
-| `agent-memory/templates/` | Markdown templates for plans, handoffs, evidence, reviews, QA, and memory records. |
-| `plugins/agent-memory-cowork/` | Optional plugin adapter for Claude/Cowork/Codex-style runtime capture. |
-| `docs/` | Detailed integration, command, architecture, publishing, and QA documentation. |
+| KB scan | Metadata-first by default; no body-copy migration |
+| Token strategy | Paths and refs first, full bodies only on demand |
+| Write policy | Additive module or mapped writes; existing notes unchanged by default |
+| Scale guard | `--max-files`, excluded generated dirs, truncation reporting |
+| Benchmarks | Reproducible local harness included under `benchmarks/` |
+
+Benchmarks and scale notes: [Performance and scale notes](docs/performance-scale-notes.md)
+
+## Not This
+
+Owledge is not:
+
+- a hosted platform
+- a vector database
+- an RBAC or enterprise policy system
+- a replacement for Superpowers or Ponytail
+- a requirement to migrate your existing vault taxonomy
+
+It is a local/project utility layer for durable memory, planning discipline, and agent coordination.
 
 ## Quality Gates
 
-The current release was validated with:
+Release validation is scriptable and local:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File tools\run-finalization-gates.ps1 -ProjectRoot . -IncludeCompliance
-powershell -NoProfile -ExecutionPolicy Bypass -File tools\run-redteam-qa.ps1 -ProjectRoot .
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run-finalization-gates.ps1 -ProjectRoot . -IncludeCompliance
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run-redteam-qa.ps1 -ProjectRoot .
 ```
 
-The finalization gate covers skill validation, scenario tests, contract checks,
-doctor checks, memory validation, index generation, retention, conflict review,
-sensitive-data scanning, runtime adapter smoke tests, retrieval fixtures,
-KB-module safety, project-folder generation, and optional Compliance Light gates.
-
-## Development
-
-Run the core checks before publishing changes:
+Public docs are checked separately for encoding, anchors, links, plugin/install consistency, and benchmark asset presence:
 
 ```powershell
-python -m py_compile tools\agent_memory_cli.py tools\build_kb_module.py tools\build_project_folder_kit.py
-powershell -NoProfile -ExecutionPolicy Bypass -File tools\test-agent-memory-contracts.ps1 -ProjectRoot .
-powershell -NoProfile -ExecutionPolicy Bypass -File tools\test-agent-memory-principles-skill.ps1 -ProjectRoot .
-powershell -NoProfile -ExecutionPolicy Bypass -File tools\test-kb-module.ps1 -ProjectRoot .
-```
-
-Run the full release gate when changing public docs, contracts, plugin metadata,
-or packaging behavior:
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File tools\run-finalization-gates.ps1 -ProjectRoot . -IncludeCompliance
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\test-public-docs.ps1 -ProjectRoot .
 ```
 
 ## Documentation
 
-- [Agent integration guide](docs/agent-integration-guide.md)
+Start here: [Documentation index](docs/README.md)
+
+- [Quickstart](docs/quickstart.md)
+- [Drop-in agent integration guide](docs/agent-integration-guide.md)
+- [Plugin install guide](docs/install-plugin.md)
 - [Harness and plugin matrix](docs/harness-plugin-matrix.md)
 - [MVP plan example](docs/mvp-plan-example.md)
-- [Team and long-running project guide](docs/team-long-running-project-guide.md)
 - [Performance and scale notes](docs/performance-scale-notes.md)
-- [Project-folder-only quickstart](docs/project-folder-only-quickstart.md)
-- [Plugin install guide](docs/install-plugin.md)
+- [Team and long-running project guide](docs/team-long-running-project-guide.md)
 - [Command reference](docs/command-reference.md)
-- [Agentic memory architecture](docs/agentic-memory-architecture.md)
-- [Superpowers companion notes](docs/superpowers-integration.md)
-- [Publishing checklist](docs/publishing.md)
+- [Owledge vs agent methods](docs/owledge-vs-agent-methods.md)

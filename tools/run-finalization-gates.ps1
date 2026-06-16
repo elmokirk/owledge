@@ -45,6 +45,7 @@ function Run-Gate {
 Run-Gate "python-compile" { python -m py_compile (Join-Path $root "tools\agent_memory_cli.py") }
 Run-Gate "principles-skill" { & (Join-Path $root "tools\test-agent-memory-principles-skill.ps1") -ProjectRoot $root }
 Run-Gate "principles-scenarios" { & (Join-Path $root "tools\test-agent-memory-principles-scenarios.ps1") -ProjectRoot $root }
+Run-Gate "public-docs" { & (Join-Path $root "tools\test-public-docs.ps1") -ProjectRoot $root }
 Run-Gate "contracts" { & (Join-Path $root "tools\test-agent-memory-contracts.ps1") -ProjectRoot $root }
 Run-Gate "doctor" { & (Join-Path $root "tools\memory-doctor.ps1") -ProjectRoot $root }
 Run-Gate "validate" { & (Join-Path $root "tools\validate-memory.ps1") -ProjectRoot $root }

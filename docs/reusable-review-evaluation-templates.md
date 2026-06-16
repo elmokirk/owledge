@@ -13,7 +13,7 @@ The templates consolidate patterns already used across the kit:
 | Senior expert critique | planning and finalization reviews | dynamic expert lens, findings, tradeoffs, next actions |
 | 10-scenario simulation | plugin and system validation tasks | scenario matrix, success metrics, residual risk |
 | Enterprise / UX / DX review | publish and dashboard reviews | persona-based critique with adoption metrics |
-| Closure plan | `docs/finalization-report.md` | finding to fix mapping with acceptance criteria |
+| Closure plan | `docs/archive/finalization-report.md` | finding to fix mapping with acceptance criteria |
 
 ## Template Index
 

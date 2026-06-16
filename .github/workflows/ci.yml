@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+jobs:
+  core-gates:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Python compile
+        shell: pwsh
+        run: python -m py_compile tools\agent_memory_cli.py tools\build_kb_module.py tools\build_project_folder_kit.py
+
+      - name: Public docs
+        shell: pwsh
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\test-public-docs.ps1 -ProjectRoot .
+
+      - name: Principles skill
+        shell: pwsh
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\test-agent-memory-principles-skill.ps1 -ProjectRoot .
+
+      - name: Contracts
+        shell: pwsh
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\test-agent-memory-contracts.ps1 -ProjectRoot .
+
+      - name: KB module
+        shell: pwsh
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\test-kb-module.ps1 -ProjectRoot .
+
+      - name: Runtime adapters
+        shell: pwsh
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\test-runtime-adapters.ps1 -ProjectRoot .

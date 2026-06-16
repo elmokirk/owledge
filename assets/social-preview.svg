@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640" role="img" aria-labelledby="title desc">
+  <title id="title">Owledge social preview</title>
+  <desc id="desc">Markdown-first persistent memory and project planning for AI agents.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#16324f"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="640" fill="url(#bg)"/>
+  <rect x="76" y="72" width="1128" height="496" rx="24" fill="#0b1220" stroke="#35506b" stroke-width="2"/>
+  <text x="112" y="156" fill="#93c5fd" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700">OWLEDGE</text>
+  <text x="112" y="262" fill="#f8fafc" font-family="Segoe UI, Arial, sans-serif" font-size="62" font-weight="700">Persistent Markdown Memory</text>
+  <text x="112" y="334" fill="#f8fafc" font-family="Segoe UI, Arial, sans-serif" font-size="62" font-weight="700">for AI Agents and Project Planning</text>
+  <text x="112" y="404" fill="#cbd5e1" font-family="Segoe UI, Arial, sans-serif" font-size="28">Plans, evidence, reviews, handoffs, and durable session continuity.</text>
+  <text x="112" y="450" fill="#cbd5e1" font-family="Segoe UI, Arial, sans-serif" font-size="28">Works with Codex, Claude Code, Cowork, OpenCode, and existing Markdown vaults.</text>
+  <rect x="112" y="498" width="230" height="44" rx="12" fill="#1d4ed8"/>
+  <text x="132" y="527" fill="#eff6ff" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="700">Markdown-first utility</text>
+</svg>

@@ -43,7 +43,7 @@ and fixes required by release gates.
 
 ## Suggested GitHub Description
 
-Owledge Kit gives AI agents durable project memory in Markdown: plans, evidence, reviews, handoffs, and decisions that stay readable across sessions, tools, teams, and existing knowledgebases.
+Owledge gives AI agents durable project memory in Markdown: plans, evidence, reviews, handoffs, and decisions that stay readable across sessions, tools, teams, and existing knowledgebases.
 
 ## Suggested Topics
 
@@ -53,14 +53,12 @@ Owledge Kit gives AI agents durable project memory in Markdown: plans, evidence,
 | agent-memory |
 | multi-agent |
 | markdown |
-| rag |
-| graphrag |
-| lightrag |
 | codex |
 | claude-code |
-| superpowers |
+| cowork |
+| project-planning |
 | obsidian |
-| knowledgebase |
+| knowledge-base |
 | ai-agents |
 
 ## Pre-Publish Commands
@@ -84,7 +82,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run-finalization-gat
 ```
 
 The finalization gate includes compile, principles skill validation,
-principles scenarios including Superpowers coexistence, contracts, doctor,
+principles scenarios including Superpowers coexistence, public-docs integrity, contracts, doctor,
 validation, full and incremental indexes, retention audit, conflict review,
 sensitive-data scan, runtime adapter smoke tests, memory evals, retrieval
 fixture eval, KB module safety, and minimal project-folder verification.
@@ -92,7 +90,15 @@ fixture eval, KB module safety, and minimal project-folder verification.
 folder; the default gate stays compliance-add-on free.
 
 For manual release debugging, the equivalent individual commands are listed in
-`docs/command-reference.md`.
+`../command-reference.md`.
+
+## GitHub Metadata
+
+- Set repository description to the suggested text above.
+- Set topics before announcement.
+- Add `assets/social-preview.svg` or an exported PNG as the GitHub social preview image before broad sharing.
+- Enable private vulnerability reporting.
+- Verify README, docs index, and plugin matrix render cleanly on GitHub.
 
 ## Publish Steps
 

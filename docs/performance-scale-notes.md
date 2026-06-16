@@ -1,6 +1,6 @@
 # Performance And Scale Notes
 
-Owledge Kit optimizes for local, reviewable Markdown workflows rather than large
+Owledge optimizes for local, reviewable Markdown workflows rather than large
 opaque databases.
 
 ## Current Scale Controls
@@ -29,11 +29,20 @@ This avoids:
 
 ## Release Benchmark Recommendation
 
-Before a major public announcement, run a simple benchmark with 1k and 10k
-Markdown files:
+Use the reproducible local harness under `benchmarks/` before making any public
+performance or token-efficiency claims.
+
+Minimum benchmark scenarios:
+
+- KB scan on an existing-style Markdown vault
+- context-pack generation for a scoped task
+- runtime handoff/resume through durable session artifacts
+
+Track at least:
 
 - wall-clock runtime
 - files scanned
 - truncation status
-- generated index size
-- existing file hash stability
+- output bytes or record count
+- included source count
+- estimated tokens or context-pack size

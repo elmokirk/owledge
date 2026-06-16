@@ -29,11 +29,13 @@ Use PowerShell with `-NoProfile -ExecutionPolicy Bypass -File` on Windows when e
 | `tools\test-runtime-adapters.ps1` | Yes, temp project | Run Claude/Cowork plus generic CLI runtime smoke fixtures |
 | `tools\test-agent-memory-principles-skill.ps1` | No | Validate the principles skill frontmatter, references, concision, and plugin mirror |
 | `tools\test-agent-memory-principles-scenarios.ps1` | Yes, temp KBs | Exercise large-codebase, existing-KB, skill-bloat, subagent-boundary, and edge-case scenarios |
+| `tools\test-public-docs.ps1` | No | Check README/public docs encoding, TOC anchors, local links, plugin/install consistency, and benchmark assets |
 | `tools\build-project-folder-kit.ps1` | Yes | Generate a minimal project-folder-only kit |
 | `tools/build_project_folder_kit.py` | Yes | Cross-platform generator for macOS/Linux project-folder-only kits |
 | `tools\build-kb-module.ps1` | Yes | Add a drop-in Agent Memory module to an existing Markdown KB without env vars |
 | `tools/build_kb_module.py` | Yes | Cross-platform drop-in KB module generator |
 | `tools\test-kb-module.ps1` | Yes, temp KB | Smoke-test KB module install without modifying existing notes |
+| `benchmarks\run-benchmarks.ps1` | Yes, ignored results | Run the local benchmark harness for KB scan, context packs, and runtime handoff |
 | `tools/*.sh` | Mixed | macOS/Linux convenience wrappers for verify, doctor, validate, index, and context packs |
 | `tools\run-finalization-gates.ps1` | Yes | Run the v0.5 release gate chain |
 
@@ -212,12 +214,13 @@ tools\run-redteam-qa.ps1 -ProjectRoot .
 ```
 
 `run-finalization-gates` executes compile, principles-skill validation,
-principles scenario tests, contracts, doctor, validation, full and incremental
-indexes, lifecycle checks, runtime smoke tests, memory evals, retrieval fixture
-eval, KB-module safety checks, and project-folder-only verification. Add
-`-IncludeExports` when you also want shared export/report generation in the
-same run. Add `-IncludeCompliance` to verify the optional Compliance Light
-add-on through a separate generated project kit. The latest machine-readable
+principles scenario tests, public-docs integrity, contracts, doctor,
+validation, full and incremental indexes, lifecycle checks, runtime smoke
+tests, memory evals, retrieval fixture eval, KB-module safety checks, and
+project-folder-only verification. Add `-IncludeExports` when you also want
+shared export/report generation in the same run. Add `-IncludeCompliance` to
+verify the optional Compliance Light add-on through a separate generated
+project kit. The latest machine-readable
 report is written to
 `agent-memory\exports\finalization-gates\latest.json`; the matching Markdown
 summary is `agent-memory\exports\finalization-gates\latest.md`. Both are

@@ -2,7 +2,7 @@
 
 Date: 2026-05-16  
 Status: implementation plan  
-Depends on: `docs/compliance-roadmap.md`
+Depends on: `docs/archive/compliance-roadmap.md`
 
 ## Goal
 
