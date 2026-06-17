@@ -38,6 +38,9 @@ import uuid
 from typing import Any
 
 
+UTC = getattr(dt, "UTC", dt.timezone.utc)
+
+
 DEFAULTS = {
     "heartbeat_interval_seconds": 60,
     "lease_ttl_seconds": 900,
@@ -571,7 +574,7 @@ STOP_WORDS = {
 
 
 def utc_now() -> str:
-    return dt.datetime.now(dt.UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    return dt.datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
 def parse_ts(value: str | None) -> float:
@@ -650,7 +653,7 @@ def locked_atomic_write_text(path: pathlib.Path, text: str, encoding: str = "utf
 
 
 def unique_run_id(prefix: str) -> str:
-    stamp = dt.datetime.now(dt.UTC).strftime("%Y%m%d%H%M%S")
+    stamp = dt.datetime.now(UTC).strftime("%Y%m%d%H%M%S")
     return f"{prefix}-{stamp}-{os.getpid()}-{secrets.token_hex(4)}"
 
 
@@ -662,8 +665,14 @@ def file_lock(lock_path: pathlib.Path, timeout_seconds: float = 15.0):
     while True:
         try:
             handle = lock_path.open("x", encoding="utf-8")
-            handle.write(json.dumps({"pid": os.getpid(), "created_at": utc_now()}))
-            handle.flush()
+            try:
+                handle.write(json.dumps({"pid": os.getpid(), "created_at": utc_now()}))
+                handle.flush()
+            except Exception:
+                handle.close()
+                with contextlib.suppress(FileNotFoundError):
+                    lock_path.unlink()
+                raise
             break
         except FileExistsError:
             if time.monotonic() - start > timeout_seconds:
@@ -1184,7 +1193,7 @@ def claim_task(conn: sqlite3.Connection, task_id: str, body: dict[str, Any], act
         return 403, {"error": "tenant_boundary_violation"}
     now = utc_now()
     lease_expires = (
-        dt.datetime.now(dt.UTC) + dt.timedelta(seconds=int(body.get("lease_ttl_seconds", DEFAULTS["lease_ttl_seconds"])))
+        dt.datetime.now(UTC) + dt.timedelta(seconds=int(body.get("lease_ttl_seconds", DEFAULTS["lease_ttl_seconds"])))
     ).replace(microsecond=0).isoformat().replace("+00:00", "Z")
     allowed = set(body.get("expected_statuses") or ["backlog", "ready", "blocked", "review", "claimed", "in_progress"])
     if task["status"] not in allowed:
@@ -1233,7 +1242,7 @@ def heartbeat_task(conn: sqlite3.Connection, task_id: str, body: dict[str, Any],
     if task["owner_agent_id"] != agent_id:
         return 403, {"error": "not_task_owner"}
     lease_expires = (
-        dt.datetime.now(dt.UTC) + dt.timedelta(seconds=int(body.get("lease_ttl_seconds", DEFAULTS["lease_ttl_seconds"])))
+        dt.datetime.now(UTC) + dt.timedelta(seconds=int(body.get("lease_ttl_seconds", DEFAULTS["lease_ttl_seconds"])))
     ).replace(microsecond=0).isoformat().replace("+00:00", "Z")
     conn.execute("UPDATE tasks SET lease_expires_at = ?, updated_at = ? WHERE task_id = ?", (lease_expires, utc_now(), task_id))
     log_event(conn, "task.heartbeat", task["tenant_id"], agent_id, task_id, {"lease_expires_at": lease_expires})
