@@ -269,55 +269,13 @@ REQUIRED_FILES = [
     "agent-memory/schemas/graphrag-node.schema.json",
     "agent-memory/schemas/graphrag-edge.schema.json",
     "agent-memory/schemas/global-user-memory.schema.json",
+    "tools/owledge.py",
     "tools/agent_memory_cli.py",
-    "tools/bootstrap-agent-memory.ps1",
-    "tools/capture-idea.ps1",
-    "tools/pi-agent-check.ps1",
-    "tools/pi-intelligence-report.ps1",
-    "tools/pi-redteam-evaluate.ps1",
-    "tools/init-agent-memory.ps1",
-    "tools/start-agent-control-plane.ps1",
-    "tools/test-agent-memory-contracts.ps1",
-    "tools/test-agent-memory-principles-skill.ps1",
-    "tools/test-agent-memory-principles-scenarios.ps1",
-    "tools/test-public-docs.ps1",
-    "tools/build-context-pack.ps1",
-    "tools/build-context-pack.sh",
-    "tools/run-memory-evals.ps1",
-    "tools/report-agent-memory-metrics.ps1",
-    "tools/promote-memory.ps1",
-    "tools/export-lightrag.ps1",
-    "tools/validate-memory.ps1",
-    "tools/validate-memory.sh",
-    "tools/verify-host-install.ps1",
-    "tools/verify-host-install.sh",
-    "tools/build-memory-index.ps1",
-    "tools/build-memory-index.sh",
-    "tools/export-rag-documents.ps1",
-    "tools/export-graphrag.ps1",
-    "tools/find-parallels.ps1",
-    "tools/compact-sessions.ps1",
-    "tools/eval-memory-retrieval.ps1",
-    "tools/audit-retention.ps1",
-    "tools/review-memory-conflicts.ps1",
-    "tools/scan-memory-sensitive-data.ps1",
-    "tools/build-project-folder-kit.ps1",
-    "tools/build-project-folder-kit.sh",
     "tools/build_project_folder_kit.py",
-    "tools/build-kb-module.ps1",
-    "tools/build-kb-module.sh",
     "tools/build_kb_module.py",
-    "tools/test-kb-module.ps1",
-    "tools/test-runtime-adapters.ps1",
-    "tools/run-finalization-gates.ps1",
-    "tools/run-redteam-qa.ps1",
-    "tools/render-memory-report.ps1",
-    "tools/run-review-workflow.ps1",
-    "tools/memory-doctor.ps1",
-    "tools/memory-doctor.sh",
     "benchmarks/README.md",
     "benchmarks/results/README.md",
-    "benchmarks/run-benchmarks.ps1",
+    "benchmarks/run_benchmarks.py",
     "assets/README.md",
     "assets/social-preview.svg",
     ".github/ISSUE_TEMPLATE/bug_report.md",
@@ -364,7 +322,7 @@ REQUIRED_FILES = [
     "plugins/agent-memory-cowork/.claude-plugin/plugin.json",
     "plugins/agent-memory-cowork/.codex-plugin/plugin.json",
     "plugins/agent-memory-cowork/hooks/hooks.json",
-    "plugins/agent-memory-cowork/hooks/hooks.unix.json",
+    "plugins/agent-memory-cowork/hooks/hooks.python.json",
     "plugins/agent-memory-cowork/skills/agent-memory-principles/SKILL.md",
     "plugins/agent-memory-cowork/skills/agent-memory-principles/references/principles.md",
     "plugins/agent-memory-cowork/skills/agent-memory-principles/references/agent-rules.md",
@@ -386,12 +344,8 @@ REQUIRED_FILES = [
     "plugins/agent-memory-cowork/commands/memory-status.md",
     "plugins/agent-memory-cowork/commands/memory-doctor.md",
     "plugins/agent-memory-cowork/commands/memory-report.md",
-    "plugins/agent-memory-cowork/scripts/capture-claude-event.ps1",
-    "plugins/agent-memory-cowork/scripts/close-runtime-session.ps1",
     "plugins/agent-memory-cowork/scripts/capture-claude-event.py",
     "plugins/agent-memory-cowork/scripts/close-runtime-session.py",
-    "plugins/agent-memory-cowork/scripts/capture-claude-event.sh",
-    "plugins/agent-memory-cowork/scripts/close-runtime-session.sh",
     "plugins/agent-memory-cowork/README.md",
     "plugins/agent-memory-cowork/LICENSE",
     "plugins/agent-memory-cowork/VERSION",
@@ -417,10 +371,7 @@ REQUIRED_FILES = [
 ADDON_REQUIRED_FILES = [
     "addons/compliance-light/addon.json",
     "addons/compliance-light/README.md",
-    "addons/compliance-light/install-compliance-layer.ps1",
     "addons/compliance-light/docs/compliance-light.md",
-    "addons/compliance-light/tools/compliance-doctor.ps1",
-    "addons/compliance-light/tools/run-compliance-gates.ps1",
     "addons/compliance-light/templates/processing-activity-template.md",
     "addons/compliance-light/templates/ai-system-template.md",
     "addons/compliance-light/templates/provider-registry-template.md",
@@ -755,9 +706,9 @@ def project_defaults(root: pathlib.Path) -> dict[str, str]:
         meta = parse_frontmatter(context.read_text(encoding="utf-8", errors="replace"))
     project_slug = slugify(meta.get("project_id") or meta.get("project") or root.name, "project-local")
     return {
-        "tenant_id": os.environ.get("AGENT_MEMORY_TENANT_ID") or str(meta.get("tenant_id") or "tenant-local"),
-        "customer_id": os.environ.get("AGENT_MEMORY_CUSTOMER_ID") or str(meta.get("customer_id") or "customer-local"),
-        "project_id": os.environ.get("AGENT_MEMORY_PROJECT_ID") or str(meta.get("project_id") or project_slug),
+        "tenant_id": str(meta.get("tenant_id") or "tenant-local"),
+        "customer_id": str(meta.get("customer_id") or "customer-local"),
+        "project_id": str(meta.get("project_id") or project_slug),
     }
 
 
@@ -821,10 +772,6 @@ def locked_atomic_create_text(path: pathlib.Path, text: str, encoding: str = "ut
         if path.exists():
             raise FileExistsError(f"Refusing to overwrite existing file: {path}")
         atomic_write_text(path, text, encoding=encoding)
-
-
-def powershell_single_quote(value: str) -> str:
-    return "'" + value.replace("'", "''") + "'"
 
 
 def run_review_workflow(
@@ -913,9 +860,9 @@ def run_review_workflow(
     rel_output = str(output_path.relative_to(root)).replace("\\", "/")
     rel_template = str(template_path.relative_to(root)).replace("\\", "/")
     qa_commands = [
-        "python -m py_compile tools\\agent_memory_cli.py",
-        "tools\\validate-memory.ps1 -ProjectRoot .",
-        f"Select-String -Path {powershell_single_quote(rel_output.replace('/', '\\'))} -Pattern 'TENANT_ID|CUSTOMER_ID|PROJECT_ID' -CaseSensitive",
+        "python -m py_compile tools/owledge.py tools/agent_memory_cli.py",
+        "python tools/agent_memory_cli.py --project-root . validate-memory --strict",
+        f"python -c \"from pathlib import Path; text=Path('{rel_output}').read_text(encoding='utf-8'); raise SystemExit(1 if any(x in text for x in ['TENANT_ID','CUSTOMER_ID','PROJECT_ID']) else 0)\"",
     ]
     return {
         "output_path": rel_output,
@@ -1526,9 +1473,9 @@ def build_context_pack_markdown(
     explicit_scope = bool(tenant_id or customer_id or project_id)
     defaults = project_defaults(root)
     scope = {
-        "tenant_id": tenant_id or (os.environ.get("AGENT_MEMORY_TENANT_ID") if explicit_scope else None),
-        "customer_id": customer_id or (os.environ.get("AGENT_MEMORY_CUSTOMER_ID") if explicit_scope else None),
-        "project_id": project_id or (os.environ.get("AGENT_MEMORY_PROJECT_ID") if explicit_scope else None),
+        "tenant_id": tenant_id or (defaults["tenant_id"] if explicit_scope else None),
+        "customer_id": customer_id or (defaults["customer_id"] if explicit_scope else None),
+        "project_id": project_id or (defaults["project_id"] if explicit_scope else None),
     }
     tenants = {str(record["metadata"].get("tenant_id", "")) for record in records if record["metadata"].get("tenant_id")}
     real_tenants = {value for value in tenants if value not in {"TENANT_ID", "tenant-local"}}
@@ -2182,7 +2129,7 @@ def memory_doctor(root: pathlib.Path, mode: str = "auto") -> dict[str, Any]:
     add("cli-local", (root / "tools" / "agent_memory_cli.py").exists(), "warning", "Local CLI exists.", "Copy tools/agent_memory_cli.py into the project or run from an Owledge repo checkout when local tooling is missing.")
     add("raw-events-ignored", bool(_gitignore_contains(root, "agent-memory/sessions/**/events.jsonl")), "warning", "Raw runtime event logs are ignored by git.", "Add agent-memory/sessions/**/events.jsonl to .gitignore for privacy.")
     validation = validate_memory(root)
-    add("memory-validation", bool(validation["passed"]), "error", f"Memory validation: {validation['failedChecks']} failed of {validation['totalChecks']}.", "Run tools/validate-memory.ps1 and fix reported frontmatter/edge issues.")
+    add("memory-validation", bool(validation["passed"]), "error", f"Memory validation: {validation['failedChecks']} failed of {validation['totalChecks']}.", "Run python tools/agent_memory_cli.py --project-root . validate-memory --strict and fix reported frontmatter/edge issues.")
     version_file = root / "VERSION"
     readme = root / "README.md"
     if version_file.exists() and readme.exists():
@@ -2279,7 +2226,7 @@ def compliance_doctor(root: pathlib.Path) -> dict[str, Any]:
         installed,
         "error",
         "Compliance Light profile is present." if installed else "Compliance Light add-on is not installed.",
-        "Install with addons/compliance-light/install-compliance-layer.ps1 -ProjectRoot . or build a project kit with -IncludeCompliance.",
+        "Build a project kit with --include-compliance or copy the Compliance Light files listed in addons/compliance-light/addon.json.",
     )
     if not installed:
         failed = [check for check in checks if not check["passed"] and check["severity"] in {"error", "warning"}]
@@ -4429,7 +4376,7 @@ def main(argv: list[str] | None = None) -> int:
     capture_p.add_argument("--event-type")
     capture_p.add_argument("--session-id")
     capture_p.add_argument("--agent-id")
-    capture_p.add_argument("--capture-mode", default=os.environ.get("AGENT_MEMORY_CAPTURE_MODE", "standard"), choices=["minimal", "standard", "full-private"])
+    capture_p.add_argument("--capture-mode", default="standard", choices=["minimal", "standard", "full-private"])
     close_p = sub.add_parser("close-runtime-session")
     close_p.add_argument("--session-id", required=True)
     close_p.add_argument("--runtime", default="generic")

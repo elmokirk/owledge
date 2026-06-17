@@ -20,14 +20,14 @@ fixes are in scope.
 | Promotion hardening | Promotion checks tenant/customer/project, source status, review status, target policy, source hash, review approval, and writes an audit manifest |
 | Context safety | Markdown context packs require explicit tenant scope when multiple real tenants are present |
 | UX/DX | Quickstart, plugin install, and command reference now describe a GitHub-link-to-working path |
-| Python override | PowerShell wrappers respect `AGENT_MEMORY_PYTHON` |
+| Python-first setup | Core commands use local Python entrypoints |
 | PI check safety | `pi-agent-check` is read-only by default; index generation requires `-BuildIndex` |
 | Versioning | Kit version aligned to `0.5.0` |
 | Generated report quality | Validation rejects disallowed control characters; PI intelligence and PI red-team report generators now preserve Markdown code ticks and concrete evidence paths |
 | LightRAG snapshot safety | LightRAG export reads immutable RAG generation documents and manifests the exact RAG generation ID |
 | Publish hygiene | Generated indexes, export snapshots, PI reports, red-team reports, raw sessions, tests, and local runtime state are ignored; publishing docs use selective staging instead of `git add .` |
 | PI report scoring | PI intelligence counters now count real candidates before fallback text is rendered |
-| Runtime docs consistency | Plugin command docs use `AGENT_MEMORY_PYTHON` where direct Python CLI calls are shown |
+| Runtime docs consistency | Plugin command docs use direct Python CLI calls |
 | Agentic memory architecture | Working, semantic, procedural, and episodic memory are now explicitly mapped to kit layers, production boundaries, and SoTA gaps |
 | Reusable review workflow | Red-team, expert-review, scenario-simulation, persona-pack, and review-to-task templates now have a documented workflow, runtime skill, CLI wrapper, and QA-gated finalization sprint |
 | Incremental indexes | Memory index builds now support optional incremental mode with manifest metadata and tombstones for deleted source records |
@@ -37,7 +37,7 @@ fixes are in scope.
 | Retrieval calibration | Added fixture corpus, query-file support, minimum score thresholds, and a non-empty-corpus gate |
 | Project-folder-only setup | Added an explicit-manifest minimal folder generator and quickstart |
 | Runtime smoke tests | Added Claude/Cowork capture fixtures plus a project-local runtime smoke wrapper |
-| Final release gates | Added `run-finalization-gates` and `run-redteam-qa` wrappers |
+| Final release gates | Added Python-first finalization and red-team QA flows |
 | Optional Compliance Light | Added opt-in compliance-support add-on validation without adding compliance files to the default minimal kit |
 
 ## Red-Team QA Closure
@@ -61,12 +61,12 @@ fixes are in scope.
 
 | Scenario | Status | Evidence |
 | --- | --- | --- |
-| Windows project-folder generation | Passed | PowerShell generator verified a lean project folder |
+| Project-folder generation | Passed | Python generator verified a lean project folder |
 | macOS/Linux project-folder generation | Passed | Python generator verified a lean project folder |
 | Lean default kit excludes optional surfaces | Passed | No compliance folder, no Compliance Light tools, no plugin adapter by default |
 | Lean + Claude/Cowork plugin on Unix | Passed | Unix hook profile replaces `hooks.json` with shell/Python hook commands |
 | Lean + Compliance Light | Passed | Opt-in project folder passed `compliance-doctor` with score 100 |
-| Runtime adapter smoke | Passed | Claude/Cowork PowerShell hooks and Python hook scripts create private session artifacts |
+| Runtime adapter smoke | Passed | Claude/Cowork Python hook scripts create private session artifacts |
 
 The `.sh` wrappers were not executed directly in the Windows release
 environment because `bash` resolves to WSL and no Linux distribution is

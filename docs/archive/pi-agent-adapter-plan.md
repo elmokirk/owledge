@@ -33,8 +33,8 @@ PI Agent Adapter
 | --- | --- |
 | Global skill | `skills/pi-agent-workspace-quality/` |
 | Optional plugin | `plugins/pi-agent-workspace/` |
-| CLI check wrapper | `tools/pi-agent-check.ps1` |
-| Idea capture wrapper | `tools/capture-idea.ps1` |
+| CLI check workflow | `python tools/owledge.py doctor --project-root .` |
+| Idea capture workflow | Markdown idea card plus Python review workflow |
 | Idea storage | `agent-memory/ideas/` |
 | Idea template | `agent-memory/templates/idea-card-template.md` |
 

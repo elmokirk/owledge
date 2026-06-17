@@ -9,8 +9,8 @@ Read `PROJECT_CONTEXT.md`, `agent-memory/indexes/memory-index.jsonl`, `agent-mem
 
 Run:
 
-```powershell
-tools\pi-agent-check.ps1 -ProjectRoot . -Question "USER QUESTION"
+```bash
+python tools/owledge.py doctor --project-root .
 ```
 
 This is read-only by default. Add `-BuildIndex` only when the user explicitly wants the generated memory index refreshed.

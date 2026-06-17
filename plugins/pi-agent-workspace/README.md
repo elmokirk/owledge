@@ -29,16 +29,16 @@ The adapter is not canonical memory. Project-local Markdown remains the source o
 
 ## Default Command
 
-```powershell
-tools\pi-agent-check.ps1 -ProjectRoot . -Question "What should be checked before this plan?"
+```bash
+python tools/owledge.py doctor --project-root .
 ```
 
 This default check is read-only. Pass `-BuildIndex` only when index regeneration is wanted.
 
 Generate a PI intelligence report:
 
-```powershell
-tools\pi-intelligence-report.ps1 -ProjectRoot .
+```bash
+python tools/agent_memory_cli.py --project-root . run-review-workflow --review-type expert-lens --subject agent-memory/pi-agent/reports --question "What intelligence should be curated?"
 ```
 
 Reports are written to `agent-memory/pi-agent/reports/` and remain candidate knowledge until reviewed.
@@ -47,8 +47,8 @@ Personal PI findings can read `USER_CONTEXT.md` and `global-memory/` when presen
 
 Evaluate the latest PI report with the Red Team scorecard:
 
-```powershell
-tools\pi-redteam-evaluate.ps1 -ProjectRoot .
+```bash
+python tools/agent_memory_cli.py --project-root . run-review-workflow --review-type multi-perspective-red-team --subject agent-memory/pi-agent/reports --question "Evaluate PI intelligence quality."
 ```
 
 ## Rules

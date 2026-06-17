@@ -21,8 +21,8 @@ Use this skill when the user asks for workspace quality, PI Agent review, planni
 
 Run:
 
-```powershell
-tools\pi-agent-check.ps1 -ProjectRoot . -Question "USER QUESTION"
+```bash
+python tools/owledge.py doctor --project-root .
 ```
 
 This is read-only by default. Add `-BuildIndex` only when the user explicitly wants the generated memory index refreshed.
@@ -42,8 +42,8 @@ Before a new plan, inspect `agent-memory/ideas/` for matching `concept_tags`, `p
 
 When the user captures a new idea, use:
 
-```powershell
-tools\capture-idea.ps1 -ProjectRoot . -Title "Idea title" -Summary "Short summary"
+```bash
+python tools/agent_memory_cli.py --project-root . run-review-workflow --review-type review-to-task-plan --subject agent-memory/ideas --question "Idea title: Short summary"
 ```
 
 ## Write Rules
@@ -62,7 +62,7 @@ tools\capture-idea.ps1 -ProjectRoot . -Title "Idea title" -Summary "Short summar
 | Claude Code | Use plugin command/skill and ask targeted questions |
 | Hermes | Map questions to context packs and evidence reads |
 | OpenClaw/OpenCode | Use generic CLI commands |
-| PI Agents | Use this skill as the policy and `pi-agent-check.ps1` as diagnostics |
+| PI Agents | Use this skill as the policy and Owledge doctor/review workflows as diagnostics |
 
 ## Done Criteria
 

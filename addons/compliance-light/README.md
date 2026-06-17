@@ -1,30 +1,25 @@
 # Compliance Light Add-on
 
-Optional compliance-support layer for the Agent Memory Kit.
+Optional compliance-support layer for Owledge.
 
-This add-on is intentionally not part of the default minimal project kit. Install
-it only when a project needs lightweight governance evidence for customer data,
+This add-on is intentionally not part of the default minimal project kit. Use it
+only when a project needs lightweight governance evidence for customer data,
 personal data, external AI providers, shared exports, or AI-risk review.
 
-It provides Markdown templates, a read-only compliance doctor, and a combined
-compliance gate. It does not provide legal advice, certification, RBAC,
-encryption, automatic deletion, or a secure MCP/API access layer.
-
-## Install Into A Project
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\addons\compliance-light\install-compliance-layer.ps1 -ProjectRoot .
-```
-
-## Commands After Install
-
-```powershell
-tools\compliance-doctor.ps1 -ProjectRoot .
-tools\run-compliance-gates.ps1 -ProjectRoot .
-```
+It provides Markdown templates and read-only compliance checks. It does not
+provide legal advice, certification, RBAC, encryption, automatic deletion, or a
+secure MCP/API access layer.
 
 ## Build A Project Folder With Compliance Support
 
-```powershell
-tools\build-project-folder-kit.ps1 -OutputPath C:\tmp\agent-memory-project-kit-compliance -Verify -IncludeCompliance
+```bash
+python tools/owledge.py build-project-kit --output-path /tmp/owledge-project-kit-compliance --include-compliance --verify
 ```
+
+## Check Compliance State
+
+```bash
+python tools/agent_memory_cli.py --project-root . compliance-doctor
+```
+
+The file copy contract for this add-on lives in `addon.json`.

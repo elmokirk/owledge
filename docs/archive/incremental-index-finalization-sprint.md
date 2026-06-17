@@ -16,7 +16,7 @@ The orchestration agent owns integration and final QA. Each task has a worker sl
 
 | Task | Worker Scope | QA Checker Scope | Definition Of Done | Quality Checks |
 | --- | --- | --- | --- | --- |
-| P1-T1 Index tooling | `tools/agent_memory_cli.py`, `tools/build-memory-index.ps1` | CLI behavior, wrapper behavior, atomic writes, tombstones | Full rebuild remains default; incremental mode updates changed/new records, preserves unchanged valid records, and tombstones deleted records when requested | Python compile, full build, incremental build, temp deletion simulation, JSONL parse |
+| P1-T1 Index tooling | `tools/agent_memory_cli.py` | CLI behavior, atomic writes, tombstones | Full rebuild remains default; incremental mode updates changed/new records, preserves unchanged valid records, and tombstones deleted records when requested | Python compile, full build, incremental build, temp deletion simulation, JSONL parse |
 | P1-T2 Index workflow docs | `docs/incremental-index-workflow.md`, command docs, README references, roadmap wording | Accuracy, source-of-truth boundary, RAG safety | Docs explain full vs incremental rebuild, manifest fields, tombstone semantics, QA, and RAG/Hub safety | Paths exist, syntax matches wrapper, no canonical-index claims |
 | P1-T3 Contract integration | Required files and release docs | Contract coverage | New docs and wrapper behavior are protected by contract tests | `test-agent-memory-contracts` passes |
 | P1-T4 End-to-end validation | Generated ignored index artifacts only | Release health | Local kit passes full validation after smoke tests | `validate-memory`, `test-agent-memory-contracts`, `memory-doctor` |

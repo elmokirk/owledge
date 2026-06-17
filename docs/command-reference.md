@@ -1,272 +1,96 @@
 # Command Reference
 
-Use PowerShell with `-NoProfile -ExecutionPolicy Bypass -File` on Windows when execution policy may block direct script calls. On macOS/Linux, use `python3 tools/agent_memory_cli.py --project-root . <command>` or the `.sh` wrappers included in the lean project folder.
+Owledge is Python-first. Use `tools/owledge.py` for public workflows and
+`tools/agent_memory_cli.py` for lower-level memory operations.
+
+## Public Owledge CLI
 
 | Command | Writes | Purpose |
 | --- | --- | --- |
-| `tools\bootstrap-agent-memory.ps1` | Yes | Copy missing kit files into a host project |
-| `tools\verify-host-install.ps1` | No | Host-project doctor plus strict validation |
-| `tools\memory-doctor.ps1` | No | Diagnose kit or host setup |
-| `tools\validate-memory.ps1` | No | Validate project and global user-memory frontmatter, IDs, edges, research fields, preferences and coach reports |
-| `tools\build-memory-index.ps1` | Yes | Generate full or incremental memory indexes with optional tombstones |
-| `tools\build-context-pack.ps1` | No | Generate scoped task context with optional objective-aware scoring |
-| `tools\audit-retention.ps1` | No | Preview retention, stale, expiry, and review-cycle findings |
-| `tools\review-memory-conflicts.ps1` | No | Detect stale records plus active contradiction and supersession edges |
-| `tools\scan-memory-sensitive-data.ps1` | No | Scan memory Markdown and raw session events for secret-like content |
-| `tools\capture-idea.ps1` | Yes | Add unique idea card |
-| `tools\pi-agent-check.ps1` | No by default | PI workspace diagnostics; pass `-BuildIndex` to write index |
-| `tools\pi-intelligence-report.ps1` | Yes | Generate PI candidate intelligence report |
-| `tools\pi-redteam-evaluate.ps1` | Yes | Score PI reports from 1-100 |
-| `tools\run-review-workflow.ps1` | Yes | Create reusable review/evaluation artifacts from templates |
-| `tools\run-redteam-qa.ps1` | Yes | Create a multi-perspective red-team release QA artifact |
-| `tools\promote-memory.ps1` | Yes | Promote reviewed memory with hardened gates |
-| `tools\export-rag-documents.ps1` | Yes | Generate neutral RAG export and snapshot |
-| `tools\export-lightrag.ps1` | Yes | Generate LightRAG arrays and snapshot |
-| `tools\export-graphrag.ps1` | Yes | Generate GraphRAG nodes/edges and snapshot |
-| `tools\render-memory-report.ps1` | Yes | Generate HTML report views |
-| `tools\run-memory-evals.ps1` | Yes, temp DB | Run control-plane concurrency eval |
-| `tools\eval-memory-retrieval.ps1` | Yes | Run retrieval calibration and write eval reports |
-| `tools\test-runtime-adapters.ps1` | Yes, temp project | Run Claude/Cowork plus generic CLI runtime smoke fixtures |
-| `tools\test-agent-memory-principles-skill.ps1` | No | Validate the principles skill frontmatter, references, concision, and plugin mirror |
-| `tools\test-agent-memory-principles-scenarios.ps1` | Yes, temp KBs | Exercise large-codebase, existing-KB, skill-bloat, subagent-boundary, and edge-case scenarios |
-| `tools\test-public-docs.ps1` | No | Check README/public docs encoding, TOC anchors, local links, plugin/install consistency, and benchmark assets |
-| `tools\build-project-folder-kit.ps1` | Yes | Generate a minimal project-folder-only kit |
-| `tools/build_project_folder_kit.py` | Yes | Cross-platform generator for macOS/Linux project-folder-only kits |
-| `tools\build-kb-module.ps1` | Yes | Add a drop-in Agent Memory module to an existing Markdown KB without env vars |
-| `tools/build_kb_module.py` | Yes | Cross-platform drop-in KB module generator |
-| `tools\test-kb-module.ps1` | Yes, temp KB | Smoke-test KB module install without modifying existing notes |
-| `benchmarks\run-benchmarks.ps1` | Yes, ignored results | Run the local benchmark harness for KB scan, context packs, and runtime handoff |
-| `tools/*.sh` | Mixed | macOS/Linux convenience wrappers for verify, doctor, validate, index, and context packs |
-| `tools\run-finalization-gates.ps1` | Yes | Run the v0.5 release gate chain |
+| `python tools/owledge.py doctor --project-root .` | No | Diagnose kit or host setup |
+| `python tools/owledge.py init-project --target /path/to/project` | Yes | Add Owledge files to an existing coding project |
+| `python tools/owledge.py add-kb-module --knowledgebase-root /path/to/vault` | Yes | Add a drop-in module to an existing Markdown KB |
+| `python tools/owledge.py build-project-kit --output-path /tmp/owledge-project-kit --verify` | Yes | Generate a minimal project-local kit |
+| `python tools/owledge.py build-context-pack --project-root . --task-id publish-v1` | No | Generate scoped task context |
+| `python tools/owledge.py test public-docs --project-root .` | No | Check public docs integrity |
+| `python tools/owledge.py test runtime-adapters --project-root .` | Yes, temp project | Smoke-test plugin runtime capture |
+| `python tools/owledge.py finalization-gates --project-root . --include-compliance` | Yes | Run release gates |
+| `python tools/owledge.py benchmark --project-root .` | Yes, ignored results | Run local benchmark harness |
 
-Optional Compliance Light add-on commands are installed only with
-`-IncludeCompliance` or `addons\compliance-light\install-compliance-layer.ps1`:
+## Lower-Level Memory CLI
 
 | Command | Writes | Purpose |
 | --- | --- | --- |
-| `tools\compliance-doctor.ps1` | No | Read-only Compliance Light profile, provider, AI-system, processing, export-safety, retention, and sensitive-data checks |
-| `tools\run-compliance-gates.ps1` | Yes | Run Compliance Light gates and write ignored reports under `agent-memory\exports\compliance\` |
-
-## Memory Index
-
-Current wrapper:
-
-```powershell
-tools\build-memory-index.ps1 -ProjectRoot .
-```
-
-Incremental wrapper with tombstones:
-
-```powershell
-tools\build-memory-index.ps1 -ProjectRoot . -Incremental -TrackTombstones
-```
-
-Output fields:
-
-- `path`: generated index path, normally `agent-memory/indexes/memory-index.jsonl`
-- `rows`: number of JSONL rows written
-- `changed`: records updated or added in this run
-- `unchanged`: unchanged records carried forward during incremental mode
-- `deleted`: records missing from the current scan
-- `tombstoned`: deleted records identified as tombstone candidates in this run
-- `mode`: `full` or `incremental`
-- `manifest_path`: generated manifest path
-- `tombstone_path`: generated tombstone JSONL path when `-TrackTombstones` is used
-
-P1 incremental indexing is documented in `docs/incremental-index-workflow.md`. Indexes, manifests, and tombstones are generated views, not canonical memory.
-
-## Lifecycle And Safety Gates
-
-Lifecycle checks are deterministic and read-only. They report findings and
-previews; they do not delete or mutate memory records.
-
-```powershell
-tools\audit-retention.ps1 -ProjectRoot .
-tools\review-memory-conflicts.ps1 -ProjectRoot .
-tools\scan-memory-sensitive-data.ps1 -ProjectRoot .
-```
-
-`audit-retention` adds an implicit retention class when a record omits
-`retention_class`, then reports expired `expires_at`, stale `stale_after`,
-expired `valid_until`, and due `review_cycle` records. `review-memory-conflicts`
-reports contradiction and supersession edges between active records.
-`scan-memory-sensitive-data` scans Markdown memory plus raw `events.jsonl` logs
-without printing unredacted secret-like values.
-
-## Context Packs
-
-Objective-aware context packs keep the old defaults and add optional scoring
-metadata:
-
-```powershell
-tools\build-context-pack.ps1 -ProjectRoot . -TaskId "publish-v0.5" -Objective "Finalize project-folder setup and release gates"
-```
-
-The JSON output includes `score_breakdown`, `freshness_warnings`, and
-`excluded_sources` reasons such as `no_relevance` or `context_budget`.
-
-## Retrieval Calibration
-
-The release fixture corpus is under `tests\fixtures\retrieval-corpus\` and is
-paired with `tests\fixtures\retrieval-queries.json`.
-
-```powershell
-tools\eval-memory-retrieval.ps1 -ProjectRoot . -ProjectRoots tests\fixtures\retrieval-corpus -QueriesFile tests\fixtures\retrieval-queries.json -MinOverallScore 85 -MinSafetyScore 100
-```
-
-Fixture runs fail if the corpus is empty, safety drops below the threshold, or
-the overall score is below the configured threshold. Raw sessions are excluded
-unless `-IncludeSessions` is explicitly passed.
-
-## Project Folder Only
-
-Generate and verify a minimal local project kit:
-
-```powershell
-tools\build-project-folder-kit.ps1 -OutputPath C:\tmp\agent-memory-project-kit -Verify
-```
-
-macOS/Linux equivalent:
-
-```bash
-python3 tools/build_project_folder_kit.py --output-path /tmp/agent-memory-project-kit --verify
-```
-
-With Claude/Cowork plugin adapter and Unix hooks:
-
-```bash
-python3 tools/build_project_folder_kit.py --output-path /tmp/agent-memory-project-kit --include-plugin-adapter --plugin-hook-profile unix --verify
-```
-
-The generator uses an explicit copy manifest and excludes plugins, tests, PI
-sample reports, generated indexes, generated exports, and raw runtime sessions.
-Release wrappers use `C:\tmp` when writable and fall back to project-local
-`.agent-control\tmp` in restricted environments.
-
-Compliance Light remains opt-in:
-
-```powershell
-tools\build-project-folder-kit.ps1 -OutputPath C:\tmp\agent-memory-project-kit-compliance -Verify -IncludeCompliance
-```
-
-Without `-IncludeCompliance`, no `agent-memory\compliance\` folder and no
-Compliance Light commands are included.
+| `python tools/agent_memory_cli.py --project-root . validate-memory --strict` | No | Validate frontmatter, IDs, edges, and memory records |
+| `python tools/agent_memory_cli.py --project-root . build-memory-index` | Yes | Generate full memory indexes |
+| `python tools/agent_memory_cli.py --project-root . build-memory-index --incremental --track-tombstones` | Yes | Incremental index with tombstone tracking |
+| `python tools/agent_memory_cli.py --project-root . audit-retention` | No | Preview retention, stale, expiry, and review-cycle findings |
+| `python tools/agent_memory_cli.py --project-root . review-memory-conflicts` | No | Detect stale records and contradiction edges |
+| `python tools/agent_memory_cli.py --project-root . scan-memory-sensitive-data` | No | Scan memory and private runtime logs for secret-like content |
+| `python tools/agent_memory_cli.py --project-root . run-review-workflow --review-type expert-lens --subject docs/README.md` | Yes | Create review/evaluation artifacts |
+| `python tools/agent_memory_cli.py --project-root . export-rag-documents --corpus-type shared` | Yes | Generate reviewed RAG export |
+| `python tools/agent_memory_cli.py --project-root . export-lightrag --corpus-type shared` | Yes | Generate LightRAG export |
+| `python tools/agent_memory_cli.py --project-root . export-graphrag --corpus-type shared` | Yes | Generate GraphRAG export |
+| `python tools/agent_memory_cli.py --project-root . render-memory-report --report-type project-dashboard --audience private` | Yes | Generate local HTML report |
 
 ## Existing Markdown Knowledgebase Module
 
-Add Agent Memory planning support to an existing Markdown KB, Obsidian vault, or
-LLM wiki without changing existing notes, wiki links, frontmatter, or OS
-environment variables:
-
-```powershell
-tools\build-kb-module.ps1 -KnowledgebaseRoot C:\path\to\knowledgebase -IncludeCli
+```bash
+python tools/owledge.py add-kb-module --knowledgebase-root /path/to/knowledgebase --include-cli
 ```
 
-macOS/Linux:
+With an existing vault map:
 
 ```bash
-python3 tools/build_kb_module.py --knowledgebase-root /path/to/knowledgebase --include-cli
-```
-
-Default output:
-
-```text
-agent-memory-module/
-|-- AGENT_MEMORY_MODULE.md
-|-- agent-memory/plans/
-|-- agent-memory/handoffs/
-|-- agent-memory/evidence/
-|-- agent-memory/reviews/
-`-- agent-memory/indexes/
+python tools/owledge.py add-kb-module --knowledgebase-root /path/to/knowledgebase --map-file agent-memory-map.json
 ```
 
 The builder scans Markdown files read-only, preserves existing `[[Wiki Links]]`,
-and writes module-owned status/index artifacts under
-`agent-memory-module\agent-memory\indexes\`. Use `--layout flat` only when the
-user explicitly wants module files at the KB root.
+and writes module-owned status/index artifacts under the module or mapped
+indexes folder.
 
-To use existing vault folders instead of the default module structure, create
-`agent-memory-map.json` in the KB and run:
+## Project Folder Kit
 
-```powershell
-tools\build-kb-module.ps1 -KnowledgebaseRoot C:\path\to\knowledgebase -MapFile agent-memory-map.json
+```bash
+python tools/owledge.py build-project-kit --output-path /tmp/owledge-project-kit --include-plugin-adapter --verify
 ```
 
-Mapped paths must be relative existing directories inside the KB. Traversal,
-absolute paths, symlinks, junctions, and missing targets fail closed.
-In mapped mode, generated module docs, status, and indexes stay under the mapped
-`indexes` folder; the builder does not create a root-level
-`AGENT_MEMORY_MODULE.md`.
+The generator uses an explicit copy manifest and excludes tests, generated
+indexes, generated exports, and raw runtime sessions. Compliance Light remains
+opt-in:
 
-Smoke test:
-
-```powershell
-tools\test-kb-module.ps1 -ProjectRoot .
+```bash
+python tools/owledge.py build-project-kit --output-path /tmp/owledge-project-kit-compliance --include-compliance --verify
 ```
 
 ## Finalization Gates
 
-Use the combined release gate before publishing:
-
-```powershell
-tools\run-finalization-gates.ps1 -ProjectRoot .
-tools\run-redteam-qa.ps1 -ProjectRoot .
+```bash
+python tools/owledge.py finalization-gates --project-root . --include-compliance
+python tools/owledge.py redteam-qa --project-root .
 ```
 
-`run-finalization-gates` executes compile, principles-skill validation,
-principles scenario tests, public-docs integrity, contracts, doctor,
-validation, full and incremental indexes, lifecycle checks, runtime smoke
-tests, memory evals, retrieval fixture eval, KB-module safety checks, and
-project-folder-only verification. Add `-IncludeExports` when you also want
-shared export/report generation in the same run. Add `-IncludeCompliance` to
-verify the optional Compliance Light add-on through a separate generated
-project kit. The latest machine-readable
-report is written to
-`agent-memory\exports\finalization-gates\latest.json`; the matching Markdown
-summary is `agent-memory\exports\finalization-gates\latest.md`. Both are
-generated ignored artifacts.
+The finalization gate runs compile checks, skill validation, scenario tests,
+public-docs integrity, contracts, doctor, validation, indexes, lifecycle checks,
+runtime smoke tests, memory evals, retrieval fixture eval, KB-module safety, and
+project-folder verification.
 
-## Review Evaluation Workflow
-
-Use the `review-evaluation-workflow` skill and command for red-team reviews, expert evaluations, scenario simulations, scorecards, and converting findings into tasks. The contract is Markdown-first and does not require backend infrastructure.
-
-Create a review artifact:
-
-```powershell
-tools\run-review-workflow.ps1 -ProjectRoot . -ReviewType expert-lens -Subject docs\reusable-review-evaluation-templates.md -Question "Does this review workflow have enough evidence and QA?"
-```
-
-Supported `-ReviewType` values:
-
-- `multi-perspective-red-team`
-- `expert-lens`
-- `scenario-simulation`
-- `persona-pack`
-- `review-to-task-plan`
-
-The command writes a private draft artifact under the relevant PI review folder and returns JSON with the output path, source template, review type, and QA commands. Scores of 95 or above are `promote-candidate` only; they do not automatically approve promotion.
+The latest machine-readable report is written to
+`agent-memory/exports/finalization-gates/latest.json`; the Markdown summary is
+`agent-memory/exports/finalization-gates/latest.md`.
 
 ## Scope Rules
 
-For enterprise hubs or aggregate roots, pass:
+For aggregate roots, pass explicit scope arguments to lower-level exports and
+reports whenever multiple tenants or customers are present:
 
-```powershell
--TenantId tenant-a -CustomerId customer-a -ProjectId project-a
+```bash
+python tools/agent_memory_cli.py --project-root . export-rag-documents --corpus-type shared --tenant-id tenant-a --customer-id customer-a --project-id project-a
 ```
-
-Do this for context packs, reports, and exports whenever multiple tenants are present.
 
 ## Promotion Requirements
 
-Promotion now requires:
-
-- source file has valid core frontmatter
-- source `tenant_id`, `customer_id`, and `project_id` match CLI args
-- source `status` is `reviewed` or `promoted`
-- source `review_status` is `reviewed` or `approved`
-- target folder matches source `doc_type`
-- shared visibility has approved sanitization
-- review artifact approves the promotion
-- optional `-SourceHash` matches the source file
-
-Promotion writes an audit manifest to `agent-memory/evidence/promotions/`.
+Promotion requires valid source frontmatter, matching scope, reviewed status,
+approved review evidence, safe shared visibility, and an optional source hash
+match. Promotion writes an audit manifest to
+`agent-memory/evidence/promotions/`.

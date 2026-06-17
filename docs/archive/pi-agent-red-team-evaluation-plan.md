@@ -59,7 +59,7 @@ PI Global Intelligence Agent
 | `skills/pi-agent-red-team-evaluator/` | Root skill for Red Team PI behavior |
 | `plugins/pi-agent-workspace/skills/pi-agent-red-team-evaluator/` | Plugin skill mirror |
 | `plugins/pi-agent-workspace/agents/pi-red-team-evaluator.md` | Runtime agent persona |
-| `tools/pi-redteam-evaluate.ps1` | Deterministic evaluator |
+| Python review workflow | Deterministic evaluator |
 | `agent-memory/templates/evaluation-framework-template.md` | Generic framework template |
 | `agent-memory/templates/pi-red-team-evaluation-template.md` | PI report evaluation template |
 | `agent-memory/templates/agent-quality-scorecard-template.md` | General agent scorecard |

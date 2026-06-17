@@ -69,14 +69,14 @@ An incremental index run is ready for phase QA when:
 
 Validate the generated index with a full rebuild:
 
-```powershell
-tools\build-memory-index.ps1 -ProjectRoot .
+```bash
+python tools/agent_memory_cli.py --project-root . build-memory-index
 ```
 
 Run an incremental update with tombstone tracking:
 
-```powershell
-tools\build-memory-index.ps1 -ProjectRoot . -Incremental -TrackTombstones
+```bash
+python tools/agent_memory_cli.py --project-root . build-memory-index --incremental --track-tombstones
 ```
 
 The command writes `agent-memory/indexes/memory-index.jsonl`, `agent-memory/indexes/memory-index-manifest.json`, and, when requested, `agent-memory/indexes/memory-index-tombstones.jsonl`.

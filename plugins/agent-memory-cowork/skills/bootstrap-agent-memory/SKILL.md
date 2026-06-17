@@ -1,27 +1,36 @@
 ---
 name: bootstrap-agent-memory
-description: Initialize Agent Memory automatically at session start or when a repo lacks PROJECT_CONTEXT.md, AGENTS.md, CLAUDE.md, DESIGN.md, tools, or agent-memory. Use for Claude/Cowork and Codex first-run project setup from an explicit Owledge Kit path.
+description: Initialize Owledge in a host project using project-local Python files and additive writes.
 ---
 
 # Bootstrap Agent Memory
 
-At session start, check for `USER_CONTEXT.md` when global user memory is enabled, `PROJECT_CONTEXT.md`, `AGENTS.md`, `CLAUDE.md`, `DESIGN.md`, `agent-memory/`, `global-memory/`, and `tools/agent_memory_cli.py`.
+Use this skill when a user asks to add Owledge to an existing coding project.
 
-If anything is missing, run:
+## Workflow
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File "C:\AgentMemoryKit\tools\bootstrap-agent-memory.ps1" -ProjectRoot . -KitRoot "C:\AgentMemoryKit"
-```
-
-macOS/Linux users can generate a project-local folder without environment
-variables:
+1. Inspect the host project for `PROJECT_CONTEXT.md`, `AGENTS.md`,
+   `CLAUDE.md`, `DESIGN.md`, `agent-memory/`, and `tools/agent_memory_cli.py`.
+2. Do not overwrite existing memory files unless the user explicitly asks.
+3. From an Owledge repo checkout, run:
 
 ```bash
-python3 tools/build_project_folder_kit.py --output-path /tmp/agent-memory-project-kit --verify
+python tools/owledge.py init-project --target /path/to/project --include-plugin-adapter
 ```
 
-If no kit path is available, ask the user for the kit path once.
+4. Verify:
 
-Never use `-Force` unless the user explicitly asks to overwrite existing files.
+```bash
+python tools/owledge.py doctor --project-root /path/to/project
+python tools/agent_memory_cli.py --project-root /path/to/project validate-memory --strict
+```
 
-After bootstrap, read `USER_CONTEXT.md` when present, then `PROJECT_CONTEXT.md`, and use project-local `agent-memory/` as the project source of truth. Treat `USER_CONTEXT.md` and `global-memory/` as private user-level context and do not export daily notes, personal tasks, onboarding profiles, or private preferences to shared RAG.
+5. Report created files, skipped existing files, and placeholders the user still
+   needs to fill.
+
+## Rules
+
+- Use local files and local Python tools.
+- Keep existing project memory intact.
+- Do not rewrite existing Markdown, wiki links, or frontmatter unless requested.
+- Keep generated indexes and runtime sessions private by default.

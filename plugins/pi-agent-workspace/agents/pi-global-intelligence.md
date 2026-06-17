@@ -29,5 +29,5 @@ Find useful repeated signals in Agent Memory:
 1. Read `PROJECT_CONTEXT.md`.
 2. Build or inspect `agent-memory/indexes/memory-index.jsonl`.
 3. Prefer deterministic frontmatter signals before semantic guessing.
-4. Run `tools/pi-intelligence-report.ps1 -ProjectRoot .` when available.
+4. Use `python tools/agent_memory_cli.py --project-root . run-review-workflow --review-type expert-lens --subject agent-memory/pi-agent/reports` when a deterministic review artifact is useful.
 5. Summarize the strongest findings and recommend review actions.

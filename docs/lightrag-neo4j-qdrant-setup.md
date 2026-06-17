@@ -43,15 +43,15 @@ Do not mix private customer corpora into `shared`. Shared ingestion should only 
 
 Your LightRAG runtime should use Neo4j and Qdrant as storage backends.
 
-```powershell
-$env:NEO4J_URI="neo4j://localhost:7687"
-$env:NEO4J_USERNAME="neo4j"
-$env:NEO4J_PASSWORD="<your-password>"
-$env:NEO4J_DATABASE="neo4j"
+```text
+NEO4J_URI=neo4j://localhost:7687
+NEO4J_USERNAME=neo4j
+NEO4J_PASSWORD=<your-password>
+NEO4J_DATABASE=neo4j
 
-$env:LIGHTRAG_GRAPH_STORAGE="Neo4JStorage"
-$env:LIGHTRAG_VECTOR_STORAGE="QdrantVectorDBStorage"
-$env:WORKSPACE="tenant-local__customer-local__project-local"
+LIGHTRAG_GRAPH_STORAGE=Neo4JStorage
+LIGHTRAG_VECTOR_STORAGE=QdrantVectorDBStorage
+WORKSPACE=tenant-local__customer-local__project-local
 ```
 
 Keep provider keys and database passwords outside Markdown, Git, reports, exports and session logs.
@@ -60,29 +60,24 @@ Keep provider keys and database passwords outside Markdown, Git, reports, export
 
 From a bootstrapped project:
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\validate-memory.ps1 -ProjectRoot .
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\build-memory-index.ps1 -ProjectRoot .
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\export-rag-documents.ps1 -ProjectRoot . -CorpusType private
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\export-lightrag.ps1 -ProjectRoot . -CorpusType private
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\export-graphrag.ps1 -ProjectRoot . -CorpusType private
+```bash
+python tools/agent_memory_cli.py --project-root . validate-memory --strict
+python tools/agent_memory_cli.py --project-root . build-memory-index
+python tools/agent_memory_cli.py --project-root . export-rag-documents --corpus-type private
+python tools/agent_memory_cli.py --project-root . export-lightrag --corpus-type private
+python tools/agent_memory_cli.py --project-root . export-graphrag --corpus-type private
 ```
 
 For an enterprise hub or multi-project vault, always scope the export:
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\export-lightrag.ps1 `
-  -ProjectRoot . `
-  -CorpusType private `
-  -TenantId tenant-a `
-  -CustomerId customer-a `
-  -ProjectId project-a
+```bash
+python tools/agent_memory_cli.py --project-root . export-lightrag --corpus-type private --tenant-id tenant-a --customer-id customer-a --project-id project-a
 ```
 
 For shared/cross-project retrieval:
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\export-lightrag.ps1 -ProjectRoot . -CorpusType shared
+```bash
+python tools/agent_memory_cli.py --project-root . export-lightrag --corpus-type shared
 ```
 
 Shared export includes only records that satisfy the shared gates:
@@ -217,17 +212,17 @@ Recommended payload fields for Qdrant or downstream retrieval traces:
 
 Run these before ingestion:
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\memory-doctor.ps1 -ProjectRoot .
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\validate-memory.ps1 -ProjectRoot .
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\export-lightrag.ps1 -ProjectRoot . -CorpusType private
+```bash
+python tools/owledge.py doctor --project-root .
+python tools/agent_memory_cli.py --project-root . validate-memory --strict
+python tools/agent_memory_cli.py --project-root . export-lightrag --corpus-type private
 ```
 
 Then inspect:
 
-```powershell
-Get-Content .\agent-memory\exports\lightrag\manifest.json
-Get-Content .\agent-memory\exports\lightrag\latest.json
+```bash
+python -m json.tool agent-memory/exports/lightrag/manifest.json
+python -m json.tool agent-memory/exports/lightrag/latest.json
 ```
 
 ## Do Not Do This
@@ -247,7 +242,7 @@ Add a small local adapter in a later milestone:
 
 | Task | Output |
 | --- | --- |
-| `tools/ingest-lightrag.ps1` | Wrapper that calls the user's local LightRAG adapter |
+| `adapters/lightrag/run_ingest.py` | Optional local Python runner that calls the user's LightRAG adapter |
 | `adapters/lightrag/ingest_agent_memory.py` | Optional sample adapter |
 | `docs/lightrag-roundtrip-eval.md` | Test plan for insert, query, source citation, and stale export handling |
 | Retrieval eval fixture | Known question set with expected memory IDs |

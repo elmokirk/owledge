@@ -1,18 +1,22 @@
 ---
-description: Show read-only Agent Memory status for the current host project.
+description: Show read-only Owledge status for the current host project.
 ---
 
-Inspect the current project as an Agent Memory workspace without creating, modifying, building, exporting, compacting, or promoting files.
+Inspect the current project as an Owledge workspace without creating,
+modifying, exporting, compacting, or promoting files.
 
 Run read-only checks from the project root:
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File tools\validate-memory.ps1 -ProjectRoot .
-powershell -NoProfile -ExecutionPolicy Bypass -File tools\memory-doctor.ps1 -ProjectRoot .
-Get-ChildItem agent-memory\sessions -Directory -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 5 Name,LastWriteTime
-Get-ChildItem agent-memory\compiled -File -Filter *.md -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 10 Name,LastWriteTime
-Get-ChildItem agent-memory\exports -Recurse -File -ErrorAction SilentlyContinue | Select-Object FullName,Length,LastWriteTime
+```bash
+python tools/agent_memory_cli.py --project-root . validate-memory --strict
+python tools/owledge.py doctor --project-root .
 ```
+
+Then inspect these folders directly:
+
+- `agent-memory/sessions/`
+- `agent-memory/compiled/`
+- `agent-memory/exports/`
 
 Report:
 
@@ -20,5 +24,5 @@ Report:
 - latest session folders under `agent-memory/sessions/`
 - draft compiled summaries under `agent-memory/compiled/`
 - validation status
-- existing RAG/LightRAG export artifact timestamps if present
+- existing export artifact timestamps if present
 - any private/confidential artifacts that must not be shared

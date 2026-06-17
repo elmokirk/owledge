@@ -1,10 +1,5 @@
 #!/usr/bin/env python3
-"""Cross-platform project-folder-only generator for the Agent Memory Kit.
-
-This mirrors the PowerShell generator but only requires Python. It is intended
-for macOS/Linux users and agents that should not need global environment
-variables or a separate kit install after the project folder is created.
-"""
+"""Build a Python-first project-local Owledge kit."""
 
 from __future__ import annotations
 
@@ -98,43 +93,10 @@ GLOBAL_DIRS = [
 ]
 
 CORE_TOOLS = [
+    "owledge.py",
     "agent_memory_cli.py",
-    "bootstrap-agent-memory.ps1",
-    "build-context-pack.ps1",
-    "build-context-pack.sh",
-    "build-memory-index.ps1",
-    "build-memory-index.sh",
-    "build-project-folder-kit.ps1",
-    "build-project-folder-kit.sh",
     "build_project_folder_kit.py",
-    "build-kb-module.ps1",
-    "build-kb-module.sh",
     "build_kb_module.py",
-    "compact-sessions.ps1",
-    "eval-memory-retrieval.ps1",
-    "export-graphrag.ps1",
-    "export-lightrag.ps1",
-    "export-rag-documents.ps1",
-    "find-parallels.ps1",
-    "init-agent-memory.ps1",
-    "memory-doctor.ps1",
-    "memory-doctor.sh",
-    "promote-memory.ps1",
-    "render-memory-report.ps1",
-    "report-agent-memory-metrics.ps1",
-    "run-memory-evals.ps1",
-    "run-review-workflow.ps1",
-    "start-agent-control-plane.ps1",
-    "test-agent-memory-principles-scenarios.ps1",
-    "test-agent-memory-principles-skill.ps1",
-    "test-kb-module.ps1",
-    "validate-memory.ps1",
-    "validate-memory.sh",
-    "verify-host-install.ps1",
-    "verify-host-install.sh",
-    "audit-retention.ps1",
-    "review-memory-conflicts.ps1",
-    "scan-memory-sensitive-data.ps1",
 ]
 
 SKILL_DIRS = [
@@ -210,13 +172,12 @@ def install_compliance(source: pathlib.Path, target: pathlib.Path) -> None:
 
 
 def apply_plugin_hook_profile(target: pathlib.Path, profile: str) -> str:
-    if profile == "auto":
-        profile = "windows" if platform.system().lower() == "windows" else "unix"
-    if profile == "unix":
-        unix_hooks = target / "plugins" / "agent-memory-cowork" / "hooks" / "hooks.unix.json"
-        hooks = target / "plugins" / "agent-memory-cowork" / "hooks" / "hooks.json"
-        if unix_hooks.exists():
-            copy_file(unix_hooks, hooks)
+    if profile != "python":
+        raise SystemExit("Only the Python hook profile is supported by the core kit.")
+    python_hooks = target / "plugins" / "agent-memory-cowork" / "hooks" / "hooks.python.json"
+    hooks = target / "plugins" / "agent-memory-cowork" / "hooks" / "hooks.json"
+    if python_hooks.exists():
+        copy_file(python_hooks, hooks)
     return profile
 
 
@@ -227,36 +188,20 @@ def write_local_readme(target: pathlib.Path, include_plugin: bool, hook_profile:
         if include_compliance
         else "Compliance Light is not included in this lean folder."
     )
-    readme = f"""# Agent Memory Project Folder Kit
+    readme = f"""# Owledge Project Folder Kit
 
-This folder is a minimal project-local Agent Memory install.
+This folder is a minimal project-local Owledge install.
 
 Markdown is the source of truth. Generated indexes and exports are rebuildable
-views. No global `AGENT_MEMORY_KIT_ROOT` variable is required because this folder
-contains its own `tools/agent_memory_cli.py`.
+views. This folder contains its own Python tools and does not require global
+installation.
 
 ## Humans
 
-Windows:
-
-```powershell
-tools\\verify-host-install.ps1 -ProjectRoot .
-tools\\build-memory-index.ps1 -ProjectRoot .
-```
-
-macOS/Linux:
-
 ```bash
-python3 tools/agent_memory_cli.py --project-root . doctor --mode host
-python3 tools/agent_memory_cli.py --project-root . validate-memory --strict
-python3 tools/agent_memory_cli.py --project-root . build-memory-index
-```
-
-Shell wrappers are also included for convenience:
-
-```bash
-bash tools/verify-host-install.sh --project-root .
-bash tools/build-memory-index.sh --project-root .
+python tools/owledge.py doctor --project-root .
+python tools/agent_memory_cli.py --project-root . validate-memory --strict
+python tools/agent_memory_cli.py --project-root . build-memory-index
 ```
 
 ## Agents
@@ -266,7 +211,7 @@ bash tools/build-memory-index.sh --project-root .
 3. Build task context with:
 
 ```bash
-python3 tools/agent_memory_cli.py --project-root . build-context-pack --task-id "<task-id>" --agent-role worker
+python tools/owledge.py build-context-pack --project-root . --task-id "<task-id>" --agent-role worker
 ```
 
 4. Write durable findings to `agent-memory/` using the templates; do not treat
@@ -332,7 +277,7 @@ def build(args: argparse.Namespace) -> dict[str, object]:
         copy_tree_filtered(
             source / "plugins" / "agent-memory-cowork",
             target / "plugins" / "agent-memory-cowork",
-            ["tests/*"],
+            ["tests/*", "scripts/*.sh"],
         )
         hook_profile = apply_plugin_hook_profile(target, args.plugin_hook_profile)
 
@@ -363,7 +308,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--include-global-memory", action="store_true")
     parser.add_argument("--include-plugin-adapter", action="store_true")
     parser.add_argument("--include-compliance", action="store_true")
-    parser.add_argument("--plugin-hook-profile", choices=["auto", "windows", "unix"], default="auto")
+    parser.add_argument("--plugin-hook-profile", choices=["python"], default="python")
     parser.add_argument("--verify", action="store_true")
     args = parser.parse_args(argv)
     result = build(args)

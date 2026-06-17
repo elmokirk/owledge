@@ -4,8 +4,8 @@ description: Run a PI Agent workspace quality and ideation check.
 
 Run the PI Agent workspace check for the current project:
 
-```powershell
-tools\pi-agent-check.ps1 -ProjectRoot . -Question "Check workspace quality and relevant ideas before planning."
+```bash
+python tools/owledge.py doctor --project-root .
 ```
 
 Summarize:

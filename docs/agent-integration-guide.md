@@ -28,20 +28,14 @@ Rules:
 3. If `agent-memory-map.json` exists, validate it and use its mapped folders.
 4. Run the local drop-in builder from the kit repo:
 
-```powershell
-tools\build-kb-module.ps1 -KnowledgebaseRoot "C:\path\to\knowledgebase" -IncludeCli
-```
-
-macOS/Linux:
-
 ```bash
-python3 tools/build_kb_module.py --knowledgebase-root /path/to/knowledgebase --include-cli
+python tools/owledge.py add-kb-module --knowledgebase-root /path/to/knowledgebase --include-cli
 ```
 
 If the user provides a map:
 
-```powershell
-tools\build-kb-module.ps1 -KnowledgebaseRoot "C:\path\to\knowledgebase" -MapFile agent-memory-map.json
+```bash
+python tools/owledge.py add-kb-module --knowledgebase-root /path/to/knowledgebase --map-file agent-memory-map.json
 ```
 
 5. Confirm that the module was created under:

@@ -32,8 +32,8 @@ Use this skill for requests that mention red team, expert review, evaluation, sc
 
 When available, create the draft artifact with:
 
-```powershell
-tools\run-review-workflow.ps1 -ProjectRoot . -ReviewType expert-lens -Subject path\to\artifact.md -Question "What should this review decide?"
+```bash
+python tools/agent_memory_cli.py --project-root . run-review-workflow --review-type expert-lens --subject path/to/artifact.md --question "What should this review decide?"
 ```
 
 If the command is unavailable in a host project, copy the matching template manually and preserve the same frontmatter fields, evidence requirements, score scale, and promotion boundary.

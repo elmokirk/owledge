@@ -41,9 +41,9 @@ Deliverables:
 | Retention policy template | `agent-memory/templates/retention-policy-template.md` |
 | Transfer assessment template | `agent-memory/templates/transfer-assessment-template.md` |
 | Redaction policy | `agent-memory/compliance/redaction-policy.md` |
-| Compliance doctor command | `tools/compliance-doctor.ps1` and CLI subcommand |
-| PII/secret scan command | `tools/scan-memory-sensitive-data.ps1` and CLI subcommand |
-| Retention audit command | `tools/audit-retention.ps1` and CLI subcommand |
+| Compliance doctor command | `agent_memory_cli.py compliance-doctor` subcommand |
+| PII/secret scan command | `agent_memory_cli.py scan-memory-sensitive-data` subcommand |
+| Retention audit command | `agent_memory_cli.py audit-retention` subcommand |
 
 Acceptance tests:
 
@@ -64,7 +64,7 @@ Deliverables:
 | Prohibited-practice checklist | `agent-memory/templates/prohibited-ai-practice-checklist-template.md` |
 | Model/provider registry schema | `agent-memory/schemas/provider.schema.json` |
 | AI system schema | `agent-memory/schemas/ai-system.schema.json` |
-| AI inventory command | `tools/build-ai-system-inventory.ps1` and CLI subcommand |
+| AI inventory command | Python CLI subcommand |
 
 Acceptance tests:
 
@@ -85,7 +85,7 @@ Deliverables:
 | Security baseline map | `agent-memory/compliance/security-baseline.md` |
 | Vendor/sub-processor register | `agent-memory/compliance/registers/vendors.md` |
 | Dependency and plugin provenance report | `agent-memory/compliance/registers/supply-chain.md` |
-| Incident pack command | `tools/build-incident-pack.ps1` and CLI subcommand |
+| Incident pack command | Python CLI subcommand |
 
 Acceptance tests:
 
@@ -104,9 +104,9 @@ Deliverables:
 | Tenant registry schema | extend `agent-memory/schemas/tenant.schema.json` |
 | Access policy template | `agent-memory/templates/access-policy-template.md` |
 | Enterprise hub layout doc | `docs/enterprise-hub.md` |
-| Promotion audit hardening | extend `tools/promote-memory.ps1` and CLI subcommand |
+| Promotion audit hardening | extend Python promote subcommand |
 | Scoped export defaults | extend RAG/LightRAG/GraphRAG export commands |
-| Compliance dashboard report | extend `tools/render-memory-report.ps1` |
+| Compliance dashboard report | extend Python report subcommand |
 
 Acceptance tests:
 
@@ -144,7 +144,7 @@ Deliverables:
 | Deliverable | Path |
 | --- | --- |
 | Compliance fixture suite | `tests/compliance/` |
-| Release gate command | `tools/run-compliance-gates.ps1` |
+| Release gate command | `python tools/owledge.py finalization-gates --include-compliance` |
 | Customer compliance pack report | report renderer extension |
 | Legal sign-off artifact template | `agent-memory/templates/legal-signoff-template.md` |
 

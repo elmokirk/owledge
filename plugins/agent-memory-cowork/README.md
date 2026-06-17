@@ -1,24 +1,24 @@
 # Owledge Cowork Adapter
 
-Host-project adapter for Owledge Kit's Markdown-first agent memory layer.
+Host-project adapter for Owledge's Markdown-first agent memory layer.
 
 ## Purpose
 
-This plugin is globally installable, but it writes to the active host project. It is not a second memory store.
+This plugin can be installed by a compatible runtime, but it writes to the
+active host project. It is not a second memory store.
 
 ```text
-Global plugin = skills, commands, Claude/Cowork hooks
+Runtime plugin = skills, commands, hooks
 Host project = PROJECT_CONTEXT.md, DESIGN.md, agent-memory/
-Enterprise hub = later aggregation of reviewed/promoted knowledge
-RAG/LightRAG = consumers of reviewed exports
+Reviewed exports = optional consumers such as RAG or reports
 ```
 
 ## Requirements
 
-- PowerShell on Windows.
-- Python available as `python` on Windows or `python3` on macOS/Linux.
-- A host project initialized with `agent-memory/` and `PROJECT_CONTEXT.md`.
-- Local `tools/agent_memory_cli.py` in the host project.
+- Python available as `python`.
+- A host project initialized with `PROJECT_CONTEXT.md` and `agent-memory/`.
+- Local `tools/agent_memory_cli.py` in the host project or an Owledge repo
+  checkout.
 
 ## Configuration
 
@@ -30,16 +30,14 @@ The normal path is project-local:
 3. Let the hooks discover the project root by walking upward from the current
    directory.
 
-Environment variables are compatibility fallbacks for unusual harnesses only,
-not the default install path.
-
 ## Capture Policy
 
 - Raw hook events are private working memory.
 - Capture defaults to redacted `standard` mode.
-- Hook errors are logged to `.agent-control/logs/plugin-errors.jsonl` and do not break Claude sessions.
-- Runtime session artifacts are expected to be private and gitignored by default: `events.jsonl`, `session.md`, and `summary.md`.
-- Runtime summaries remain private session artifacts until curated.
+- Hook errors are logged to `.agent-control/logs/plugin-errors.jsonl` and do
+  not break runtime sessions.
+- Runtime session artifacts are private and ignored by default:
+  `events.jsonl`, `session.md`, and `summary.md`.
 - Shared exports require approved review and sanitization.
 
 ## Install Shape
@@ -49,63 +47,29 @@ plugins/agent-memory-cowork/
 |-- .claude-plugin/plugin.json
 |-- .codex-plugin/plugin.json
 |-- commands/
-|   |-- memory-init.md
-|   |-- memory-status.md
-|   |-- memory-doctor.md
-|   `-- memory-report.md
 |-- agents/
-|   `-- memory-curator.md
 |-- skills/
-|   |-- agent-memory-principles/
-|   |-- agent-memory-runtime-bridge/
-|   |-- review-evaluation-workflow/
-|   `-- render-memory-report/
 |-- hooks/hooks.json
-|-- hooks/hooks.unix.json
+|-- hooks/hooks.python.json
 |-- scripts/
-|   |-- capture-claude-event.ps1
-|   |-- close-runtime-session.ps1
 |   |-- capture-claude-event.py
-|   |-- close-runtime-session.py
-|   |-- capture-claude-event.sh
-|   `-- close-runtime-session.sh
+|   `-- close-runtime-session.py
 |-- tests/fixtures/
 |-- LICENSE
 |-- VERSION
 `-- CHANGELOG.md
 ```
 
-Claude/Cowork uses hooks. Codex uses the skills and commands; Claude hook wiring is intentionally not advertised through the Codex manifest.
-
 Use `agent-memory-principles` as the primary entrypoint when an agent should
 connect to an existing Markdown knowledgebase, Obsidian vault, or LLM wiki
-without forcing the preset folder structure. It supports a zero-env,
-principles-first workflow with an optional local `agent-memory-map.json`.
+without forcing the preset folder structure. It supports a principles-first
+workflow with an optional local `agent-memory-map.json`.
 
-## macOS And Linux
-
-The default `hooks/hooks.json` is Windows PowerShell-first. For macOS/Linux,
-use the Unix hook profile:
+## Local Starter
 
 ```bash
-cp plugins/agent-memory-cowork/hooks/hooks.unix.json plugins/agent-memory-cowork/hooks/hooks.json
+python tools/owledge.py build-project-kit --output-path /tmp/owledge-project-kit --include-plugin-adapter --verify
 ```
-
-The cross-platform project-folder generator does this automatically:
-
-```bash
-python3 tools/build_project_folder_kit.py \
-  --output-path /tmp/agent-memory-project-kit \
-  --include-plugin-adapter \
-  --plugin-hook-profile unix \
-  --verify
-```
-
-The Unix hooks use shell launchers that try `AGENT_MEMORY_PYTHON`, then
-`python3`, then `python`. When Claude/Cowork runs from the initialized project
-root, no project or kit environment variable is required because the hook finds
-`PROJECT_CONTEXT.md`, `agent-memory/`, and the local CLI by walking upward from
-the current directory.
 
 ## Commands
 
@@ -116,19 +80,12 @@ the current directory.
 | `memory-doctor` | No | Read-only install, privacy, schema, and adapter diagnosis. |
 | `memory-report` | Yes | Generate local HTML report views. Markdown remains canonical. |
 
-For enterprise hubs, pass tenant/customer/project scope to exports and reports whenever the project root aggregates multiple customers.
-
 ## Manual Smoke Test
 
 Use a temporary copy or a private test project.
 
-```powershell
-Get-Content plugins\agent-memory-cowork\tests\fixtures\session-start.json -Raw |
-  powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File plugins\agent-memory-cowork\scripts\capture-claude-event.ps1
-
-Get-Content plugins\agent-memory-cowork\tests\fixtures\stop.json -Raw |
-  powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File plugins\agent-memory-cowork\scripts\close-runtime-session.ps1
-
-powershell -NoProfile -ExecutionPolicy Bypass -File tools\memory-doctor.ps1 -ProjectRoot .
-powershell -NoProfile -ExecutionPolicy Bypass -File tools\verify-host-install.ps1 -ProjectRoot .
+```bash
+python plugins/agent-memory-cowork/scripts/capture-claude-event.py < plugins/agent-memory-cowork/tests/fixtures/session-start.json
+python plugins/agent-memory-cowork/scripts/close-runtime-session.py < plugins/agent-memory-cowork/tests/fixtures/stop.json
+python tools/owledge.py doctor --project-root .
 ```

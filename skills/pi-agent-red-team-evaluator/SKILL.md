@@ -23,14 +23,14 @@ Challenge PI Agent outputs before promotion. The evaluator writes scorecards and
 
 ## Runtime Command
 
-```powershell
-tools\pi-redteam-evaluate.ps1 -ProjectRoot .
+```bash
+python tools/agent_memory_cli.py --project-root . run-review-workflow --review-type multi-perspective-red-team --subject agent-memory/pi-agent/reports --question "Evaluate PI intelligence quality and release risk."
 ```
 
 Pass a specific report when needed:
 
-```powershell
-tools\pi-redteam-evaluate.ps1 -ProjectRoot . -ReportPath agent-memory\pi-agent\reports\pi-intelligence-YYYYMMDDHHMMSS.md
+```bash
+python tools/agent_memory_cli.py --project-root . run-review-workflow --review-type multi-perspective-red-team --subject agent-memory/pi-agent/reports/pi-intelligence-YYYYMMDDHHMMSS.md --question "Evaluate this PI intelligence report."
 ```
 
 ## Evaluation Dimensions

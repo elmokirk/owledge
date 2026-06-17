@@ -7,14 +7,14 @@ description: Run the QA Red Team PI Agent evaluator against the latest PI intell
 
 Run from the project root:
 
-```powershell
-tools\pi-redteam-evaluate.ps1 -ProjectRoot .
+```bash
+python tools/agent_memory_cli.py --project-root . run-review-workflow --review-type multi-perspective-red-team --subject agent-memory/pi-agent/reports --question "Evaluate PI intelligence quality."
 ```
 
 For a specific report:
 
-```powershell
-tools\pi-redteam-evaluate.ps1 -ProjectRoot . -ReportPath agent-memory\pi-agent\reports\pi-intelligence-YYYYMMDDHHMMSS.md
+```bash
+python tools/agent_memory_cli.py --project-root . run-review-workflow --review-type multi-perspective-red-team --subject agent-memory/pi-agent/reports/pi-intelligence-YYYYMMDDHHMMSS.md --question "Evaluate this PI intelligence report."
 ```
 
 The evaluator writes a 1-100 scorecard under `agent-memory/pi-agent/red-team/`.

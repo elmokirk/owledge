@@ -7,7 +7,7 @@ on:
 
 jobs:
   docs-integrity:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -18,9 +18,7 @@ jobs:
           python-version: "3.11"
 
       - name: Public docs gate
-        shell: pwsh
-        run: powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\test-public-docs.ps1 -ProjectRoot .
+        run: python tools/owledge.py test public-docs --project-root .
 
       - name: Benchmark harness smoke
-        shell: pwsh
-        run: powershell -NoProfile -ExecutionPolicy Bypass -File .\benchmarks\run-benchmarks.ps1 -ProjectRoot .
+        run: python tools/owledge.py benchmark --project-root .

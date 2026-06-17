@@ -65,10 +65,10 @@ The PI Agent should:
 
 ## Runtime Commands
 
-```powershell
-tools\pi-agent-check.ps1 -ProjectRoot . -Question "What should be checked before this plan?"
-tools\pi-intelligence-report.ps1 -ProjectRoot .
-tools\pi-redteam-evaluate.ps1 -ProjectRoot .
+```bash
+python tools/owledge.py doctor --project-root .
+python tools/agent_memory_cli.py --project-root . run-review-workflow --review-type expert-lens --subject agent-memory/pi-agent/reports --question "What intelligence should be curated?"
+python tools/agent_memory_cli.py --project-root . run-review-workflow --review-type multi-perspective-red-team --subject agent-memory/pi-agent/reports --question "Evaluate PI intelligence quality."
 ```
 
 ## Next Improvements

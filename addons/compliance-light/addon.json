@@ -45,14 +45,6 @@
       "target": "agent-memory/schemas/compliance-record.schema.json"
     },
     {
-      "source": "tools/compliance-doctor.ps1",
-      "target": "tools/compliance-doctor.ps1"
-    },
-    {
-      "source": "tools/run-compliance-gates.ps1",
-      "target": "tools/run-compliance-gates.ps1"
-    },
-    {
       "source": "docs/compliance-light.md",
       "target": "docs/compliance-light.md"
     }

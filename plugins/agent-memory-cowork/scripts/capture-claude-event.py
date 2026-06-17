@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-import os
 import pathlib
 import subprocess
 import sys
@@ -70,7 +69,7 @@ def main() -> int:
     try:
         root = find_project_root(pathlib.Path.cwd())
         cli = resolve_cli(root)
-        capture_mode = os.environ.get("AGENT_MEMORY_CAPTURE_MODE", "standard")
+        capture_mode = "standard"
         payload = normalized_payload(sys.stdin.read(), capture_mode)
         with tempfile.NamedTemporaryFile("w", encoding="utf-8", delete=False) as handle:
             handle.write(payload)
@@ -97,8 +96,6 @@ def main() -> int:
             event_path.unlink(missing_ok=True)
     except Exception as exc:
         write_error(str(exc), root)
-        if os.environ.get("AGENT_MEMORY_STRICT_HOOKS") == "1":
-            return 1
     return 0
 
 

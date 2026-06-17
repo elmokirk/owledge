@@ -10,8 +10,8 @@ Owledge keeps benchmark claims local and reproducible.
 
 ## Run
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\benchmarks\run-benchmarks.ps1 -ProjectRoot .
+```bash
+python tools/owledge.py benchmark --project-root .
 ```
 
 The script writes:

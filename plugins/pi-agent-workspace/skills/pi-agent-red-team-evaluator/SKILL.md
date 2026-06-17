@@ -13,8 +13,8 @@ Evaluate and challenge PI outputs before promotion. Write scorecards and red-tea
 
 ## Runtime Command
 
-```powershell
-tools\pi-redteam-evaluate.ps1 -ProjectRoot .
+```bash
+python tools/agent_memory_cli.py --project-root . run-review-workflow --review-type multi-perspective-red-team --subject agent-memory/pi-agent/reports --question "Evaluate PI intelligence quality and release risk."
 ```
 
 ## Recommendation Bands

@@ -13,8 +13,8 @@ PI intelligence is candidate knowledge. Write project-level findings to `agent-m
 
 ## Runtime Command
 
-```powershell
-tools\pi-intelligence-report.ps1 -ProjectRoot .
+```bash
+python tools/agent_memory_cli.py --project-root . run-review-workflow --review-type expert-lens --subject agent-memory/pi-agent/reports --question "What cross-project intelligence should be curated?"
 ```
 
 ## Artifact Workspace

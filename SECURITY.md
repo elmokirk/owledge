@@ -38,4 +38,4 @@ Public issue tracker is not an acceptable place for undisclosed security finding
 - Export shared RAG only from reviewed and sanitized artifacts.
 - Keep customer-specific memory scoped by `tenant_id`, `customer_id`, and `project_id`.
 - Run validation before export or promotion.
-- Run `tools\scan-memory-sensitive-data.ps1 -ProjectRoot .` before shared export or release review.
+- Run `python tools/agent_memory_cli.py --project-root . scan-memory-sensitive-data` before shared export or release review.

@@ -1,5 +1,5 @@
 ---
-description: Generate a local HTML Agent Memory report from reviewed Markdown memory.
+description: Generate a local HTML Owledge report from reviewed Markdown memory.
 ---
 
 Generate a local HTML view. Markdown remains canonical.
@@ -17,20 +17,20 @@ Valid report types:
 
 Default private report:
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File tools\render-memory-report.ps1 -ProjectRoot . -ReportType project-dashboard -Audience private
+```bash
+python tools/agent_memory_cli.py --project-root . render-memory-report --report-type project-dashboard --audience private
 ```
 
 Customer-safe report:
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File tools\render-memory-report.ps1 -ProjectRoot . -ReportType project-dashboard -Audience customer
+```bash
+python tools/agent_memory_cli.py --project-root . render-memory-report --report-type project-dashboard --audience customer
 ```
 
 Shared-safe report:
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File tools\render-memory-report.ps1 -ProjectRoot . -ReportType project-dashboard -Audience shared
+```bash
+python tools/agent_memory_cli.py --project-root . render-memory-report --report-type project-dashboard --audience shared
 ```
 
 Report the generated file path and any audience-filtered records.

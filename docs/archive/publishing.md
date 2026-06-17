@@ -63,22 +63,22 @@ Owledge gives AI agents durable project memory in Markdown: plans, evidence, rev
 
 ## Pre-Publish Commands
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run-finalization-gates.ps1 -ProjectRoot .
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run-redteam-qa.ps1 -ProjectRoot .
+```bash
+python tools/owledge.py finalization-gates --project-root .
+python tools/owledge.py redteam-qa --project-root .
 ```
 
-For shared export/report validation, add `-IncludeExports` to the finalization
+For shared export/report validation, add `--include-exports` to the finalization
 gate:
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run-finalization-gates.ps1 -ProjectRoot . -IncludeExports
+```bash
+python tools/owledge.py finalization-gates --project-root . --include-exports
 ```
 
-For optional Compliance Light add-on validation, add `-IncludeCompliance`:
+For optional Compliance Light add-on validation, add `--include-compliance`:
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run-finalization-gates.ps1 -ProjectRoot . -IncludeCompliance
+```bash
+python tools/owledge.py finalization-gates --project-root . --include-compliance
 ```
 
 The finalization gate includes compile, principles skill validation,
@@ -86,7 +86,7 @@ principles scenarios including Superpowers coexistence, public-docs integrity, c
 validation, full and incremental indexes, retention audit, conflict review,
 sensitive-data scan, runtime adapter smoke tests, memory evals, retrieval
 fixture eval, KB module safety, and minimal project-folder verification.
-`-IncludeCompliance` validates the add-on through a separate generated project
+`--include-compliance` validates the add-on through a separate generated project
 folder; the default gate stays compliance-add-on free.
 
 For manual release debugging, the equivalent individual commands are listed in
@@ -102,7 +102,7 @@ For manual release debugging, the equivalent individual commands are listed in
 
 ## Publish Steps
 
-```powershell
+```bash
 git init
 git status --short
 git add .agent-control .gitignore AGENTS.md AGENTS.template.md CHANGELOG.md CLAUDE.md CLAUDE.template.md DESIGN.md LICENSE PRIVACY.md PROJECT_CONTEXT.template.md README.md REPORT_DESIGN_SELECTOR.html ROADMAP.md SECURITY.md VERSION agent-memory docs plugins shared skills tools

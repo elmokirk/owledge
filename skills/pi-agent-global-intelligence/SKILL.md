@@ -42,8 +42,8 @@ Use these artifact folders:
 4. Inspect only relevant project memory groups: `ideas/`, `canonical/`, `compiled/`, `patterns/`, `lessons/`, `decisions/`, `handoffs/`, `evidence/`, and reviewed session summaries.
 5. Run the runtime command when available:
 
-```powershell
-tools\pi-intelligence-report.ps1 -ProjectRoot .
+```bash
+python tools/agent_memory_cli.py --project-root . run-review-workflow --review-type expert-lens --subject agent-memory/pi-agent/reports --question "What cross-project intelligence should be curated?"
 ```
 
 6. Review the generated report and classify findings:

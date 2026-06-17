@@ -13,7 +13,7 @@ Owledge gives agents durable project memory in local Markdown: plans, evidence, 
 > Use Superpowers to execute. Use Owledge to remember, hand off, review, and keep project knowledge durable.  
 > Use Ponytail to reduce code. Use Owledge to preserve context, evidence, and planning discipline.
 
-**Release proof:** 20 release gates passing locally, additive writes by default, private runtime capture, metadata-first KB scan, and no required OS-wide setup.
+**Release proof:** 21 release gates passing locally, additive writes by default, private runtime capture, metadata-first KB scan, and no required OS-wide setup.
 
 ## Table Of Contents
 
@@ -43,13 +43,7 @@ Owledge is for teams and power users who already work in Markdown, Obsidian, LLM
 Add Owledge as a small additive module inside an existing vault:
 
 ```bash
-python tools/build_kb_module.py --knowledgebase-root /path/to/your/vault --include-cli
-```
-
-Windows:
-
-```powershell
-py -3 tools\build_kb_module.py --knowledgebase-root C:\path\to\your\vault --include-cli
+python tools/owledge.py add-kb-module --knowledgebase-root /path/to/your/vault --include-cli
 ```
 
 Best next read: [Drop-in agent integration guide](docs/agent-integration-guide.md)
@@ -58,8 +52,8 @@ Best next read: [Drop-in agent integration guide](docs/agent-integration-guide.m
 
 Bootstrap a host project from your local Owledge clone:
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\bootstrap-agent-memory.ps1 -ProjectRoot C:\path\to\your-project -KitRoot .
+```bash
+python tools/owledge.py init-project --target /path/to/your-project --include-plugin-adapter
 ```
 
 Best next read: [Project quickstart](docs/quickstart.md)
@@ -144,15 +138,15 @@ It is a local/project utility layer for durable memory, planning discipline, and
 
 Release validation is scriptable and local:
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run-finalization-gates.ps1 -ProjectRoot . -IncludeCompliance
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run-redteam-qa.ps1 -ProjectRoot .
+```bash
+python tools/owledge.py finalization-gates --project-root . --include-compliance
+python tools/owledge.py redteam-qa --project-root .
 ```
 
 Public docs are checked separately for encoding, anchors, links, plugin/install consistency, and benchmark asset presence:
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\test-public-docs.ps1 -ProjectRoot .
+```bash
+python tools/owledge.py test public-docs --project-root .
 ```
 
 ## Documentation

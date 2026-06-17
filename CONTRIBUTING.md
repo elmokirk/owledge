@@ -14,9 +14,9 @@ Owledge accepts contributions that improve:
 
 Run:
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\test-public-docs.ps1 -ProjectRoot .
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run-finalization-gates.ps1 -ProjectRoot . -IncludeCompliance
+```bash
+python tools/owledge.py test public-docs --project-root .
+python tools/owledge.py finalization-gates --project-root . --include-compliance
 ```
 
 ## Pull Request Rules
