@@ -1,4 +1,4 @@
-# Owledge Kit And Superpowers
+# Owledge And Superpowers
 
 ## Positioning
 
@@ -6,14 +6,14 @@
 focuses on brainstorming, implementation plans, TDD, debugging, review loops,
 branch finishing, and subagent-driven development.
 
-Owledge Kit is the complementary persistent memory layer. It keeps plans,
+Owledge is the complementary persistent memory layer. It keeps plans,
 evidence, reviews, handoffs, session continuity, and project knowledge durable
 inside Markdown projects, Obsidian vaults, LLM wikis, or mapped knowledgebase
 folders.
 
 ## Comparison
 
-| Area | Superpowers | Owledge Kit |
+| Area | Superpowers | Owledge |
 | --- | --- | --- |
 | Primary job | Execute software work through agent workflows | Preserve project knowledge and planning context |
 | Core unit | Skill-driven development process | Markdown memory, evidence, handoffs, reviews |
@@ -23,14 +23,14 @@ folders.
 | Existing KBs | Not the main focus | Drop-in Markdown/Obsidian/LLM-wiki integration |
 | Canonical truth | Workflow artifacts | Markdown source-of-truth records |
 
-Use Superpowers to execute. Use Owledge Kit to remember, audit, hand off,
+Use Superpowers to execute. Use Owledge to remember, audit, hand off,
 and keep project knowledge durable.
 
 ## Recommended Combined Flow
 
 1. Use Superpowers to brainstorm, write implementation plans, run TDD, dispatch
    subagents, and finish branches.
-2. Let Owledge Kit scan Superpowers plans read-only, especially
+2. Let Owledge scan Superpowers plans read-only, especially
    `docs/superpowers/plans/*.md`.
 3. Write Owledge evidence, reviews, handoffs, decisions, and MVP follow-up
    plans in `agent-memory-module/`, project `agent-memory/`, or mapped KB
@@ -42,7 +42,7 @@ and keep project knowledge durable.
 
 ```text
 Use Superpowers for coding execution workflows.
-Use Owledge Kit as the durable Markdown memory layer.
+Use Owledge as the durable Markdown memory layer.
 
 When you see docs/superpowers/plans/*.md:
 - read them as source evidence

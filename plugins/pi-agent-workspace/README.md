@@ -1,6 +1,6 @@
 # PI Agent Workspace Adapter
 
-Optional standalone adapter for Agent Memory Kit.
+Optional standalone adapter for Owledge.
 
 ## Purpose
 

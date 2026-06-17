@@ -1,9 +1,9 @@
 {
   "name": "agent-memory-cowork",
-  "version": "0.3.0",
-  "description": "Codex-facing host-project adapter for Owledge Kit's Markdown-first agent memory skills, commands, diagnostics, and reports. Claude hooks are packaged separately in the Claude manifest.",
+  "version": "0.5.0",
+  "description": "Codex-facing host-project adapter for Owledge's Markdown-first agent memory skills, commands, diagnostics, and reports. Claude hooks are packaged separately in the Claude manifest.",
   "author": {
-    "name": "Owledge Kit"
+    "name": "Owledge"
   },
   "license": "MIT",
   "keywords": [
@@ -24,10 +24,10 @@
   "agents": "./agents/",
   "skills": "./skills/",
   "interface": {
-    "displayName": "Owledge Kit",
+    "displayName": "Owledge",
     "shortDescription": "Give agents durable Markdown project memory.",
     "longDescription": "Keeps plans, evidence, reviews, handoffs, and session context durable as private Markdown-first project memory, then prepares reviewed summaries for RAG, LightRAG, and GraphRAG exports.",
-    "developerName": "Owledge Kit",
+    "developerName": "Owledge",
     "category": "Productivity",
     "capabilities": [
       "Write",

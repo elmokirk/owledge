@@ -13,9 +13,11 @@ Owledge is Python-first. Use `tools/owledge.py` for public workflows and
 | `python tools/owledge.py build-project-kit --output-path /tmp/owledge-project-kit --verify` | Yes | Generate a minimal project-local kit |
 | `python tools/owledge.py build-context-pack --project-root . --task-id publish-v1` | No | Generate scoped task context |
 | `python tools/owledge.py test public-docs --project-root .` | No | Check public docs integrity |
+| `python tools/owledge.py test release-trust --project-root .` | No | Check version alignment, product naming, and bounded runtime claims |
+| `python tools/owledge.py test poweruser-simulations --project-root .` | Yes, temp project | Run dirty-vault and first-user DX simulations |
 | `python tools/owledge.py test runtime-adapters --project-root .` | Yes, temp project | Smoke-test plugin runtime capture |
 | `python tools/owledge.py finalization-gates --project-root . --include-compliance` | Yes | Run release gates |
-| `python tools/owledge.py benchmark --project-root .` | Yes, ignored results | Run local benchmark harness |
+| `python tools/owledge.py benchmark --project-root . --scale-files 100,1000,10000` | Yes, ignored results | Run local benchmark harness |
 
 ## Lower-Level Memory CLI
 
@@ -70,10 +72,11 @@ python tools/owledge.py finalization-gates --project-root . --include-compliance
 python tools/owledge.py redteam-qa --project-root .
 ```
 
-The finalization gate runs compile checks, skill validation, scenario tests,
-public-docs integrity, contracts, doctor, validation, indexes, lifecycle checks,
-runtime smoke tests, memory evals, retrieval fixture eval, KB-module safety, and
-project-folder verification.
+The finalization gate runs compile checks, public-docs integrity, release-trust
+checks, skill validation, scenario tests, power-user simulations, contracts,
+doctor, validation, indexes, lifecycle checks, runtime smoke tests, memory
+evals, retrieval fixture eval, KB-module safety, and project-folder
+verification.
 
 The latest machine-readable report is written to
 `agent-memory/exports/finalization-gates/latest.json`; the Markdown summary is

@@ -6,6 +6,7 @@ Start with the path that matches your setup.
 
 - Read [agent-integration-guide.md](agent-integration-guide.md)
 - Then read [mvp-plan-example.md](mvp-plan-example.md)
+- For a tiny demo vault, see [../examples/README.md](../examples/README.md)
 
 ## I want Owledge inside a coding project
 

@@ -2,7 +2,7 @@
 
 ## Supported Status
 
-This repository is currently a concept-validated standalone kit. It is not yet certified for regulated production use.
+This repository is currently a concept-validated local kit. It is not yet certified for regulated production use.
 
 | Area | Status |
 | --- | --- |

@@ -24,7 +24,7 @@ Working memory is represented by context packs and private session artifacts.
 - Runtime plugin hooks can write private events under `agent-memory/sessions/`.
 - Handoffs and evidence records keep task state outside the model context window.
 
-This is production-ready for local/project use when agents treat generated context as disposable and rebuild it from Markdown.
+This is release-ready for local/project use when agents treat generated context as disposable and rebuild it from Markdown.
 
 ### Semantic Memory
 
@@ -49,7 +49,7 @@ Procedural memory is implemented through runtime-neutral instructions and progre
 - `plugins/agent-memory-cowork/` packages commands, hooks, and skills for Claude/Cowork and Codex-compatible use.
 - `tools/owledge.py` and `tools/agent_memory_cli.py` expose repeatable procedures for validation, indexing, promotion, reports, exports, and evals.
 
-This is production-ready as a local adapter model. The important boundary is that skills and plugins do not own memory; they operate on the Markdown contract.
+This is a local adapter model. The important boundary is that skills and plugins do not own memory; they operate on the Markdown contract.
 
 ### Episodic Memory
 
@@ -80,11 +80,11 @@ long-term learning system with destructive deletion.
 | Promotion queue UX | Promotion is hardened but CLI-centric | Acceptable for technical users | Later read-only dashboard plus reviewed promotion queue |
 | Compliance depth | Data classification exists, but regulated production needs more | Do not market as regulated enterprise compliance | Implement processing inventory, provider registry, DSAR/export/delete flows, and encrypted vault options |
 
-## Recommended Production-Ready Scope For Tomorrow
+## Recommended Release Scope
 
 Ship v0.5.0 as:
 
-- Markdown-first Agent Memory Kit for coding and multi-agent projects.
+- Markdown-first Owledge memory for coding and multi-agent projects.
 - Local/project memory architecture with optional private global user layer.
 - Project-ready support for all four memory types.
 - Safe by default for raw sessions, private user context, and shared exports.

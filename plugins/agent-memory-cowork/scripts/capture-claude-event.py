@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail-soft Claude/Cowork hook capture for macOS/Linux plugin installs."""
+"""Fail-soft Claude/Cowork hook capture for Python plugin installs."""
 
 from __future__ import annotations
 
@@ -91,6 +91,7 @@ def main() -> int:
                 ],
                 check=True,
                 stdout=subprocess.DEVNULL,
+                timeout=15,
             )
         finally:
             event_path.unlink(missing_ok=True)

@@ -20,5 +20,8 @@ jobs:
       - name: Public docs gate
         run: python tools/owledge.py test public-docs --project-root .
 
+      - name: Release trust gate
+        run: python tools/owledge.py test release-trust --project-root .
+
       - name: Benchmark harness smoke
-        run: python tools/owledge.py benchmark --project-root .
+        run: python tools/owledge.py benchmark --project-root . --scale-files 100

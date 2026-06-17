@@ -27,6 +27,14 @@ This avoids:
 - treating generated indexes as canonical memory
 - over-fetching unrelated project history
 
+Treat this as a design rule until a benchmark report includes tokenizer-based
+baseline comparisons. Public token-saving claims should compare at least:
+
+- full vault prompt
+- metadata-only scan
+- generated context pack
+- oracle scoped source files
+
 ## Release Benchmark Recommendation
 
 Use the reproducible local harness under `benchmarks/` before making any public
@@ -41,8 +49,17 @@ Minimum benchmark scenarios:
 Track at least:
 
 - wall-clock runtime
+- commit SHA, OS, Python version, CPU count, and command
 - files scanned
 - truncation status
+- records per second
+- peak Python allocation bytes
 - output bytes or record count
 - included source count
-- estimated tokens or context-pack size
+- tokenizer-based prompt tokens when making public token claims
+
+Example local matrix:
+
+```bash
+python tools/owledge.py benchmark --project-root . --scale-files 100,1000,10000
+```

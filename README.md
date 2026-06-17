@@ -1,6 +1,6 @@
 # Owledge
 
-**A Markdown-first persistent memory and project-planning layer for AI agents, existing knowledgebases, and multi-agent delivery workflows.**
+**Drop-in durable project memory for existing Markdown repos and Obsidian-style vaults: no migration, no vector DB, no wiki-link rewrite.**
 
 [![Version](https://img.shields.io/badge/version-0.5.0-blue)](VERSION)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
@@ -8,12 +8,9 @@
 [![Runtime support](https://img.shields.io/badge/runtimes-Codex%20%7C%20Claude%20Code%20%7C%20Cowork%20%7C%20OpenCode-orange)](docs/harness-plugin-matrix.md)
 [![Release gates](https://img.shields.io/badge/release_gates-passing-brightgreen)](docs/README.md)
 
-Owledge gives agents durable project memory in local Markdown: plans, evidence, reviews, handoffs, and decisions that stay readable across sessions, tools, teams, and existing vaults.
+Owledge gives agents durable local Markdown artifacts: plans, evidence, reviews, handoffs, and decisions that stay readable across sessions, tools, teams, and existing vaults.
 
-> Use Superpowers to execute. Use Owledge to remember, hand off, review, and keep project knowledge durable.  
-> Use Ponytail to reduce code. Use Owledge to preserve context, evidence, and planning discipline.
-
-**Release proof:** 21 release gates passing locally, additive writes by default, private runtime capture, metadata-first KB scan, and no required OS-wide setup.
+**Release proof:** local release gates pass with additive writes by default, private runtime capture, metadata-first KB scan, and no required OS-wide setup. CI runs platform-neutral Python gates; broader runtime installs remain local adapter support, not marketplace certification.
 
 ## Table Of Contents
 
@@ -90,12 +87,12 @@ Owledge is a memory layer around agent runtimes. It does not replace the runtime
 
 | Harness | Current shape | Install path |
 | --- | --- | --- |
-| Codex | Ready | Local CLI, skills, optional plugin adapter |
-| Claude Code | Ready | Skill/plugin copy path plus project-local memory rules |
-| Cowork / Claude-compatible | Ready | `plugins/agent-memory-cowork/` |
-| OpenCode-style agents | Ready | Repo-link integration via `AGENTS.md` and local scripts |
-| Existing Markdown / Obsidian KBs | Ready | `tools/build_kb_module.py` or `agent-memory-map.json` |
-| PI agents | Optional | Candidate-only QA, workspace checks, and intelligence artifacts |
+| Codex | Local adapter support | Local CLI, skills, optional plugin adapter |
+| Claude Code | Local adapter support | Skill/plugin copy path plus project-local memory rules |
+| Cowork / Claude-compatible | Local adapter support | `plugins/agent-memory-cowork/` |
+| OpenCode-style agents | Instruction-based support | Repo-link integration via `AGENTS.md` and local scripts |
+| Existing Markdown / Obsidian KBs | Primary supported path | `tools/build_kb_module.py` or `agent-memory-map.json` |
+| PI agents | Advanced optional path | Candidate-only QA, workspace checks, and intelligence artifacts |
 
 Full matrix: [Harness and plugin matrix](docs/harness-plugin-matrix.md)
 
@@ -158,6 +155,7 @@ Start here: [Documentation index](docs/README.md)
 - [Plugin install guide](docs/install-plugin.md)
 - [Harness and plugin matrix](docs/harness-plugin-matrix.md)
 - [MVP plan example](docs/mvp-plan-example.md)
+- [Demo vault](examples/README.md)
 - [Performance and scale notes](docs/performance-scale-notes.md)
 - [Team and long-running project guide](docs/team-long-running-project-guide.md)
 - [Command reference](docs/command-reference.md)

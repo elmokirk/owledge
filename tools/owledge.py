@@ -266,6 +266,10 @@ def public_docs_gate(root: pathlib.Path) -> dict[str, Any]:
             else:
                 passed = pattern.lower() not in lowered
             results.add(f"python-first-doc:{relative}:{pattern}", passed, "Public docs must not present platform-specific wrappers or OS env setup as core UX.")
+        if relative in {"README.md", "docs/harness-plugin-matrix.md"}:
+            results.add(f"runtime-claim-wording:{relative}", "| Ready |" not in content, "Public runtime matrix should use bounded local-support wording, not broad Ready claims.")
+        if relative == "README.md":
+            results.add("product-name-first-screen", "Agent Memory Kit" not in content[:1200], "README first screen should lead with Owledge, not legacy kit naming.")
 
     readme = (root / "README.md").read_text(encoding="utf-8", errors="replace")
     headings = [github_anchor(match.group(1)) for match in re.finditer(r"(?m)^##+\s+(.+)$", readme)]
@@ -312,12 +316,45 @@ def public_docs_gate(root: pathlib.Path) -> dict[str, Any]:
         label = relative_posix(path, root)
         text = path.read_text(encoding="utf-8", errors="replace")
         results.add("plugin-path:" + label, "plugins/agent-memory-cowork/" in text or "plugins\\agent-memory-cowork\\" in text, "Canonical plugin path is documented.")
+    install_doc = root / "docs" / "install-plugin.md"
+    if install_doc.exists():
+        install_text = install_doc.read_text(encoding="utf-8", errors="replace")
+        for heading in ["Codex", "Claude Code", "Cowork-Compatible", "OpenCode-Style", "Generic Agents", "Verify", "Uninstall"]:
+            results.add(f"plugin-install-section:{heading}", heading in install_text, "Plugin install guide includes concrete install, verify, and uninstall sections.")
 
     if "benchmark" in readme.lower() or "benchmark" in (root / "docs" / "performance-scale-notes.md").read_text(encoding="utf-8", errors="replace").lower():
         results.add("benchmark-assets:readme", (root / "benchmarks" / "README.md").exists(), "Benchmark README exists.")
         results.add("benchmark-assets:script", (root / "benchmarks" / "run_benchmarks.py").exists(), "Python benchmark runner exists.")
 
     return results.payload(project=str(root))
+
+
+def release_trust_gate(root: pathlib.Path) -> dict[str, Any]:
+    results = ResultSet()
+    version = (root / "VERSION").read_text(encoding="utf-8", errors="replace").strip()
+    readme = (root / "README.md").read_text(encoding="utf-8", errors="replace")
+    results.add("version:readme-badge", f"version-{version}-" in readme or f"version-{version}" in readme, "README badge matches root VERSION.")
+    for relative in [
+        "plugins/agent-memory-cowork/VERSION",
+        "plugins/agent-memory-cowork/.claude-plugin/plugin.json",
+        "plugins/agent-memory-cowork/.codex-plugin/plugin.json",
+    ]:
+        path = root / pathlib.Path(relative)
+        results.add(f"exists:{relative}", path.exists(), "Versioned plugin file exists.")
+        if not path.exists():
+            continue
+        if path.suffix == ".json":
+            payload = json.loads(path.read_text(encoding="utf-8"))
+            results.add(f"version:{relative}", payload.get("version") == version, "Plugin manifest version matches root VERSION.")
+            results.add(f"product-name:{relative}", "Owledge" in json.dumps(payload), "Plugin manifest uses Owledge product naming.")
+        else:
+            results.add(f"version:{relative}", path.read_text(encoding="utf-8", errors="replace").strip() == version, "Plugin VERSION matches root VERSION.")
+    matrix = (root / "docs" / "harness-plugin-matrix.md").read_text(encoding="utf-8", errors="replace")
+    results.add("harness-matrix-local-support", "Local adapter support" in matrix, "Harness matrix explains local adapter support boundary.")
+    results.add("harness-matrix-no-ready-column", "| Ready |" not in matrix, "Harness matrix avoids broad Ready status wording.")
+    security = (root / "SECURITY.md").read_text(encoding="utf-8", errors="replace")
+    results.add("security-local-kit-boundary", "local kit" in security.lower() and "not yet certified" in security.lower(), "Security doc states local-kit and regulated-production boundaries.")
+    return results.payload(project=str(root), version=version)
 
 
 def read_skill_frontmatter(path: pathlib.Path) -> dict[str, Any]:
@@ -716,6 +753,64 @@ def principles_scenarios_gate(root: pathlib.Path) -> dict[str, Any]:
     return results.payload(symlink_case_skipped=True)
 
 
+def poweruser_simulations_gate(root: pathlib.Path) -> dict[str, Any]:
+    tmp_base = root / ".agent-control" / "tmp" / "poweruser-simulations"
+    if tmp_base.exists():
+        shutil.rmtree(tmp_base)
+    tmp_base.mkdir(parents=True)
+    results = ResultSet()
+
+    dirty_vault = tmp_base / "dirty vault with spaces"
+    dirty_vault.mkdir()
+    for index in range(1, 5001):
+        folder = dirty_vault / ("Notes" if index % 3 else "Research") / f"group-{index % 17:02}"
+        frontmatter = "---\ntype: note\nstatus: active\n---\n\n" if index % 11 == 0 else ""
+        body = f"{frontmatter}# Dirty Note {index}\n\nLinks to [[Dirty Note {(index % 5000) + 1}]] and [[Shared Topic]].\n"
+        write_text(folder / f"Dirty Note {index}.md", body)
+    write_text(dirty_vault / "Assets" / "image-placeholder.png.md", "# Image Placeholder\n\nA markdown sidecar for an attachment.\n")
+    before_dirty = tree_hash(dirty_vault)
+    dirty_result = build_kb_module.build(
+        argparse.Namespace(
+            knowledgebase_root=str(dirty_vault),
+            kit_root=str(root),
+            layout="module-dir",
+            module_dir="agent-memory-module",
+            map_file="",
+            max_files=5000,
+            include_cli=True,
+            create_sample_plan=True,
+        )
+    )
+    after_dirty = tree_hash(dirty_vault, ["agent-memory-module"])
+    results.add("dirty-vault-source-files-unchanged", before_dirty == after_dirty, "5k-file dirty vault stayed byte-identical outside the module.")
+    results.add("dirty-vault-scanned-5k", dirty_result.get("markdown_files_scanned") == 5000, "Dirty vault scan honored 5k max-files target.")
+    results.add("dirty-vault-no-env", dirty_result.get("requires_os_environment_variables") is False, "Dirty vault install requires no OS environment variables.")
+
+    dx_project = tmp_base / "first user project"
+    started = time.perf_counter()
+    init_result = init_project(dx_project, root, include_plugin_adapter=False, include_compliance=False)
+    write_text(dx_project / "agent-memory" / "plans" / "first-use-plan.md", "# First Use Plan\n\nGoal: create one useful source-backed plan.\n")
+    write_text(dx_project / "agent-memory" / "handoffs" / "first-use-handoff.md", "# First Use Handoff\n\nNext action: run validation and continue the MVP cutline.\n")
+    dx_seconds = round(time.perf_counter() - started, 3)
+    results.add("first-user-init-doctor", bool(init_result.get("doctor_passed")), "Initialized project passes doctor.")
+    results.add("first-user-useful-artifacts", (dx_project / "agent-memory" / "plans" / "first-use-plan.md").exists() and (dx_project / "agent-memory" / "handoffs" / "first-use-handoff.md").exists(), "First user can reach one useful plan and handoff.")
+    results.add("first-user-dx-under-10s", dx_seconds < 10, f"First-user simulation completed in {dx_seconds}s.")
+
+    existing = tmp_base / "existing project ünicode"
+    write_text(existing / ".gitignore", "dist/\n")
+    write_text(existing / "AGENTS.md", "# Existing Agent Rules\n\nDo not overwrite me.\n")
+    write_text(existing / "agent-memory" / "plans" / "existing-plan.md", "# Existing Plan\n\nKeep this file.\n")
+    existing_agents_hash = sha256_file(existing / "AGENTS.md")
+    existing_plan_hash = sha256_file(existing / "agent-memory" / "plans" / "existing-plan.md")
+    existing_result = init_project(existing, root, include_plugin_adapter=True, include_compliance=False)
+    results.add("existing-project-agents-preserved", sha256_file(existing / "AGENTS.md") == existing_agents_hash, "Existing AGENTS.md was not overwritten.")
+    results.add("existing-project-plan-preserved", sha256_file(existing / "agent-memory" / "plans" / "existing-plan.md") == existing_plan_hash, "Existing memory plan was not overwritten.")
+    results.add("existing-project-plugin-added", (existing / "plugins" / "agent-memory-cowork" / "README.md").exists(), "Plugin adapter can be added to an existing project.")
+    results.add("existing-project-skipped-existing", "AGENTS.md" in existing_result.get("skipped_existing", []), "Init reports skipped existing project files.")
+
+    return results.payload(project=str(root), simulated_files=5000)
+
+
 def run_gate(name: str, func: Callable[[], Any]) -> dict[str, Any]:
     started = time.perf_counter()
     try:
@@ -816,8 +911,10 @@ def finalization_gates(root: pathlib.Path, include_exports: bool, include_compli
 
     add("python-compile", lambda: py_compile_gate(root))
     add("public-docs", lambda: public_docs_gate(root))
+    add("release-trust", lambda: release_trust_gate(root))
     add("principles-skill", lambda: principles_skill_gate(root))
     add("principles-scenarios", lambda: principles_scenarios_gate(root))
+    add("poweruser-simulations", lambda: poweruser_simulations_gate(root))
     add("contracts", lambda: core.test_contracts(root))
     add("core-platform-neutral", lambda: platform_neutral_core_gate(root))
     add("doctor", lambda: core.memory_doctor(root, mode="kit"))
@@ -932,9 +1029,9 @@ def redteam_qa(root: pathlib.Path, subject: str, question: str, gate_report_path
     }
 
 
-def run_benchmarks(root: pathlib.Path) -> dict[str, Any]:
+def run_benchmarks(root: pathlib.Path, scale_files: str = "100", seed: int = 1) -> dict[str, Any]:
     benchmark_path = root / "benchmarks" / "run_benchmarks.py"
-    process = run_subprocess([sys.executable, str(benchmark_path), "--project-root", str(root)])
+    process = run_subprocess([sys.executable, str(benchmark_path), "--project-root", str(root), "--scale-files", scale_files, "--seed", str(seed)])
     return parse_json_stdout(process)
 
 
@@ -982,7 +1079,7 @@ def main(argv: list[str] | None = None) -> int:
     test_p = sub.add_parser("test", parents=[project_parent])
     test_p.add_argument(
         "suite",
-        choices=["all", "public-docs", "principles-skill", "principles-scenarios", "contracts", "kb-module", "runtime-adapters", "core-platform-neutral"],
+        choices=["all", "public-docs", "release-trust", "principles-skill", "principles-scenarios", "poweruser-simulations", "contracts", "kb-module", "runtime-adapters", "core-platform-neutral"],
         default="all",
         nargs="?",
     )
@@ -996,7 +1093,9 @@ def main(argv: list[str] | None = None) -> int:
     redteam_p.add_argument("--question", default="Validate v0.5 project-ready release quality, privacy, retrieval, onboarding, and release-gate completeness.")
     redteam_p.add_argument("--gate-report-path", default="")
 
-    sub.add_parser("benchmark", parents=[project_parent])
+    benchmark_p = sub.add_parser("benchmark", parents=[project_parent])
+    benchmark_p.add_argument("--scale-files", default="100")
+    benchmark_p.add_argument("--seed", type=int, default=1)
 
     args = parser.parse_args(argv)
     root = resolve_path(getattr(args, "command_project_root", None) or args.project_root)
@@ -1055,8 +1154,10 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "test":
             suites: dict[str, Callable[[], dict[str, Any]]] = {
                 "public-docs": lambda: public_docs_gate(root),
+                "release-trust": lambda: release_trust_gate(root),
                 "principles-skill": lambda: principles_skill_gate(root),
                 "principles-scenarios": lambda: principles_scenarios_gate(root),
+                "poweruser-simulations": lambda: poweruser_simulations_gate(root),
                 "contracts": lambda: core.test_contracts(root),
                 "kb-module": lambda: kb_module_gate(root),
                 "runtime-adapters": lambda: runtime_adapters_gate(root),
@@ -1078,7 +1179,7 @@ def main(argv: list[str] | None = None) -> int:
             print_json(redteam_qa(root, args.subject, args.question, args.gate_report_path))
             return 0
         if args.command == "benchmark":
-            print_json(run_benchmarks(root))
+            print_json(run_benchmarks(root, args.scale_files, args.seed))
             return 0
     except Exception as exc:
         print_json({"passed": False, "error": str(exc)})

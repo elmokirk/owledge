@@ -20,11 +20,20 @@ Reviewed exports = optional consumers such as RAG or reports
 - Local `tools/agent_memory_cli.py` in the host project or an Owledge repo
   checkout.
 
+## Install
+
+Install this folder through the runtime's local plugin mechanism, or copy the
+full `plugins/agent-memory-cowork/` folder into the plugin directory that the
+runtime reads from.
+
+Runtime-specific install and uninstall steps are documented in
+[`docs/install-plugin.md`](../../docs/install-plugin.md).
+
 ## Configuration
 
 The normal path is project-local:
 
-1. Start Claude/Cowork from the initialized project root.
+1. Start the runtime from the initialized project root.
 2. Keep `PROJECT_CONTEXT.md`, `agent-memory/`, and `tools/agent_memory_cli.py`
    in that project.
 3. Let the hooks discover the project root by walking upward from the current
@@ -88,4 +97,11 @@ Use a temporary copy or a private test project.
 python plugins/agent-memory-cowork/scripts/capture-claude-event.py < plugins/agent-memory-cowork/tests/fixtures/session-start.json
 python plugins/agent-memory-cowork/scripts/close-runtime-session.py < plugins/agent-memory-cowork/tests/fixtures/stop.json
 python tools/owledge.py doctor --project-root .
+```
+
+For a normal verification path, prefer:
+
+```bash
+python tools/owledge.py test runtime-adapters --project-root .
+python tools/owledge.py test release-trust --project-root .
 ```

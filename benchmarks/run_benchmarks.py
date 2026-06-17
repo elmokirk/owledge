@@ -5,11 +5,15 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import pathlib
+import platform
 import shutil
+import subprocess
 import sys
 import tempfile
 import time
+import tracemalloc
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 TOOLS = ROOT / "tools"
@@ -27,9 +31,29 @@ def write_text(path: pathlib.Path, text: str) -> None:
 
 
 def measure(name: str, action):
+    tracemalloc.start()
     started = time.perf_counter()
     data = action()
-    return {"name": name, "seconds": round(time.perf_counter() - started, 3), "data": data}
+    current, peak = tracemalloc.get_traced_memory()
+    tracemalloc.stop()
+    return {
+        "name": name,
+        "seconds": round(time.perf_counter() - started, 3),
+        "peak_python_bytes": peak,
+        "data": data,
+    }
+
+
+def git_sha(project_root: pathlib.Path) -> str:
+    process = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=str(project_root),
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+        check=False,
+    )
+    return process.stdout.strip() if process.returncode == 0 else "unknown"
 
 
 def new_synthetic_vault(path: pathlib.Path, count: int) -> None:
@@ -39,7 +63,7 @@ def new_synthetic_vault(path: pathlib.Path, count: int) -> None:
         write_text(path / f"note-{index}.md", f"# Note {index}\n\nThis is a benchmark note.\n\n- link: {next_link}\n- tag: benchmark\n")
 
 
-def run(project_root: pathlib.Path) -> dict:
+def run(project_root: pathlib.Path, scale_files: list[int], seed: int) -> dict:
     project_root = project_root.resolve()
     results_dir = project_root / "benchmarks" / "results"
     results_dir.mkdir(parents=True, exist_ok=True)
@@ -48,28 +72,36 @@ def run(project_root: pathlib.Path) -> dict:
         shutil.rmtree(tmp_root)
     tmp_root.mkdir(parents=True)
     try:
-        vault_root = tmp_root / "vault"
-        new_synthetic_vault(vault_root, 100)
+        scenarios = []
+        for count in scale_files:
+            vault_root = tmp_root / f"vault-{count}"
+            new_synthetic_vault(vault_root, count)
 
-        kb_step = measure(
-            "kb-scan",
-            lambda: {
-                key: value
-                for key, value in build_kb_module.build(
-                    argparse.Namespace(
-                        knowledgebase_root=str(vault_root),
-                        kit_root=str(project_root),
-                        layout="module-dir",
-                        module_dir="agent-memory-module",
-                        map_file="",
-                        max_files=1000,
-                        include_cli=True,
-                        create_sample_plan=True,
-                    )
-                ).items()
-                if key in {"markdown_files_scanned", "existing_kb_files_modified", "index_path", "module_root"}
-            },
-        )
+            def scan(vault=vault_root, count=count):
+                result = {
+                    key: value
+                    for key, value in build_kb_module.build(
+                        argparse.Namespace(
+                            knowledgebase_root=str(vault),
+                            kit_root=str(project_root),
+                            layout="module-dir",
+                            module_dir="agent-memory-module",
+                            map_file="",
+                            max_files=count,
+                            include_cli=True,
+                            create_sample_plan=True,
+                        )
+                    ).items()
+                    if key in {"markdown_files_scanned", "existing_kb_files_modified", "index_path", "module_root", "markdown_scan_truncated"}
+                }
+                index_path = vault / "agent-memory-module" / "agent-memory" / "indexes" / "kb-scan.jsonl"
+                result["output_bytes"] = index_path.stat().st_size if index_path.exists() else 0
+                return result
+
+            step = measure(f"kb-scan-{count}", scan)
+            scanned = step["data"].get("markdown_files_scanned") or 0
+            step["data"]["records_per_second"] = round(scanned / step["seconds"], 2) if step["seconds"] else scanned
+            scenarios.append(step)
 
         context_step = measure(
             "context-pack",
@@ -100,10 +132,20 @@ def run(project_root: pathlib.Path) -> dict:
             "summary_bytes": summary_path.stat().st_size if summary_path.exists() else 0,
         }
 
+        scenarios.extend([context_step, runtime_step])
         report = {
             "generated_at": core.utc_now(),
             "project": str(project_root),
-            "scenarios": [kb_step, context_step, runtime_step],
+            "metadata": {
+                "commit": git_sha(project_root),
+                "os": platform.platform(),
+                "python": sys.version.split()[0],
+                "cpu_count": os.cpu_count(),
+                "command": f"python tools/owledge.py benchmark --project-root . --scale-files {','.join(str(item) for item in scale_files)} --seed {seed}",
+                "seed": seed,
+                "scale_files": scale_files,
+            },
+            "scenarios": scenarios,
         }
         json_text = json.dumps(report, indent=2, sort_keys=True) + "\n"
         (results_dir / "latest.json").write_text(json_text, encoding="utf-8")
@@ -111,12 +153,15 @@ def run(project_root: pathlib.Path) -> dict:
             "# Benchmark Results",
             "",
             f"- Generated at: {report['generated_at']}",
+            f"- Commit: `{report['metadata']['commit']}`",
+            f"- Python: `{report['metadata']['python']}`",
+            f"- OS: `{report['metadata']['os']}`",
             "",
             "## Scenarios",
             "",
         ]
         for scenario in report["scenarios"]:
-            lines.append(f"- {scenario['name']}: {scenario['seconds']}s")
+            lines.append(f"- {scenario['name']}: {scenario['seconds']}s, peak Python bytes {scenario['peak_python_bytes']}")
         (results_dir / "latest.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
         return report
     finally:
@@ -127,8 +172,11 @@ def run(project_root: pathlib.Path) -> dict:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Run local Owledge benchmark scenarios.")
     parser.add_argument("--project-root", default=str(ROOT))
+    parser.add_argument("--scale-files", default="100", help="Comma-separated synthetic vault sizes, for example 100,1000,10000.")
+    parser.add_argument("--seed", type=int, default=1)
     args = parser.parse_args(argv)
-    print(json.dumps(run(pathlib.Path(args.project_root)), indent=2, sort_keys=True))
+    scale_files = [int(item.strip()) for item in args.scale_files.split(",") if item.strip()]
+    print(json.dumps(run(pathlib.Path(args.project_root), scale_files, args.seed), indent=2, sort_keys=True))
     return 0
 
 

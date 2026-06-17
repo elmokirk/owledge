@@ -2135,9 +2135,16 @@ def memory_doctor(root: pathlib.Path, mode: str = "auto") -> dict[str, Any]:
     if version_file.exists() and readme.exists():
         version = version_file.read_text(encoding="utf-8", errors="replace").strip()
         readme_text = readme.read_text(encoding="utf-8", errors="replace")
-        version_ok = f'version: "{version}"' in readme_text or f"version: {version}" in readme_text
-        add("version-consistency", version_ok, "warning", f"README version {'matches' if version_ok else 'does not match'} VERSION ({version}).", "Align README frontmatter version and VERSION.")
+        version_ok = f"version-{version}-" in readme_text or f"version-{version}" in readme_text
+        add("version-consistency", version_ok, "warning", f"README version badge {'matches' if version_ok else 'does not match'} VERSION ({version}).", "Align README version badge and VERSION.")
+    hook_error_log = root / ".agent-control" / "logs" / "plugin-errors.jsonl"
+    hook_error_count = 0
+    if hook_error_log.exists():
+        hook_error_count = sum(1 for line in hook_error_log.read_text(encoding="utf-8", errors="replace").splitlines() if line.strip())
+    add("runtime-hook-errors", hook_error_count == 0, "warning", f"Runtime hook error log entries: {hook_error_count}.", "Inspect .agent-control/logs/plugin-errors.jsonl and fix plugin install issues.")
     session_events = list((root / "agent-memory" / "sessions").glob("**/events.jsonl")) if (root / "agent-memory" / "sessions").exists() else []
+    oversized_sessions = [path for path in session_events if path.stat().st_size > 5_000_000]
+    add("runtime-session-log-size", not oversized_sessions, "warning", f"Oversized runtime event logs: {len(oversized_sessions)}.", "Close sessions, compact summaries, or rotate private runtime logs.")
     add("private-session-events", not session_events, "info", f"Private raw event logs found: {len(session_events)}.", "Keep raw events private; compact and redact before sharing.")
     shared_unsafe = []
     for record in load_memory_records(root, include_sessions=False):
@@ -3759,8 +3766,29 @@ def runtime_session_paths(root: pathlib.Path, session_id: str) -> dict[str, path
         "events": session_dir / "events.jsonl",
         "session_md": session_dir / "session.md",
         "summary_md": session_dir / "summary.md",
+        "state": session_dir / "session-state.json",
         "lock": session_dir / ".session.lock",
     }
+
+
+def read_runtime_session_state(paths: dict[str, pathlib.Path]) -> dict[str, Any]:
+    if paths["state"].exists():
+        try:
+            state = json.loads(paths["state"].read_text(encoding="utf-8"))
+            if isinstance(state, dict):
+                return state
+        except Exception:
+            pass
+    event_count = 0
+    if paths["events"].exists():
+        with paths["events"].open("r", encoding="utf-8", errors="replace") as handle:
+            event_count = sum(1 for line in handle if line.strip())
+    return {"event_count": event_count}
+
+
+def write_runtime_session_state(paths: dict[str, pathlib.Path], state: dict[str, Any]) -> None:
+    state = {**state, "updated_at": utc_now()}
+    atomic_write_text(paths["state"], json.dumps(state, indent=2, sort_keys=True) + "\n")
 
 
 def session_memory_id(defaults: dict[str, str], session_id: str) -> str:
@@ -3858,6 +3886,7 @@ def capture_runtime_event(
     paths = runtime_session_paths(root, session_id)
     paths["session_dir"].mkdir(parents=True, exist_ok=True)
     with file_lock(paths["lock"]):
+        state = read_runtime_session_state(paths)
         event_record = {
             "captured_at": utc_now(),
             "runtime": runtime,
@@ -3870,7 +3899,16 @@ def capture_runtime_event(
         }
         with paths["events"].open("a", encoding="utf-8") as handle:
             handle.write(json.dumps(event_record, sort_keys=True) + "\n")
-        event_count = sum(1 for line in paths["events"].read_text(encoding="utf-8").splitlines() if line.strip())
+        event_count = int(state.get("event_count") or 0) + 1
+        write_runtime_session_state(
+            paths,
+            {
+                "event_count": event_count,
+                "last_event_type": event_type,
+                "last_capture_mode": capture_mode,
+                "events_bytes": paths["events"].stat().st_size,
+            },
+        )
         source_hash = sha256_file(paths["events"])
         session_md = write_runtime_session_markdown(root, session_id, runtime, agent_id, "active", event_count, source_hash, event_type)
     return {
@@ -3945,6 +3983,16 @@ def close_runtime_session(
             with paths["events"].open("a", encoding="utf-8") as handle:
                 handle.write(json.dumps(close_record, sort_keys=True) + "\n")
             events.append(close_record)
+            write_runtime_session_state(
+                paths,
+                {
+                    "event_count": len(events),
+                    "last_event_type": "RuntimeClosed",
+                    "last_capture_mode": "system",
+                    "events_bytes": paths["events"].stat().st_size,
+                    "closed": True,
+                },
+            )
 
         event_types: dict[str, int] = {}
         prompt_excerpts = []

@@ -6,7 +6,43 @@ on:
   pull_request:
 
 jobs:
-  core-gates:
+  core-matrix:
+    name: core-${{ matrix.os }}-py${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ["3.10", "3.11", "3.12"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Python compile
+        run: python -m py_compile tools/owledge.py tools/agent_memory_cli.py tools/build_kb_module.py tools/build_project_folder_kit.py benchmarks/run_benchmarks.py plugins/agent-memory-cowork/scripts/capture-claude-event.py plugins/agent-memory-cowork/scripts/close-runtime-session.py
+
+      - name: Public docs
+        run: python tools/owledge.py test public-docs --project-root .
+
+      - name: Release trust
+        run: python tools/owledge.py test release-trust --project-root .
+
+      - name: Platform-neutral core
+        run: python tools/owledge.py test core-platform-neutral --project-root .
+
+      - name: KB module
+        run: python tools/owledge.py test kb-module --project-root .
+
+      - name: Runtime adapters
+        run: python tools/owledge.py test runtime-adapters --project-root .
+
+  release-gates:
+    name: full-release-gates
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -17,23 +53,5 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Python compile
-        run: python -m py_compile tools/owledge.py tools/agent_memory_cli.py tools/build_kb_module.py tools/build_project_folder_kit.py benchmarks/run_benchmarks.py
-
-      - name: Public docs
-        run: python tools/owledge.py test public-docs --project-root .
-
-      - name: Principles skill
-        run: python tools/owledge.py test principles-skill --project-root .
-
-      - name: Contracts
-        run: python tools/owledge.py test contracts --project-root .
-
-      - name: KB module
-        run: python tools/owledge.py test kb-module --project-root .
-
-      - name: Runtime adapters
-        run: python tools/owledge.py test runtime-adapters --project-root .
-
-      - name: Platform-neutral core
-        run: python tools/owledge.py test core-platform-neutral --project-root .
+      - name: Finalization gates
+        run: python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports

@@ -1,6 +1,6 @@
 ---
 name: agent-memory-runtime-bridge
-description: Framework-agnostic workflow for Codex, Claude Code, Cowork/MCP, Hermes, OpenClaw/OpenCode, PI Agents, and generic agents to use the Markdown-first Agent Memory Kit.
+description: Framework-agnostic workflow for Codex, Claude Code, Cowork/MCP, Hermes, OpenClaw/OpenCode, PI Agents, and generic agents to use Owledge's Markdown-first memory contract.
 version: 0.1.0
 ---
 

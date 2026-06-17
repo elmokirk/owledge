@@ -2,7 +2,7 @@
 
 Date: 2026-05-16  
 Status: integration plan  
-Scope: connect the Markdown-first Agent Memory Kit to an existing local LightRAG installation using Neo4j for graph storage and Qdrant for vector storage.
+Scope: connect the Markdown-first Owledge memory contract to an existing local LightRAG installation using Neo4j for graph storage and Qdrant for vector storage.
 
 ## Positioning
 
@@ -108,7 +108,7 @@ agent-memory/exports/lightrag/generations/<generation_id>/
 
 ## Minimal Ingestion Adapter
 
-Create this in your LightRAG project, not inside the Agent Memory Kit, unless you intentionally vendor an adapter later.
+Create this in your LightRAG project, not inside Owledge, unless you intentionally vendor an adapter later.
 
 ```python
 import asyncio

@@ -53,3 +53,4 @@ __pycache__/
 tools/__pycache__/
 benchmarks/results/latest.json
 benchmarks/results/latest.md
+examples/demo-vault/agent-memory-module/

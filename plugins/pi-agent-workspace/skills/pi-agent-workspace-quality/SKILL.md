@@ -1,6 +1,6 @@
 ---
 name: pi-agent-workspace-quality
-description: Use as a PI Agent workspace guardian for Agent Memory projects. Checks quality, asks targeted planning questions, reviews workspace health, inspects ideas before new plans, and routes Codex, Claude Code, Hermes, OpenClaw/OpenCode, PI Agents, or generic CLI engines through the Markdown-first Agent Memory Kit.
+description: Use as a PI Agent workspace guardian for Owledge projects. Checks quality, asks targeted planning questions, reviews workspace health, inspects ideas before new plans, and routes Codex, Claude Code, Hermes, OpenClaw/OpenCode, PI Agents, or generic CLI engines through Owledge's Markdown-first memory contract.
 ---
 
 # PI Agent Workspace Quality
