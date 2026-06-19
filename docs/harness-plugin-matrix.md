@@ -7,6 +7,7 @@ certification for every runtime.
 
 | Harness | Status | Install path | Notes |
 | --- | --- | --- | --- |
+| Principles-only coding agents | First-class support | Instructions or `agent-memory-principles` skill | No plugin, generated kit, wrapper, or OS-specific setup required. |
 | Codex | Local adapter support | `.codex-plugin` plus local CLI | Repo-installable; verify with local gates. |
 | Claude Code | Local adapter support | `.claude-plugin` or skills copy path | Start from project root when possible. |
 | Cowork / Claude-compatible | Local adapter support | `plugins/agent-memory-cowork/` | Private runtime capture and durable summaries. |

@@ -13,9 +13,13 @@ Host project = PROJECT_CONTEXT.md, DESIGN.md, agent-memory/
 Reviewed exports = optional consumers such as RAG or reports
 ```
 
+Use the principles-only path when a runtime can follow instructions without a
+plugin. This adapter is for local hooks and commands around the same Markdown
+contract.
+
 ## Requirements
 
-- Python available as `python`.
+- Python 3 available to the runtime command environment.
 - A host project initialized with `PROJECT_CONTEXT.md` and `agent-memory/`.
 - Local `tools/agent_memory_cli.py` in the host project or an Owledge repo
   checkout.
@@ -88,6 +92,9 @@ python tools/owledge.py build-project-kit --output-path /tmp/owledge-project-kit
 | `memory-status` | No | Read-only project status. |
 | `memory-doctor` | No | Read-only install, privacy, schema, and adapter diagnosis. |
 | `memory-report` | Yes | Generate local HTML report views. Markdown remains canonical. |
+
+`memory-report` can also route to optional Project Snapshot Kit report types
+after `project-snapshot-kit` is installed in the host project.
 
 ## Manual Smoke Test
 

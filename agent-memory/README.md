@@ -90,14 +90,14 @@ Agents may capture new product, project, or implementation ideas in `agent-memor
 
 The optional PI Agent global intelligence layer writes candidate artifacts under `agent-memory/pi-agent/`. It scans frontmatter signals, idea cards, decisions, lessons, patterns, and QA reports to find parallels, trends, recurring agent errors, and central project candidates. PI Agent output is never canonical by default; a curator or owner must review it before promoting stable findings into `patterns/`, `lessons/`, `compiled/`, or `canonical/`.
 
-```powershell
-tools\pi-intelligence-report.ps1 -ProjectRoot .
+```bash
+python tools/agent_memory_cli.py --project-root . run-review-workflow --review-type expert-lens --subject agent-memory/pi-agent/reports --question "What intelligence should be curated?"
 ```
 
 The QA Red Team PI Agent evaluates PI reports with a 1-100 scorecard. Scores below 85 require revision before the report should guide planning; scores above 95 are promotion candidates, not automatic approvals.
 
-```powershell
-tools\pi-redteam-evaluate.ps1 -ProjectRoot .
+```bash
+python tools/agent_memory_cli.py --project-root . run-review-workflow --review-type multi-perspective-red-team --subject agent-memory/pi-agent/reports --question "Evaluate PI intelligence quality."
 ```
 
 ## Reusable Review Templates
@@ -116,8 +116,8 @@ See `docs/reusable-review-evaluation-templates.md` for selection rules and defau
 
 Create a draft review artifact with:
 
-```powershell
-tools\run-review-workflow.ps1 -ProjectRoot . -ReviewType expert-lens -Subject docs\reusable-review-evaluation-templates.md -Question "What should this review decide?"
+```bash
+python tools/agent_memory_cli.py --project-root . run-review-workflow --review-type expert-lens --subject docs/reusable-review-evaluation-templates.md --question "What should this review decide?"
 ```
 
 The command writes candidate QA memory only. A score of 95 or above is still a promotion candidate, not automatic approval.

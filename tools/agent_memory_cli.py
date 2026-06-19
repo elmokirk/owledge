@@ -2,7 +2,7 @@
 """Agent Memory Kit markdown-core tools plus optional control-plane adapter.
 
 This module intentionally uses only the Python standard library so the kit can
-bootstrap on Windows without installing dependencies. It provides:
+bootstrap on macOS, Linux, and Windows without installing dependencies. It provides:
 
 - Markdown frontmatter validation, memory indexing, context packs, neutral RAG
   export, LightRAG export, GraphRAG export, parallel finding, and compaction.
@@ -188,6 +188,7 @@ REQUIRED_FILES = [
     "docs/team-long-running-project-guide.md",
     "docs/performance-scale-notes.md",
     "docs/html-reports.md",
+    "docs/project-snapshot-kit.md",
     "docs/incremental-index-workflow.md",
     "docs/reusable-review-evaluation-templates.md",
     "docs/archive/README.md",
@@ -391,6 +392,15 @@ ADDON_REQUIRED_FILES = [
     "addons/compliance-light/tests/fixtures/missing-provider/agent-memory/compliance/profile.md",
     "addons/compliance-light/tests/fixtures/invalid-processing-fields/agent-memory/compliance/profile.md",
     "addons/compliance-light/tests/fixtures/invalid-processing-fields/agent-memory/compliance/registers/processing-activity.md",
+    "addons/project-snapshot-kit/addon.json",
+    "addons/project-snapshot-kit/README.md",
+    "addons/project-snapshot-kit/docs/project-snapshot-kit.md",
+    "addons/project-snapshot-kit/starter/agent-memory/project-snapshot/profile.md",
+    "addons/project-snapshot-kit/templates/project-story-snapshot-template.md",
+    "addons/project-snapshot-kit/templates/project-execution-snapshot-template.md",
+    "addons/project-snapshot-kit/templates/project-site-html-template.md",
+    "addons/project-snapshot-kit/skills/render-memory-report/references/project-site.md",
+    "addons/project-snapshot-kit/skills/render-memory-report/references/execution-dashboard.md",
     "tests/fixtures/compliance-light/expected-installed-delta.txt",
 ]
 
@@ -3291,6 +3301,8 @@ REPORT_TYPE_LABELS = {
     "agent-activity": "Agent Activity Report",
     "project-dashboard": "Project Dashboard",
     "website-ui": "Website / UI Report",
+    "project-site": "Project Snapshot Site",
+    "execution-dashboard": "Execution Dashboard",
 }
 
 
@@ -3301,7 +3313,18 @@ REPORT_TYPE_DOCS = {
     "agent-activity": {"session", "compiled", "evidence", "handoff"},
     "project-dashboard": {"project_context", "canonical", "compiled", "adr", "lesson"},
     "website-ui": {"canonical", "compiled", "adr", "evidence", "lesson"},
+    "project-site": {"project_context", "canonical", "compiled", "adr", "lesson", "handoff", "evidence", "qa"},
+    "execution-dashboard": {"compiled", "handoff", "evidence", "qa", "adr"},
 }
+
+
+PROJECT_SNAPSHOT_PROFILE_REL = "agent-memory/project-snapshot/profile.md"
+PROJECT_SNAPSHOT_MANIFEST_REL = "agent-memory/project-snapshot/project-snapshot-manifest.json"
+PROJECT_STORY_SNAPSHOT_REL = "agent-memory/compiled/project-story-snapshot.md"
+PROJECT_EXECUTION_SNAPSHOT_REL = "agent-memory/compiled/project-execution-snapshot.md"
+PROJECT_SNAPSHOT_REPORT_TYPES = {"project-site", "execution-dashboard"}
+PROJECT_SNAPSHOT_DEFAULT_TOKEN_BUDGET = 12000
+PROJECT_SNAPSHOT_LARGE_TOKEN_BUDGET = 40000
 
 
 REPORT_DESIGN_PRESETS = {
@@ -3408,6 +3431,10 @@ def render_memory_report(
 ) -> dict[str, Any]:
     if report_type not in REPORT_TYPE_LABELS:
         raise ValueError(f"Unknown report type: {report_type}")
+    if report_type == "project-site":
+        return render_project_snapshot_site(root, output_dir=output_dir, title=title, audience=audience)
+    if report_type == "execution-dashboard":
+        return render_execution_dashboard(root, output_dir=output_dir, title=title, audience=audience)
     records, report_rejected = selected_report_records(
         root,
         report_type,
@@ -3644,6 +3671,793 @@ def render_memory_report(
         "audience": audience,
         "unsafe_shared_records": unsafe_shared,
         "rejected_counts": report_rejected,
+    }
+
+
+def project_snapshot_profile_path(root: pathlib.Path) -> pathlib.Path:
+    return root / pathlib.Path(PROJECT_SNAPSHOT_PROFILE_REL)
+
+
+def project_snapshot_addon_installed(root: pathlib.Path) -> bool:
+    return project_snapshot_profile_path(root).exists()
+
+
+def require_project_snapshot_addon(root: pathlib.Path) -> None:
+    if not project_snapshot_addon_installed(root):
+        raise FileNotFoundError(
+            "Project Snapshot Kit is not installed. Run: "
+            "python tools/owledge.py install-addon --project-root . --addon project-snapshot-kit"
+        )
+
+
+def write_text_if_changed(path: pathlib.Path, text: str) -> bool:
+    if path.exists() and path.read_text(encoding="utf-8", errors="replace") == text:
+        return False
+    locked_atomic_write_text(path, text)
+    return True
+
+
+def safe_project_file(root: pathlib.Path, relative: str) -> pathlib.Path | None:
+    if not relative or ".." in pathlib.PurePosixPath(relative.replace("\\", "/")).parts:
+        return None
+    path = root / pathlib.Path(relative)
+    try:
+        path.resolve().relative_to(root.resolve())
+    except ValueError:
+        return None
+    return path
+
+
+def read_memory_index_rows_for_snapshot(root: pathlib.Path) -> tuple[list[dict[str, Any]], bool]:
+    index_path = root / "agent-memory" / "indexes" / "memory-index.jsonl"
+    if index_path.exists():
+        return read_jsonl(index_path), True
+    records = load_memory_records(root, include_sessions=False)
+    return [memory_index_row(record) for record in records], False
+
+
+def first_markdown_heading(text: str, fallback: str) -> str:
+    for line in markdown_body(text).splitlines():
+        stripped = line.strip()
+        if stripped.startswith("#"):
+            return stripped.lstrip("#").strip() or fallback
+    return fallback
+
+
+def source_excerpt(root: pathlib.Path, relative: str, max_chars: int = 1200) -> str:
+    if relative.endswith("events.jsonl"):
+        return ""
+    path = safe_project_file(root, relative)
+    if not path or not path.exists() or not path.is_file() or path.suffix.lower() != ".md":
+        return ""
+    return markdown_body(path.read_text(encoding="utf-8", errors="replace")).strip()[:max_chars]
+
+
+def project_snapshot_rows(root: pathlib.Path, rows: list[dict[str, Any]], limit: int = 60) -> list[dict[str, Any]]:
+    wanted = {"project_context", "canonical", "compiled", "adr", "lesson", "pattern", "idea", "handoff", "evidence", "qa"}
+    generated_sources = {
+        PROJECT_STORY_SNAPSHOT_REL,
+        PROJECT_EXECUTION_SNAPSHOT_REL,
+        PROJECT_SNAPSHOT_MANIFEST_REL,
+    }
+    filtered = [
+        row
+        for row in rows
+        if row.get("doc_type") in wanted
+        and row.get("data_class") not in {"confidential", "personal", "special-category"}
+        and not str(row.get("source_path", "")).endswith("events.jsonl")
+        and str(row.get("source_path", "")) not in generated_sources
+        and not str(row.get("source_path", "")).startswith("agent-memory/reports/")
+        and not str(row.get("source_path", "")).startswith("agent-memory/project-snapshot/")
+    ]
+    priority = {
+        "project_context": 0,
+        "canonical": 1,
+        "adr": 2,
+        "compiled": 3,
+        "lesson": 4,
+        "pattern": 5,
+        "idea": 6,
+        "handoff": 7,
+        "evidence": 8,
+        "qa": 9,
+    }
+    filtered.sort(key=lambda row: (priority.get(str(row.get("doc_type")), 99), str(row.get("source_path", ""))))
+    return filtered[:limit]
+
+
+def scan_project_task_artifacts(root: pathlib.Path) -> list[dict[str, Any]]:
+    artifacts: list[dict[str, Any]] = []
+    for base_rel, durable in [("agent-memory/plans", True), ("agent-plans", False)]:
+        base = root / pathlib.Path(base_rel)
+        if not base.exists():
+            continue
+        for path in sorted(base.rglob("*.md")):
+            rel = str(path.relative_to(root)).replace("\\", "/")
+            text = path.read_text(encoding="utf-8", errors="replace")
+            meta = parse_frontmatter(text)
+            item_type = str(meta.get("type") or meta.get("doc_type") or "Plan")
+            if item_type not in {"TaskCard", "WorkPackage", "EpicOverview", "Plan", "task", "handoff"} and base_rel == "agent-plans":
+                item_type = "Plan"
+            title = str(meta.get("title") or meta.get("semantic_title") or first_markdown_heading(text, path.stem))
+            status = str(meta.get("status") or "unknown")
+            body = markdown_body(text)
+            blocker_lines = [line.strip("- ").strip() for line in body.splitlines() if "block" in line.lower()][:3]
+            artifacts.append(
+                {
+                    "id": str(meta.get("id") or meta.get("memory_id") or path.stem),
+                    "type": item_type,
+                    "status": status,
+                    "priority": str(meta.get("priority") or ""),
+                    "title": title,
+                    "source_path": rel,
+                    "source_hash": sha256_file(path),
+                    "durable": durable,
+                    "blockers": blocker_lines,
+                    "epic_id": str(meta.get("epic_id") or ""),
+                    "workpackage_id": str(meta.get("workpackage_id") or ""),
+                }
+            )
+    return artifacts
+
+
+def count_by(items: list[dict[str, Any]], key: str) -> dict[str, int]:
+    counts: dict[str, int] = {}
+    for item in items:
+        value = str(item.get(key) or "unknown")
+        counts[value] = counts.get(value, 0) + 1
+    return counts
+
+
+def md_table(headers: list[str], rows: list[list[Any]]) -> str:
+    lines = ["| " + " | ".join(headers) + " |", "| " + " | ".join("---" for _ in headers) + " |"]
+    for row in rows:
+        lines.append("| " + " | ".join(str(cell).replace("\n", " ") for cell in row) + " |")
+    return "\n".join(lines)
+
+
+def bullet_lines(values: list[str], empty: str = "None detected.") -> str:
+    cleaned = [value for value in values if value]
+    if not cleaned:
+        return f"- {empty}"
+    return "\n".join(f"- {value}" for value in cleaned)
+
+
+def project_snapshot_source_fingerprints(rows: list[dict[str, Any]], tasks: list[dict[str, Any]]) -> dict[str, str]:
+    fingerprints: dict[str, str] = {}
+    for row in rows:
+        if row.get("source_path") and row.get("source_hash"):
+            fingerprints[str(row["source_path"])] = str(row["source_hash"])
+    for task in tasks:
+        if task.get("source_path") and task.get("source_hash"):
+            fingerprints[str(task["source_path"])] = str(task["source_hash"])
+    return dict(sorted(fingerprints.items()))
+
+
+def snapshot_frontmatter(defaults: dict[str, str], kind: str, title: str, summary: str, source_hash: str, now: str) -> str:
+    slug = "project-story-snapshot" if kind == "project_story" else "project-execution-snapshot"
+    return f"""---
+memory_id: "mem:{defaults['tenant_id']}:{defaults['customer_id']}:{defaults['project_id']}:compiled:{slug}"
+tenant_id: {yaml_string(defaults['tenant_id'])}
+customer_id: {yaml_string(defaults['customer_id'])}
+project_id: {yaml_string(defaults['project_id'])}
+doc_type: "compiled"
+snapshot_kind: {yaml_string(kind)}
+status: "draft"
+visibility: "private"
+data_class: "internal"
+semantic_title: {yaml_string(title)}
+summary: {yaml_string(summary)}
+concept_tags:
+  - "project-snapshot"
+stack_tags: []
+problem_patterns: []
+architecture_patterns: []
+failure_modes: []
+reusable_lessons: []
+confidence: 0.7
+review_status: "unreviewed"
+sanitization_status: "not_required"
+created_at: {yaml_string(now)}
+updated_at: {yaml_string(now)}
+retention_class: "standard"
+stale_after: ""
+expires_at: ""
+last_reviewed_at: ""
+review_cycle: "monthly"
+source_hash: {yaml_string(source_hash)}
+edges: []
+---
+"""
+
+
+def collect_project_snapshot_model(root: pathlib.Path, token_budget: int, allow_large_context: bool) -> dict[str, Any]:
+    defaults = project_defaults(root)
+    rows, used_index = read_memory_index_rows_for_snapshot(root)
+    selected_rows = project_snapshot_rows(root, rows)
+    tasks = scan_project_task_artifacts(root)
+    extra_sources: list[dict[str, Any]] = []
+    for rel in ["README.md", "ROADMAP.md", "PROJECT_CONTEXT.md", "PROJECT_CONTEXT.template.md"]:
+        path = root / rel
+        if path.exists() and path.is_file():
+            extra_sources.append(
+                {
+                    "source_path": rel,
+                    "source_hash": sha256_file(path),
+                    "doc_type": "project_source",
+                    "status": "active",
+                    "semantic_title": first_markdown_heading(path.read_text(encoding="utf-8", errors="replace"), rel),
+                    "summary": source_excerpt(root, rel, max_chars=220).replace("\n", " "),
+                }
+            )
+    all_source_rows = selected_rows + extra_sources
+    source_fingerprints = project_snapshot_source_fingerprints(all_source_rows, tasks)
+    source_fingerprint_text = json.dumps(source_fingerprints, sort_keys=True)
+    source_hash = sha256_text(source_fingerprint_text)
+    snippets = [source_excerpt(root, str(row.get("source_path", "")), max_chars=900) for row in all_source_rows[:18]]
+    estimate_input_tokens = max(0, math.ceil((len(json.dumps(all_source_rows[:80], sort_keys=True)) + sum(len(item) for item in snippets)) / 4))
+    estimate_output_tokens = 3500 if tasks else 2500
+    if token_budget > PROJECT_SNAPSHOT_LARGE_TOKEN_BUDGET and not allow_large_context:
+        raise ValueError("Token budgets above 40000 require --allow-large-context.")
+    if estimate_input_tokens > token_budget and not allow_large_context:
+        raise ValueError(f"Estimated narrative refresh input tokens ({estimate_input_tokens}) exceed --token-budget {token_budget}. Pass --allow-large-context to continue.")
+    return {
+        "defaults": defaults,
+        "rows": all_source_rows,
+        "tasks": tasks,
+        "used_memory_index": used_index,
+        "source_fingerprints": source_fingerprints,
+        "source_hash": source_hash,
+        "token_estimate": {
+            "model_tokens_used": 0,
+            "estimated_refresh_input_tokens": estimate_input_tokens,
+            "estimated_refresh_output_tokens": estimate_output_tokens,
+            "token_budget": token_budget,
+            "allow_large_context": allow_large_context,
+        },
+        "counts": {
+            "doc_types": count_by(all_source_rows, "doc_type"),
+            "record_status": count_by(all_source_rows, "status"),
+            "task_status": count_by(tasks, "status"),
+            "task_types": count_by(tasks, "type"),
+        },
+    }
+
+
+def render_project_story_snapshot_markdown(model: dict[str, Any], now: str) -> str:
+    defaults = model["defaults"]
+    rows = model["rows"]
+    counts = model["counts"]
+    source_hash = model["source_hash"]
+    titles = [str(row.get("semantic_title") or row.get("summary") or row.get("source_path")) for row in rows[:10]]
+    summaries = [str(row.get("summary") or "") for row in rows[:8] if row.get("summary")]
+    problem_patterns = sorted({str(item) for row in rows for item in row.get("problem_patterns", []) if item})
+    architecture_patterns = sorted({str(item) for row in rows for item in row.get("architecture_patterns", []) if item})
+    feature_tags = sorted({str(item) for row in rows for item in row.get("concept_tags", []) if item})[:12]
+    sources = [[row.get("source_path", ""), row.get("doc_type", ""), str(row.get("source_hash", ""))[:16]] for row in rows[:30]]
+    body = f"""# Project Story Snapshot
+
+## One-Line Pitch
+
+{defaults['project_id']} is summarized from local Owledge memory as a source-backed project with {len(rows)} selected records and {sum(counts['task_status'].values())} local planning artifacts.
+
+## Problem
+
+{bullet_lines(problem_patterns, "No explicit problem patterns found in selected memory.")}
+
+## Target Users
+
+- Project owners who need a durable overview of agent-planned work.
+- Agents that need compact project context without reloading full history.
+
+## Painpoints Solved
+
+{bullet_lines(summaries[:6], "No reusable painpoint summaries found yet.")}
+
+## Core Features
+
+{bullet_lines(feature_tags or titles[:8], "No feature tags found yet.")}
+
+## Workflows
+
+{bullet_lines(architecture_patterns, "No explicit architecture or workflow patterns found yet.")}
+
+## Architecture And Layers
+
+{md_table(["Document type", "Count"], [[key, value] for key, value in sorted(counts["doc_types"].items())])}
+
+## Current Status
+
+{md_table(["Status", "Count"], [[key, value] for key, value in sorted(counts["record_status"].items())])}
+
+## Sources
+
+{md_table(["Source", "Type", "Hash"], sources)}
+"""
+    return snapshot_frontmatter(defaults, "project_story", "Project story snapshot", "Reusable project orientation, pitch, painpoints, workflows, and feature overview.", source_hash, now) + body
+
+
+def render_project_execution_snapshot_markdown(model: dict[str, Any], now: str) -> str:
+    defaults = model["defaults"]
+    rows = model["rows"]
+    tasks = model["tasks"]
+    counts = model["counts"]
+    source_hash = model["source_hash"]
+    blockers = [blocker for task in tasks for blocker in task.get("blockers", [])][:10]
+    task_rows = [
+        [task.get("id", ""), task.get("type", ""), task.get("status", ""), task.get("priority", ""), task.get("source_path", "")]
+        for task in tasks[:40]
+    ]
+    source_rows = [[row.get("source_path", ""), row.get("doc_type", ""), str(row.get("source_hash", ""))[:16]] for row in rows[:24]]
+    body = f"""# Project Execution Snapshot
+
+## Goal
+
+Keep {defaults['project_id']} execution state visible through local Owledge plans, task cards, evidence, handoffs, and generated snapshots.
+
+## MVP
+
+- Install Project Snapshot Kit only when requested.
+- Generate source-backed Markdown snapshots.
+- Generate static local HTML from existing snapshots.
+- Track Owledge-local task status deterministically.
+
+## Explicitly Out Of MVP
+
+- External GitHub, Linear, or Jira synchronization.
+- Hosted dashboard, authentication, or RBAC.
+- Automatic promotion to canonical memory.
+- Model calls from the CLI.
+
+## Active Workstreams
+
+{md_table(["Task type", "Count"], [[key, value] for key, value in sorted(counts["task_types"].items())])}
+
+## Task Status
+
+{md_table(["Status", "Count"], [[key, value] for key, value in sorted(counts["task_status"].items())])}
+
+## Local Tasks And Plans
+
+{md_table(["ID", "Type", "Status", "Priority", "Source"], task_rows) if task_rows else "- No Owledge-local task artifacts found."}
+
+## Roadmap
+
+- Refresh snapshots when source hashes change.
+- Keep HTML regeneration deterministic and zero-token.
+- Add external ticket adapters later as optional importers.
+
+## Blockers
+
+{bullet_lines(blockers, "No blockers detected in local task artifacts.")}
+
+## QA Gates
+
+- Run `python tools/agent_memory_cli.py --project-root . validate-memory --strict`.
+- Run `python tools/owledge.py doctor --project-root .`.
+- Run add-on generation with `--changed-only` before sharing reports.
+
+## Latest Agent Activity
+
+Source-backed activity is summarized from handoffs and evidence records only. Raw runtime event logs are excluded.
+
+## Sources
+
+{md_table(["Source", "Type", "Hash"], source_rows)}
+"""
+    return snapshot_frontmatter(defaults, "execution_state", "Project execution snapshot", "Reusable MVP, roadmap, workstream, task, blocker, QA, and agent activity snapshot.", source_hash, now) + body
+
+
+def read_project_snapshot_manifest(root: pathlib.Path) -> dict[str, Any]:
+    path = root / pathlib.Path(PROJECT_SNAPSHOT_MANIFEST_REL)
+    if not path.exists():
+        return {}
+    with contextlib.suppress(Exception):
+        data = json.loads(path.read_text(encoding="utf-8", errors="replace"))
+        if isinstance(data, dict):
+            return data
+    return {}
+
+
+def write_project_snapshot_manifest(root: pathlib.Path, payload: dict[str, Any]) -> bool:
+    path = root / pathlib.Path(PROJECT_SNAPSHOT_MANIFEST_REL)
+    return write_text_if_changed(path, json.dumps(payload, indent=2, sort_keys=True) + "\n")
+
+
+def build_project_snapshot(
+    root: pathlib.Path,
+    render_html: bool = False,
+    changed_only: bool = False,
+    token_budget: int = PROJECT_SNAPSHOT_DEFAULT_TOKEN_BUDGET,
+    allow_large_context: bool = False,
+) -> dict[str, Any]:
+    require_project_snapshot_addon(root)
+    model = collect_project_snapshot_model(root, token_budget=token_budget, allow_large_context=allow_large_context)
+    previous_manifest = read_project_snapshot_manifest(root)
+    story_path = root / pathlib.Path(PROJECT_STORY_SNAPSHOT_REL)
+    execution_path = root / pathlib.Path(PROJECT_EXECUTION_SNAPSHOT_REL)
+    now = utc_now()
+    generated_files: list[str] = []
+    skipped_files: list[str] = []
+    unchanged_sources = previous_manifest.get("source_hash") == model["source_hash"]
+    snapshots_exist = story_path.exists() and execution_path.exists()
+    if changed_only and unchanged_sources and snapshots_exist:
+        skipped_files.extend([PROJECT_STORY_SNAPSHOT_REL, PROJECT_EXECUTION_SNAPSHOT_REL])
+    else:
+        story_text = render_project_story_snapshot_markdown(model, now)
+        execution_text = render_project_execution_snapshot_markdown(model, now)
+        if write_text_if_changed(story_path, story_text):
+            generated_files.append(PROJECT_STORY_SNAPSHOT_REL)
+        else:
+            skipped_files.append(PROJECT_STORY_SNAPSHOT_REL)
+        if write_text_if_changed(execution_path, execution_text):
+            generated_files.append(PROJECT_EXECUTION_SNAPSHOT_REL)
+        else:
+            skipped_files.append(PROJECT_EXECUTION_SNAPSHOT_REL)
+    html_result: dict[str, Any] | None = None
+    if render_html:
+        site_dir = root / "agent-memory" / "reports" / "project-site"
+        expected_pages = ["index.html", "product.html", "workflows.html", "implementation.html", "activity.html", "sources.html"]
+        html_exists = all((site_dir / page).exists() for page in expected_pages)
+        if changed_only and unchanged_sources and html_exists:
+            skipped_files.extend([f"agent-memory/reports/project-site/{page}" for page in expected_pages])
+            html_result = {
+                "path": "agent-memory/reports/project-site/index.html",
+                "paths": [],
+                "report_type": "project-site",
+                "audience": "private",
+                "records": 2,
+                "skipped": True,
+            }
+        else:
+            html_result = render_project_snapshot_site(root)
+            generated_files.extend(html_result.get("paths", []))
+    manifest_payload = {
+        "generated_at": now,
+        "project_id": model["defaults"]["project_id"],
+        "source_hash": model["source_hash"],
+        "source_paths": model["source_fingerprints"],
+        "generated_files": generated_files,
+        "skipped_files": skipped_files,
+        "used_memory_index": model["used_memory_index"],
+        "counts": model["counts"],
+        "token_estimate": model["token_estimate"],
+        "html": html_result or {},
+    }
+    write_project_snapshot_manifest(root, manifest_payload)
+    return {
+        "passed": True,
+        "addon": "project-snapshot-kit",
+        "generated_files": generated_files,
+        "skipped_files": skipped_files,
+        "manifest_path": PROJECT_SNAPSHOT_MANIFEST_REL,
+        "source_hash": model["source_hash"],
+        "changed_only": changed_only,
+        "render_html": render_html,
+        "token_estimate": model["token_estimate"],
+    }
+
+
+def project_snapshot_file_href(raw: str) -> str | None:
+    normalized = raw.strip().replace("\\", "/")
+    if not normalized or "://" in normalized or " " in normalized:
+        return None
+    safe_prefix = (
+        normalized.startswith("./")
+        or normalized.startswith("../")
+        or normalized.startswith("/")
+        or normalized.startswith("agent-memory/")
+        or normalized.startswith("agent-plans/")
+        or normalized.startswith("docs/")
+        or normalized.startswith("tools/")
+        or normalized.startswith("addons/")
+    )
+    safe_suffix = pathlib.PurePosixPath(normalized).suffix.lower() in {
+        ".md",
+        ".html",
+        ".py",
+        ".json",
+        ".jsonl",
+        ".txt",
+        ".yaml",
+        ".yml",
+    }
+    if safe_prefix or safe_suffix:
+        return urllib.parse.quote(normalized, safe="/#?=&:.-_")
+    return None
+
+
+def project_snapshot_inline_html(text: str) -> str:
+    direct_href = project_snapshot_file_href(text)
+    if direct_href:
+        escaped_text = html_escape(text)
+        return f"<a class='file-link' href='{direct_href}'>{escaped_text}</a>"
+
+    def code_repl(match: re.Match[str]) -> str:
+        raw = match.group(1)
+        escaped = html_escape(raw)
+        href = project_snapshot_file_href(raw)
+        if href:
+            return f"<a class='file-link' href='{href}'><code>{escaped}</code></a>"
+        return f"<code>{escaped}</code>"
+
+    escaped = html_escape(text)
+    return re.sub(r"`([^`]+)`", code_repl, escaped)
+
+
+def markdown_table_to_html(table_lines: list[str]) -> str:
+    rows = [[cell.strip() for cell in line.strip().strip("|").split("|")] for line in table_lines]
+    if len(rows) < 2 or not all(rows):
+        return "<pre class='md-table'>" + html_escape("\n".join(table_lines)) + "</pre>"
+    separator = rows[1]
+    if not all(re.fullmatch(r":?-{3,}:?", cell.replace(" ", "")) for cell in separator):
+        return "<pre class='md-table'>" + html_escape("\n".join(table_lines)) + "</pre>"
+    header = rows[0]
+    body_rows = rows[2:]
+    head_html = "".join(f"<th>{project_snapshot_inline_html(cell)}</th>" for cell in header)
+    body_html = "".join(
+        "<tr>" + "".join(f"<td>{project_snapshot_inline_html(cell)}</td>" for cell in row) + "</tr>"
+        for row in body_rows
+    )
+    return f"<div class='table-wrap'><table><thead><tr>{head_html}</tr></thead><tbody>{body_html}</tbody></table></div>"
+
+
+def html_from_markdown_fragment(markdown: str) -> str:
+    html_lines: list[str] = []
+    in_list = False
+    in_table = False
+    table_lines: list[str] = []
+
+    def flush_list() -> None:
+        nonlocal in_list
+        if in_list:
+            html_lines.append("</ul>")
+            in_list = False
+
+    def flush_table() -> None:
+        nonlocal in_table, table_lines
+        if not in_table:
+            return
+        html_lines.append(markdown_table_to_html(table_lines))
+        table_lines = []
+        in_table = False
+
+    for raw in markdown_body(markdown).splitlines():
+        line = raw.rstrip()
+        stripped = line.strip()
+        if not stripped:
+            flush_list()
+            flush_table()
+            continue
+        if stripped.startswith("|"):
+            flush_list()
+            in_table = True
+            table_lines.append(stripped)
+            continue
+        flush_table()
+        if stripped.startswith("### "):
+            flush_list()
+            html_lines.append(f"<h3>{project_snapshot_inline_html(stripped[4:])}</h3>")
+        elif stripped.startswith("## "):
+            flush_list()
+            html_lines.append(f"<h2>{project_snapshot_inline_html(stripped[3:])}</h2>")
+        elif stripped.startswith("# "):
+            flush_list()
+            html_lines.append(f"<h1>{project_snapshot_inline_html(stripped[2:])}</h1>")
+        elif stripped.startswith("- "):
+            if not in_list:
+                html_lines.append("<ul>")
+                in_list = True
+            html_lines.append(f"<li>{project_snapshot_inline_html(stripped[2:])}</li>")
+        else:
+            flush_list()
+            html_lines.append(f"<p>{project_snapshot_inline_html(stripped)}</p>")
+    flush_list()
+    flush_table()
+    return "\n".join(html_lines)
+
+
+def project_snapshot_metrics(
+    story_text: str,
+    execution_text: str,
+    manifest: dict[str, Any],
+) -> list[tuple[str, str, str]]:
+    source_count = len(manifest.get("source_paths") or {})
+    token_estimate = manifest.get("token_estimate") or {}
+    estimated_input = token_estimate.get("estimated_refresh_input_tokens", 0)
+    model_tokens_used = token_estimate.get("model_tokens_used", 0)
+    sections = len(re.findall(r"^##\s+", story_text + "\n" + execution_text, flags=re.MULTILINE))
+    return [
+        ("Sources", str(source_count), "Indexed files considered"),
+        ("Sections", str(sections), "Snapshot sections rendered"),
+        ("Est. input", str(estimated_input), "Future narrative refresh budget"),
+        ("Model tokens", str(model_tokens_used), "Used for this deterministic render"),
+    ]
+
+
+def project_snapshot_page(
+    title: str,
+    active: str,
+    body: str,
+    design: dict[str, str],
+    generated_at: str,
+    metrics: list[tuple[str, str, str]] | None = None,
+) -> str:
+    nav = [
+        ("index.html", "Overview"),
+        ("product.html", "Product"),
+        ("workflows.html", "Workflows"),
+        ("implementation.html", "Implementation"),
+        ("activity.html", "Activity"),
+        ("sources.html", "Sources"),
+    ]
+    nav_html = "".join(f"<a class='{ 'active' if href == active else '' }' href='{href}'>{label}</a>" for href, label in nav)
+    metric_html = ""
+    if metrics:
+        metric_html = "<section class='metrics' aria-label='Snapshot metrics'>" + "".join(
+            f"<article class='metric'><span>{html_escape(label)}</span><strong>{html_escape(value)}</strong><small>{html_escape(caption)}</small></article>"
+            for label, value, caption in metrics
+        ) + "</section>"
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{html_escape(title)}</title>
+  <style>
+    :root {{
+      --bg: {design['bg']};
+      --surface: {design['panel']};
+      --surface-2: color-mix(in srgb, {design['panel']} 88%, {design['accent']});
+      --ink: {design['ink']};
+      --muted: {design['muted']};
+      --line: {design['line']};
+      --accent: {design['accent']};
+      --radius: {design['radius']};
+      --font-family: {design['font_family']};
+      --density: {design.get('density', '20px')};
+    }}
+    * {{ box-sizing: border-box; }}
+    body {{ margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-family); font-size: 16px; }}
+    header {{ padding: 30px min(5vw, 64px); background: var(--surface); border-bottom: 1px solid var(--line); }}
+    .topline {{ display: flex; flex-wrap: wrap; align-items: center; gap: 10px; color: var(--muted); font-size: 13px; }}
+    .badge {{ display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px; color: var(--accent); background: color-mix(in srgb, var(--surface) 82%, var(--accent)); font-weight: 700; }}
+    nav {{ display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }}
+    nav a {{ color: var(--muted); text-decoration: none; border: 1px solid var(--line); border-radius: 999px; padding: 8px 12px; background: var(--surface); }}
+    nav a:hover {{ color: var(--ink); border-color: var(--accent); }}
+    nav a.active {{ color: white; background: var(--accent); border-color: var(--accent); }}
+    main {{ max-width: 1180px; margin: 0 auto; padding: 28px min(5vw, 64px) 64px; }}
+    h1 {{ margin: 10px 0 0; font-size: 42px; line-height: 1.08; letter-spacing: 0; }}
+    h2 {{ margin-top: 30px; font-size: 25px; line-height: 1.2; letter-spacing: 0; }}
+    h3 {{ margin-top: 22px; line-height: 1.3; letter-spacing: 0; }}
+    p, li {{ color: var(--muted); line-height: 1.55; }}
+    .metrics {{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 18px; }}
+    .metric {{ background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; min-width: 0; }}
+    .metric span {{ display: block; color: var(--muted); font-size: 12px; font-weight: 700; text-transform: uppercase; }}
+    .metric strong {{ display: block; color: var(--ink); font-size: 28px; line-height: 1.1; margin-top: 8px; }}
+    .metric small {{ display: block; color: var(--muted); margin-top: 8px; line-height: 1.35; }}
+    .panel {{ background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: var(--density); }}
+    .table-wrap {{ overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); margin: 16px 0; }}
+    table {{ width: 100%; border-collapse: collapse; min-width: 620px; }}
+    th, td {{ padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }}
+    th {{ color: var(--ink); background: var(--surface-2); font-size: 12px; text-transform: uppercase; }}
+    td {{ color: var(--muted); line-height: 1.5; }}
+    tr:last-child td {{ border-bottom: 0; }}
+    .md-table {{ overflow-x: auto; white-space: pre-wrap; background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; }}
+    code {{ overflow-wrap: anywhere; color: var(--ink); background: var(--surface-2); border: 1px solid var(--line); border-radius: 6px; padding: 1px 5px; }}
+    .file-link {{ color: var(--accent); text-decoration: none; }}
+    .file-link:hover {{ text-decoration: underline; }}
+    details {{ border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; background: var(--surface-2); }}
+    summary {{ cursor: pointer; color: var(--ink); font-weight: 700; }}
+    @media (max-width: 840px) {{
+      h1 {{ font-size: 32px; }}
+      .metrics {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }}
+    }}
+    @media (max-width: 560px) {{
+      header, main {{ padding-left: 18px; padding-right: 18px; }}
+      .metrics {{ grid-template-columns: 1fr; }}
+    }}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="topline"><span class="badge">Project Snapshot</span><span>Generated {html_escape(generated_at)}</span><span>Markdown snapshots are the source of truth.</span></div>
+    <h1>{html_escape(title)}</h1>
+    <nav>{nav_html}</nav>
+  </header>
+  <main>{metric_html}<section class="panel">{body}</section></main>
+</body>
+</html>
+"""
+
+
+def render_project_snapshot_site(
+    root: pathlib.Path,
+    output_dir: pathlib.Path | None = None,
+    title: str | None = None,
+    audience: str = "private",
+) -> dict[str, Any]:
+    require_project_snapshot_addon(root)
+    if audience != "private":
+        raise ValueError("Project Snapshot Kit reports are private-only in the MVP.")
+    story_path = root / pathlib.Path(PROJECT_STORY_SNAPSHOT_REL)
+    execution_path = root / pathlib.Path(PROJECT_EXECUTION_SNAPSHOT_REL)
+    if not story_path.exists() or not execution_path.exists():
+        raise FileNotFoundError("Project snapshot Markdown is missing. Run build-project-snapshot before rendering HTML.")
+    design = read_report_design(root)
+    generated_at = utc_now()
+    out_dir = output_dir or (root / "agent-memory" / "reports" / "project-site")
+    out_dir.mkdir(parents=True, exist_ok=True)
+    story_text = story_path.read_text(encoding="utf-8", errors="replace")
+    execution_text = execution_path.read_text(encoding="utf-8", errors="replace")
+    manifest = read_project_snapshot_manifest(root)
+    metrics = project_snapshot_metrics(story_text, execution_text, manifest)
+    source_lines = [
+        f"- `{path}` `{str(hash_value)[:16]}`"
+        for path, hash_value in sorted((manifest.get("source_paths") or {}).items())
+    ]
+    token_estimate = manifest.get("token_estimate", {})
+    source_body = "# Sources\n\n" + "\n".join(source_lines or ["- No manifest sources found."])
+    source_html = (
+        html_from_markdown_fragment(source_body)
+        + "\n<details open><summary>Token estimate</summary><pre class='md-table'>"
+        + html_escape(json.dumps(token_estimate, indent=2, sort_keys=True))
+        + "</pre></details>"
+    )
+    pages = {
+        "index.html": html_from_markdown_fragment(story_text),
+        "product.html": html_from_markdown_fragment(story_text),
+        "workflows.html": html_from_markdown_fragment(story_text),
+        "implementation.html": html_from_markdown_fragment(execution_text),
+        "activity.html": html_from_markdown_fragment(execution_text),
+        "sources.html": source_html,
+    }
+    written: list[str] = []
+    for filename, body in pages.items():
+        page_title = title or f"Project Snapshot: {project_defaults(root)['project_id']}"
+        if filename != "index.html":
+            page_title = f"{page_title} - {filename.removesuffix('.html').replace('-', ' ').title()}"
+        out = out_dir / filename
+        if write_text_if_changed(out, project_snapshot_page(page_title, filename, body, design, generated_at, metrics)):
+            written.append(str(out.relative_to(root)).replace("\\", "/"))
+    return {
+        "path": str((out_dir / "index.html").relative_to(root)).replace("\\", "/"),
+        "paths": written,
+        "report_type": "project-site",
+        "audience": audience,
+        "records": 2,
+    }
+
+
+def render_execution_dashboard(
+    root: pathlib.Path,
+    output_dir: pathlib.Path | None = None,
+    title: str | None = None,
+    audience: str = "private",
+) -> dict[str, Any]:
+    require_project_snapshot_addon(root)
+    if audience != "private":
+        raise ValueError("Execution dashboard is private-only in the MVP.")
+    execution_path = root / pathlib.Path(PROJECT_EXECUTION_SNAPSHOT_REL)
+    if not execution_path.exists():
+        raise FileNotFoundError("Project execution snapshot is missing. Run build-project-snapshot before rendering HTML.")
+    design = read_report_design(root)
+    generated_at = utc_now()
+    out_dir = output_dir or (root / "agent-memory" / "reports" / "project-site")
+    out_dir.mkdir(parents=True, exist_ok=True)
+    execution_text = execution_path.read_text(encoding="utf-8", errors="replace")
+    manifest = read_project_snapshot_manifest(root)
+    metrics = project_snapshot_metrics("", execution_text, manifest)
+    body = html_from_markdown_fragment(execution_text)
+    title = title or f"Execution Dashboard: {project_defaults(root)['project_id']}"
+    out = out_dir / "execution-dashboard.html"
+    changed = write_text_if_changed(out, project_snapshot_page(title, "implementation.html", body, design, generated_at, metrics))
+    return {
+        "path": str(out.relative_to(root)).replace("\\", "/"),
+        "paths": [str(out.relative_to(root)).replace("\\", "/")] if changed else [],
+        "report_type": "execution-dashboard",
+        "audience": audience,
+        "records": 1,
     }
 
 
@@ -4257,7 +5071,7 @@ def test_contracts(root: pathlib.Path) -> dict[str, Any]:
         add(f"file:{rel}", (root / rel).is_file(), "Required file exists.")
     if (root / "addons" / "compliance-light").exists():
         for rel in ADDON_REQUIRED_FILES:
-            add(f"file:{rel}", (root / rel).is_file(), "Optional Compliance Light add-on file exists.")
+            add(f"file:{rel}", (root / rel).is_file(), "Optional add-on file exists.")
     for schema in (root / "agent-memory" / "schemas").glob("*.json"):
         try:
             json.loads(schema.read_text(encoding="utf-8"))
@@ -4280,6 +5094,8 @@ def test_contracts(root: pathlib.Path) -> dict[str, Any]:
         "agent-memory/exports/retrieval-eval/",
         "agent-memory/exports/finalization-gates/",
         "agent-memory/exports/compliance/",
+        "agent-memory/reports/project-site/",
+        "agent-memory/project-snapshot/project-snapshot-manifest.json",
         "agent-plans/",
     ]:
         add(f"gitignore:{pattern}", pattern in gitignore, "Runtime or scratch path is ignored.")
@@ -4450,6 +5266,11 @@ def main(argv: list[str] | None = None) -> int:
     context_p.add_argument("--agent-role", default="worker")
     context_p.add_argument("--budget-chars", type=int)
     context_p.add_argument("--objective")
+    snapshot_p = sub.add_parser("build-project-snapshot")
+    snapshot_p.add_argument("--render-html", action="store_true")
+    snapshot_p.add_argument("--changed-only", action="store_true")
+    snapshot_p.add_argument("--token-budget", type=int, default=PROJECT_SNAPSHOT_DEFAULT_TOKEN_BUDGET)
+    snapshot_p.add_argument("--allow-large-context", action="store_true")
     sub.add_parser("audit-retention")
     sub.add_parser("review-memory-conflicts")
     sub.add_parser("scan-memory-sensitive-data")
@@ -4569,6 +5390,20 @@ def main(argv: list[str] | None = None) -> int:
                     objective=args.objective,
                 )
             print(json.dumps(result, indent=2, sort_keys=True))
+        elif args.command == "build-project-snapshot":
+            print(
+                json.dumps(
+                    build_project_snapshot(
+                        root,
+                        render_html=args.render_html,
+                        changed_only=args.changed_only,
+                        token_budget=args.token_budget,
+                        allow_large_context=args.allow_large_context,
+                    ),
+                    indent=2,
+                    sort_keys=True,
+                )
+            )
         elif args.command == "audit-retention":
             result = audit_retention(root)
             print(json.dumps(result, indent=2, sort_keys=True))

@@ -118,8 +118,8 @@ from pathlib import Path
 from lightrag import LightRAG
 
 
-EXPORT_DIR = Path(r"C:\path\to\project\agent-memory\exports\lightrag")
-WORKING_DIR = r"C:\path\to\lightrag\storage"
+EXPORT_DIR = Path("/path/to/project/agent-memory/exports/lightrag")
+WORKING_DIR = "/path/to/lightrag/storage"
 WORKSPACE = "tenant-local__customer-local__project-local"
 
 

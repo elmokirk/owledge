@@ -1,0 +1,25 @@
+{
+  "description": "Portable quality-ratchet thresholds for the small benchmark gate. These limits are intentionally broad enough for CI runners and local laptops while catching major regressions.",
+  "scenarios": {
+    "kb-scan-100": {
+      "max_output_bytes": 250000,
+      "max_peak_python_bytes": 25000000,
+      "max_seconds": 10,
+      "min_markdown_files_scanned": 100,
+      "min_records_per_second": 10,
+      "require_existing_kb_files_unmodified": true
+    },
+    "context-pack": {
+      "max_peak_python_bytes": 30000000,
+      "max_seconds": 10,
+      "min_included_sources": 1
+    },
+    "runtime-handoff": {
+      "max_peak_python_bytes": 30000000,
+      "max_seconds": 15,
+      "max_summary_bytes": 50000,
+      "min_checked_files": 3
+    }
+  },
+  "version": 1
+}

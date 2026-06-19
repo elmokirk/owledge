@@ -56,7 +56,7 @@ Every durable memory artifact must include:
 
 ## Runtime Profiles
 
-- Codex: use shell wrappers in `tools/` and respect AGENTS.md.
+- Codex: use the project-local Python CLI in `tools/` and respect AGENTS.md.
 - Claude Code: use CLAUDE.md plus the same markdown contracts.
 - Cowork/MCP: expose wrappers as MCP tools, but keep Markdown canonical.
 - Hermes: map agent tasks to context packs and evidence writes.

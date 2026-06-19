@@ -64,14 +64,13 @@ fixes are in scope.
 | Project-folder generation | Passed | Python generator verified a lean project folder |
 | macOS/Linux project-folder generation | Passed | Python generator verified a lean project folder |
 | Lean default kit excludes optional surfaces | Passed | No compliance folder, no Compliance Light tools, no plugin adapter by default |
-| Lean + Claude/Cowork plugin on Unix | Passed | Unix hook profile replaces `hooks.json` with shell/Python hook commands |
+| Lean + Claude/Cowork plugin | Passed | Python hook profile replaces `hooks.json` with platform-neutral Python commands |
 | Lean + Compliance Light | Passed | Opt-in project folder passed `compliance-doctor` with score 100 |
 | Runtime adapter smoke | Passed | Claude/Cowork Python hook scripts create private session artifacts |
 
-The `.sh` wrappers were not executed directly in the Windows release
-environment because `bash` resolves to WSL and no Linux distribution is
-installed. The underlying Python CLI paths used by those wrappers were verified
-through the Python generator, local CLI checks, and runtime hook smoke tests.
+Optional wrapper extensions were outside the core release surface. The
+underlying Python CLI paths were verified through the Python generator, local
+CLI checks, and runtime hook smoke tests.
 
 ## Remaining Roadmap
 

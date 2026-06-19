@@ -18,6 +18,8 @@ global-memory/exports/graphrag/*/
 agent-memory/tmp/
 agent-memory/scratch/
 agent-memory/reports/html/
+agent-memory/reports/project-site/
+agent-memory/project-snapshot/project-snapshot-manifest.json
 agent-memory/indexes/*.jsonl
 agent-memory/indexes/*.json
 agent-memory/pi-agent/indexes/*.jsonl

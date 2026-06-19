@@ -44,7 +44,7 @@ Every durable memory artifact must include stable `memory_id`, tenant/customer/p
 ## Runtime Profiles
 
 - Claude/Cowork: use plugin hooks to capture events, then close sessions into private draft summaries.
-- Codex: use shell wrappers in `tools/` and respect `AGENTS.md`.
+- Codex: use the project-local Python CLI in `tools/` and respect `AGENTS.md`.
 - Cowork/MCP: expose wrappers as MCP tools, but keep Markdown canonical.
 - Hermes: map agent tasks to context packs and evidence writes.
 - OpenClaw/OpenCode: use generic CLI profile.

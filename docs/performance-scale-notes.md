@@ -63,3 +63,16 @@ Example local matrix:
 ```bash
 python tools/owledge.py benchmark --project-root . --scale-files 100,1000,10000
 ```
+
+## Benchmark Gate
+
+Release QA also runs a small benchmark gate against
+`benchmarks/results/baseline.json`:
+
+```bash
+python tools/owledge.py test quality-ratchet --project-root .
+```
+
+The gate is intentionally broad enough for local laptops and CI runners, but it
+fails on major regressions in scan count, wall-clock runtime, Python allocation,
+output size, context-pack behavior, or runtime handoff generation.

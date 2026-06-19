@@ -1,0 +1,55 @@
+{
+  "name": "project-snapshot-kit",
+  "version": "0.1.0",
+  "description": "Optional Markdown-first project snapshot and static dashboard add-on for Owledge projects.",
+  "install_directories": [
+    "agent-memory/project-snapshot",
+    "agent-memory/plans"
+  ],
+  "install_files": [
+    {
+      "source": "starter/agent-memory/project-snapshot/profile.md",
+      "target": "agent-memory/project-snapshot/profile.md"
+    },
+    {
+      "source": "templates/project-story-snapshot-template.md",
+      "target": "agent-memory/templates/project-story-snapshot-template.md"
+    },
+    {
+      "source": "templates/project-execution-snapshot-template.md",
+      "target": "agent-memory/templates/project-execution-snapshot-template.md"
+    },
+    {
+      "source": "templates/project-site-html-template.md",
+      "target": "agent-memory/templates/project-site-html-template.md"
+    },
+    {
+      "source": "skills/render-memory-report/references/project-site.md",
+      "target": "skills/render-memory-report/references/project-site.md"
+    },
+    {
+      "source": "skills/render-memory-report/references/execution-dashboard.md",
+      "target": "skills/render-memory-report/references/execution-dashboard.md"
+    },
+    {
+      "source": "docs/project-snapshot-kit.md",
+      "target": "docs/project-snapshot-kit.md"
+    }
+  ],
+  "install_if_parent_exists": [
+    {
+      "parent": "plugins/agent-memory-cowork",
+      "source": "skills/render-memory-report/references/project-site.md",
+      "target": "plugins/agent-memory-cowork/skills/render-memory-report/references/project-site.md"
+    },
+    {
+      "parent": "plugins/agent-memory-cowork",
+      "source": "skills/render-memory-report/references/execution-dashboard.md",
+      "target": "plugins/agent-memory-cowork/skills/render-memory-report/references/execution-dashboard.md"
+    }
+  ],
+  "gitignore": [
+    "agent-memory/project-snapshot/project-snapshot-manifest.json",
+    "agent-memory/reports/project-site/"
+  ]
+}

@@ -8,7 +8,6 @@ import fnmatch
 import json
 import os
 import pathlib
-import platform
 import shutil
 import subprocess
 import sys
@@ -30,6 +29,7 @@ AGENT_EXCLUDES = [
     "exports/lightrag/*",
     "exports/graphrag/*",
     "exports/retrieval-eval/*",
+    "exports/finalization-gates/*",
     "exports/compliance/*",
     "indexes/*.json*",
     "compliance/*",
@@ -132,10 +132,6 @@ def ensure_gitkeep(root: pathlib.Path, relative_dirs: Iterable[str]) -> None:
 
 def safe_replace_roots(source: pathlib.Path) -> list[pathlib.Path]:
     roots = [source / ".agent-control" / "tmp", pathlib.Path(tempfile.gettempdir())]
-    if platform.system().lower() == "windows":
-        roots.append(pathlib.Path("C:/tmp"))
-    else:
-        roots.append(pathlib.Path("/tmp"))
     return [root.resolve() for root in roots if root.exists() or root.parent.exists()]
 
 
@@ -277,7 +273,7 @@ def build(args: argparse.Namespace) -> dict[str, object]:
         copy_tree_filtered(
             source / "plugins" / "agent-memory-cowork",
             target / "plugins" / "agent-memory-cowork",
-            ["tests/*", "scripts/*.sh"],
+            ["tests/*"],
         )
         hook_profile = apply_plugin_hook_profile(target, args.plugin_hook_profile)
 

@@ -16,7 +16,7 @@ concept_tags:
   - "production-ready"
 stack_tags:
   - "markdown"
-  - "powershell"
+  - "python"
 problem_patterns:
   - "stale-memory"
   - "contradictory-memory"

@@ -14,6 +14,8 @@ Valid report types:
 - `agent-activity`
 - `project-dashboard`
 - `website-ui`
+- `project-site` (requires optional `project-snapshot-kit`)
+- `execution-dashboard` (requires optional `project-snapshot-kit`)
 
 Default private report:
 
@@ -34,3 +36,10 @@ python tools/agent_memory_cli.py --project-root . render-memory-report --report-
 ```
 
 Report the generated file path and any audience-filtered records.
+
+Optional Project Snapshot Kit reports:
+
+```bash
+python tools/owledge.py install-addon --project-root . --addon project-snapshot-kit
+python tools/owledge.py project-snapshot --project-root . --yes
+```

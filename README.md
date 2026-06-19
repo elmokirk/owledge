@@ -18,6 +18,7 @@ Owledge gives agents durable local Markdown artifacts: plans, evidence, reviews,
 - [Quickstart Paths](#quickstart-paths)
 - [Before / After](#before--after)
 - [Harness Support](#harness-support)
+- [Integration Model](#integration-model)
 - [Performance And Token Model](#performance-and-token-model)
 - [Not This](#not-this)
 - [Quality Gates](#quality-gates)
@@ -35,27 +36,50 @@ Owledge is for teams and power users who already work in Markdown, Obsidian, LLM
 
 ## Quickstart Paths
 
-### 1. Existing Markdown Knowledgebase
+### 1. Add Owledge To A Project
+
+From your local Owledge clone:
+
+```bash
+python tools/owledge.py init-project --target /path/to/your-project
+```
+
+This is the primary setup path. It adds project-local Markdown memory and
+Python tools without changing the host framework, package manager, or source
+tree.
+
+Best next read: [Project quickstart](docs/quickstart.md)
+
+### 2. Add Owledge To A Knowledgebase
 
 Add Owledge as a small additive module inside an existing vault:
 
 ```bash
-python tools/owledge.py add-kb-module --knowledgebase-root /path/to/your/vault --include-cli
+python tools/owledge.py add-kb-module --knowledgebase-root /path/to/your/vault
 ```
 
 Best next read: [Drop-in agent integration guide](docs/agent-integration-guide.md)
 
-### 2. Existing Coding Project
+### 3. Check An Existing Install
 
-Bootstrap a host project from your local Owledge clone:
+Verify any initialized project:
 
 ```bash
-python tools/owledge.py init-project --target /path/to/your-project --include-plugin-adapter
+python tools/owledge.py doctor --project-root /path/to/your-project
 ```
 
-Best next read: [Project quickstart](docs/quickstart.md)
+### Optional: Principles-Only Agent Integration
 
-### 3. Plugin / Harness Setup
+Use Owledge as a portable memory contract when a coding agent should work
+inside an existing system without adding a plugin or generated folder first:
+
+```text
+Follow Owledge principles: keep Markdown canonical, preserve existing files,
+write evidence-linked plans and handoffs, use stable frontmatter ids and typed
+edges, keep raw sessions private, and promote only reviewed memory.
+```
+
+### Optional: Plugin / Harness Setup
 
 Use the ready-to-install Cowork / Claude-compatible plugin bundle:
 
@@ -64,6 +88,19 @@ plugins/agent-memory-cowork/
 ```
 
 Best next read: [Plugin install guide](docs/install-plugin.md)
+
+### Optional: Project Snapshot Kit
+
+Install the optional project cockpit add-on only when a project should generate
+reusable snapshots and static HTML pages:
+
+```bash
+python tools/owledge.py install-addon --project-root . --addon project-snapshot-kit
+python tools/owledge.py project-snapshot --project-root .
+```
+
+The generation command asks before creating Markdown snapshots or HTML pages
+unless explicit non-interactive flags are used.
 
 ## Before / After
 
@@ -87,6 +124,7 @@ Owledge is a memory layer around agent runtimes. It does not replace the runtime
 
 | Harness | Current shape | Install path |
 | --- | --- | --- |
+| Principles-only coding agents | First-class support | Instructions or `agent-memory-principles` skill |
 | Codex | Local adapter support | Local CLI, skills, optional plugin adapter |
 | Claude Code | Local adapter support | Skill/plugin copy path plus project-local memory rules |
 | Cowork / Claude-compatible | Local adapter support | `plugins/agent-memory-cowork/` |
@@ -95,6 +133,15 @@ Owledge is a memory layer around agent runtimes. It does not replace the runtime
 | PI agents | Advanced optional path | Candidate-only QA, workspace checks, and intelligence artifacts |
 
 Full matrix: [Harness and plugin matrix](docs/harness-plugin-matrix.md)
+
+## Integration Model
+
+| Mode | What changes | Best fit |
+| --- | --- | --- |
+| Principles-only | Agent instructions adopt the Owledge memory contract; no plugin, generator, wrapper, or OS-specific setup is required | Existing coding agents and mature repos |
+| Project-local kit | Adds `PROJECT_CONTEXT.md`, `agent-memory/`, local Python tools, and optional runtime adapter files | Coding projects that want durable memory in-repo |
+| Knowledgebase module | Adds an Owledge-owned module or mapped folders beside an existing Markdown KB | Obsidian-style vaults and LLM wikis |
+| Runtime adapter | Adds optional plugin hooks and commands around the same Markdown source of truth | Claude/Cowork/Codex-compatible local workflows |
 
 ## Performance And Token Model
 
@@ -144,6 +191,7 @@ Public docs are checked separately for encoding, anchors, links, plugin/install 
 
 ```bash
 python tools/owledge.py test public-docs --project-root .
+python tools/owledge.py test quality-ratchet --project-root .
 ```
 
 ## Documentation
@@ -159,4 +207,5 @@ Start here: [Documentation index](docs/README.md)
 - [Performance and scale notes](docs/performance-scale-notes.md)
 - [Team and long-running project guide](docs/team-long-running-project-guide.md)
 - [Command reference](docs/command-reference.md)
+- [Project Snapshot Kit](docs/project-snapshot-kit.md)
 - [Owledge vs agent methods](docs/owledge-vs-agent-methods.md)

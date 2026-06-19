@@ -28,6 +28,11 @@ Use this skill only for generated visual reporting. Markdown remains the source 
 | stakeholder overview, project status, executive summary | `references/project-dashboard.md` |
 | website, UI, design system, branding, visual decisions, design tokens | `references/website-ui-report.md` |
 | report style, visual theme, HTML template design, design selector | `references/report-design-systems.md` |
+| optional project cockpit, pitch site, workflows, implementation pages | `references/project-site.md` from Project Snapshot Kit |
+| optional MVP, roadmap, local tickets, blockers, QA dashboard | `references/execution-dashboard.md` from Project Snapshot Kit |
+
+The `project-site` and `execution-dashboard` report types are available only
+when the optional `project-snapshot-kit` add-on is installed in the project.
 
 ## Required Output Rules
 

@@ -14,5 +14,3 @@ agent-memory/templates/processing-activity-template.md
 agent-memory/templates/provider-registry-template.md
 agent-memory/templates/security-incident-template.md
 docs/compliance-light.md
-tools/compliance-doctor.ps1
-tools/run-compliance-gates.ps1

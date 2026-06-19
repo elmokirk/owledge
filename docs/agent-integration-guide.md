@@ -1,7 +1,25 @@
-# Agent Integration Guide: Drop-In KB Module
+# Agent Integration Guide: Principles-First And Drop-In KB Module
 
-Use this guide when a user wants an agent to add Agent Memory planning support
-to an existing Markdown knowledgebase, Obsidian vault, or LLM wiki.
+Use this guide when a user wants an agent to adopt Owledge principles or add
+Agent Memory planning support to an existing Markdown knowledgebase, Obsidian
+vault, or LLM wiki.
+
+## Principles-Only Path
+
+Use this path when the existing coding agent, repo, or knowledge system should
+keep its current structure.
+
+```text
+Apply Owledge principles only:
+- Markdown remains the canonical memory surface.
+- Existing source notes, wiki links, frontmatter, code, and project structure stay unchanged.
+- New durable work is evidence-linked plans, handoffs, reviews, decisions, and summaries.
+- Stable ids, typed edges, tenant/customer/project scope, and review status are required before promotion.
+- Raw runtime sessions and unsanitized private notes never enter shared retrieval.
+```
+
+This mode does not require a plugin, generated kit, wrapper script, global
+install, vector database, or OS-specific setting.
 
 ## Copy-Paste Prompt For Agents
 
@@ -17,6 +35,7 @@ Rules:
 - Do not rewrite or convert existing [[Wiki Links]].
 - Do not set OS environment variables.
 - Do not require a global install.
+- Treat ingestion as metadata-first; do not copy full note bodies by default.
 - Use agent-memory-map.json if present; otherwise create only a small local module structure.
 - After installation, produce a short status report and one example project plan.
 ```
@@ -126,6 +145,7 @@ fail closed.
 
 - Existing Markdown notes are scanned read-only.
 - Existing `[[Wiki Links]]` are preserved exactly.
+- Ingestion is metadata-first: paths, titles, hashes, frontmatter keys, and link metadata before note bodies.
 - The generated index records wiki-link metadata, but does not convert links.
 - Module-owned indexes may be refreshed on rerun.
 - Existing KB files must stay byte-identical unless the user explicitly asks for

@@ -73,8 +73,8 @@ edges: []
 
 | Gate | Command / Review | Pass Rule | Evidence Path |
 | --- | --- | --- | --- |
-| Memory validation | `tools\validate-memory.ps1 -ProjectRoot .` | 0 failed checks | |
-| Contract tests | `tools\test-agent-memory-contracts.ps1 -ProjectRoot .` | 0 failed checks | |
+| Memory validation | `python tools/agent_memory_cli.py --project-root . validate-memory --strict` | 0 failed checks | |
+| Contract tests | `python tools/agent_memory_cli.py --project-root . test-contracts` | 0 failed checks | |
 | Review rerun | Use matching review template | Target score reached | |
 
 ## Promotion Decision

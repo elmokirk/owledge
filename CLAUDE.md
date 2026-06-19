@@ -24,15 +24,15 @@ At the beginning of every agent session:
    - `global-memory/` when the private user layer is enabled
    - `tools/agent_memory_cli.py`
 2. If anything is missing in a host project, use the `bootstrap-agent-memory` skill.
-3. Prefer project-local tools when `tools/agent_memory_cli.py` exists. Otherwise bootstrap from an explicit `-KitRoot`; `AGENT_MEMORY_KIT_ROOT` is only a convenience fallback.
+3. Prefer project-local Python tools when `tools/agent_memory_cli.py` exists. Otherwise initialize from an explicit local Owledge checkout.
 4. Do not overwrite existing project memory unless the user explicitly asks for force/overwrite.
-5. In this kit repository, use `tools\memory-doctor.ps1 -ProjectRoot .` on Windows or `python3 tools/agent_memory_cli.py --project-root . doctor --mode kit` on macOS/Linux.
+5. In this kit repository, use `python tools/agent_memory_cli.py --project-root . doctor --mode kit` on every supported OS.
 
 ## Global vs Project Local
 
 | Layer | Location | Purpose |
 | --- | --- | --- |
-| Global kit | explicit `-KitRoot` or optional `AGENT_MEMORY_KIT_ROOT` | Templates, tools, skills, plugins |
+| Global kit | explicit local Owledge checkout | Templates, tools, skills, plugins |
 | Global skills | `.claude/skills`, `.codex/skills` | Agent behavior and bootstrap rules |
 | Global user context | `USER_CONTEXT.md` | Private user profile, preferences, goals, and agent collaboration defaults |
 | Global user memory | `global-memory/` | Private preferences, goals, daily notes, tasks, ideas, research, patterns, and coach reports |
@@ -43,14 +43,14 @@ At the beginning of every agent session:
 
 ## Bootstrap Command
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File "C:\AgentMemoryKit\tools\bootstrap-agent-memory.ps1" -ProjectRoot . -KitRoot "C:\AgentMemoryKit"
+```bash
+python tools/owledge.py init-project --target /path/to/project --include-plugin-adapter
 ```
 
-Project-folder-only macOS/Linux setup:
+Project-folder-only setup:
 
 ```bash
-python3 tools/build_project_folder_kit.py --output-path /tmp/agent-memory-project-kit --verify
+python tools/owledge.py build-project-kit --output-path /tmp/agent-memory-project-kit --verify
 ```
 
 ## Core Rule

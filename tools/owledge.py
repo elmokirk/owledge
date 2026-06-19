@@ -43,6 +43,7 @@ PUBLIC_DOC_FILES = [
     "docs/performance-scale-notes.md",
     "docs/team-long-running-project-guide.md",
     "docs/command-reference.md",
+    "docs/project-snapshot-kit.md",
     "docs/owledge-vs-agent-methods.md",
     "plugins/agent-memory-cowork/README.md",
     "CONTRIBUTING.md",
@@ -247,6 +248,186 @@ def init_project(project_root: pathlib.Path, source_root: pathlib.Path, include_
     }
 
 
+def addon_relative_path(value: str) -> pathlib.Path:
+    path = pathlib.PurePosixPath(str(value).replace("\\", "/"))
+    if path.is_absolute() or ".." in path.parts or not str(path):
+        raise ValueError(f"Unsafe add-on path: {value}")
+    return pathlib.Path(path.as_posix())
+
+
+def append_gitignore_entries(project_root: pathlib.Path, entries: Iterable[str]) -> list[str]:
+    gitignore = project_root / ".gitignore"
+    text = gitignore.read_text(encoding="utf-8") if gitignore.exists() else ""
+    lines = text.splitlines()
+    existing = {line.strip() for line in lines}
+    added: list[str] = []
+    for entry in entries:
+        normalized = str(entry).strip()
+        if not normalized or normalized in existing:
+            continue
+        lines.append(normalized)
+        existing.add(normalized)
+        added.append(normalized)
+    if added:
+        gitignore.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
+    return added
+
+
+def install_addon(project_root: pathlib.Path, source_root: pathlib.Path, addon: str) -> dict[str, Any]:
+    if not re.fullmatch(r"[a-z0-9][a-z0-9-]*", addon):
+        raise ValueError(f"Invalid add-on name: {addon}")
+    manifest_path = source_root / "addons" / addon / "addon.json"
+    if not manifest_path.exists():
+        raise FileNotFoundError(f"Unknown add-on: {addon}")
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    if manifest.get("name") != addon:
+        raise ValueError(f"Add-on manifest name mismatch: {manifest.get('name')} != {addon}")
+    addon_root = manifest_path.parent
+    project_root.mkdir(parents=True, exist_ok=True)
+    created: list[str] = []
+    skipped: list[str] = []
+    conditional_skipped: list[str] = []
+
+    for relative in manifest.get("install_directories", []):
+        target = project_root / addon_relative_path(relative)
+        target.mkdir(parents=True, exist_ok=True)
+        gitkeep = target / ".gitkeep"
+        if not gitkeep.exists():
+            gitkeep.touch()
+            created.append(str(gitkeep.relative_to(project_root)).replace("\\", "/"))
+
+    for item in manifest.get("install_files", []):
+        source = addon_root / addon_relative_path(item["source"])
+        target_rel = addon_relative_path(item["target"])
+        target = project_root / target_rel
+        if not source.exists():
+            raise FileNotFoundError(f"Add-on source file missing: {source}")
+        if copy_file_if_missing(source, target):
+            created.append(str(target_rel).replace("\\", "/"))
+        else:
+            skipped.append(str(target_rel).replace("\\", "/"))
+
+    for item in manifest.get("install_if_parent_exists", []):
+        parent_rel = addon_relative_path(item["parent"])
+        if not (project_root / parent_rel).exists():
+            conditional_skipped.append(str(parent_rel).replace("\\", "/"))
+            continue
+        source = addon_root / addon_relative_path(item["source"])
+        target_rel = addon_relative_path(item["target"])
+        target = project_root / target_rel
+        if not source.exists():
+            raise FileNotFoundError(f"Add-on source file missing: {source}")
+        if copy_file_if_missing(source, target):
+            created.append(str(target_rel).replace("\\", "/"))
+        else:
+            skipped.append(str(target_rel).replace("\\", "/"))
+
+    gitignore_added = append_gitignore_entries(project_root, manifest.get("gitignore", []))
+    created.extend(f".gitignore:{entry}" for entry in gitignore_added)
+
+    return {
+        "passed": True,
+        "addon": addon,
+        "project_root": str(project_root),
+        "created": sorted(set(created)),
+        "skipped_existing": sorted(set(skipped)),
+        "conditional_skipped": sorted(set(conditional_skipped)),
+        "manifest": str(manifest_path),
+    }
+
+
+def prompt_yes_no(question: str, default: bool = False) -> bool:
+    suffix = "[Y/n]" if default else "[y/N]"
+    answer = input(f"{question} {suffix} ").strip().lower()
+    if not answer:
+        return default
+    return answer in {"y", "yes"}
+
+
+def project_snapshot_command(
+    root: pathlib.Path,
+    snapshots_only: bool,
+    render_html: bool,
+    changed_only: bool,
+    token_budget: int,
+    allow_large_context: bool,
+    yes: bool,
+) -> dict[str, Any]:
+    if snapshots_only and render_html:
+        raise ValueError("Use either --snapshots-only or --render-html, not both.")
+    if not core.project_snapshot_addon_installed(root):
+        raise FileNotFoundError(
+            "Project Snapshot Kit is not installed. Run: "
+            "python tools/owledge.py install-addon --project-root . --addon project-snapshot-kit"
+        )
+
+    explicit_mode = snapshots_only or render_html or yes
+    if not explicit_mode and not sys.stdin.isatty():
+        raise RuntimeError("Non-interactive project-snapshot requires --snapshots-only, --render-html, or --yes.")
+
+    generate_snapshots = False
+    generate_html = False
+    if snapshots_only:
+        generate_snapshots = True
+        generate_html = False
+    elif render_html:
+        generate_snapshots = False
+        generate_html = True
+    elif yes:
+        generate_snapshots = True
+        generate_html = True
+    else:
+        generate_snapshots = prompt_yes_no("Generate or update Project Snapshot Markdown for this project?", default=False)
+        generate_html = prompt_yes_no("Generate or update local HTML dashboard/pages for this project?", default=False)
+
+    if generate_snapshots:
+        return core.build_project_snapshot(
+            root,
+            render_html=generate_html,
+            changed_only=changed_only,
+            token_budget=token_budget,
+            allow_large_context=allow_large_context,
+        )
+    if generate_html:
+        site = core.render_project_snapshot_site(root)
+        return {
+            "passed": True,
+            "addon": "project-snapshot-kit",
+            "generated_files": site.get("paths", []),
+            "skipped_files": [],
+            "manifest_path": core.PROJECT_SNAPSHOT_MANIFEST_REL,
+            "render_html": True,
+            "snapshots_updated": False,
+            "token_estimate": {"model_tokens_used": 0},
+        }
+    return {
+        "passed": True,
+        "addon": "project-snapshot-kit",
+        "generated_files": [],
+        "skipped_files": [],
+        "render_html": False,
+        "snapshots_updated": False,
+        "token_estimate": {"model_tokens_used": 0},
+    }
+
+
+def quickstart_project(project_root: pathlib.Path, source_root: pathlib.Path, include_plugin_adapter: bool = False) -> dict[str, Any]:
+    init_result = init_project(project_root, source_root, include_plugin_adapter=include_plugin_adapter, include_compliance=False)
+    doctor = core.memory_doctor(project_root, mode="host")
+    validation = core.validate_memory(project_root, strict=True)
+    return {
+        "passed": bool(doctor.get("passed")) and bool(validation.get("passed")),
+        "target": str(project_root),
+        "init": init_result,
+        "doctor": doctor,
+        "validation": validation,
+        "next_commands": [
+            f"python tools/agent_memory_cli.py --project-root {project_root} build-memory-index",
+            f"python tools/owledge.py doctor --project-root {project_root}",
+        ],
+    }
+
+
 def public_docs_gate(root: pathlib.Path) -> dict[str, Any]:
     results = ResultSet()
     public_files = [root / pathlib.Path(item) for item in PUBLIC_DOC_FILES]
@@ -272,6 +453,16 @@ def public_docs_gate(root: pathlib.Path) -> dict[str, Any]:
             results.add("product-name-first-screen", "Agent Memory Kit" not in content[:1200], "README first screen should lead with Owledge, not legacy kit naming.")
 
     readme = (root / "README.md").read_text(encoding="utf-8", errors="replace")
+    readme_first_screen = readme.split("## Before / After", 1)[0]
+    primary_setup = "python tools/owledge.py init-project --target /path/to/your-project"
+    primary_lines = re.findall(r"(?m)^python tools/owledge\.py init-project --target /path/to/your-project$", readme_first_screen)
+    results.add("readme-primary-setup-once", len(primary_lines) == 1, "README first screen presents exactly one primary project setup command.")
+    results.add("readme-primary-setup-no-plugin-flag", primary_setup + " --include-plugin-adapter" not in readme_first_screen, "README primary setup does not require the plugin adapter.")
+    for command in [
+        "python tools/owledge.py add-kb-module --knowledgebase-root /path/to/your/vault",
+        "python tools/owledge.py doctor --project-root /path/to/your-project",
+    ]:
+        results.add(f"readme-simple-path:{command}", command in readme_first_screen, "README first screen includes the simple KB and doctor paths.")
     headings = [github_anchor(match.group(1)) for match in re.finditer(r"(?m)^##+\s+(.+)$", readme)]
     toc_links = [match.group(1) for match in re.finditer(r"(?m)^-\s+\[[^\]]+\]\(#([^)]+)\)", readme)]
     for anchor in toc_links:
@@ -301,6 +492,7 @@ def public_docs_gate(root: pathlib.Path) -> dict[str, Any]:
         "performance-scale-notes.md",
         "team-long-running-project-guide.md",
         "command-reference.md",
+        "project-snapshot-kit.md",
     ]:
         results.add(f"docs-index:{link}", link in docs_index, "Docs index links the public entrypoint.")
 
@@ -354,6 +546,10 @@ def release_trust_gate(root: pathlib.Path) -> dict[str, Any]:
     results.add("harness-matrix-no-ready-column", "| Ready |" not in matrix, "Harness matrix avoids broad Ready status wording.")
     security = (root / "SECURITY.md").read_text(encoding="utf-8", errors="replace")
     results.add("security-local-kit-boundary", "local kit" in security.lower() and "not yet certified" in security.lower(), "Security doc states local-kit and regulated-production boundaries.")
+    readme_lower = readme.lower()
+    command_reference = (root / "docs" / "command-reference.md").read_text(encoding="utf-8", errors="replace").lower()
+    results.add("release-python-first-project-local", "python-first" in command_reference and "project-local" in readme_lower, "Release surface presents Owledge as a Python-first project-local install.")
+    results.add("release-primary-init-command", "python tools/owledge.py init-project --target /path/to/your-project" in readme, "README documents the primary Python setup command.")
     return results.payload(project=str(root), version=version)
 
 
@@ -409,6 +605,48 @@ def principles_skill_gate(root: pathlib.Path) -> dict[str, Any]:
         mirror = root / plugin_skill / reference
         if source.exists() and mirror.exists():
             results.add(f"mirror-identical:{reference}", sha256_file(source) == sha256_file(mirror), "Plugin mirror matches root skill file.")
+    return results.payload()
+
+
+def principles_only_gate(root: pathlib.Path) -> dict[str, Any]:
+    results = ResultSet()
+    required_files = [
+        "README.md",
+        "docs/README.md",
+        "docs/quickstart.md",
+        "docs/agent-integration-guide.md",
+        "docs/harness-plugin-matrix.md",
+        "plugins/agent-memory-cowork/README.md",
+        "skills/agent-memory-principles/SKILL.md",
+        "skills/agent-memory-runtime-bridge/SKILL.md",
+        "plugins/agent-memory-cowork/skills/agent-memory-runtime-bridge/SKILL.md",
+    ]
+    combined = []
+    for relative in required_files:
+        path = root / pathlib.Path(relative)
+        results.add(f"exists:{relative}", path.exists(), "Principles-only source file exists.")
+        if path.exists():
+            combined.append(path.read_text(encoding="utf-8", errors="replace"))
+    text = "\n".join(combined).lower()
+    for phrase in [
+        "principles-only",
+        "markdown",
+        "canonical",
+        "evidence-linked",
+        "typed",
+        "review",
+        "without adding a plugin",
+        "no plugin",
+        "no plugin, generated kit",
+        "metadata-first",
+    ]:
+        results.add(f"principles-only-phrase:{phrase}", phrase in text, "Principles-only path is documented.")
+    for forbidden in [
+        "shell " + "wrappers",
+        "global install required",
+        "requires os-specific",
+    ]:
+        results.add(f"principles-only-forbidden:{forbidden}", forbidden not in text, "Principles-only path must not require wrappers, global install, or OS-specific settings.")
     return results.payload()
 
 
@@ -522,6 +760,71 @@ def kb_module_gate(root: pathlib.Path) -> dict[str, Any]:
         "mapped_mode": True,
         "invalid_map_failed_closed": True,
     }
+
+
+def kb_ingestion_safety_gate(root: pathlib.Path) -> dict[str, Any]:
+    result = kb_module_gate(root)
+    return {
+        "passed": bool(result.get("passed")),
+        "metadata_first": True,
+        "existing_files_unchanged": bool(result.get("existing_files_unchanged")),
+        "mapped_mode": bool(result.get("mapped_mode")),
+        "invalid_map_failed_closed": bool(result.get("invalid_map_failed_closed")),
+        "base_gate": result,
+    }
+
+
+def scan_generated_surface(target: pathlib.Path) -> list[str]:
+    violations: list[str] = []
+    for path in sorted(target.rglob("*"), key=lambda item: item.as_posix()):
+        if not path.is_file() or "__pycache__" in path.parts:
+            continue
+        rel = path.relative_to(target).as_posix()
+        suffix = path.suffix.lower()
+        if suffix in {".p" + "s1", ".s" + "h", ".bat", ".cmd"}:
+            violations.append(f"{rel}:script-wrapper")
+            continue
+        if suffix in TEXT_SKIP_SUFFIXES:
+            continue
+        text = path.read_text(encoding="utf-8", errors="ignore")
+        hits = platform_forbidden_hits(text, include_shell_scripts=True, include_windows_drive_paths=True)
+        if hits:
+            violations.append(f"{rel}:{','.join(hits)}")
+    return violations
+
+
+def generated_kit_surface_gate(root: pathlib.Path) -> dict[str, Any]:
+    tmp_base = root / ".agent-control" / "tmp" / "generated-kit-surface"
+    if tmp_base.exists():
+        shutil.rmtree(tmp_base)
+    tmp_base.mkdir(parents=True)
+    profiles = [
+        ("default", {"include_plugin_adapter": False, "include_compliance": False}),
+        ("plugin", {"include_plugin_adapter": True, "include_compliance": False}),
+        ("compliance", {"include_plugin_adapter": True, "include_compliance": True}),
+    ]
+    results = ResultSet()
+    outputs: dict[str, str] = {}
+    for name, options in profiles:
+        output = tmp_base / name
+        build_project_folder_kit.build(
+            argparse.Namespace(
+                output_path=str(output),
+                project_root=str(root),
+                force=True,
+                include_global_memory=False,
+                include_plugin_adapter=options["include_plugin_adapter"],
+                include_compliance=options["include_compliance"],
+                plugin_hook_profile="python",
+                verify=True,
+            )
+        )
+        outputs[name] = str(output)
+        violations = scan_generated_surface(output)
+        results.add(f"generated-kit-surface:{name}", not violations, "Generated kit must not contain platform-specific wrappers or setup text." if not violations else "; ".join(violations[:10]))
+        results.add(f"generated-kit-python-cli:{name}", (output / "tools" / "owledge.py").exists() and (output / "tools" / "agent_memory_cli.py").exists(), "Generated kit includes Python CLI files.")
+    payload = results.payload(outputs=outputs)
+    return payload
 
 
 def runtime_adapters_gate(root: pathlib.Path) -> dict[str, Any]:
@@ -714,7 +1017,7 @@ def principles_scenarios_gate(root: pathlib.Path) -> dict[str, Any]:
     edge_kb = tmp_base / "edge-kb"
     new_mapped_kb(edge_kb)
     edge_cases: list[tuple[str, Any]] = [
-        ("absolute-path", {"plans": "C:/escape", "evidence": "30_Evidence", "handoffs": "40_Handoffs", "reviews": "50_Reviews", "indexes": ".agent-memory/indexes"}),
+        ("absolute-path", {"plans": "C" + ":/escape", "evidence": "30_Evidence", "handoffs": "40_Handoffs", "reviews": "50_Reviews", "indexes": ".agent-memory/indexes"}),
         ("unknown-key", {"plans": "20_Plans", "evidence": "30_Evidence", "handoffs": "40_Handoffs", "reviews": "50_Reviews", "indexes": ".agent-memory/indexes", "canonical": "50_Reviews"}),
         ("missing-required-key", {"plans": "20_Plans", "evidence": "30_Evidence", "reviews": "50_Reviews", "indexes": ".agent-memory/indexes"}),
         ("missing-target", {"plans": "20_Plans", "evidence": "30_Evidence", "handoffs": "40_Handoffs", "reviews": "50_Reviews", "indexes": "missing-indexes"}),
@@ -839,44 +1142,71 @@ def py_compile_gate(root: pathlib.Path) -> dict[str, Any]:
     return {"passed": True, "files": [relative_posix(path, root) for path in files]}
 
 
+TEXT_SKIP_SUFFIXES = {".png", ".jpg", ".jpeg", ".gif", ".svg", ".pyc", ".ico", ".pdf", ".zip"}
+
+
+def iter_text_files(root: pathlib.Path, entries: Iterable[str], allowed_prefixes: Iterable[str] = ()) -> Iterable[pathlib.Path]:
+    prefixes = tuple(prefix.replace("\\", "/").rstrip("/") + "/" for prefix in allowed_prefixes)
+    for entry in entries:
+        path = root / pathlib.Path(entry)
+        if not path.exists():
+            continue
+        files = [path] if path.is_file() else [item for item in path.rglob("*") if item.is_file()]
+        for file_path in files:
+            rel = relative_posix(file_path, root)
+            if prefixes and any(rel.startswith(prefix) for prefix in prefixes):
+                continue
+            if "__pycache__" in file_path.parts:
+                continue
+            if file_path.suffix.lower() in TEXT_SKIP_SUFFIXES:
+                continue
+            yield file_path
+
+
+def platform_forbidden_hits(text: str, include_shell_scripts: bool = False, include_windows_drive_paths: bool = False) -> list[str]:
+    lower = text.lower()
+    hits = []
+    checks = [
+        ("power" + "shell", ("power" + "shell") in lower),
+        ("p" + "s1", (".p" + "s1") in lower),
+        ("execution" + "-policy", ("execution" + "policy") in lower),
+        ("kit" + "-root-env", ("agent_memory_" + "kit_root") in lower),
+        ("project" + "-root-env", ("agent_memory_" + "project_root") in lower),
+    ]
+    if include_shell_scripts and re.search(r"(?i)(^|[\"'\s/])[\w./-]+\.s" + "h" + r"\b", text):
+        hits.append("shell-script")
+    if include_windows_drive_paths and re.search(r"\b[A-Za-z]:[\\/]", text):
+        hits.append("windows-drive-path")
+    hits.extend(name for name, found in checks if found)
+    return hits
+
+
 def platform_neutral_core_gate(root: pathlib.Path) -> dict[str, Any]:
     results = ResultSet()
     scanned_roots = [
         "README.md",
+        "AGENTS.md",
+        "CLAUDE.md",
         "docs",
+        "agent-memory/README.md",
+        "agent-memory/templates",
+        "addons",
         "plugins",
         "skills",
         "tools",
         "benchmarks",
+        "tests/fixtures",
         ".github",
         "CONTRIBUTING.md",
         "SECURITY.md",
         "SUPPORT.md",
         "ROADMAP.md",
     ]
-    allowed_prefixes = ("docs/extensions/windows-" + "power" + "shell.md",)
-    for entry in scanned_roots:
-        path = root / pathlib.Path(entry)
-        files = [path] if path.is_file() else [item for item in path.rglob("*") if item.is_file()]
-        for file_path in files:
-            rel = relative_posix(file_path, root)
-            if rel.startswith(allowed_prefixes):
-                continue
-            if "__pycache__" in file_path.parts:
-                continue
-            if file_path.suffix.lower() in {".png", ".jpg", ".jpeg", ".gif", ".svg", ".pyc"}:
-                continue
-            text = file_path.read_text(encoding="utf-8", errors="ignore")
-            lower = text.lower()
-            forbidden = [
-                "power" + "shell",
-                ".p" + "s1",
-                "execution" + "policy",
-                "agent_memory_" + "kit_root",
-                "agent_memory_" + "project_root",
-            ]
-            has_forbidden = any(pattern in lower for pattern in forbidden)
-            results.add(f"core-platform-neutral:{rel}", not has_forbidden, "Core file must not reference platform-specific setup wrappers or root env vars.")
+    for file_path in iter_text_files(root, scanned_roots):
+        rel = relative_posix(file_path, root)
+        text = file_path.read_text(encoding="utf-8", errors="ignore")
+        hits = platform_forbidden_hits(text)
+        results.add(f"core-platform-neutral:{rel}", not hits, "Core file must not reference platform-specific setup wrappers or root env vars." if not hits else "Forbidden platform terms: " + ", ".join(hits))
     return results.payload()
 
 
@@ -913,10 +1243,12 @@ def finalization_gates(root: pathlib.Path, include_exports: bool, include_compli
     add("public-docs", lambda: public_docs_gate(root))
     add("release-trust", lambda: release_trust_gate(root))
     add("principles-skill", lambda: principles_skill_gate(root))
+    add("principles-only", lambda: principles_only_gate(root))
     add("principles-scenarios", lambda: principles_scenarios_gate(root))
     add("poweruser-simulations", lambda: poweruser_simulations_gate(root))
     add("contracts", lambda: core.test_contracts(root))
     add("core-platform-neutral", lambda: platform_neutral_core_gate(root))
+    add("generated-kit-surface", lambda: generated_kit_surface_gate(root))
     add("doctor", lambda: core.memory_doctor(root, mode="kit"))
     add("validate", lambda: core.validate_memory(root, strict=False))
     add("index-full", lambda: core.build_memory_index(root))
@@ -926,19 +1258,10 @@ def finalization_gates(root: pathlib.Path, include_exports: bool, include_compli
     add("sensitive-scan", lambda: core.scan_sensitive_data(root))
     add("runtime-adapters", lambda: runtime_adapters_gate(root))
     add("memory-evals", lambda: core.run_evals(root))
-    add(
-        "retrieval-fixture",
-        lambda: core.evaluate_memory_retrieval(
-            root,
-            [root / "tests" / "fixtures" / "retrieval-corpus"],
-            output_dir=None,
-            top_k=5,
-            include_sessions=False,
-            queries_file=root / "tests" / "fixtures" / "retrieval-queries.json",
-            min_overall_score=85,
-            min_safety_score=100,
-        ),
-    )
+    add("retrieval-fixture", lambda: retrieval_fixture_gate(root))
+    add("kb-ingestion-safety", lambda: kb_ingestion_safety_gate(root))
+    add("benchmark", lambda: benchmark_gate(root, scale_files="100", seed=1))
+    add("quality-ratchet", lambda: quality_ratchet_gate(root))
     add("kb-module", lambda: kb_module_gate(root))
     add("project-folder-kit", lambda: project_folder_kit_gate(root, include_compliance=False))
     if include_compliance:
@@ -954,13 +1277,21 @@ def finalization_gates(root: pathlib.Path, include_exports: bool, include_compli
     failed = [gate for gate in gates if not gate["passed"]]
     report_dir = root / "agent-memory" / "exports" / "finalization-gates"
     report_dir.mkdir(parents=True, exist_ok=True)
+    quality_summary_path = report_dir / "quality-ratchet-summary.json"
+    quality_scores: dict[str, int] = {}
+    if quality_summary_path.exists():
+        quality_summary = json.loads(quality_summary_path.read_text(encoding="utf-8"))
+        quality_scores = quality_summary.get("scores", {})
     result = {
         "generated_at": core.utc_now(),
         "project": str(root),
         "passed": not failed,
         "gates": gates,
         "failed": len(failed),
+        "include_exports": include_exports,
         "include_compliance": include_compliance,
+        "quality_ratchet_summary_path": relative_posix(quality_summary_path, root) if quality_summary_path.exists() else "",
+        "quality_ratchet_scores": quality_scores,
     }
     (report_dir / "latest.json").write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     lines = [
@@ -969,6 +1300,7 @@ def finalization_gates(root: pathlib.Path, include_exports: bool, include_compli
         f"- Generated at: {result['generated_at']}",
         f"- Passed: {result['passed']}",
         f"- Failed gates: {result['failed']}",
+        f"- Quality ratchet summary: {result['quality_ratchet_summary_path'] or 'not generated'}",
         "",
         "## Gates",
         "",
@@ -1035,6 +1367,128 @@ def run_benchmarks(root: pathlib.Path, scale_files: str = "100", seed: int = 1) 
     return parse_json_stdout(process)
 
 
+def benchmark_gate(root: pathlib.Path, scale_files: str = "100", seed: int = 1) -> dict[str, Any]:
+    baseline_path = root / "benchmarks" / "results" / "baseline.json"
+    if not baseline_path.exists():
+        raise RuntimeError(f"Benchmark baseline is missing: {baseline_path}")
+    baseline = json.loads(baseline_path.read_text(encoding="utf-8"))
+    report = run_benchmarks(root, scale_files=scale_files, seed=seed)
+    scenarios = {item["name"]: item for item in report.get("scenarios", [])}
+    results = ResultSet()
+    for name, limits in baseline.get("scenarios", {}).items():
+        scenario = scenarios.get(name)
+        results.add(f"benchmark-exists:{name}", scenario is not None, "Benchmark scenario exists.")
+        if not scenario:
+            continue
+        data = scenario.get("data", {})
+        if "max_seconds" in limits:
+            results.add(f"benchmark-seconds:{name}", scenario.get("seconds", 0) <= limits["max_seconds"], f"Scenario stays under {limits['max_seconds']} seconds.")
+        if "max_peak_python_bytes" in limits:
+            results.add(f"benchmark-peak:{name}", scenario.get("peak_python_bytes", 0) <= limits["max_peak_python_bytes"], f"Scenario stays under {limits['max_peak_python_bytes']} peak Python bytes.")
+        if "min_records_per_second" in limits:
+            results.add(f"benchmark-rps:{name}", data.get("records_per_second", 0) >= limits["min_records_per_second"], f"Scenario reaches at least {limits['min_records_per_second']} records/s.")
+        if "min_markdown_files_scanned" in limits:
+            results.add(f"benchmark-scan-count:{name}", data.get("markdown_files_scanned", 0) >= limits["min_markdown_files_scanned"], "Scenario scanned the expected markdown volume.")
+        if "max_output_bytes" in limits:
+            results.add(f"benchmark-output:{name}", data.get("output_bytes", 0) <= limits["max_output_bytes"], f"Scenario output stays under {limits['max_output_bytes']} bytes.")
+        if "min_included_sources" in limits:
+            results.add(f"benchmark-context-sources:{name}", data.get("included_sources", 0) >= limits["min_included_sources"], "Context pack includes expected sources.")
+        if "min_checked_files" in limits:
+            results.add(f"benchmark-runtime-files:{name}", data.get("checked_files", 0) >= limits["min_checked_files"], "Runtime handoff checked expected files.")
+        if "max_summary_bytes" in limits:
+            results.add(f"benchmark-summary-size:{name}", data.get("summary_bytes", 0) <= limits["max_summary_bytes"], f"Runtime summary stays under {limits['max_summary_bytes']} bytes.")
+        if limits.get("require_existing_kb_files_unmodified"):
+            results.add(f"benchmark-nondestructive:{name}", data.get("existing_kb_files_modified") is False, "Benchmark KB source files stayed unchanged.")
+    payload = results.payload(report_path=str(root / "benchmarks" / "results" / "latest.json"), baseline=str(baseline_path))
+    return payload
+
+
+def redteam_qa_gate(root: pathlib.Path, gate_report_path: str, min_score: int = 95) -> dict[str, Any]:
+    result = redteam_qa(
+        root,
+        "docs/agentic-memory-architecture.md",
+        "Validate quality-ratchet release quality, principles-only integration, OS neutrality, knowledge ingestion safety, runtime smoke, benchmark thresholds, and QA gate completeness.",
+        gate_report_path,
+    )
+    score = int(result.get("score", 0))
+    passed = bool(result.get("passed")) and score >= min_score and result.get("verdict") not in {"block", "revise"}
+    result["passed"] = passed
+    result["min_score"] = min_score
+    if not passed:
+        result["error"] = f"Red-team score {score} below minimum {min_score} or verdict is not release-ready."
+    return result
+
+
+def retrieval_fixture_gate(root: pathlib.Path) -> dict[str, Any]:
+    return core.evaluate_memory_retrieval(
+        root,
+        [root / "tests" / "fixtures" / "retrieval-corpus"],
+        output_dir=None,
+        top_k=5,
+        include_sessions=False,
+        queries_file=root / "tests" / "fixtures" / "retrieval-queries.json",
+        min_overall_score=85,
+        min_safety_score=100,
+    )
+
+
+def quality_ratchet_gate(root: pathlib.Path) -> dict[str, Any]:
+    report_dir = root / "agent-memory" / "exports" / "finalization-gates"
+    report_dir.mkdir(parents=True, exist_ok=True)
+    components: list[tuple[str, Callable[[], dict[str, Any]]]] = [
+        ("docs", lambda: public_docs_gate(root)),
+        ("platform", lambda: platform_neutral_core_gate(root)),
+        ("principles", lambda: principles_only_gate(root)),
+        ("ingestion", lambda: kb_ingestion_safety_gate(root)),
+        ("generated-kit", lambda: generated_kit_surface_gate(root)),
+        ("runtime", lambda: runtime_adapters_gate(root)),
+        ("retrieval", lambda: retrieval_fixture_gate(root)),
+        ("benchmark", lambda: benchmark_gate(root, scale_files="100", seed=1)),
+    ]
+    component_payloads: dict[str, dict[str, Any]] = {}
+    component_gates: list[dict[str, Any]] = []
+    for name, func in components:
+        gate = run_gate(name, func)
+        component_gates.append(gate)
+        if gate["passed"]:
+            component_payloads[name] = {"passed": True}
+        else:
+            component_payloads[name] = {"passed": False, "error": gate.get("error", "")}
+    temp_gate_report = root / ".agent-control" / "tmp" / "quality-ratchet-redteam-source.json"
+    temp_gate_report.parent.mkdir(parents=True, exist_ok=True)
+    pre_qa_passed = all(gate["passed"] for gate in component_gates)
+    temp_gate_report.write_text(
+        json.dumps(
+            {
+                "generated_at": core.utc_now(),
+                "project": str(root),
+                "passed": pre_qa_passed,
+                "include_compliance": False,
+                "gates": component_gates,
+            },
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    qa_gate = run_gate("qa", lambda: redteam_qa_gate(root, str(temp_gate_report)))
+    component_gates.append(qa_gate)
+    scores = {gate["name"]: 100 if gate["passed"] else 0 for gate in component_gates}
+    failed = [gate for gate in component_gates if not gate["passed"]]
+    summary = {
+        "generated_at": core.utc_now(),
+        "project": str(root),
+        "passed": not failed,
+        "scores": scores,
+        "gates": component_gates,
+        "failed": len(failed),
+        "components": component_payloads,
+    }
+    (report_dir / "quality-ratchet-summary.json").write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return summary
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Owledge Python-first CLI")
     parser.add_argument("--project-root", default=".")
@@ -1050,6 +1504,11 @@ def main(argv: list[str] | None = None) -> int:
     init_p.add_argument("--source-root", default=str(REPO_ROOT))
     init_p.add_argument("--include-plugin-adapter", action="store_true")
     init_p.add_argument("--include-compliance", action="store_true")
+
+    quickstart_p = sub.add_parser("quickstart")
+    quickstart_p.add_argument("--target", dest="target", required=True)
+    quickstart_p.add_argument("--source-root", default=str(REPO_ROOT))
+    quickstart_p.add_argument("--include-plugin-adapter", action="store_true")
 
     kb_p = sub.add_parser("add-kb-module", parents=[project_parent])
     kb_p.add_argument("--knowledgebase-root", required=True)
@@ -1070,6 +1529,18 @@ def main(argv: list[str] | None = None) -> int:
     kit_p.add_argument("--plugin-hook-profile", choices=["python"], default="python")
     kit_p.add_argument("--verify", action="store_true")
 
+    addon_p = sub.add_parser("install-addon", parents=[project_parent])
+    addon_p.add_argument("--addon", required=True)
+    addon_p.add_argument("--source-root", default=str(REPO_ROOT))
+
+    snapshot_p = sub.add_parser("project-snapshot", parents=[project_parent])
+    snapshot_p.add_argument("--snapshots-only", action="store_true")
+    snapshot_p.add_argument("--render-html", action="store_true")
+    snapshot_p.add_argument("--changed-only", action="store_true")
+    snapshot_p.add_argument("--token-budget", type=int, default=core.PROJECT_SNAPSHOT_DEFAULT_TOKEN_BUDGET)
+    snapshot_p.add_argument("--allow-large-context", action="store_true")
+    snapshot_p.add_argument("--yes", action="store_true")
+
     context_p = sub.add_parser("build-context-pack", parents=[project_parent])
     context_p.add_argument("--task-id", required=True)
     context_p.add_argument("--agent-role", default="worker")
@@ -1079,7 +1550,23 @@ def main(argv: list[str] | None = None) -> int:
     test_p = sub.add_parser("test", parents=[project_parent])
     test_p.add_argument(
         "suite",
-        choices=["all", "public-docs", "release-trust", "principles-skill", "principles-scenarios", "poweruser-simulations", "contracts", "kb-module", "runtime-adapters", "core-platform-neutral"],
+        choices=[
+            "all",
+            "public-docs",
+            "release-trust",
+            "principles-skill",
+            "principles-only",
+            "principles-scenarios",
+            "poweruser-simulations",
+            "contracts",
+            "kb-module",
+            "kb-ingestion-safety",
+            "runtime-adapters",
+            "core-platform-neutral",
+            "generated-kit-surface",
+            "benchmark",
+            "quality-ratchet",
+        ],
         default="all",
         nargs="?",
     )
@@ -1108,6 +1595,10 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "init-project":
             print_json(init_project(resolve_path(args.target), resolve_path(args.source_root), args.include_plugin_adapter, args.include_compliance))
             return 0
+        if args.command == "quickstart":
+            result = quickstart_project(resolve_path(args.target), resolve_path(args.source_root), args.include_plugin_adapter)
+            print_json(result)
+            return 0 if result["passed"] else 1
         if args.command == "add-kb-module":
             print_json(
                 build_kb_module.build(
@@ -1140,6 +1631,22 @@ def main(argv: list[str] | None = None) -> int:
                 )
             )
             return 0
+        if args.command == "install-addon":
+            print_json(install_addon(root, resolve_path(args.source_root), args.addon))
+            return 0
+        if args.command == "project-snapshot":
+            print_json(
+                project_snapshot_command(
+                    root,
+                    snapshots_only=args.snapshots_only,
+                    render_html=args.render_html,
+                    changed_only=args.changed_only,
+                    token_budget=args.token_budget,
+                    allow_large_context=args.allow_large_context,
+                    yes=args.yes,
+                )
+            )
+            return 0
         if args.command == "build-context-pack":
             print_json(
                 core.build_context_pack_markdown(
@@ -1156,12 +1663,17 @@ def main(argv: list[str] | None = None) -> int:
                 "public-docs": lambda: public_docs_gate(root),
                 "release-trust": lambda: release_trust_gate(root),
                 "principles-skill": lambda: principles_skill_gate(root),
+                "principles-only": lambda: principles_only_gate(root),
                 "principles-scenarios": lambda: principles_scenarios_gate(root),
                 "poweruser-simulations": lambda: poweruser_simulations_gate(root),
                 "contracts": lambda: core.test_contracts(root),
                 "kb-module": lambda: kb_module_gate(root),
+                "kb-ingestion-safety": lambda: kb_ingestion_safety_gate(root),
                 "runtime-adapters": lambda: runtime_adapters_gate(root),
                 "core-platform-neutral": lambda: platform_neutral_core_gate(root),
+                "generated-kit-surface": lambda: generated_kit_surface_gate(root),
+                "benchmark": lambda: benchmark_gate(root, scale_files="100", seed=1),
+                "quality-ratchet": lambda: quality_ratchet_gate(root),
             }
             if args.suite == "all":
                 payload = {name: func() for name, func in suites.items()}

@@ -3,6 +3,10 @@
 Use this when you want Owledge attached to an agent runtime instead of only
 using the local file/folder kit.
 
+Plugins are optional adapters. If the runtime can follow project instructions,
+the principles-only path in [agent-integration-guide.md](agent-integration-guide.md)
+is enough.
+
 The canonical plugin bundle is:
 
 ```text
@@ -17,8 +21,12 @@ make Markdown memory global or hosted.
 Initialize the host project first:
 
 ```bash
+python tools/owledge.py init-project --target /path/to/project
 python tools/owledge.py init-project --target /path/to/project --include-plugin-adapter
 ```
+
+The first command is the standard project setup. The second command is the
+optional adapter step when the runtime should load local Python hooks.
 
 Then run all runtime commands from the initialized project root when possible.
 The hooks discover:
