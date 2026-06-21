@@ -1,0 +1,28 @@
+{
+  "name": "decision-trace-kit",
+  "version": "0.1.0",
+  "description": "Optional read-only decision trace JSON and HTML add-on for Owledge projects.",
+  "install_directories": [
+    "agent-memory/decision-trace",
+    "agent-memory/reports/decision-trace",
+    "tools/decision-trace"
+  ],
+  "install_files": [
+    {
+      "source": "README.md",
+      "target": "docs/decision-trace-kit.md"
+    },
+    {
+      "source": "tools/render-decision-trace.py",
+      "target": "tools/decision-trace/render-decision-trace.py"
+    },
+    {
+      "source": "starter/agent-memory/decision-trace/trace-profile.md",
+      "target": "agent-memory/decision-trace/trace-profile.md"
+    }
+  ],
+  "gitignore": [
+    "agent-memory/reports/decision-trace/"
+  ]
+}
+
