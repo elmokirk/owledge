@@ -1,0 +1,20 @@
+{
+  "runtime": "claude-code",
+  "status": "local-adapter-support",
+  "fixtures": [
+    "fixtures/session-start.json",
+    "fixtures/user-prompt.json"
+  ],
+  "expected_artifacts": [
+    "PROJECT_CONTEXT.md",
+    "CLAUDE.md",
+    "agent-memory/",
+    "tools/agent_memory_cli.py"
+  ],
+  "failure_modes": [
+    "missing-claude-instructions",
+    "hook-error-hidden",
+    "raw-session-exported"
+  ],
+  "verification": "read-only contract check plus optional plugin smoke tests"
+}

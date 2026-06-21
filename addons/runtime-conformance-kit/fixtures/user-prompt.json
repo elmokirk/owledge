@@ -1,0 +1,6 @@
+{
+  "hook_event_name": "UserPromptSubmit",
+  "session_id": "runtime-conformance-demo",
+  "cwd": ".",
+  "prompt": "Use Owledge memory and write evidence-linked handoffs."
+}

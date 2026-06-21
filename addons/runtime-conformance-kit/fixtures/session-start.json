@@ -1,0 +1,6 @@
+{
+  "hook_event_name": "SessionStart",
+  "session_id": "runtime-conformance-demo",
+  "cwd": ".",
+  "transcript_path": ".agent-control/tmp/runtime-conformance-demo.jsonl"
+}

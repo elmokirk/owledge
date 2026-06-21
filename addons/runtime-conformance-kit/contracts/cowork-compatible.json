@@ -1,0 +1,20 @@
+{
+  "runtime": "cowork-compatible",
+  "status": "local-adapter-support",
+  "fixtures": [
+    "fixtures/session-start.json",
+    "fixtures/user-prompt.json"
+  ],
+  "expected_artifacts": [
+    "PROJECT_CONTEXT.md",
+    "agent-memory/",
+    "plugins/agent-memory-cowork/",
+    "plugins/agent-memory-cowork/hooks/hooks.python.json"
+  ],
+  "failure_modes": [
+    "plugin-folder-missing",
+    "hook-fixture-mismatch",
+    "raw-session-exported"
+  ],
+  "verification": "read-only contract check plus runtime-adapters gate"
+}

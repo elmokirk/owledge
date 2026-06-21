@@ -1,0 +1,20 @@
+{
+  "runtime": "codex",
+  "status": "local-adapter-support",
+  "fixtures": [
+    "fixtures/session-start.json",
+    "fixtures/user-prompt.json"
+  ],
+  "expected_artifacts": [
+    "PROJECT_CONTEXT.md",
+    "AGENTS.md",
+    "agent-memory/",
+    "tools/agent_memory_cli.py"
+  ],
+  "failure_modes": [
+    "missing-project-context",
+    "missing-local-cli",
+    "raw-session-exported"
+  ],
+  "verification": "read-only contract check plus standard doctor and validation gates"
+}
