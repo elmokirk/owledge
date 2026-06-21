@@ -1,0 +1,19 @@
+{
+  "name": "minimal-ts-adapter-retrieval",
+  "queries": [
+    {
+      "query": "typescript adapter retrieval fixture stable keyword harness",
+      "limit": 1,
+      "expected_memory_ids": [
+        "mem:tenant-local:customer-local:ts-adapter-fixture:compiled:retrieval-adapter"
+      ]
+    },
+    {
+      "query": "markdown canonical source of truth no second memory engine",
+      "limit": 1,
+      "expected_memory_ids": [
+        "mem:tenant-local:customer-local:ts-adapter-fixture:canonical:markdown-contract"
+      ]
+    }
+  ]
+}

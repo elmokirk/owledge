@@ -1,0 +1,46 @@
+{
+  "name": "ts-adapter-kit",
+  "version": "0.1.0",
+  "description": "Optional Node/TypeScript CI validation for the Owledge Markdown contract.",
+  "install_directories": [
+    "tools/ts-adapter"
+  ],
+  "install_files": [
+    {
+      "source": "README.md",
+      "target": "tools/ts-adapter/README.md"
+    },
+    {
+      "source": "package.json",
+      "target": "tools/ts-adapter/package.json"
+    },
+    {
+      "source": "bin/owledge-lint.mjs",
+      "target": "tools/ts-adapter/bin/owledge-lint.mjs"
+    },
+    {
+      "source": "dist/cli.js",
+      "target": "tools/ts-adapter/dist/cli.js"
+    },
+    {
+      "source": "schemas/core-frontmatter.schema.json",
+      "target": "tools/ts-adapter/schemas/core-frontmatter.schema.json"
+    },
+    {
+      "source": "fixtures/invalid-missing-memory-id.md",
+      "target": "tools/ts-adapter/fixtures/invalid-missing-memory-id.md"
+    },
+    {
+      "source": "fixtures/retrieval-fixture.json",
+      "target": "tools/ts-adapter/fixtures/retrieval-fixture.json"
+    },
+    {
+      "source": "fixtures/minimal-project/agent-memory/canonical/markdown-contract.md",
+      "target": "tools/ts-adapter/fixtures/minimal-project/agent-memory/canonical/markdown-contract.md"
+    },
+    {
+      "source": "fixtures/minimal-project/agent-memory/compiled/retrieval-adapter.md",
+      "target": "tools/ts-adapter/fixtures/minimal-project/agent-memory/compiled/retrieval-adapter.md"
+    }
+  ]
+}

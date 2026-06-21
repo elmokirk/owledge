@@ -1,0 +1,20 @@
+{
+  "name": "@owledge/ts-adapter-kit",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Dependency-light TypeScript/Node adapter proof for Owledge Markdown memory.",
+  "type": "module",
+  "bin": {
+    "owledge-lint": "./bin/owledge-lint.mjs"
+  },
+  "scripts": {
+    "test": "node ./bin/owledge-lint.mjs --root ./fixtures/minimal-project --strict --fixture ./fixtures/retrieval-fixture.json",
+    "lint:fixture": "node ./bin/owledge-lint.mjs --root ./fixtures/minimal-project --strict --fixture ./fixtures/retrieval-fixture.json",
+    "lint:repo": "node ./bin/owledge-lint.mjs --root ../..",
+    "check:ts": "node --experimental-strip-types --check ./src/cli.ts"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {}
+}
