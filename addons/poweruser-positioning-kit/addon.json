@@ -1,0 +1,22 @@
+{
+  "name": "poweruser-positioning-kit",
+  "version": "0.1.0",
+  "description": "Optional snapshot-first positioning scorecard for Owledge against adjacent AI agent power-user tool categories.",
+  "install_directories": [
+    "agent-memory/reports/poweruser-positioning",
+    "tools/poweruser-positioning"
+  ],
+  "install_files": [
+    {
+      "source": "README.md",
+      "target": "docs/poweruser-positioning-kit.md"
+    },
+    {
+      "source": "tools/render-poweruser-positioning.py",
+      "target": "tools/poweruser-positioning/render-poweruser-positioning.py"
+    }
+  ],
+  "gitignore": [
+    "agent-memory/reports/poweruser-positioning/"
+  ]
+}
