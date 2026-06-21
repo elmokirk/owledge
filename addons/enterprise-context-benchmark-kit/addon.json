@@ -1,0 +1,31 @@
+{
+  "name": "enterprise-context-benchmark-kit",
+  "version": "0.1.0",
+  "description": "Optional enterprise-scale context and token hygiene benchmark add-on for Owledge.",
+  "install_directories": [
+    "agent-memory/enterprise-context-benchmark",
+    "agent-memory/reports/enterprise-context-benchmark",
+    "tools/enterprise-context-benchmark"
+  ],
+  "install_files": [
+    {
+      "source": "README.md",
+      "target": "docs/enterprise-context-benchmark-kit.md"
+    },
+    {
+      "source": "tools/run-enterprise-context-benchmark.py",
+      "target": "tools/enterprise-context-benchmark/run-enterprise-context-benchmark.py"
+    },
+    {
+      "source": "starter/agent-memory/enterprise-context-benchmark/profile.md",
+      "target": "agent-memory/enterprise-context-benchmark/profile.md"
+    }
+  ],
+  "gitignore": [
+    "agent-memory/reports/enterprise-context-benchmark/",
+    "benchmarks/results/context-growth.json",
+    "benchmarks/results/context-growth-charts.json",
+    "benchmarks/results/token-efficiency.md",
+    ".agent-control/tmp/enterprise-context-benchmark/"
+  ]
+}
