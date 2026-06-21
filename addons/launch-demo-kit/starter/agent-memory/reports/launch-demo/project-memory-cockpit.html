@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Owledge Launch Demo Cockpit</title>
+  <style>
+    body { margin: 0; font-family: system-ui, sans-serif; background: #f6f7f9; color: #16202a; }
+    main { max-width: 980px; margin: 0 auto; padding: 40px 24px; }
+    h1 { font-size: 34px; margin: 0 0 10px; letter-spacing: 0; }
+    .lede { font-size: 18px; color: #51606f; margin-bottom: 28px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+    .card { background: white; border: 1px solid #d9e0e7; border-radius: 8px; padding: 18px; }
+    .label { color: #51606f; font-size: 13px; text-transform: uppercase; letter-spacing: .04em; }
+    .value { font-size: 22px; font-weight: 700; margin-top: 8px; }
+    code { background: #edf1f5; padding: 2px 5px; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Owledge Launch Demo Cockpit</h1>
+    <p class="lede">The next agent resumes from Markdown evidence and a handoff, not from chat history.</p>
+    <section class="grid">
+      <article class="card"><div class="label">Memory source</div><div class="value">Markdown</div></article>
+      <article class="card"><div class="label">Demo evidence</div><div class="value">1 reviewed file</div></article>
+      <article class="card"><div class="label">Handoff</div><div class="value">Ready</div></article>
+      <article class="card"><div class="label">Shared export</div><div class="value">Blocked by review</div></article>
+    </section>
+    <p>Start from <code>agent-memory/handoffs/launch-demo-resume-handoff.md</code>.</p>
+  </main>
+</body>
+</html>
+

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Owledge launch demo cockpit</title>
+  <desc id="desc">A static proof asset showing Markdown evidence, handoff, index, and private export boundaries.</desc>
+  <rect width="1200" height="630" fill="#f6f7f9"/>
+  <rect x="70" y="70" width="1060" height="490" rx="18" fill="#ffffff" stroke="#d7dee7"/>
+  <text x="110" y="145" font-family="Arial, sans-serif" font-size="46" font-weight="700" fill="#17212b">Owledge Launch Demo</text>
+  <text x="110" y="190" font-family="Arial, sans-serif" font-size="24" fill="#566575">The next agent resumes from Markdown evidence, not chat history.</text>
+  <g font-family="Arial, sans-serif">
+    <rect x="110" y="250" width="225" height="150" rx="10" fill="#edf4fa" stroke="#bdd1e2"/>
+    <text x="135" y="305" font-size="18" fill="#566575">Evidence</text>
+    <text x="135" y="350" font-size="30" font-weight="700" fill="#245c88">Reviewed</text>
+    <rect x="365" y="250" width="225" height="150" rx="10" fill="#f3f7ef" stroke="#cbdcbd"/>
+    <text x="390" y="305" font-size="18" fill="#566575">Handoff</text>
+    <text x="390" y="350" font-size="30" font-weight="700" fill="#48733d">Ready</text>
+    <rect x="620" y="250" width="225" height="150" rx="10" fill="#f8f3ea" stroke="#dfcfaf"/>
+    <text x="645" y="305" font-size="18" fill="#566575">Index</text>
+    <text x="645" y="350" font-size="30" font-weight="700" fill="#8b6622">Rebuilt</text>
+    <rect x="875" y="250" width="225" height="150" rx="10" fill="#f8eeee" stroke="#e0bcbc"/>
+    <text x="900" y="305" font-size="18" fill="#566575">Shared RAG</text>
+    <text x="900" y="350" font-size="30" font-weight="700" fill="#9a3d3d">Gated</text>
+  </g>
+  <text x="110" y="475" font-family="Arial, sans-serif" font-size="22" fill="#17212b">Run: python tools/owledge.py test launch-readiness --project-root .</text>
+</svg>
