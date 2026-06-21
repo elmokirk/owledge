@@ -1,0 +1,29 @@
+{
+  "name": "swarm-coordination-kit",
+  "version": "0.1.0",
+  "description": "Optional role-lane templates for coordinating Codex, Claude Code, Hermes, and generic agent swarms with Owledge memory.",
+  "install_directories": [
+    "agent-memory/swarm-coordination",
+    "agent-memory/workpackages",
+    "agent-memory/handoffs"
+  ],
+  "install_files": [
+    {
+      "source": "README.md",
+      "target": "docs/swarm-coordination-kit.md"
+    },
+    {
+      "source": "templates/swarm-orchestration-plan-template.md",
+      "target": "agent-memory/templates/swarm-orchestration-plan-template.md"
+    },
+    {
+      "source": "templates/agent-lane-handoff-template.md",
+      "target": "agent-memory/templates/agent-lane-handoff-template.md"
+    },
+    {
+      "source": "templates/promotion-proposal-template.md",
+      "target": "agent-memory/templates/promotion-proposal-template.md"
+    }
+  ]
+}
+
