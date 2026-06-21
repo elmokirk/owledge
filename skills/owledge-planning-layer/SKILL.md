@@ -1,0 +1,71 @@
+---
+name: owledge-planning-layer
+description: Add Owledge's MVP-first planning, evidence, handoff, and context-hygiene layer on top of an existing project's own AGENTS.md, skills, hooks, or custom agent harness without replacing them.
+version: 0.1.0
+---
+
+# Owledge Planning Layer
+
+Use this skill when a user wants Owledge planning discipline inside an existing project that already has its own agent instructions, skills, hooks, Superpowers workflow, LLM wiki, Obsidian vault, or custom harness.
+
+## Core Promise
+
+Respect the host project first. Add Owledge as a planning and memory layer only.
+
+## Read References
+
+- Read `references/planning-layer.md` before producing a plan, assigning agents, or writing Owledge artifacts.
+
+## Trigger Signals
+
+Use this skill when the user asks for:
+
+- an MVP plan that stays tied to the original goal
+- scoped context before implementation
+- multi-agent or subagent coordination
+- planning inside an existing `AGENTS.md` project
+- Superpowers, LLM Wiki, Obsidian, Graphify, Hermes, Codex, Claude Code, or custom harness coexistence
+- handoffs, evidence, reviews, decisions, lessons, or cross-project reuse
+
+## Workflow
+
+1. Read existing project instructions and treat them as higher-priority local operating rules.
+2. Detect Owledge mode:
+   - project-local `agent-memory/`
+   - mapped knowledgebase via `agent-memory-map.json`
+   - `agent-memory-module/`
+   - principles-only fallback
+3. Identify the initial user goal, non-goals, MVP cutline, constraints, and source evidence.
+4. Load metadata and scoped sources first; do not load full vaults or raw logs by default.
+5. Produce a plan with:
+   - goal
+   - non-goals
+   - MVP cutline
+   - evidence sources
+   - task lanes
+   - review gates
+   - handoff expectations
+6. Write only to allowed Owledge locations if writing is requested or clearly needed.
+7. End with the next action and a handoff-ready summary.
+
+## Hard Rules
+
+- Do not overwrite or rewrite a host project's `AGENTS.md`, `CLAUDE.md`, skills, hooks, Superpowers files, or vault taxonomy.
+- Do not install Owledge automatically.
+- Do not migrate a knowledgebase structure unless explicitly requested.
+- Do not use raw session logs, private notes, or unsanitized records as shared context.
+- Do not expand scope beyond the MVP cutline without calling it out as a separate idea, future task, or rejected expansion.
+- Do not promote candidate ideas, PI reports, or agent interpretations into canonical memory without review.
+
+## Default Output
+
+Return:
+
+- active mode: project-local, mapped KB, module, or principles-only
+- sources consulted
+- MVP plan and non-goals
+- task lanes and write locations
+- context budget notes
+- review gates
+- next handoff
+
