@@ -1,0 +1,45 @@
+{
+  "generated_at": "2026-06-19T21:11:09Z",
+  "metadata": {
+    "command": "python tools/owledge.py benchmark --project-root . --scale-files 100 --seed 1",
+    "scale_files": [
+      100
+    ],
+    "seed": 1
+  },
+  "project": "pilot-fixture",
+  "scenarios": [
+    {
+      "data": {
+        "existing_kb_files_modified": false,
+        "markdown_files_scanned": 100,
+        "output_bytes": 21776,
+        "records_per_second": 1612.9
+      },
+      "name": "kb-scan-100",
+      "peak_python_bytes": 422375,
+      "seconds": 0.062
+    },
+    {
+      "data": {
+        "dropped_sources": 31,
+        "estimated_tokens": 255,
+        "included_sources": 1,
+        "raw_chars_available": 153624
+      },
+      "name": "context-pack",
+      "peak_python_bytes": 1666969,
+      "seconds": 0.036
+    },
+    {
+      "data": {
+        "checked_files": 3,
+        "passed": true,
+        "summary_bytes": 1817
+      },
+      "name": "runtime-handoff",
+      "peak_python_bytes": 463158,
+      "seconds": 1.258
+    }
+  ]
+}

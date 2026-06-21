@@ -1,0 +1,35 @@
+{
+  "name": "pilot-benchmark-kit",
+  "version": "0.1.0",
+  "description": "Optional pilot benchmark metrics and static chart views for Owledge quality evidence.",
+  "install_directories": [
+    "agent-memory/pilot-benchmark",
+    "agent-memory/reports/pilot-benchmark",
+    "tools/pilot-benchmark"
+  ],
+  "install_files": [
+    {
+      "source": "docs/pilot-benchmark-kit.md",
+      "target": "docs/pilot-benchmark-kit.md"
+    },
+    {
+      "source": "fixtures/benchmark-latest.json",
+      "target": "agent-memory/pilot-benchmark/fixtures/benchmark-latest.json"
+    },
+    {
+      "source": "fixtures/retrieval-eval.json",
+      "target": "agent-memory/pilot-benchmark/fixtures/retrieval-eval.json"
+    },
+    {
+      "source": "fixtures/finalization-summary.json",
+      "target": "agent-memory/pilot-benchmark/fixtures/finalization-summary.json"
+    },
+    {
+      "source": "tools/render-pilot-benchmark.py",
+      "target": "tools/pilot-benchmark/render-pilot-benchmark.py"
+    }
+  ],
+  "gitignore": [
+    "agent-memory/reports/pilot-benchmark/"
+  ]
+}

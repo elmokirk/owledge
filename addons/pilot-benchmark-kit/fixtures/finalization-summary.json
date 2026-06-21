@@ -1,0 +1,64 @@
+{
+  "components": {
+    "benchmark": {
+      "passed": true
+    },
+    "docs": {
+      "passed": true
+    },
+    "generated-kit": {
+      "passed": true
+    },
+    "ingestion": {
+      "passed": true
+    },
+    "platform": {
+      "passed": true
+    },
+    "principles": {
+      "passed": true
+    },
+    "retrieval": {
+      "passed": true
+    },
+    "runtime": {
+      "passed": true
+    }
+  },
+  "failed": 0,
+  "gates": [
+    {
+      "name": "docs",
+      "passed": true,
+      "seconds": 0.011
+    },
+    {
+      "name": "platform",
+      "passed": true,
+      "seconds": 0.143
+    },
+    {
+      "name": "retrieval",
+      "passed": true,
+      "seconds": 0.014
+    },
+    {
+      "name": "benchmark",
+      "passed": true,
+      "seconds": 1.617
+    }
+  ],
+  "generated_at": "2026-06-19T21:11:09Z",
+  "passed": true,
+  "project": "pilot-fixture",
+  "scores": {
+    "benchmark": 100,
+    "docs": 100,
+    "generated-kit": 100,
+    "ingestion": 100,
+    "platform": 100,
+    "principles": 100,
+    "retrieval": 100,
+    "runtime": 100
+  }
+}

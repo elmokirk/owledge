@@ -1,0 +1,72 @@
+{
+  "corpus": {
+    "build_ms": 7.374,
+    "documents": 11,
+    "include_sessions": false,
+    "total_chars": 7524
+  },
+  "failures": [],
+  "generated_at": "2026-06-19T21:11:08Z",
+  "metrics": {
+    "avg_mrr": 1.0,
+    "avg_ndcg_at_k": 1.0,
+    "avg_precision_at_k": 1.0,
+    "avg_project_coverage": 1.0,
+    "avg_recall_at_k": 0.4545,
+    "cross_project_parallel_candidates": 16,
+    "overall_score": 95.09,
+    "p95_query_latency_ms": 0.715,
+    "parallel_score": 100,
+    "precision_score": 83.64,
+    "raw_session_docs_in_corpus": 0,
+    "reusability_score": 100,
+    "safety_score": 100.0,
+    "scalability_score": 100,
+    "unsafe_shared_docs": 0
+  },
+  "passed": true,
+  "project_ids": [
+    "retrieval-fixture",
+    "retrieval-reference"
+  ],
+  "queries": [
+    {
+      "expected_count": 11,
+      "latency_ms": 0.715,
+      "mrr": 1.0,
+      "name": "memory-lifecycle",
+      "ndcg_at_k": 1.0,
+      "precision_at_k": 1.0,
+      "project_coverage": 1.0,
+      "query": "raw sessions private reviewed export lifecycle retention",
+      "recall_at_k": 0.4545
+    },
+    {
+      "expected_count": 5,
+      "latency_ms": 0.411,
+      "mrr": 1.0,
+      "name": "context-pack-scoring",
+      "ndcg_at_k": 1.0,
+      "precision_at_k": 1.0,
+      "project_coverage": 1.0,
+      "query": "context pack objective score breakdown freshness warnings",
+      "recall_at_k": 0.6
+    }
+  ],
+  "top_parallel_candidates": [
+    {
+      "left": "mem:fixture:demo:retrieval-fixture:canonical:memory-lifecycle-policy",
+      "left_project": "retrieval-fixture",
+      "match_weight": 5,
+      "matches": {
+        "concept_tags": [
+          "agent-memory",
+          "retrieval-calibration"
+        ]
+      },
+      "right": "mem:shared:shared:retrieval-reference:lesson:privacy-export-gate",
+      "right_project": "retrieval-reference",
+      "semantic_similarity": 0.12
+    }
+  ]
+}
