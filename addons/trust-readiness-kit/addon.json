@@ -1,0 +1,30 @@
+{
+  "name": "trust-readiness-kit",
+  "version": "0.1.0",
+  "description": "Optional trust, enterprise-evaluation, data-flow, and security-readiness docs for teams adopting Owledge.",
+  "install_directories": [
+    "docs/trust-readiness"
+  ],
+  "install_files": [
+    {
+      "source": "docs/trust-readiness.md",
+      "target": "docs/trust-readiness/trust-readiness.md"
+    },
+    {
+      "source": "docs/data-flow.md",
+      "target": "docs/trust-readiness/data-flow.md"
+    },
+    {
+      "source": "docs/threat-model.md",
+      "target": "docs/trust-readiness/threat-model.md"
+    },
+    {
+      "source": "docs/security-faq.md",
+      "target": "docs/trust-readiness/security-faq.md"
+    },
+    {
+      "source": "docs/team-evaluation-checklist.md",
+      "target": "docs/trust-readiness/team-evaluation-checklist.md"
+    }
+  ]
+}
