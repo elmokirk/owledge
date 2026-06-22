@@ -11,6 +11,10 @@
 
 Owledge gives agents durable local Markdown artifacts: plans, evidence, reviews, handoffs, and decisions that stay readable across sessions, tools, teams, and existing vaults.
 
+Use it when agents are losing project context, plans are stuck in chat, multiple runtimes need a shared handoff surface, or a mature knowledgebase needs traceable decisions without a migration.
+
+Core idea: **Markdown is the source of truth; indexes, reports, graphs, benchmarks, and runtime adapters are generated or optional views.**
+
 **Release proof:** local release gates pass with additive writes by default, private runtime capture, metadata-first KB scan, and no required OS-wide setup. CI runs platform-neutral Python gates; broader runtime installs remain local adapter support, not marketplace certification.
 
 **Minimal by default:** start with principles and skills only. Add project files,
@@ -145,13 +149,16 @@ python tools/owledge.py install-addon --project-root . --addon pi-proof-kit
 ```
 
 Additional proof add-ons are available for teams that need TypeScript CI
-validation, benchmark charts, decision traceability, or poweruser positioning:
+validation, benchmark charts, decision traceability, cross-project reuse,
+multi-agent handoffs, or poweruser positioning:
 
 ```bash
 python tools/owledge.py install-addon --project-root . --addon ts-adapter-kit
 python tools/owledge.py install-addon --project-root . --addon pilot-benchmark-kit
 python tools/owledge.py install-addon --project-root . --addon enterprise-context-benchmark-kit
 python tools/owledge.py install-addon --project-root . --addon decision-trace-kit
+python tools/owledge.py install-addon --project-root . --addon cross-project-hub-kit
+python tools/owledge.py install-addon --project-root . --addon swarm-coordination-kit
 python tools/owledge.py install-addon --project-root . --addon poweruser-positioning-kit
 ```
 
@@ -165,7 +172,8 @@ Use the smallest integration that solves the current problem.
 | Project-local kit | A repo needs durable plans, evidence, handoffs, indexes, and validation | Local Markdown memory and Python tools |
 | Knowledgebase module | An existing Markdown or Obsidian-style vault should be scanned without migration | Additive module or mapped indexes |
 | Runtime adapter | Session capture, hooks, or runtime handoffs are needed | Optional plugin files and hooks |
-| Add-ons | Demo, trust, conformance, PI proof, TS eval, benchmark, decision trace, or positioning evidence is needed | Optional docs, fixtures, tools, and generated views |
+| Planning layer skill | A project already has its own `AGENTS.md` or agent memory and should keep it | Opt-in Owledge planning, evidence, handoff, and context hygiene rules |
+| Add-ons | Demo, trust, conformance, PI proof, TS eval, benchmark, decision trace, cross-project hub, swarm coordination, or positioning evidence is needed | Optional docs, fixtures, tools, and generated views |
 
 Detailed guide: [Integration decision guide](docs/integration-decision-guide.md).
 
@@ -259,6 +267,8 @@ The core stays small. Broad-launch proof is handled by optional add-ons:
 | `pilot-benchmark-kit` | Optional pilot benchmark summaries and static chart views. |
 | `enterprise-context-benchmark-kit` | Research-grade synthetic context/token benchmark with JSON data, charts, and HTML report. |
 | `decision-trace-kit` | Read-only JSON and HTML trace from memory records to decision tree. |
+| `cross-project-hub-kit` | Reviewed export map from project-local lessons, patterns, decisions, and summaries into a central reusable hub. |
+| `swarm-coordination-kit` | Role-lane templates for Codex, Claude Code, Hermes, and generic agent swarms without hard distributed locking. |
 | `poweruser-positioning-kit` | Snapshot-first positioning scorecard for adjacent AI-agent tool categories. |
 
 Launch scoring and pass/fail criteria: [Launch readiness rubric](docs/launch-readiness.md). Distribution path: [Distribution and release](docs/distribution.md).
@@ -298,4 +308,9 @@ Start here: [Documentation index](docs/README.md)
 - [Team and long-running project guide](docs/team-long-running-project-guide.md)
 - [Command reference](docs/command-reference.md)
 - [Project Snapshot Kit](docs/project-snapshot-kit.md)
+- [Decision Trace Kit](docs/decision-trace-kit.md)
+- [Enterprise Context Benchmark Kit](docs/enterprise-context-benchmark-kit.md)
+- [Cross-Project Hub Kit](docs/cross-project-hub-kit.md)
+- [Swarm Coordination Kit](docs/swarm-coordination-kit.md)
+- [Poweruser Positioning Kit](docs/poweruser-positioning-kit.md)
 - [Owledge vs agent methods](docs/owledge-vs-agent-methods.md)

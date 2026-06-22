@@ -129,14 +129,23 @@ python tools/owledge.py install-addon --project-root . --addon pi-proof-kit
 python tools/owledge.py install-addon --project-root . --addon ts-adapter-kit
 python tools/owledge.py install-addon --project-root . --addon pilot-benchmark-kit
 python tools/owledge.py install-addon --project-root . --addon enterprise-context-benchmark-kit
+python tools/owledge.py install-addon --project-root . --addon decision-trace-kit
+python tools/owledge.py install-addon --project-root . --addon cross-project-hub-kit
+python tools/owledge.py install-addon --project-root . --addon swarm-coordination-kit
+python tools/owledge.py install-addon --project-root . --addon poweruser-positioning-kit
 python tools/enterprise-context-benchmark/run-enterprise-context-benchmark.py --project-root . --profile enterprise_default --seed 42
+python tools/decision-trace/render-decision-trace.py --project-root .
+python tools/poweruser-positioning/render-poweruser-positioning.py --project-root .
+python tools/cross-project-hub/build-cross-project-map.py --project-root .
 python tools/owledge.py test launch-readiness --project-root .
 ```
 
 The launch-readiness gate validates the add-on manifests, five-minute demo
 docs, runtime contracts, PI proof corpus, non-empty red-team scorecard, and
 packaging metadata, optional TypeScript evaluation adapter files, and optional
-pilot benchmark proof assets.
+pilot benchmark proof assets. The enterprise benchmark, decision trace,
+cross-project hub, swarm coordination, and positioning kits remain optional
+power-user proof layers; they do not become core dependencies.
 
 Research-grade context benchmark outputs are generated views:
 
@@ -145,6 +154,16 @@ benchmarks/results/context-growth.json
 benchmarks/results/context-growth-charts.json
 benchmarks/results/token-efficiency.md
 agent-memory/reports/enterprise-context-benchmark/index.html
+```
+
+Decision trace and positioning outputs are also generated views:
+
+```text
+agent-memory/decision-trace/trace.json
+agent-memory/reports/decision-trace/index.html
+agent-memory/reports/poweruser-positioning/positioning.json
+agent-memory/reports/poweruser-positioning/index.html
+agent-memory/cross-project-hub/cross-project-map.json
 ```
 
 ## Finalization Gates

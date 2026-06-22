@@ -41,9 +41,12 @@ Start with the path that matches your setup.
 ## I want to understand scale and quality
 
 - Read [performance-scale-notes.md](performance-scale-notes.md)
-- Read [critique-derived-addons-roadmap.md](critique-derived-addons-roadmap.md) for planned optional add-ons derived from power-user feedback
+- Read [critique-derived-addons-roadmap.md](critique-derived-addons-roadmap.md) for the power-user critique that shaped the optional add-on layer
 - Read [power-user-objections.md](power-user-objections.md) for durable pitch objections and product guardrails
 - Install `enterprise-context-benchmark-kit` when you need research-grade token/context proof with generated charts
+- Install `decision-trace-kit` when you need a visual, read-only decision tree from Markdown memory records
+- Install `cross-project-hub-kit` when reviewed lessons from separate projects should feed a central reusable hub
+- Install `swarm-coordination-kit` when multiple agents need role lanes, handoffs, and promotion proposals
 - Install `poweruser-positioning-kit` when you need a snapshot-first positioning scorecard for adjacent AI-agent tool categories
 - Read [launch-readiness.md](launch-readiness.md)
 - Read [distribution.md](distribution.md)
@@ -54,6 +57,7 @@ Start with the path that matches your setup.
 ## I want category context
 
 - Read [owledge-vs-agent-methods.md](owledge-vs-agent-methods.md)
+- Read [superpowers-integration.md](superpowers-integration.md) when comparing Owledge with execution frameworks
 
 ## Advanced
 

@@ -58,6 +58,7 @@ linking, and obvious gate correctness bugs.
 | --- | --- |
 | 5-minute demo | `docs/try-owledge-in-5-minutes.md` |
 | Launch add-ons | `addons/launch-demo-kit/`, `addons/trust-readiness-kit/`, `addons/runtime-conformance-kit/`, `addons/pi-proof-kit/`, `addons/ts-adapter-kit/`, `addons/pilot-benchmark-kit/` |
+| Power-user proof add-ons | `addons/enterprise-context-benchmark-kit/`, `addons/decision-trace-kit/`, `addons/cross-project-hub-kit/`, `addons/swarm-coordination-kit/`, `addons/poweruser-positioning-kit/` |
 | Distribution path | `docs/distribution.md` |
 | Core gates | `agent-memory/exports/finalization-gates/latest.md` |
 | Security boundary | `SECURITY.md` |
