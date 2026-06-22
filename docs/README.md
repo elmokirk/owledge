@@ -4,9 +4,17 @@ Start with the path that matches your setup.
 
 ## I only want the principles in an existing agent system
 
+- This is the default minimal path
 - Read [agent-integration-guide.md](agent-integration-guide.md)
+- Read [integration-decision-guide.md](integration-decision-guide.md) when you are unsure which path to choose
 - Use `skills/agent-memory-principles` as the portable rule set
 - Add project files only when the team wants local validation and indexes
+
+## I want to see value in five minutes
+
+- Read [try-owledge-in-5-minutes.md](try-owledge-in-5-minutes.md)
+- Install `launch-demo-kit` for evidence, handoff, and a static proof report
+- Run `python tools/owledge.py test launch-readiness --project-root .` before broad sharing
 
 ## I already have a Markdown knowledgebase
 
@@ -33,6 +41,13 @@ Start with the path that matches your setup.
 ## I want to understand scale and quality
 
 - Read [performance-scale-notes.md](performance-scale-notes.md)
+- Read [critique-derived-addons-roadmap.md](critique-derived-addons-roadmap.md) for planned optional add-ons derived from power-user feedback
+- Read [power-user-objections.md](power-user-objections.md) for durable pitch objections and product guardrails
+- Install `enterprise-context-benchmark-kit` when you need research-grade token/context proof with generated charts
+- Install `poweruser-positioning-kit` when you need a snapshot-first positioning scorecard for adjacent AI-agent tool categories
+- Read [launch-readiness.md](launch-readiness.md)
+- Read [distribution.md](distribution.md)
+- Read [operational-hardening.md](operational-hardening.md)
 - Read [team-long-running-project-guide.md](team-long-running-project-guide.md)
 - Run `python tools/owledge.py test quality-ratchet --project-root .`
 

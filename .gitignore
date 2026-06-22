@@ -19,6 +19,11 @@ agent-memory/tmp/
 agent-memory/scratch/
 agent-memory/reports/html/
 agent-memory/reports/project-site/
+agent-memory/reports/pilot-benchmark/
+agent-memory/reports/enterprise-context-benchmark/
+agent-memory/reports/decision-trace/
+agent-memory/reports/poweruser-positioning/
+agent-memory/decision-trace/trace.json
 agent-memory/project-snapshot/project-snapshot-manifest.json
 agent-memory/indexes/*.jsonl
 agent-memory/indexes/*.json
@@ -55,4 +60,9 @@ __pycache__/
 tools/__pycache__/
 benchmarks/results/latest.json
 benchmarks/results/latest.md
+benchmarks/results/context-growth.json
+benchmarks/results/context-growth-charts.json
+benchmarks/results/token-efficiency.md
 examples/demo-vault/agent-memory-module/
+.agent-control/tmp/enterprise-context-benchmark/
+agent-memory/cross-project-hub/cross-project-map.json

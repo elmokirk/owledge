@@ -13,6 +13,17 @@ Owledge is Python-first. Use `tools/owledge.py` for public workflows and
 | `python tools/owledge.py add-kb-module --knowledgebase-root /path/to/vault` | Yes | Add a drop-in module to an existing Markdown KB |
 | `python tools/owledge.py build-project-kit --output-path /tmp/owledge-project-kit --verify` | Yes | Generate a minimal project-local kit |
 | `python tools/owledge.py install-addon --project-root . --addon project-snapshot-kit` | Yes | Install an optional add-on without changing the core setup |
+| `python tools/owledge.py install-addon --project-root . --addon launch-demo-kit` | Yes | Install five-minute demo evidence, handoff, and proof report assets |
+| `python tools/owledge.py install-addon --project-root . --addon trust-readiness-kit` | Yes | Install team trust, data-flow, threat-model, and security-readiness docs |
+| `python tools/owledge.py install-addon --project-root . --addon runtime-conformance-kit` | Yes | Install read-only runtime conformance contracts and fixtures |
+| `python tools/owledge.py install-addon --project-root . --addon pi-proof-kit` | Yes | Install a synthetic PI Agent proof corpus and scorecard |
+| `python tools/owledge.py install-addon --project-root . --addon ts-adapter-kit` | Yes | Install optional Node/TypeScript CI validation for the Markdown contract |
+| `python tools/owledge.py install-addon --project-root . --addon pilot-benchmark-kit` | Yes | Install optional pilot benchmark summaries and static chart views |
+| `python tools/owledge.py install-addon --project-root . --addon enterprise-context-benchmark-kit` | Yes | Install optional enterprise-scale context and token hygiene benchmark assets |
+| `python tools/owledge.py install-addon --project-root . --addon decision-trace-kit` | Yes | Install optional read-only decision trace JSON and HTML assets |
+| `python tools/owledge.py install-addon --project-root . --addon cross-project-hub-kit` | Yes | Install optional reviewed cross-project learning hub assets |
+| `python tools/owledge.py install-addon --project-root . --addon swarm-coordination-kit` | Yes | Install optional multi-agent role-lane coordination templates |
+| `python tools/owledge.py install-addon --project-root . --addon poweruser-positioning-kit` | Yes | Install optional snapshot-first poweruser positioning scorecard assets |
 | `python tools/owledge.py project-snapshot --project-root . --snapshots-only` | Yes | Generate optional Project Snapshot Kit Markdown snapshots |
 | `python tools/owledge.py project-snapshot --project-root . --render-html` | Yes | Render optional static dashboard pages from existing snapshots |
 | `python tools/owledge.py project-snapshot --project-root . --yes` | Yes | Generate snapshots and dashboard pages without prompts |
@@ -22,6 +33,8 @@ Owledge is Python-first. Use `tools/owledge.py` for public workflows and
 | `python tools/owledge.py test principles-only --project-root .` | No | Check the no-plugin/no-generator principles integration path |
 | `python tools/owledge.py test kb-ingestion-safety --project-root .` | Yes, temp KB | Check metadata-first non-destructive KB integration |
 | `python tools/owledge.py test generated-kit-surface --project-root .` | Yes, temp projects | Check generated kits for platform-neutral Python surface |
+| `python tools/owledge.py test retrieval --project-root .` | Yes, ignored reports | Run the retrieval fixture eval directly |
+| `python tools/owledge.py test launch-readiness --project-root .` | No | Check 95+ launch-readiness evidence, add-ons, packaging, and PI proof |
 | `python tools/owledge.py test quality-ratchet --project-root .` | Yes, ignored reports | Run platform, ingestion, runtime, retrieval, benchmark, and QA guardrails |
 | `python tools/owledge.py test poweruser-simulations --project-root .` | Yes, temp project | Run dirty-vault and first-user DX simulations |
 | `python tools/owledge.py test runtime-adapters --project-root .` | Yes, temp project | Smoke-test plugin runtime capture |
@@ -102,6 +115,37 @@ The CLI itself uses zero model tokens. It writes token estimates to
 agent-authored narrative refreshes.
 
 `--render-html` uses existing Markdown snapshots and does not update them.
+
+## Optional Launch Add-Ons
+
+These add-ons are for broad distribution readiness. They are not required for
+the minimal Owledge core.
+
+```bash
+python tools/owledge.py install-addon --project-root . --addon launch-demo-kit
+python tools/owledge.py install-addon --project-root . --addon trust-readiness-kit
+python tools/owledge.py install-addon --project-root . --addon runtime-conformance-kit
+python tools/owledge.py install-addon --project-root . --addon pi-proof-kit
+python tools/owledge.py install-addon --project-root . --addon ts-adapter-kit
+python tools/owledge.py install-addon --project-root . --addon pilot-benchmark-kit
+python tools/owledge.py install-addon --project-root . --addon enterprise-context-benchmark-kit
+python tools/enterprise-context-benchmark/run-enterprise-context-benchmark.py --project-root . --profile enterprise_default --seed 42
+python tools/owledge.py test launch-readiness --project-root .
+```
+
+The launch-readiness gate validates the add-on manifests, five-minute demo
+docs, runtime contracts, PI proof corpus, non-empty red-team scorecard, and
+packaging metadata, optional TypeScript evaluation adapter files, and optional
+pilot benchmark proof assets.
+
+Research-grade context benchmark outputs are generated views:
+
+```text
+benchmarks/results/context-growth.json
+benchmarks/results/context-growth-charts.json
+benchmarks/results/token-efficiency.md
+agent-memory/reports/enterprise-context-benchmark/index.html
+```
 
 ## Finalization Gates
 

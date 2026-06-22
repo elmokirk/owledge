@@ -6,21 +6,29 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Storage: Markdown](https://img.shields.io/badge/storage-Markdown-black)](docs/quickstart.md)
 [![Runtime support](https://img.shields.io/badge/runtimes-Codex%20%7C%20Claude%20Code%20%7C%20Cowork%20%7C%20OpenCode-orange)](docs/harness-plugin-matrix.md)
-[![Release gates](https://img.shields.io/badge/release_gates-passing-brightgreen)](docs/README.md)
+[![CI](https://github.com/elmokirk/owledge/actions/workflows/ci.yml/badge.svg)](https://github.com/elmokirk/owledge/actions/workflows/ci.yml)
+[![Docs](https://github.com/elmokirk/owledge/actions/workflows/docs.yml/badge.svg)](https://github.com/elmokirk/owledge/actions/workflows/docs.yml)
 
 Owledge gives agents durable local Markdown artifacts: plans, evidence, reviews, handoffs, and decisions that stay readable across sessions, tools, teams, and existing vaults.
 
 **Release proof:** local release gates pass with additive writes by default, private runtime capture, metadata-first KB scan, and no required OS-wide setup. CI runs platform-neutral Python gates; broader runtime installs remain local adapter support, not marketplace certification.
 
+**Minimal by default:** start with principles and skills only. Add project files,
+runtime adapters, or add-ons only when the current project needs durable local
+artifacts, runtime capture, proof assets, or release evidence.
+
 ## Table Of Contents
 
 - [Why It Exists](#why-it-exists)
+- [Install Or Try](#install-or-try)
 - [Quickstart Paths](#quickstart-paths)
+- [Decision Guide](#decision-guide)
 - [Before / After](#before--after)
 - [Harness Support](#harness-support)
 - [Integration Model](#integration-model)
 - [Performance And Token Model](#performance-and-token-model)
 - [Not This](#not-this)
+- [Launch Extensions](#launch-extensions)
 - [Quality Gates](#quality-gates)
 - [Documentation](#documentation)
 
@@ -34,7 +42,40 @@ Owledge is for teams and power users who already work in Markdown, Obsidian, LLM
 - Let multiple agents coordinate through explicit artifacts instead of raw logs.
 - Stay local, inspectable, and repo-friendly.
 
+## Install Or Try
+
+Packaging metadata is included for the public `owledge` console script. Until a
+package is published, use a source checkout:
+
+```bash
+python tools/owledge.py --help
+```
+
+Fastest proof path:
+
+```bash
+python tools/owledge.py quickstart --target .agent-control/tmp/owledge-five-minute-demo
+python tools/owledge.py install-addon --project-root .agent-control/tmp/owledge-five-minute-demo --addon launch-demo-kit
+python tools/agent_memory_cli.py --project-root .agent-control/tmp/owledge-five-minute-demo build-memory-index
+```
+
+Expected result: the demo project contains evidence, a next-agent handoff, and
+a static proof report. Full walk-through: [Try Owledge in 5 minutes](docs/try-owledge-in-5-minutes.md).
+
 ## Quickstart Paths
+
+### 0. Use Only The Principles Or Skills
+
+For the smallest setup, do not install anything. Tell an agent to follow the
+Owledge principles or use `skills/agent-memory-principles`:
+
+```text
+Follow Owledge principles: keep Markdown canonical, preserve existing files,
+write evidence-linked plans and handoffs, use stable frontmatter ids and typed
+edges, keep raw sessions private, and promote only reviewed memory.
+```
+
+This path is the default for existing systems, solo users, and quick adoption.
 
 ### 1. Add Owledge To A Project
 
@@ -68,17 +109,6 @@ Verify any initialized project:
 python tools/owledge.py doctor --project-root /path/to/your-project
 ```
 
-### Optional: Principles-Only Agent Integration
-
-Use Owledge as a portable memory contract when a coding agent should work
-inside an existing system without adding a plugin or generated folder first:
-
-```text
-Follow Owledge principles: keep Markdown canonical, preserve existing files,
-write evidence-linked plans and handoffs, use stable frontmatter ids and typed
-edges, keep raw sessions private, and promote only reviewed memory.
-```
-
 ### Optional: Plugin / Harness Setup
 
 Use the ready-to-install Cowork / Claude-compatible plugin bundle:
@@ -101,6 +131,43 @@ python tools/owledge.py project-snapshot --project-root .
 
 The generation command asks before creating Markdown snapshots or HTML pages
 unless explicit non-interactive flags are used.
+
+### Optional: Launch Add-ons
+
+Launch add-ons improve distribution readiness without changing the core memory
+contract:
+
+```bash
+python tools/owledge.py install-addon --project-root . --addon launch-demo-kit
+python tools/owledge.py install-addon --project-root . --addon trust-readiness-kit
+python tools/owledge.py install-addon --project-root . --addon runtime-conformance-kit
+python tools/owledge.py install-addon --project-root . --addon pi-proof-kit
+```
+
+Additional proof add-ons are available for teams that need TypeScript CI
+validation, benchmark charts, decision traceability, or poweruser positioning:
+
+```bash
+python tools/owledge.py install-addon --project-root . --addon ts-adapter-kit
+python tools/owledge.py install-addon --project-root . --addon pilot-benchmark-kit
+python tools/owledge.py install-addon --project-root . --addon enterprise-context-benchmark-kit
+python tools/owledge.py install-addon --project-root . --addon decision-trace-kit
+python tools/owledge.py install-addon --project-root . --addon poweruser-positioning-kit
+```
+
+## Decision Guide
+
+Use the smallest integration that solves the current problem.
+
+| Path | Use when | Adds |
+| --- | --- | --- |
+| Principles-only / Skills | An agent needs the memory rules inside an existing workflow | Instructions only |
+| Project-local kit | A repo needs durable plans, evidence, handoffs, indexes, and validation | Local Markdown memory and Python tools |
+| Knowledgebase module | An existing Markdown or Obsidian-style vault should be scanned without migration | Additive module or mapped indexes |
+| Runtime adapter | Session capture, hooks, or runtime handoffs are needed | Optional plugin files and hooks |
+| Add-ons | Demo, trust, conformance, PI proof, TS eval, benchmark, decision trace, or positioning evidence is needed | Optional docs, fixtures, tools, and generated views |
+
+Detailed guide: [Integration decision guide](docs/integration-decision-guide.md).
 
 ## Before / After
 
@@ -138,7 +205,7 @@ Full matrix: [Harness and plugin matrix](docs/harness-plugin-matrix.md)
 
 | Mode | What changes | Best fit |
 | --- | --- | --- |
-| Principles-only | Agent instructions adopt the Owledge memory contract; no plugin, generator, wrapper, or OS-specific setup is required | Existing coding agents and mature repos |
+| Principles-only | Agent instructions adopt the Owledge memory contract without adding a plugin; no plugin, generator, wrapper, or OS-specific setup is required | Existing coding agents and mature repos |
 | Project-local kit | Adds `PROJECT_CONTEXT.md`, `agent-memory/`, local Python tools, and optional runtime adapter files | Coding projects that want durable memory in-repo |
 | Knowledgebase module | Adds an Owledge-owned module or mapped folders beside an existing Markdown KB | Obsidian-style vaults and LLM wikis |
 | Runtime adapter | Adds optional plugin hooks and commands around the same Markdown source of truth | Claude/Cowork/Codex-compatible local workflows |
@@ -178,6 +245,24 @@ Owledge is not:
 
 It is a local/project utility layer for durable memory, planning discipline, and agent coordination.
 
+## Launch Extensions
+
+The core stays small. Broad-launch proof is handled by optional add-ons:
+
+| Add-on | Purpose |
+| --- | --- |
+| `launch-demo-kit` | Five-minute demo with evidence, handoff, and static proof report. |
+| `trust-readiness-kit` | Data-flow, threat model, security FAQ, and team checklist. |
+| `runtime-conformance-kit` | Read-only runtime contracts for Codex, Claude Code, and Cowork-compatible adapters. |
+| `pi-proof-kit` | Synthetic PI loop proving observe, detect, red-team, promote, and measure. |
+| `ts-adapter-kit` | Optional Node/TypeScript CI validation for the Markdown contract. |
+| `pilot-benchmark-kit` | Optional pilot benchmark summaries and static chart views. |
+| `enterprise-context-benchmark-kit` | Research-grade synthetic context/token benchmark with JSON data, charts, and HTML report. |
+| `decision-trace-kit` | Read-only JSON and HTML trace from memory records to decision tree. |
+| `poweruser-positioning-kit` | Snapshot-first positioning scorecard for adjacent AI-agent tool categories. |
+
+Launch scoring and pass/fail criteria: [Launch readiness rubric](docs/launch-readiness.md). Distribution path: [Distribution and release](docs/distribution.md).
+
 ## Quality Gates
 
 Release validation is scriptable and local:
@@ -192,6 +277,7 @@ Public docs are checked separately for encoding, anchors, links, plugin/install 
 ```bash
 python tools/owledge.py test public-docs --project-root .
 python tools/owledge.py test quality-ratchet --project-root .
+python tools/owledge.py test launch-readiness --project-root .
 ```
 
 ## Documentation
@@ -199,6 +285,10 @@ python tools/owledge.py test quality-ratchet --project-root .
 Start here: [Documentation index](docs/README.md)
 
 - [Quickstart](docs/quickstart.md)
+- [Integration decision guide](docs/integration-decision-guide.md)
+- [Try Owledge in 5 minutes](docs/try-owledge-in-5-minutes.md)
+- [Launch readiness rubric](docs/launch-readiness.md)
+- [Distribution and release](docs/distribution.md)
 - [Drop-in agent integration guide](docs/agent-integration-guide.md)
 - [Plugin install guide](docs/install-plugin.md)
 - [Harness and plugin matrix](docs/harness-plugin-matrix.md)
