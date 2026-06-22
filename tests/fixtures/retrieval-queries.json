@@ -71,6 +71,162 @@
         "mem:fixture:demo:retrieval-reference:compiled:stale-conflict-review"
       ],
       "expect_projects": ["retrieval-fixture", "retrieval-reference"]
+    },
+    {
+      "name": "privacy-export-gate",
+      "query": "shared retrieval export privacy gate confidential data sanitization approved raw sessions rejected",
+      "expected_ids": [
+        "mem:shared:shared:retrieval-reference:lesson:privacy-export-gate",
+        "mem:tenant-fixture:customer-fixture:retrieval-fixture:lesson:runtime-rag-safety",
+        "mem:fixture:demo:retrieval-fixture:canonical:memory-lifecycle-policy",
+        "mem:tenant-fixture:customer-fixture:retrieval-fixture:compiled:promotion-audit",
+        "mem:fixture:demo:retrieval-reference:adr:markdown-source-of-truth"
+      ],
+      "expect_projects": ["retrieval-fixture", "retrieval-reference"]
+    },
+    {
+      "name": "promotion-audit",
+      "query": "promotion audit source hash review approval target policy manifest evidence durable memory",
+      "expected_ids": [
+        "mem:tenant-fixture:customer-fixture:retrieval-fixture:compiled:promotion-audit",
+        "mem:tenant-fixture:customer-fixture:retrieval-fixture:canonical:context-pack-objective",
+        "mem:fixture:demo:retrieval-fixture:canonical:memory-lifecycle-policy",
+        "mem:shared:shared:retrieval-reference:lesson:privacy-export-gate",
+        "mem:fixture:demo:retrieval-reference:adr:markdown-source-of-truth"
+      ],
+      "expect_projects": ["retrieval-fixture", "retrieval-reference"]
+    },
+    {
+      "name": "stale-conflict-review",
+      "query": "stale memory conflict contradiction review supersession stale_after valid_until warnings",
+      "expected_ids": [
+        "mem:fixture:demo:retrieval-reference:compiled:stale-conflict-review",
+        "mem:fixture:demo:retrieval-fixture:canonical:memory-lifecycle-policy",
+        "mem:tenant-fixture:customer-fixture:retrieval-fixture:canonical:stale-research-signal",
+        "mem:tenant-fixture:customer-fixture:retrieval-fixture:compiled:promotion-audit",
+        "mem:fixture:demo:retrieval-fixture:compiled:context-pack-scoring"
+      ],
+      "expect_projects": ["retrieval-fixture", "retrieval-reference"]
+    },
+    {
+      "name": "cross-project-parallels",
+      "query": "cross project parallel discovery recurring patterns typed edges stable memory ids shared lessons",
+      "expected_ids": [
+        "mem:tenant-fixture:customer-fixture:retrieval-fixture:pattern:cross-project-parallel",
+        "mem:fixture:demo:retrieval-fixture:pattern:progressive-disclosure-runtime",
+        "mem:tenant-fixture:customer-fixture:retrieval-fixture:lesson:runtime-rag-safety",
+        "mem:shared:shared:retrieval-reference:lesson:privacy-export-gate",
+        "mem:fixture:demo:retrieval-reference:adr:markdown-source-of-truth"
+      ],
+      "expect_projects": ["retrieval-fixture", "retrieval-reference"]
+    },
+    {
+      "name": "progressive-disclosure-skillset",
+      "query": "progressive disclosure skill index detailed Markdown procedures task description matches runtime bridge",
+      "expected_ids": [
+        "mem:fixture:demo:retrieval-fixture:pattern:progressive-disclosure-runtime",
+        "mem:tenant-fixture:customer-fixture:retrieval-fixture:canonical:context-pack-objective",
+        "mem:fixture:demo:retrieval-fixture:compiled:context-pack-scoring",
+        "mem:fixture:demo:retrieval-reference:adr:markdown-source-of-truth",
+        "mem:tenant-fixture:customer-fixture:retrieval-fixture:pattern:cross-project-parallel"
+      ],
+      "expect_projects": ["retrieval-fixture", "retrieval-reference"]
+    },
+    {
+      "name": "freshness-warnings",
+      "query": "freshness warnings stale research valid until dates stale_after review cycle without deleting memory",
+      "expected_ids": [
+        "mem:tenant-fixture:customer-fixture:retrieval-fixture:canonical:stale-research-signal",
+        "mem:fixture:demo:retrieval-reference:compiled:stale-conflict-review",
+        "mem:fixture:demo:retrieval-fixture:canonical:memory-lifecycle-policy",
+        "mem:fixture:demo:retrieval-fixture:compiled:context-pack-scoring",
+        "mem:tenant-fixture:customer-fixture:retrieval-fixture:compiled:promotion-audit"
+      ],
+      "expect_projects": ["retrieval-fixture", "retrieval-reference"]
+    },
+    {
+      "name": "generated-views-boundary",
+      "query": "generated indexes exports dashboards reports rebuildable views not canonical memory source truth",
+      "expected_ids": [
+        "mem:fixture:demo:retrieval-reference:adr:markdown-source-of-truth",
+        "mem:shared:shared:retrieval-reference:lesson:privacy-export-gate",
+        "mem:tenant-fixture:customer-fixture:retrieval-fixture:lesson:runtime-rag-safety",
+        "mem:fixture:demo:retrieval-fixture:canonical:memory-lifecycle-policy",
+        "mem:fixture:demo:retrieval-fixture:compiled:context-pack-scoring"
+      ],
+      "expect_projects": ["retrieval-fixture", "retrieval-reference"]
+    },
+    {
+      "name": "runtime-rag-safety",
+      "query": "runtime events raw sessions private summarized before shared RAG reviewed sanitized promotion",
+      "expected_ids": [
+        "mem:tenant-fixture:customer-fixture:retrieval-fixture:lesson:runtime-rag-safety",
+        "mem:shared:shared:retrieval-reference:lesson:privacy-export-gate",
+        "mem:fixture:demo:retrieval-fixture:canonical:memory-lifecycle-policy",
+        "mem:tenant-fixture:customer-fixture:retrieval-fixture:compiled:promotion-audit",
+        "mem:fixture:demo:retrieval-reference:adr:markdown-source-of-truth"
+      ],
+      "expect_projects": ["retrieval-fixture", "retrieval-reference"]
+    },
+    {
+      "name": "context-budget-exclusions",
+      "query": "context budget excluded sources included sources dropped records task objective scoring",
+      "expected_ids": [
+        "mem:fixture:demo:retrieval-fixture:compiled:context-pack-scoring",
+        "mem:tenant-fixture:customer-fixture:retrieval-fixture:canonical:context-pack-objective",
+        "mem:fixture:demo:retrieval-fixture:pattern:progressive-disclosure-runtime",
+        "mem:fixture:demo:retrieval-fixture:canonical:memory-lifecycle-policy",
+        "mem:tenant-fixture:customer-fixture:retrieval-fixture:compiled:promotion-audit"
+      ],
+      "expect_projects": ["retrieval-fixture"]
+    },
+    {
+      "name": "red-team-quality-loop",
+      "query": "red team scorecard QA review evidence metrics promote candidate safety privacy quality ratchet",
+      "expected_ids": [
+        "mem:tenant-fixture:customer-fixture:retrieval-fixture:compiled:promotion-audit",
+        "mem:fixture:demo:retrieval-fixture:canonical:memory-lifecycle-policy",
+        "mem:shared:shared:retrieval-reference:lesson:privacy-export-gate",
+        "mem:tenant-fixture:customer-fixture:retrieval-fixture:lesson:runtime-rag-safety",
+        "mem:fixture:demo:retrieval-reference:adr:markdown-source-of-truth"
+      ],
+      "expect_projects": ["retrieval-fixture", "retrieval-reference"]
+    },
+    {
+      "name": "add-on-boundary",
+      "query": "optional add ons proof QA distribution generated artifacts no default dependency no hosted service",
+      "expected_ids": [
+        "mem:fixture:demo:retrieval-reference:adr:markdown-source-of-truth",
+        "mem:fixture:demo:retrieval-fixture:canonical:memory-lifecycle-policy",
+        "mem:fixture:demo:retrieval-fixture:pattern:progressive-disclosure-runtime",
+        "mem:shared:shared:retrieval-reference:lesson:privacy-export-gate",
+        "mem:tenant-fixture:customer-fixture:retrieval-fixture:pattern:cross-project-parallel"
+      ],
+      "expect_projects": ["retrieval-fixture", "retrieval-reference"]
+    },
+    {
+      "name": "knowledgebase-ingestion",
+      "query": "existing Markdown Obsidian knowledgebase metadata first scan no wiki link rewrite no body copy",
+      "expected_ids": [
+        "mem:fixture:demo:retrieval-reference:adr:markdown-source-of-truth",
+        "mem:fixture:demo:retrieval-fixture:canonical:memory-lifecycle-policy",
+        "mem:fixture:demo:retrieval-fixture:compiled:context-pack-scoring",
+        "mem:tenant-fixture:customer-fixture:retrieval-fixture:canonical:context-pack-objective",
+        "mem:shared:shared:retrieval-reference:lesson:privacy-export-gate"
+      ],
+      "expect_projects": ["retrieval-fixture", "retrieval-reference"]
+    },
+    {
+      "name": "typescript-eval-adapter",
+      "query": "TypeScript Node adapter validation frontmatter schema lint CI optional no second memory engine",
+      "expected_ids": [
+        "mem:fixture:demo:retrieval-reference:adr:markdown-source-of-truth",
+        "mem:fixture:demo:retrieval-fixture:pattern:progressive-disclosure-runtime",
+        "mem:tenant-fixture:customer-fixture:retrieval-fixture:compiled:promotion-audit",
+        "mem:fixture:demo:retrieval-fixture:canonical:memory-lifecycle-policy",
+        "mem:shared:shared:retrieval-reference:lesson:privacy-export-gate"
+      ],
+      "expect_projects": ["retrieval-fixture", "retrieval-reference"]
     }
   ]
 }

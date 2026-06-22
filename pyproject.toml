@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "owledge"
+version = "0.5.0"
+description = "Markdown-first durable memory for AI agents, existing repos, and knowledgebases."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+  { name = "Owledge maintainers" }
+]
+keywords = [
+  "agent-memory",
+  "ai-agents",
+  "markdown",
+  "codex",
+  "claude-code",
+  "knowledge-base"
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Software Development :: Documentation",
+  "Topic :: Text Processing :: Markup :: Markdown"
+]
+
+[project.urls]
+Documentation = "https://github.com/elmokirk/owledge/tree/main/docs"
+Issues = "https://github.com/elmokirk/owledge/issues"
+Source = "https://github.com/elmokirk/owledge"
+
+[project.scripts]
+owledge = "tools.owledge:main"
+
+[tool.setuptools]
+packages = ["tools"]
+py-modules = []
+
+[tool.setuptools.package-data]
+tools = ["*.py"]

@@ -1,0 +1,25 @@
+include AGENTS.template.md
+include CLAUDE.template.md
+include DESIGN.md
+include LICENSE
+include PRIVACY.md
+include PROJECT_CONTEXT.template.md
+include README.md
+include REPORT_DESIGN_SELECTOR.html
+include SECURITY.md
+include USER_CONTEXT.template.md
+include VERSION
+recursive-include addons *
+recursive-include agent-memory *
+recursive-include assets *
+recursive-include benchmarks *
+recursive-include docs *
+recursive-include examples *
+recursive-include plugins *
+recursive-include skills *
+recursive-include tools *
+recursive-exclude .agent-control *
+recursive-exclude .git *
+recursive-exclude global-memory *
+global-exclude __pycache__
+global-exclude *.py[cod]
