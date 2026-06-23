@@ -26,7 +26,12 @@ At the beginning of every agent session:
 2. If anything is missing in a host project, use the `bootstrap-agent-memory` skill.
 3. Prefer project-local Python tools when `tools/agent_memory_cli.py` exists. Otherwise initialize from an explicit local Owledge checkout.
 4. Do not overwrite existing project memory unless the user explicitly asks for force/overwrite.
-5. In this kit repository, use `python tools/agent_memory_cli.py --project-root . doctor --mode kit` on every supported OS.
+5. Repo layout:
+   - `templates/agent-memory/` is the pristine product source (shipped to users via `init-project` and `build-project-kit`).
+   - `internal/agent-memory/` is the maintainers' live dogfood workspace (decision traces, compiled snapshots, indexes, exports, benchmarks).
+   - For product health checks: `python tools/agent_memory_cli.py --project-root . doctor --mode kit`
+   - For dogfood gates: `python tools/owledge.py finalization-gates --project-root internal --include-compliance --include-exports`
+   - Never write generated artifacts (decision traces, compiled snapshots, indexes, exports) into `templates/`. That directory is the shipped product source.
 
 ## Global vs Project Local
 

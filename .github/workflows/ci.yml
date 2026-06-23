@@ -53,5 +53,23 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Finalization gates
-        run: python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports
+      - name: Finalization gates (dogfood)
+        run: python tools/owledge.py finalization-gates --project-root internal --include-compliance --include-exports
+
+      - name: Build clean kit
+        run: python tools/owledge.py build-project-kit --output-path /tmp/clean-kit --force --verify
+
+      - name: Kit integrity (zero dogfood)
+        run: python tools/agent_memory_cli.py --project-root /tmp/clean-kit kit-integrity
+
+      - name: Addon boundary check
+        run: python tools/agent_memory_cli.py --project-root /tmp/clean-kit addon-boundary-check
+
+      - name: Source vs target audit
+        run: python tools/agent_memory_cli.py --project-root . source-vs-target-audit
+
+      - name: Sdist clean
+        run: |
+          python -m pip install --quiet build
+          python -m build --sdist
+          python -c "import tarfile,glob; t=tarfile.open(glob.glob('dist/*.tar.gz')[0]); names=t.getnames(); bad=[n for n in names if n.startswith('owledge-0.5.0/internal/') or 'agent-memory/decision-trace/' in n and 'addons/' not in n]; assert not bad, f'Leaked: {bad}'"

@@ -2,6 +2,7 @@
 .agent-control/logs/
 .agent-control/secrets/
 .agent-control/tmp/
+internal/.agent-control/
 USER_CONTEXT.md
 global-memory/**/*.md
 global-memory/indexes/*.jsonl
@@ -66,3 +67,4 @@ benchmarks/results/token-efficiency.md
 examples/demo-vault/agent-memory-module/
 .agent-control/tmp/enterprise-context-benchmark/
 agent-memory/cross-project-hub/cross-project-map.json
+dist/

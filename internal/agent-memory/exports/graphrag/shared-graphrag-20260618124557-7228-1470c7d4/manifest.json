@@ -1,0 +1,16 @@
+{
+  "accepted_edges": 0,
+  "accepted_nodes": 0,
+  "corpus_type": "shared",
+  "customer_id": "",
+  "generated_at": "2026-06-18T12:45:57Z",
+  "generation_id": "shared-graphrag-20260618124557-7228-1470c7d4",
+  "include_drafts": false,
+  "policy_version": "graphrag-export-v0.2",
+  "project_id": "",
+  "rejected_counts": {
+    "doc_type_not_in_default_rag": 23,
+    "status_not_reviewed_or_promoted": 1
+  },
+  "tenant_id": ""
+}

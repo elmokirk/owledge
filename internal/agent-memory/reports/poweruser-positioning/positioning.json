@@ -1,0 +1,152 @@
+{
+  "axes": [
+    {
+      "id": "durable_source_of_truth",
+      "label": "Durable source of truth",
+      "scale": "1-5"
+    },
+    {
+      "id": "context_hygiene",
+      "label": "Context hygiene",
+      "scale": "1-5"
+    },
+    {
+      "id": "traceability",
+      "label": "Traceability",
+      "scale": "1-5"
+    },
+    {
+      "id": "multi_agent_handoff",
+      "label": "Multi-agent handoff",
+      "scale": "1-5"
+    },
+    {
+      "id": "integration_safety",
+      "label": "Integration safety",
+      "scale": "1-5"
+    },
+    {
+      "id": "benchmarkability",
+      "label": "Benchmarkability",
+      "scale": "1-5"
+    },
+    {
+      "id": "compliance_auditability",
+      "label": "Compliance/auditability",
+      "scale": "1-5"
+    },
+    {
+      "id": "adoption_friction",
+      "label": "Low adoption friction",
+      "scale": "1-5"
+    }
+  ],
+  "comparators": [
+    {
+      "category": "Markdown-first memory/proof layer",
+      "limitation": "Not an execution runtime, graph database, vector store, or replacement for existing project-specific agent instructions.",
+      "name": "Owledge",
+      "positioning": "Best when long-running projects need durable plans, evidence, reviews, handoffs, decisions, and proof artifacts across agents.",
+      "score_100": 90,
+      "scores": {
+        "adoption_friction": 3,
+        "benchmarkability": 4,
+        "compliance_auditability": 5,
+        "context_hygiene": 5,
+        "durable_source_of_truth": 5,
+        "integration_safety": 5,
+        "multi_agent_handoff": 4,
+        "traceability": 5
+      }
+    },
+    {
+      "category": "Agent execution methodology",
+      "limitation": "Usually not a project-wide reviewed memory contract or cross-project proof layer.",
+      "name": "Superpowers-style execution frameworks",
+      "positioning": "Strong for coding workflow discipline, implementation flow, and agent execution structure.",
+      "score_100": 60,
+      "scores": {
+        "adoption_friction": 4,
+        "benchmarkability": 3,
+        "compliance_auditability": 2,
+        "context_hygiene": 3,
+        "durable_source_of_truth": 2,
+        "integration_safety": 3,
+        "multi_agent_handoff": 4,
+        "traceability": 3
+      }
+    },
+    {
+      "category": "Graph visualization and exploration",
+      "limitation": "A graph view should consume reviewed memory; it should not become the canonical truth by itself.",
+      "name": "Graphify-style graph visualizers",
+      "positioning": "Strong for seeing relationships, dependencies, and clusters once clean source records exist.",
+      "score_100": 55,
+      "scores": {
+        "adoption_friction": 3,
+        "benchmarkability": 2,
+        "compliance_auditability": 3,
+        "context_hygiene": 3,
+        "durable_source_of_truth": 2,
+        "integration_safety": 3,
+        "multi_agent_handoff": 2,
+        "traceability": 4
+      }
+    },
+    {
+      "category": "Human-curated notes and wiki structure",
+      "limitation": "Needs explicit contracts, review status, and scoped context generation before agents can consume it reliably.",
+      "name": "LLM Wiki / Obsidian-style knowledgebases",
+      "positioning": "Strong for human knowledge capture, linking, and existing taxonomy.",
+      "score_100": 60,
+      "scores": {
+        "adoption_friction": 4,
+        "benchmarkability": 2,
+        "compliance_auditability": 3,
+        "context_hygiene": 2,
+        "durable_source_of_truth": 4,
+        "integration_safety": 4,
+        "multi_agent_handoff": 2,
+        "traceability": 3
+      }
+    },
+    {
+      "category": "Agent runtime and coding execution",
+      "limitation": "Runtime memory and logs are not the same as reviewed project memory with reusable decisions and lessons.",
+      "name": "Claude Code / Codex-style agent runtimes",
+      "positioning": "Strong for executing tasks, editing files, running tests, and operating agent sessions.",
+      "score_100": 68,
+      "scores": {
+        "adoption_friction": 5,
+        "benchmarkability": 3,
+        "compliance_auditability": 3,
+        "context_hygiene": 4,
+        "durable_source_of_truth": 2,
+        "integration_safety": 3,
+        "multi_agent_handoff": 4,
+        "traceability": 3
+      }
+    },
+    {
+      "category": "Team-specific agent automation",
+      "limitation": "Often depends on implicit team conventions unless paired with a stable memory and evidence contract.",
+      "name": "Custom harnesses and hooks",
+      "positioning": "Strong for highly tailored orchestration and local automation.",
+      "score_100": 52,
+      "scores": {
+        "adoption_friction": 2,
+        "benchmarkability": 3,
+        "compliance_auditability": 2,
+        "context_hygiene": 3,
+        "durable_source_of_truth": 2,
+        "integration_safety": 2,
+        "multi_agent_handoff": 4,
+        "traceability": 3
+      }
+    }
+  ],
+  "generated_at": "2026-06-22T07:36:30Z",
+  "interpretation": "Owledge is strongest as a durable memory, evidence, context hygiene, and traceability layer beside execution runtimes, graph views, wikis, and harnesses.",
+  "schema_version": "poweruser-positioning-v1",
+  "scoring_note": "Scores describe fit for Owledge's memory/proof positioning, not absolute product quality."
+}

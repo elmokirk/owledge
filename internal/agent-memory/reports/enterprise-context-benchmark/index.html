@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Enterprise Context Benchmark</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 0; background: #f5f7fa; color: #17202a; }
+    main { max-width: 1180px; margin: 0 auto; padding: 32px; }
+    header, section { background: #fff; border: 1px solid #d8dee7; padding: 20px; margin: 0 0 18px; }
+    h1, h2 { margin: 0 0 12px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { border-bottom: 1px solid #e3e8ef; padding: 8px; text-align: right; }
+    th:first-child, td:first-child, th:nth-child(3), td:nth-child(3) { text-align: left; }
+    code { background: #eef2f6; padding: 2px 5px; }
+    img { max-width: 100%; height: auto; border: 1px solid #e3e8ef; }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Enterprise Context Benchmark</h1>
+    <p>Research-grade synthetic experiment. JSON is the source artifact; charts and tables are generated views.</p>
+    <p><strong>Commit:</strong> <code>d4a0c0d0f3c300ab4bf7d56c9b10e44be089f050</code> <strong>Tokenizer:</strong> <code>deterministic-char4-estimate</code></p>
+    <p><strong>Command:</strong> <code>python tools/enterprise-context-benchmark/run-enterprise-context-benchmark.py --project-root . --profile fresh --seed 42</code></p>
+  </header>
+  <section>
+    <h2>Hypotheses</h2>
+    <ul>
+      <li>H1: Scoped Owledge context packs grow sublinearly compared with full-vault prompting.</li>
+      <li>H2: Owledge reduces irrelevant-context ratio compared with naive paste and keyword search.</li>
+      <li>H3: Metadata-first selection plus scoped context remains closer to the oracle than full-vault prompting under tighter token budgets.</li>
+    </ul>
+  </section>
+  <section><h2>Tokens By Project Size</h2><img src="tokens_by_project_size.svg" alt="tokens_by_project_size chart"></section>
+<section><h2>Cost By Strategy</h2><img src="cost_by_strategy.svg" alt="cost_by_strategy chart"></section>
+<section><h2>Precision Recall</h2><img src="precision_recall.svg" alt="precision_recall chart"></section>
+<section><h2>Irrelevant Context Ratio</h2><img src="irrelevant_context_ratio.svg" alt="irrelevant_context_ratio chart"></section>
+<section><h2>Context Growth Curve</h2><img src="context_growth_curve.svg" alt="context_growth_curve chart"></section>
+<section><h2>Oracle Distance</h2><img src="oracle_distance.svg" alt="oracle_distance chart"></section>
+  <section>
+    <h2>Final Data Table</h2>
+    <table>
+      <thead><tr><th>Scenario</th><th>Files</th><th>Strategy</th><th>Tokens</th><th>Cost USD</th><th>Precision</th><th>Recall</th><th>Irrelevant Tokens</th><th>Oracle Distance</th><th>Privacy Leaks</th></tr></thead>
+      <tbody><tr><td>fresh</td><td>48</td><td>full_vault</td><td>16593</td><td>0.041482</td><td>0.25</td><td>1.0</td><td>0.5015</td><td>0.6</td><td>5</td></tr><tr><td>fresh</td><td>48</td><td>naive_paste</td><td>16593</td><td>0.041482</td><td>0.25</td><td>1.0</td><td>0.5015</td><td>0.6</td><td>5</td></tr><tr><td>fresh</td><td>48</td><td>keyword_search</td><td>16593</td><td>0.041482</td><td>0.25</td><td>1.0</td><td>0.5015</td><td>0.6</td><td>5</td></tr><tr><td>fresh</td><td>48</td><td>metadata_scan</td><td>1762</td><td>0.004405</td><td>0.25</td><td>1.0</td><td>0.5068</td><td>0.6</td><td>5</td></tr><tr><td>fresh</td><td>48</td><td>owledge_context_pack</td><td>6126</td><td>0.015315</td><td>0.7059</td><td>1.0</td><td>0.0</td><td>0.1724</td><td>0</td></tr><tr><td>fresh</td><td>48</td><td>oracle</td><td>4322</td><td>0.010805</td><td>1.0</td><td>1.0</td><td>0.0</td><td>0.0</td><td>0</td></tr></tbody>
+    </table>
+  </section>
+  <section>
+    <h2>Threats To Validity</h2>
+    <p>The corpus is synthetic and controls ground truth. External validity requires runs against real project vaults. Cost numbers are scenario estimates, not universal savings claims.</p>
+  </section>
+</main>
+</body>
+</html>

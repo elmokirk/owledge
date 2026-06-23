@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="420" viewBox="0 0 980 420" role="img" aria-label="Useful-source precision by strategy">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="54" y="30" font-family="system-ui" font-size="18" font-weight="700" fill="#17202a">Useful-source precision by strategy</text>
+<text x="54" y="52" font-family="system-ui" font-size="12" fill="#52616f">Unit: precision 0-1</text>
+<line x1="54" y1="366" x2="926" y2="366" stroke="#aab4c0"/>
+<line x1="54" y1="54" x2="54" y2="366" stroke="#aab4c0"/>
+<rect x="54.0" y="288.0" width="143.3" height="78.0" fill="#8b1e3f"/>
+<rect x="199.3" y="288.0" width="143.3" height="78.0" fill="#b85c38"/>
+<rect x="344.7" y="288.0" width="143.3" height="78.0" fill="#d99b2b"/>
+<rect x="490.0" y="288.0" width="143.3" height="78.0" fill="#397097"/>
+<rect x="635.3" y="145.8" width="143.3" height="220.2" fill="#26734d"/>
+<rect x="780.7" y="54.0" width="143.3" height="312.0" fill="#4b5563"/>
+<text x="54" y="402" font-family="system-ui" font-size="11" fill="#52616f">Bars are ordered by scenario and strategy. Exact values are in context-growth-charts.json.</text>
+</svg>

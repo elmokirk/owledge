@@ -62,4 +62,16 @@ Release artifacts must not include:
 - Customer data.
 - Private user memory.
 - Generated temp output under `.agent-control/tmp`.
+- The `internal/` dogfood workspace.
+
+## Dogfooding vs. Product
+
+This repository contains two distinct memory trees:
+
+| Directory | Purpose | Shipped to users? |
+|-----------|---------|-------------------|
+| `templates/agent-memory/` | Pristine product source: schemas, templates, structural `.gitkeep` | Yes — via `init-project`, `build-project-kit`, and sdist |
+| `internal/agent-memory/` | Maintainers' live dogfood: decision traces, compiled snapshots, generated indexes, red-team reports, benchmarks | No — excluded from sdist and release ZIPs |
+
+A CI `kit-integrity` gate verifies that built kits contain zero files from the dogfood tree. A `sdist-clean` gate verifies the PyPI source distribution contains no `internal/` paths. A `source-vs-target-audit` gate verifies `templates/agent-memory/` has all core directories and no leaked dogfood.
 

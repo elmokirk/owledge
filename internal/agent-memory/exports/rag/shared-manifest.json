@@ -1,0 +1,37 @@
+{
+  "accepted_count": 0,
+  "corpus_type": "shared",
+  "customer_id": "",
+  "filters": {
+    "default_doc_types": [
+      "adr",
+      "canonical",
+      "compiled",
+      "goal",
+      "lesson",
+      "pattern",
+      "personal_pattern",
+      "preference",
+      "research",
+      "user_context"
+    ],
+    "private_default": "reviewed/promoted records only unless include_drafts=true",
+    "shared_requires": [
+      "visibility=shared",
+      "review_status=approved",
+      "sanitization_status=approved",
+      "data_class in ['internal', 'public']"
+    ]
+  },
+  "generated_at": "2026-06-23T17:41:31Z",
+  "generation_id": "shared-rag-20260623174131-53640-3ade8d5c",
+  "include_drafts": false,
+  "include_sessions": false,
+  "policy_version": "rag-export-v0.2",
+  "project_id": "",
+  "rejected_counts": {
+    "doc_type_not_in_default_rag": 46,
+    "status_not_reviewed_or_promoted": 2
+  },
+  "tenant_id": ""
+}

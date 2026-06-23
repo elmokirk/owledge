@@ -1,0 +1,2 @@
+[console_scripts]
+owledge = tools.owledge:main

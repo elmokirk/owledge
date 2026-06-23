@@ -1,0 +1,182 @@
+{
+  "failed": 0,
+  "gates": [
+    {
+      "name": "python-compile",
+      "passed": true,
+      "seconds": 0.182
+    },
+    {
+      "name": "public-docs",
+      "passed": true,
+      "seconds": 0.011
+    },
+    {
+      "name": "release-trust",
+      "passed": true,
+      "seconds": 0.001
+    },
+    {
+      "name": "principles-skill",
+      "passed": true,
+      "seconds": 0.002
+    },
+    {
+      "name": "principles-only",
+      "passed": true,
+      "seconds": 0.001
+    },
+    {
+      "name": "principles-scenarios",
+      "passed": true,
+      "seconds": 1.286
+    },
+    {
+      "name": "poweruser-simulations",
+      "passed": true,
+      "seconds": 8.767
+    },
+    {
+      "name": "contracts",
+      "passed": true,
+      "seconds": 0.005
+    },
+    {
+      "name": "core-platform-neutral",
+      "passed": true,
+      "seconds": 0.141
+    },
+    {
+      "name": "generated-kit-surface",
+      "passed": true,
+      "seconds": 1.724
+    },
+    {
+      "name": "doctor",
+      "passed": true,
+      "seconds": 0.005
+    },
+    {
+      "name": "validate",
+      "passed": true,
+      "seconds": 0.04
+    },
+    {
+      "name": "index-full",
+      "passed": true,
+      "seconds": 0.025
+    },
+    {
+      "name": "index-incremental",
+      "passed": true,
+      "seconds": 0.026
+    },
+    {
+      "name": "retention",
+      "passed": true,
+      "seconds": 0.007
+    },
+    {
+      "name": "conflicts",
+      "passed": true,
+      "seconds": 0.021
+    },
+    {
+      "name": "sensitive-scan",
+      "passed": true,
+      "seconds": 0.036
+    },
+    {
+      "name": "runtime-adapters",
+      "passed": true,
+      "seconds": 1.111
+    },
+    {
+      "name": "memory-evals",
+      "passed": true,
+      "seconds": 2.929
+    },
+    {
+      "name": "retrieval-fixture",
+      "passed": true,
+      "seconds": 0.018
+    },
+    {
+      "name": "kb-ingestion-safety",
+      "passed": true,
+      "seconds": 0.098
+    },
+    {
+      "name": "benchmark",
+      "passed": true,
+      "seconds": 1.495
+    },
+    {
+      "name": "quality-ratchet",
+      "passed": true,
+      "seconds": 4.936
+    },
+    {
+      "name": "kb-module",
+      "passed": true,
+      "seconds": 0.09
+    },
+    {
+      "name": "project-folder-kit",
+      "passed": true,
+      "seconds": 0.468
+    },
+    {
+      "name": "compliance-addon-source",
+      "passed": true,
+      "seconds": 0.0
+    },
+    {
+      "name": "project-folder-kit-compliance",
+      "passed": true,
+      "seconds": 0.627
+    },
+    {
+      "name": "compliance-gates",
+      "passed": true,
+      "seconds": 0.008
+    },
+    {
+      "name": "export-rag-shared",
+      "passed": true,
+      "seconds": 0.078
+    },
+    {
+      "name": "export-lightrag-shared",
+      "passed": true,
+      "seconds": 0.112
+    },
+    {
+      "name": "export-graphrag-shared",
+      "passed": true,
+      "seconds": 0.031
+    },
+    {
+      "name": "report-shared",
+      "passed": true,
+      "seconds": 0.023
+    }
+  ],
+  "generated_at": "2026-06-23T17:41:31Z",
+  "include_compliance": true,
+  "include_exports": true,
+  "passed": true,
+  "project": "C:\\Users\\Kirk\\Documents\\Playground\\agent-memory-standalone",
+  "quality_ratchet_scores": {
+    "benchmark": 100,
+    "docs": 100,
+    "generated-kit": 100,
+    "ingestion": 100,
+    "platform": 100,
+    "principles": 100,
+    "qa": 100,
+    "retrieval": 100,
+    "runtime": 100
+  },
+  "quality_ratchet_summary_path": "internal/agent-memory/exports/finalization-gates/quality-ratchet-summary.json"
+}

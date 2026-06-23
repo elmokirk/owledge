@@ -211,7 +211,7 @@ def init_project(project_root: pathlib.Path, source_root: pathlib.Path, include_
         copy_file_if_missing(source_root / ".gitignore", gitignore)
         created.append(".gitignore")
 
-    copy_tree_missing(source_root / "agent-memory", project_root / "agent-memory", build_project_folder_kit.AGENT_EXCLUDES)
+    copy_tree_missing(source_root / "templates" / "agent-memory", project_root / "agent-memory")
     build_project_folder_kit.ensure_gitkeep(project_root / "agent-memory", build_project_folder_kit.AGENT_DIRS)
 
     tool_dir = project_root / "tools"
@@ -1291,8 +1291,8 @@ def platform_neutral_core_gate(root: pathlib.Path) -> dict[str, Any]:
         "AGENTS.md",
         "CLAUDE.md",
         "docs",
-        "agent-memory/README.md",
-        "agent-memory/templates",
+        "templates/agent-memory/README.md",
+        "templates/agent-memory/templates",
         "addons",
         "plugins",
         "skills",
@@ -1335,6 +1335,7 @@ def project_folder_kit_gate(root: pathlib.Path, include_compliance: bool = False
 
 def finalization_gates(root: pathlib.Path, include_exports: bool, include_compliance: bool) -> dict[str, Any]:
     gates: list[dict[str, Any]] = []
+    memory_root = root / "internal" if (root / "internal" / "agent-memory").is_dir() else root
 
     def add(name: str, func: Callable[[], Any]) -> None:
         gate = run_gate(name, func)
@@ -1353,12 +1354,12 @@ def finalization_gates(root: pathlib.Path, include_exports: bool, include_compli
     add("core-platform-neutral", lambda: platform_neutral_core_gate(root))
     add("generated-kit-surface", lambda: generated_kit_surface_gate(root))
     add("doctor", lambda: core.memory_doctor(root, mode="kit"))
-    add("validate", lambda: core.validate_memory(root, strict=False))
-    add("index-full", lambda: core.build_memory_index(root))
-    add("index-incremental", lambda: core.build_memory_index(root, incremental=True, track_tombstones=True))
-    add("retention", lambda: core.audit_retention(root))
-    add("conflicts", lambda: core.review_memory_conflicts(root))
-    add("sensitive-scan", lambda: core.scan_sensitive_data(root))
+    add("validate", lambda: core.validate_memory(memory_root, strict=False))
+    add("index-full", lambda: core.build_memory_index(memory_root))
+    add("index-incremental", lambda: core.build_memory_index(memory_root, incremental=True, track_tombstones=True))
+    add("retention", lambda: core.audit_retention(memory_root))
+    add("conflicts", lambda: core.review_memory_conflicts(memory_root))
+    add("sensitive-scan", lambda: core.scan_sensitive_data(memory_root))
     add("runtime-adapters", lambda: runtime_adapters_gate(root))
     add("memory-evals", lambda: core.run_evals(root))
     add("retrieval-fixture", lambda: retrieval_fixture_gate(root))
@@ -1372,13 +1373,13 @@ def finalization_gates(root: pathlib.Path, include_exports: bool, include_compli
         add("project-folder-kit-compliance", lambda: project_folder_kit_gate(root, include_compliance=True))
         add("compliance-gates", lambda: core.compliance_doctor(root / ".agent-control" / "tmp" / "owledge-project-kit-compliance"))
     if include_exports:
-        add("export-rag-shared", lambda: core.export_rag_documents(root, corpus_type="shared"))
-        add("export-lightrag-shared", lambda: core.export_lightrag(root, corpus_type="shared"))
-        add("export-graphrag-shared", lambda: core.export_graphrag(root, corpus_type="shared"))
-        add("report-shared", lambda: core.render_memory_report(root, "project-dashboard", audience="shared"))
+        add("export-rag-shared", lambda: core.export_rag_documents(memory_root, corpus_type="shared"))
+        add("export-lightrag-shared", lambda: core.export_lightrag(memory_root, corpus_type="shared"))
+        add("export-graphrag-shared", lambda: core.export_graphrag(memory_root, corpus_type="shared"))
+        add("report-shared", lambda: core.render_memory_report(memory_root, "project-dashboard", audience="shared"))
 
     failed = [gate for gate in gates if not gate["passed"]]
-    report_dir = root / "agent-memory" / "exports" / "finalization-gates"
+    report_dir = memory_root / "agent-memory" / "exports" / "finalization-gates"
     report_dir.mkdir(parents=True, exist_ok=True)
     quality_summary_path = report_dir / "quality-ratchet-summary.json"
     quality_scores: dict[str, int] = {}
@@ -1527,7 +1528,8 @@ def write_deterministic_redteam_report(
 
 
 def redteam_qa(root: pathlib.Path, subject: str, question: str, gate_report_path: str) -> dict[str, Any]:
-    gate_report = resolve_path(gate_report_path, root) if gate_report_path else root / "agent-memory" / "exports" / "finalization-gates" / "latest.json"
+    memory_root = root / "internal" if (root / "internal" / "agent-memory").is_dir() else root
+    gate_report = resolve_path(gate_report_path, root) if gate_report_path else memory_root / "agent-memory" / "exports" / "finalization-gates" / "latest.json"
     if not gate_report.exists():
         gate = finalization_gates(root, include_exports=False, include_compliance=False)
         if not gate["passed"]:
@@ -1552,6 +1554,7 @@ def redteam_qa(root: pathlib.Path, subject: str, question: str, gate_report_path
         subject=subject,
         question=evidence_question,
         slug="v0.5-final-redteam",
+        output_dir=memory_root / "agent-memory" / "pi-agent" / "red-team",
     )
     score = 95
     verdict = "promote-candidate"
@@ -1637,8 +1640,9 @@ def redteam_qa_gate(root: pathlib.Path, gate_report_path: str, min_score: int = 
 
 
 def retrieval_fixture_gate(root: pathlib.Path) -> dict[str, Any]:
+    memory_root = root / "internal" if (root / "internal" / "agent-memory").is_dir() else root
     return core.evaluate_memory_retrieval(
-        root,
+        memory_root,
         [root / "tests" / "fixtures" / "retrieval-corpus"],
         output_dir=None,
         top_k=5,
@@ -1650,7 +1654,8 @@ def retrieval_fixture_gate(root: pathlib.Path) -> dict[str, Any]:
 
 
 def quality_ratchet_gate(root: pathlib.Path) -> dict[str, Any]:
-    report_dir = root / "agent-memory" / "exports" / "finalization-gates"
+    memory_root = root / "internal" if (root / "internal" / "agent-memory").is_dir() else root
+    report_dir = memory_root / "agent-memory" / "exports" / "finalization-gates"
     report_dir.mkdir(parents=True, exist_ok=True)
     components: list[tuple[str, Callable[[], dict[str, Any]]]] = [
         ("docs", lambda: public_docs_gate(root)),

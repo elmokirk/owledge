@@ -1,0 +1,13 @@
+{
+  "corpus_type": "shared",
+  "customer_id": "",
+  "document_count": 0,
+  "documents": [],
+  "generated_at": "2026-06-18T13:15:53Z",
+  "generation_id": "shared-lightrag-20260618131553-44460-643b4f4b",
+  "policy_version": "lightrag-export-v0.2",
+  "project_id": "",
+  "rag_generation_id": "shared-rag-20260618131553-44460-cc7025d8",
+  "rag_manifest": "agent-memory\\exports\\rag\\shared-rag-20260618131553-44460-cc7025d8\\manifest.json",
+  "tenant_id": ""
+}

@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Execution Dashboard: agent-memory-standalone</title>
+  <style>
+    :root {
+      --bg: #f6f7f9;
+      --surface: #ffffff;
+      --surface-2: color-mix(in srgb, #ffffff 88%, #245c88);
+      --ink: #17191d;
+      --muted: #626b78;
+      --line: #d9dee7;
+      --accent: #245c88;
+      --radius: 8px;
+      --font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --density: 18px;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-family); font-size: 16px; }
+    header { padding: 30px min(5vw, 64px); background: var(--surface); border-bottom: 1px solid var(--line); }
+    .topline { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; color: var(--muted); font-size: 13px; }
+    .badge { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px; color: var(--accent); background: color-mix(in srgb, var(--surface) 82%, var(--accent)); font-weight: 700; }
+    nav { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+    nav a { color: var(--muted); text-decoration: none; border: 1px solid var(--line); border-radius: 999px; padding: 8px 12px; background: var(--surface); }
+    nav a:hover { color: var(--ink); border-color: var(--accent); }
+    nav a.active { color: white; background: var(--accent); border-color: var(--accent); }
+    main { max-width: 1180px; margin: 0 auto; padding: 28px min(5vw, 64px) 64px; }
+    h1 { margin: 10px 0 0; font-size: 42px; line-height: 1.08; letter-spacing: 0; }
+    h2 { margin-top: 30px; font-size: 25px; line-height: 1.2; letter-spacing: 0; }
+    h3 { margin-top: 22px; line-height: 1.3; letter-spacing: 0; }
+    p, li { color: var(--muted); line-height: 1.55; }
+    .metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 18px; }
+    .metric { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; min-width: 0; }
+    .metric span { display: block; color: var(--muted); font-size: 12px; font-weight: 700; text-transform: uppercase; }
+    .metric strong { display: block; color: var(--ink); font-size: 28px; line-height: 1.1; margin-top: 8px; }
+    .metric small { display: block; color: var(--muted); margin-top: 8px; line-height: 1.35; }
+    .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: var(--density); }
+    .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); margin: 16px 0; }
+    table { width: 100%; border-collapse: collapse; min-width: 620px; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { color: var(--ink); background: var(--surface-2); font-size: 12px; text-transform: uppercase; }
+    td { color: var(--muted); line-height: 1.5; }
+    tr:last-child td { border-bottom: 0; }
+    .md-table { overflow-x: auto; white-space: pre-wrap; background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; }
+    code { overflow-wrap: anywhere; color: var(--ink); background: var(--surface-2); border: 1px solid var(--line); border-radius: 6px; padding: 1px 5px; }
+    .file-link { color: var(--accent); text-decoration: none; }
+    .file-link:hover { text-decoration: underline; }
+    details { border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; background: var(--surface-2); }
+    summary { cursor: pointer; color: var(--ink); font-weight: 700; }
+    @media (max-width: 840px) {
+      h1 { font-size: 32px; }
+      .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 560px) {
+      header, main { padding-left: 18px; padding-right: 18px; }
+      .metrics { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="topline"><span class="badge">Project Snapshot</span><span>Generated 2026-06-19T14:04:12Z</span><span>Markdown snapshots are the source of truth.</span></div>
+    <h1>Execution Dashboard: agent-memory-standalone</h1>
+    <nav><a class='' href='index.html'>Overview</a><a class='' href='product.html'>Product</a><a class='' href='workflows.html'>Workflows</a><a class='active' href='implementation.html'>Implementation</a><a class='' href='activity.html'>Activity</a><a class='' href='sources.html'>Sources</a></nav>
+  </header>
+  <main><section class='metrics' aria-label='Snapshot metrics'><article class='metric'><span>Sources</span><strong>28</strong><small>Indexed files considered</small></article><article class='metric'><span>Sections</span><strong>11</strong><small>Snapshot sections rendered</small></article><article class='metric'><span>Est. input</span><strong>10960</strong><small>Future narrative refresh budget</small></article><article class='metric'><span>Model tokens</span><strong>0</strong><small>Used for this deterministic render</small></article></section><section class="panel"><h1>Project Execution Snapshot</h1>
+<h2>Goal</h2>
+<p>Keep agent-memory-standalone execution state visible through local Owledge plans, task cards, evidence, handoffs, and generated snapshots.</p>
+<h2>MVP</h2>
+<ul>
+<li>Install Project Snapshot Kit only when requested.</li>
+<li>Generate source-backed Markdown snapshots.</li>
+<li>Generate static local HTML from existing snapshots.</li>
+<li>Track Owledge-local task status deterministically.</li>
+</ul>
+<h2>Explicitly Out Of MVP</h2>
+<ul>
+<li>External GitHub, Linear, or Jira synchronization.</li>
+<li>Hosted dashboard, authentication, or RBAC.</li>
+<li>Automatic promotion to canonical memory.</li>
+<li>Model calls from the CLI.</li>
+</ul>
+<h2>Active Workstreams</h2>
+<div class='table-wrap'><table><thead><tr><th>Task type</th><th>Count</th></tr></thead><tbody></tbody></table></div>
+<h2>Task Status</h2>
+<div class='table-wrap'><table><thead><tr><th>Status</th><th>Count</th></tr></thead><tbody></tbody></table></div>
+<h2>Local Tasks And Plans</h2>
+<ul>
+<li>No Owledge-local task artifacts found.</li>
+</ul>
+<h2>Roadmap</h2>
+<ul>
+<li>Refresh snapshots when source hashes change.</li>
+<li>Keep HTML regeneration deterministic and zero-token.</li>
+<li>Add external ticket adapters later as optional importers.</li>
+</ul>
+<h2>Blockers</h2>
+<ul>
+<li>No blockers detected in local task artifacts.</li>
+</ul>
+<h2>QA Gates</h2>
+<ul>
+<li>Run <code>python tools/agent_memory_cli.py --project-root . validate-memory --strict</code>.</li>
+<li>Run <code>python tools/owledge.py doctor --project-root .</code>.</li>
+<li>Run add-on generation with <code>--changed-only</code> before sharing reports.</li>
+</ul>
+<h2>Latest Agent Activity</h2>
+<p>Source-backed activity is summarized from handoffs and evidence records only. Raw runtime event logs are excluded.</p>
+<h2>Sources</h2>
+<div class='table-wrap'><table><thead><tr><th>Source</th><th>Type</th><th>Hash</th></tr></thead><tbody><tr><td><a class='file-link' href='PROJECT_CONTEXT.template.md'>PROJECT_CONTEXT.template.md</a></td><td>project_context</td><td>bd2e88a545213622</td></tr><tr><td><a class='file-link' href='agent-memory/ideas/pi-agent-global-intelligence.md'>agent-memory/ideas/pi-agent-global-intelligence.md</a></td><td>idea</td><td>0bc48096b1cb2930</td></tr><tr><td><a class='file-link' href='agent-memory/pi-agent/red-team/multi-perspective-red-team-v0-5-final-redteam-20260526152155-8884-c0d48fe7.md'>agent-memory/pi-agent/red-team/multi-perspective-red-team-v0-5-final-redteam-20260526152155-8884-c0d48fe7.md</a></td><td>qa</td><td>69ba6f055bfb27d1</td></tr><tr><td><a class='file-link' href='agent-memory/pi-agent/red-team/multi-perspective-red-team-v0-5-final-redteam-20260526152246-23008-b6295fd5.md'>agent-memory/pi-agent/red-team/multi-perspective-red-team-v0-5-final-redteam-20260526152246-23008-b6295fd5.md</a></td><td>qa</td><td>a385048efd5ca51b</td></tr><tr><td><a class='file-link' href='agent-memory/pi-agent/red-team/multi-perspective-red-team-v0-5-final-redteam-20260526184806-16688-d0de5d35.md'>agent-memory/pi-agent/red-team/multi-perspective-red-team-v0-5-final-redteam-20260526184806-16688-d0de5d35.md</a></td><td>qa</td><td>a004375d0e9883a0</td></tr><tr><td><a class='file-link' href='agent-memory/pi-agent/red-team/multi-perspective-red-team-v0-5-final-redteam-20260526184929-31580-875b8946.md'>agent-memory/pi-agent/red-team/multi-perspective-red-team-v0-5-final-redteam-20260526184929-31580-875b8946.md</a></td><td>qa</td><td>61eedfe8b4583042</td></tr><tr><td><a class='file-link' href='agent-memory/pi-agent/red-team/multi-perspective-red-team-v0-5-final-redteam-20260527134409-43176-c0ea8c34.md'>agent-memory/pi-agent/red-team/multi-perspective-red-team-v0-5-final-redteam-20260527134409-43176-c0ea8c34.md</a></td><td>qa</td><td>8ca60f3d8217e0ae</td></tr><tr><td><a class='file-link' href='agent-memory/pi-agent/red-team/multi-perspective-red-team-v0-5-final-redteam-20260527134527-18064-1776618b.md'>agent-memory/pi-agent/red-team/multi-perspective-red-team-v0-5-final-redteam-20260527134527-18064-1776618b.md</a></td><td>qa</td><td>d2d56a6c0ad55864</td></tr><tr><td><a class='file-link' href='agent-memory/pi-agent/red-team/multi-perspective-red-team-v0-5-final-redteam-20260527134652-44888-989b2391.md'>agent-memory/pi-agent/red-team/multi-perspective-red-team-v0-5-final-redteam-20260527134652-44888-989b2391.md</a></td><td>qa</td><td>8947a4c0b6d85931</td></tr><tr><td><a class='file-link' href='agent-memory/pi-agent/red-team/multi-perspective-red-team-v0-5-final-redteam-20260527191826-26932-48444041.md'>agent-memory/pi-agent/red-team/multi-perspective-red-team-v0-5-final-redteam-20260527191826-26932-48444041.md</a></td><td>qa</td><td>29a3380a86ef3278</td></tr><tr><td><a class='file-link' href='agent-memory/pi-agent/red-team/multi-perspective-red-team-v0-5-final-redteam-20260601114428-46544-1892e18b.md'>agent-memory/pi-agent/red-team/multi-perspective-red-team-v0-5-final-redteam-20260601114428-46544-1892e18b.md</a></td><td>qa</td><td>68c60511c7ab5b2a</td></tr><tr><td><a class='file-link' href='agent-memory/pi-agent/red-team/multi-perspective-red-team-v0-5-final-redteam-20260615182353-21644-9208b830.md'>agent-memory/pi-agent/red-team/multi-perspective-red-team-v0-5-final-redteam-20260615182353-21644-9208b830.md</a></td><td>qa</td><td>2b952ae362d830b3</td></tr><tr><td><a class='file-link' href='agent-memory/pi-agent/red-team/multi-perspective-red-team-v0-5-final-redteam-20260615202645-4976-af217c1a.md'>agent-memory/pi-agent/red-team/multi-perspective-red-team-v0-5-final-redteam-20260615202645-4976-af217c1a.md</a></td><td>qa</td><td>70c38ca1ef8ae52f</td></tr><tr><td><a class='file-link' href='agent-memory/pi-agent/red-team/multi-perspective-red-team-v0-5-final-redteam-20260618124159-45020-5ec83a9c.md'>agent-memory/pi-agent/red-team/multi-perspective-red-team-v0-5-final-redteam-20260618124159-45020-5ec83a9c.md</a></td><td>qa</td><td>60c0a104bd7a3a28</td></tr><tr><td><a class='file-link' href='agent-memory/pi-agent/red-team/multi-perspective-red-team-v0-5-final-redteam-20260618124238-45764-175c918f.md'>agent-memory/pi-agent/red-team/multi-perspective-red-team-v0-5-final-redteam-20260618124238-45764-175c918f.md</a></td><td>qa</td><td>93b68f5d8508969c</td></tr><tr><td><a class='file-link' href='agent-memory/pi-agent/red-team/multi-perspective-red-team-v0-5-final-redteam-20260618124312-48992-b62a825e.md'>agent-memory/pi-agent/red-team/multi-perspective-red-team-v0-5-final-redteam-20260618124312-48992-b62a825e.md</a></td><td>qa</td><td>05391ea2b2e7aac4</td></tr><tr><td><a class='file-link' href='agent-memory/pi-agent/red-team/multi-perspective-red-team-v0-5-final-redteam-20260618124555-7228-9757e6f0.md'>agent-memory/pi-agent/red-team/multi-perspective-red-team-v0-5-final-redteam-20260618124555-7228-9757e6f0.md</a></td><td>qa</td><td>92940aa225962276</td></tr><tr><td><a class='file-link' href='agent-memory/pi-agent/red-team/multi-perspective-red-team-v0-5-final-redteam-20260618131340-57980-fb4fecec.md'>agent-memory/pi-agent/red-team/multi-perspective-red-team-v0-5-final-redteam-20260618131340-57980-fb4fecec.md</a></td><td>qa</td><td>9e8ccf579b25e530</td></tr><tr><td><a class='file-link' href='agent-memory/pi-agent/red-team/multi-perspective-red-team-v0-5-final-redteam-20260618131428-31236-c3812307.md'>agent-memory/pi-agent/red-team/multi-perspective-red-team-v0-5-final-redteam-20260618131428-31236-c3812307.md</a></td><td>qa</td><td>30e33cabb1ff1265</td></tr><tr><td><a class='file-link' href='agent-memory/pi-agent/red-team/multi-perspective-red-team-v0-5-final-redteam-20260618131551-44460-1ce99787.md'>agent-memory/pi-agent/red-team/multi-perspective-red-team-v0-5-final-redteam-20260618131551-44460-1ce99787.md</a></td><td>qa</td><td>c6a7766468129ac9</td></tr><tr><td><a class='file-link' href='agent-memory/pi-agent/red-team/pi-redteam-evaluation-20260516105511-40152-35dbdf99.md'>agent-memory/pi-agent/red-team/pi-redteam-evaluation-20260516105511-40152-35dbdf99.md</a></td><td>qa</td><td>fa0e15c1ee44e451</td></tr><tr><td><a class='file-link' href='agent-memory/pi-agent/red-team/pi-redteam-evaluation-20260516132641-39528-a85541aa.md'>agent-memory/pi-agent/red-team/pi-redteam-evaluation-20260516132641-39528-a85541aa.md</a></td><td>qa</td><td>c3c631f2cf915849</td></tr><tr><td><a class='file-link' href='agent-memory/pi-agent/red-team/pi-redteam-evaluation-20260516133409-54600-b276791e.md'>agent-memory/pi-agent/red-team/pi-redteam-evaluation-20260516133409-54600-b276791e.md</a></td><td>qa</td><td>d4b4b5bafd625cb7</td></tr><tr><td><a class='file-link' href='agent-memory/pi-agent/reports/pi-intelligence-20260516105510-21912-e98369c6.md'>agent-memory/pi-agent/reports/pi-intelligence-20260516105510-21912-e98369c6.md</a></td><td>qa</td><td>1464c196a21bfcaa</td></tr></tbody></table></div></section></main>
+</body>
+</html>
