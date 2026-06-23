@@ -1,7 +1,7 @@
 ---
 title: "Global Agent Memory Kit Instructions"
 date: "2026-05-13"
-version: "0.4.0"
+version: "0.5.0"
 status: "active"
 type: "global-kit-instructions"
 ---
