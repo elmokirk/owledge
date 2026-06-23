@@ -113,6 +113,9 @@ def run(project_root: pathlib.Path, scale_files: list[int], seed: int) -> dict:
                     "worker",
                     2400,
                     objective="Measure scoped context behavior",
+                    tenant_id="owledge",
+                    customer_id="global",
+                    project_id="owledge",
                 ).items()
                 if key in {"estimated_tokens", "included_sources", "dropped_sources", "raw_chars_available"}
             },
