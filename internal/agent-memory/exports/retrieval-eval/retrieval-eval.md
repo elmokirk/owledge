@@ -28,7 +28,7 @@
 - MRR: 1.0
 - nDCG@5: 1.0
 - Project coverage: 1.0
-- Latency: 0.482 ms
+- Latency: 0.65 ms
 - Top hits:
   - `mem:fixture:demo:retrieval-fixture:canonical:memory-lifecycle-policy` (retrieval-fixture, score=88.522754)
   - `mem:shared:shared:retrieval-reference:lesson:privacy-export-gate` (retrieval-reference, score=70.659981)
@@ -44,7 +44,7 @@
 - MRR: 1.0
 - nDCG@5: 1.0
 - Project coverage: 1.0
-- Latency: 0.411 ms
+- Latency: 0.489 ms
 - Top hits:
   - `mem:fixture:demo:retrieval-fixture:compiled:context-pack-scoring` (retrieval-fixture, score=226.186217)
   - `mem:tenant-fixture:customer-fixture:retrieval-fixture:canonical:context-pack-objective` (retrieval-fixture, score=154.471258)
@@ -60,7 +60,7 @@
 - MRR: 1.0
 - nDCG@5: 1.0
 - Project coverage: 1.0
-- Latency: 0.394 ms
+- Latency: 0.491 ms
 - Top hits:
   - `mem:fixture:demo:retrieval-fixture:pattern:progressive-disclosure-runtime` (retrieval-fixture, score=207.845825)
   - `mem:fixture:demo:retrieval-fixture:canonical:memory-lifecycle-policy` (retrieval-fixture, score=33.015527)
@@ -76,7 +76,7 @@
 - MRR: 1.0
 - nDCG@5: 1.0
 - Project coverage: 1.0
-- Latency: 0.387 ms
+- Latency: 0.473 ms
 - Top hits:
   - `mem:fixture:demo:retrieval-reference:adr:markdown-source-of-truth` (retrieval-reference, score=173.709225)
   - `mem:fixture:demo:retrieval-fixture:pattern:progressive-disclosure-runtime` (retrieval-fixture, score=41.62425)
@@ -92,7 +92,7 @@
 - MRR: 1.0
 - nDCG@5: 0.9829
 - Project coverage: 1.0
-- Latency: 0.486 ms
+- Latency: 0.434 ms
 - Top hits:
   - `mem:shared:shared:retrieval-reference:lesson:privacy-export-gate` (retrieval-reference, score=228.844825)
   - `mem:tenant-fixture:customer-fixture:retrieval-fixture:lesson:runtime-rag-safety` (retrieval-fixture, score=76.665325)
@@ -108,7 +108,7 @@
 - MRR: 1.0
 - nDCG@5: 0.9829
 - Project coverage: 1.0
-- Latency: 0.409 ms
+- Latency: 0.433 ms
 - Top hits:
   - `mem:tenant-fixture:customer-fixture:retrieval-fixture:compiled:promotion-audit` (retrieval-fixture, score=322.897575)
   - `mem:fixture:demo:retrieval-fixture:canonical:memory-lifecycle-policy` (retrieval-fixture, score=44.496375)
@@ -124,7 +124,7 @@
 - MRR: 1.0
 - nDCG@5: 1.0
 - Project coverage: 1.0
-- Latency: 0.387 ms
+- Latency: 0.413 ms
 - Top hits:
   - `mem:tenant-fixture:customer-fixture:retrieval-fixture:canonical:stale-research-signal` (retrieval-fixture, score=91.7378)
   - `mem:fixture:demo:retrieval-reference:compiled:stale-conflict-review` (retrieval-reference, score=54.0)
@@ -140,7 +140,7 @@
 - MRR: 1.0
 - nDCG@5: 0.9558
 - Project coverage: 1.0
-- Latency: 0.396 ms
+- Latency: 0.418 ms
 - Top hits:
   - `mem:tenant-fixture:customer-fixture:retrieval-fixture:pattern:cross-project-parallel` (retrieval-fixture, score=253.877229)
   - `mem:fixture:demo:retrieval-reference:adr:markdown-source-of-truth` (retrieval-reference, score=52.773854)
@@ -156,7 +156,7 @@
 - MRR: 1.0
 - nDCG@5: 1.0
 - Project coverage: 1.0
-- Latency: 0.383 ms
+- Latency: 0.5 ms
 - Top hits:
   - `mem:fixture:demo:retrieval-fixture:pattern:progressive-disclosure-runtime` (retrieval-fixture, score=191.113037)
   - `mem:fixture:demo:retrieval-reference:adr:markdown-source-of-truth` (retrieval-reference, score=29.820267)
@@ -172,7 +172,7 @@
 - MRR: 1.0
 - nDCG@5: 1.0
 - Project coverage: 1.0
-- Latency: 0.394 ms
+- Latency: 0.48 ms
 - Top hits:
   - `mem:tenant-fixture:customer-fixture:retrieval-fixture:canonical:stale-research-signal` (retrieval-fixture, score=225.029877)
   - `mem:fixture:demo:retrieval-reference:compiled:stale-conflict-review` (retrieval-reference, score=40.076538)
@@ -188,7 +188,7 @@
 - MRR: 1.0
 - nDCG@5: 0.8529
 - Project coverage: 1.0
-- Latency: 0.372 ms
+- Latency: 0.474 ms
 - Top hits:
   - `mem:fixture:demo:retrieval-reference:adr:markdown-source-of-truth` (retrieval-reference, score=78.5565)
   - `mem:tenant-fixture:customer-fixture:retrieval-fixture:compiled:promotion-audit` (retrieval-fixture, score=23.954883)
@@ -204,7 +204,7 @@
 - MRR: 1.0
 - nDCG@5: 1.0
 - Project coverage: 1.0
-- Latency: 0.38 ms
+- Latency: 0.541 ms
 - Top hits:
   - `mem:tenant-fixture:customer-fixture:retrieval-fixture:lesson:runtime-rag-safety` (retrieval-fixture, score=210.390775)
   - `mem:shared:shared:retrieval-reference:lesson:privacy-export-gate` (retrieval-reference, score=99.7395)
@@ -220,7 +220,7 @@
 - MRR: 1.0
 - nDCG@5: 0.9829
 - Project coverage: 1.0
-- Latency: 0.369 ms
+- Latency: 0.439 ms
 - Top hits:
   - `mem:fixture:demo:retrieval-fixture:compiled:context-pack-scoring` (retrieval-fixture, score=147.910125)
   - `mem:tenant-fixture:customer-fixture:retrieval-fixture:canonical:context-pack-objective` (retrieval-fixture, score=85.925125)
@@ -236,7 +236,7 @@
 - MRR: 1.0
 - nDCG@5: 0.9675
 - Project coverage: 1.0
-- Latency: 0.436 ms
+- Latency: 0.485 ms
 - Top hits:
   - `mem:shared:shared:retrieval-reference:lesson:privacy-export-gate` (retrieval-reference, score=32.250688)
   - `mem:tenant-fixture:customer-fixture:retrieval-fixture:compiled:promotion-audit` (retrieval-fixture, score=23.600521)
@@ -252,7 +252,7 @@
 - MRR: 0.0
 - nDCG@5: 0.0
 - Project coverage: 1.0
-- Latency: 0.435 ms
+- Latency: 0.511 ms
 - Top hits:
   - `mem:fixture:demo:retrieval-fixture:compiled:context-pack-scoring` (retrieval-fixture, score=5.651144)
   - `mem:tenant-fixture:customer-fixture:retrieval-fixture:lesson:runtime-rag-safety` (retrieval-fixture, score=4.520915)
@@ -266,7 +266,7 @@
 - MRR: 1.0
 - nDCG@5: 0.9047
 - Project coverage: 1.0
-- Latency: 0.397 ms
+- Latency: 0.498 ms
 - Top hits:
   - `mem:fixture:demo:retrieval-reference:adr:markdown-source-of-truth` (retrieval-reference, score=19.950996)
   - `mem:fixture:demo:retrieval-fixture:pattern:progressive-disclosure-runtime` (retrieval-fixture, score=12.421327)
@@ -282,7 +282,7 @@
 - MRR: 1.0
 - nDCG@5: 0.9829
 - Project coverage: 1.0
-- Latency: 0.557 ms
+- Latency: 0.437 ms
 - Top hits:
   - `mem:fixture:demo:retrieval-reference:adr:markdown-source-of-truth` (retrieval-reference, score=22.358388)
   - `mem:fixture:demo:retrieval-fixture:canonical:memory-lifecycle-policy` (retrieval-fixture, score=9.336673)

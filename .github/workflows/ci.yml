@@ -72,4 +72,4 @@ jobs:
         run: |
           python -m pip install --quiet build
           python -m build --sdist
-          python -c "import tarfile,glob,pathlib; t=tarfile.open(glob.glob('dist/*.tar.gz')[0]); names=t.getnames(); ver=pathlib.Path('VERSION').read_text().strip(); prefix=f'owledge-{ver}/internal/'; bad=[n for n in names if n.startswith(prefix) or ('agent-memory/decision-trace/' in n and 'addons/' not in n)]; assert not bad, f'Leaked: {bad}'"
+          python tools/agent_memory_cli.py --project-root . sdist-clean

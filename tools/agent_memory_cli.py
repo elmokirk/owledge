@@ -5364,6 +5364,87 @@ def source_vs_target_audit(root: pathlib.Path) -> dict[str, Any]:
     }
 
 
+def sdist_clean_check(root: pathlib.Path, sdist_glob: str = "dist/owledge-*.tar.gz") -> dict[str, Any]:
+    """Assert the built PyPI sdist is clean and complete.
+
+    Verifies, against the most recent sdist under ``root``:
+    1. No ``internal/`` paths leak into the published source distribution.
+    2. No non-addon ``agent-memory/decision-trace/`` dogfood leaks (addons/
+       may ship their own decision-trace fixtures, so those are allowed).
+    3. Required root release docs are present (CHANGELOG, CONTRIBUTING, README,
+       LICENSE, SECURITY, PRIVACY, VERSION).
+    4. Core product trees are present (templates/, skills/, tools/, addons/).
+    """
+    import tarfile as _tarfile
+    import glob as _glob
+
+    dist_dir = root / "dist"
+    if not dist_dir.is_dir():
+        return {"passed": False, "reason": "dist/ not found; run python -m build first", "project": str(root)}
+
+    matches = sorted(_glob.glob(str(root / sdist_glob)))
+    if not matches:
+        return {"passed": False, "reason": f"no sdist matching {sdist_glob} under dist/", "project": str(root)}
+    sdist_path = pathlib.Path(matches[-1])
+    try:
+        version = (root / "VERSION").read_text(encoding="utf-8", errors="replace").strip()
+    except OSError:
+        version = ""
+
+    with _tarfile.open(sdist_path) as tar:
+        names = tar.getnames()
+
+    prefix = f"owledge-{version}/" if version else None
+    internal_prefix = (prefix or "owledge-") + "internal/"
+    leaked_internal = [n for n in names if n.startswith(internal_prefix)]
+    leaked_decision_trace = [
+        n for n in names
+        if "/agent-memory/decision-trace/" in n and "/addons/" not in n and "/tools/decision-trace/" not in n
+    ]
+
+    required_root_files = [
+        "CHANGELOG.md",
+        "CONTRIBUTING.md",
+        "README.md",
+        "LICENSE",
+        "SECURITY.md",
+        "PRIVACY.md",
+        "VERSION",
+    ]
+    missing_root: list[str] = []
+    for rel in required_root_files:
+        candidates = [prefix + rel] if prefix else [rel]
+        candidates += [n for n in names if n.endswith("/" + rel) and "/internal/" not in n]
+        if not any(c in names for c in candidates):
+            missing_root.append(rel)
+
+    required_trees = ["templates/", "skills/", "tools/", "addons/"]
+    missing_trees: list[str] = []
+    for tree in required_trees:
+        tree_prefix = (prefix or "") + tree
+        if not any(n.startswith(tree_prefix) for n in names):
+            missing_trees.append(tree)
+
+    violations: list[str] = []
+    violations += [f"internal leak: {n}" for n in sorted(leaked_internal)]
+    violations += [f"decision-trace leak: {n}" for n in sorted(leaked_decision_trace)]
+    violations += [f"missing root file: {rel}" for rel in missing_root]
+    violations += [f"missing tree: {tree}" for tree in missing_trees]
+
+    return {
+        "passed": not violations,
+        "sdist": str(sdist_path),
+        "version": version,
+        "files_checked": len(names),
+        "violations": sorted(violations),
+        "leaked_internal": sorted(leaked_internal),
+        "leaked_decision_trace": sorted(leaked_decision_trace),
+        "missing_root_files": missing_root,
+        "missing_trees": missing_trees,
+        "project": str(root),
+    }
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Agent Memory Kit control plane and harness")
     parser.add_argument("--project-root", default=os.getcwd())
@@ -5469,6 +5550,8 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("kit-integrity")
     sub.add_parser("addon-boundary-check")
     sub.add_parser("source-vs-target-audit")
+    sdist_p = sub.add_parser("sdist-clean")
+    sdist_p.add_argument("--sdist-glob", default="dist/owledge-*.tar.gz")
 
     args = parser.parse_args(argv)
     root = resolve_root(args.project_root)
@@ -5648,6 +5731,10 @@ def main(argv: list[str] | None = None) -> int:
             return 0 if result["passed"] else 1
         elif args.command == "source-vs-target-audit":
             result = source_vs_target_audit(root)
+            print(json.dumps(result, indent=2, sort_keys=True))
+            return 0 if result["passed"] else 1
+        elif args.command == "sdist-clean":
+            result = sdist_clean_check(root, sdist_glob=args.sdist_glob)
             print(json.dumps(result, indent=2, sort_keys=True))
             return 0 if result["passed"] else 1
         return 0

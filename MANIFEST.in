@@ -1,5 +1,7 @@
 include AGENTS.template.md
+include CHANGELOG.md
 include CLAUDE.template.md
+include CONTRIBUTING.md
 include DESIGN.md
 include LICENSE
 include PRIVACY.md

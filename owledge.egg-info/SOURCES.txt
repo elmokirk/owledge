@@ -1,5 +1,7 @@
 AGENTS.template.md
+CHANGELOG.md
 CLAUDE.template.md
+CONTRIBUTING.md
 DESIGN.md
 LICENSE
 MANIFEST.in
