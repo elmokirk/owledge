@@ -2,6 +2,7 @@
 .agent-control/logs/
 .agent-control/secrets/
 .agent-control/tmp/
+internal/.agent-control/
 USER_CONTEXT.md
 global-memory/**/*.md
 global-memory/indexes/*.jsonl
@@ -38,9 +39,9 @@ agent-memory/exports/lightrag/*/
 agent-memory/exports/graphrag/*.json
 agent-memory/exports/graphrag/*.jsonl
 agent-memory/exports/graphrag/*/
-agent-memory/exports/retrieval-eval/
-agent-memory/exports/finalization-gates/
-agent-memory/exports/compliance/
+agent-memory/exports/retrieval-eval/*/
+agent-memory/exports/finalization-gates/*/
+agent-memory/exports/compliance/*/
 agent-memory/pi-agent/reports/*.md
 agent-memory/pi-agent/red-team/*.md
 agent-memory/pi-agent/evaluations/*.md
@@ -66,3 +67,39 @@ benchmarks/results/token-efficiency.md
 examples/demo-vault/agent-memory-module/
 .agent-control/tmp/enterprise-context-benchmark/
 agent-memory/cross-project-hub/cross-project-map.json
+
+# internal/ dogfood workspace — mirrors the agent-memory/ patterns above.
+# The refactor moved dogfood from root agent-memory/ to internal/agent-memory/,
+# but the root patterns above only match root-level paths, not internal/ paths.
+# These mirrored patterns keep generated dogfood artifacts out of git while
+# preserving the "latest" snapshot files as tracked dogfood evidence.
+internal/agent-memory/tmp/
+internal/agent-memory/scratch/
+internal/agent-memory/reports/html/
+internal/agent-memory/reports/project-site/
+internal/agent-memory/reports/pilot-benchmark/
+internal/agent-memory/reports/enterprise-context-benchmark/
+internal/agent-memory/reports/decision-trace/
+internal/agent-memory/reports/poweruser-positioning/
+internal/agent-memory/decision-trace/trace.json
+internal/agent-memory/project-snapshot/project-snapshot-manifest.json
+internal/agent-memory/indexes/*.jsonl
+internal/agent-memory/indexes/*.json
+internal/agent-memory/pi-agent/indexes/*.jsonl
+internal/agent-memory/pi-agent/indexes/*.json
+internal/agent-memory/exports/rag/shared-*/
+internal/agent-memory/exports/lightrag/shared-*/
+internal/agent-memory/exports/graphrag/shared-*/
+internal/agent-memory/exports/retrieval-eval/*/
+internal/agent-memory/exports/finalization-gates/*/
+internal/agent-memory/exports/compliance/*/
+internal/agent-memory/pi-agent/reports/*.md
+internal/agent-memory/pi-agent/red-team/*.md
+internal/agent-memory/pi-agent/evaluations/*.md
+internal/agent-memory/pi-agent/scorecards/*.md
+internal/agent-memory/sessions/**/events.jsonl
+internal/agent-memory/sessions/**/session.md
+internal/agent-memory/sessions/**/summary.md
+internal/agent-memory/sessions/**/.session.lock
+
+dist/

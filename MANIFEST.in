@@ -10,7 +10,7 @@ include SECURITY.md
 include USER_CONTEXT.template.md
 include VERSION
 recursive-include addons *
-recursive-include agent-memory *
+recursive-include templates *
 recursive-include assets *
 recursive-include benchmarks *
 recursive-include docs *
@@ -20,6 +20,7 @@ recursive-include skills *
 recursive-include tools *
 recursive-exclude .agent-control *
 recursive-exclude .git *
+recursive-exclude internal *
 recursive-exclude global-memory *
 global-exclude __pycache__
 global-exclude *.py[cod]

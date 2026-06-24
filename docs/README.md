@@ -65,6 +65,16 @@ Start with the path that matches your setup.
 - [cross-platform-lean-setup.md](cross-platform-lean-setup.md)
 - [agent-first-run-setup.md](agent-first-run-setup.md)
 
+## Integration And Setup Guides
+
+- [agents-md-integration-block.md](agents-md-integration-block.md) — copy-paste Owledge rules into an existing AGENTS.md or CLAUDE.md
+- [pi-agent-setup.md](pi-agent-setup.md) — how to set up and run the PI Agent (deterministic mode, no auth needed)
+
+## Feedback And Roadmap
+
+- [feedback-round-2026-06.md](feedback-round-2026-06.md) — structured feedback triage with tickets FB-001 through FB-017 (including Round 2 feature ideas FB-013 through FB-017)
+- [roadmap-ideas-2026-06.md](roadmap-ideas-2026-06.md) — idea log from the 2026-06 feedback round with 16 idea cards (including Round 2 feature ideas)
+
 ## Maintainer And Historical Docs
 
 - [archive/README.md](archive/README.md)

@@ -1,0 +1,113 @@
+﻿{
+  "checks": [
+    {
+      "details": "Doctor mode: kit (detected: host).",
+      "fix": "",
+      "name": "doctor-mode",
+      "passed": true,
+      "severity": "info"
+    },
+    {
+      "details": "PROJECT_CONTEXT.template.md is present.",
+      "fix": "Restore the kit templates.",
+      "name": "kit-template-project-context",
+      "passed": true,
+      "severity": "error"
+    },
+    {
+      "details": "AGENTS.template.md is present.",
+      "fix": "Restore the kit templates.",
+      "name": "kit-template-agents",
+      "passed": true,
+      "severity": "error"
+    },
+    {
+      "details": "CLAUDE.template.md is present.",
+      "fix": "Restore the kit templates.",
+      "name": "kit-template-claude",
+      "passed": true,
+      "severity": "error"
+    },
+    {
+      "details": "Kit CLI exists.",
+      "fix": "Restore tools/agent_memory_cli.py.",
+      "name": "kit-tools",
+      "passed": true,
+      "severity": "error"
+    },
+    {
+      "details": "agent-memory directory is present.",
+      "fix": "Run init-agent-memory for this repo.",
+      "name": "agent-memory-dir",
+      "passed": true,
+      "severity": "error"
+    },
+    {
+      "details": "DESIGN.md is present.",
+      "fix": "Copy DESIGN.md from the kit if visual reports are used.",
+      "name": "design-md",
+      "passed": true,
+      "severity": "warning"
+    },
+    {
+      "details": "Local CLI exists.",
+      "fix": "Copy tools/agent_memory_cli.py into the project or run from an Owledge repo checkout when local tooling is missing.",
+      "name": "cli-local",
+      "passed": true,
+      "severity": "warning"
+    },
+    {
+      "details": "Raw runtime event logs are ignored by git.",
+      "fix": "Add agent-memory/sessions/**/events.jsonl to .gitignore for privacy.",
+      "name": "raw-events-ignored",
+      "passed": true,
+      "severity": "warning"
+    },
+    {
+      "details": "Memory validation: 0 failed of 100.",
+      "fix": "Run python tools/agent_memory_cli.py --project-root . validate-memory --strict and fix reported frontmatter/edge issues.",
+      "name": "memory-validation",
+      "passed": true,
+      "severity": "error"
+    },
+    {
+      "details": "README version badge matches VERSION (0.5.0).",
+      "fix": "Align README version badge and VERSION.",
+      "name": "version-consistency",
+      "passed": true,
+      "severity": "warning"
+    },
+    {
+      "details": "Runtime hook error log entries: 0.",
+      "fix": "Inspect .agent-control/logs/plugin-errors.jsonl and fix plugin install issues.",
+      "name": "runtime-hook-errors",
+      "passed": true,
+      "severity": "warning"
+    },
+    {
+      "details": "Oversized runtime event logs: 0.",
+      "fix": "Close sessions, compact summaries, or rotate private runtime logs.",
+      "name": "runtime-session-log-size",
+      "passed": true,
+      "severity": "warning"
+    },
+    {
+      "details": "Private raw event logs found: 0.",
+      "fix": "Keep raw events private; compact and redact before sharing.",
+      "name": "private-session-events",
+      "passed": true,
+      "severity": "info"
+    },
+    {
+      "details": "Unsafe shared records: 0.",
+      "fix": "Approve review and sanitization before shared export.",
+      "name": "shared-export-safe",
+      "passed": true,
+      "severity": "error"
+    }
+  ],
+  "passed": true,
+  "project": "C:\\Users\\Kirk\\Documents\\Playground\\agent-memory-standalone",
+  "score": 100,
+  "unsafe_shared_records": []
+}

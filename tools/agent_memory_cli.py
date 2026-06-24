@@ -228,7 +228,6 @@ REQUIRED_FILES = [
     "agent-memory/templates/personal-pattern-template.md",
     "agent-memory/templates/coach-report-template.md",
     "agent-memory/templates/onboarding-profile-template.md",
-    "agent-memory/ideas/pi-agent-global-intelligence.md",
     "agent-memory/templates/pi-intelligence-report-template.md",
     "agent-memory/templates/pi-parallel-report-template.md",
     "agent-memory/templates/pi-recurring-error-template.md",
@@ -823,6 +822,8 @@ def run_review_workflow(
     now = utc_now()
 
     template_path = root / "agent-memory" / "templates" / str(config["template"])
+    if not template_path.exists():
+        template_path = root / "templates" / "agent-memory" / "templates" / str(config["template"])
     if not template_path.exists():
         raise FileNotFoundError(f"Missing review workflow template: {template_path}")
 
@@ -2130,24 +2131,28 @@ def memory_doctor(root: pathlib.Path, mode: str = "auto") -> dict[str, Any]:
     def add(name: str, passed: bool, severity: str, details: str, fix: str = "") -> None:
         checks.append({"name": name, "passed": bool(passed), "severity": severity, "details": details, "fix": fix})
 
-    is_kit = (root / "PROJECT_CONTEXT.template.md").exists() and (root / "tools" / "agent_memory_cli.py").exists() and (root / "agent-memory" / "templates").is_dir()
+    is_kit = (root / "PROJECT_CONTEXT.template.md").exists() and (root / "tools" / "agent_memory_cli.py").exists() and (
+        (root / "agent-memory" / "templates").is_dir() or (root / "templates" / "agent-memory" / "templates").is_dir()
+    )
     detected_mode = "kit" if is_kit and not (root / "PROJECT_CONTEXT.md").exists() else "host"
     effective_mode = detected_mode if mode == "auto" else mode
     add("doctor-mode", True, "info", f"Doctor mode: {effective_mode} (detected: {detected_mode}).")
     if effective_mode == "kit":
+        am_base = root / "templates" / "agent-memory"
         add("kit-template-project-context", (root / "PROJECT_CONTEXT.template.md").exists(), "error", "PROJECT_CONTEXT.template.md is present.", "Restore the kit templates.")
         add("kit-template-agents", (root / "AGENTS.template.md").exists(), "error", "AGENTS.template.md is present.", "Restore the kit templates.")
         add("kit-template-claude", (root / "CLAUDE.template.md").exists(), "error", "CLAUDE.template.md is present.", "Restore the kit templates.")
         add("kit-tools", (root / "tools" / "agent_memory_cli.py").exists(), "error", "Kit CLI exists.", "Restore tools/agent_memory_cli.py.")
     else:
+        am_base = root / "agent-memory"
         add("project-context", (root / "PROJECT_CONTEXT.md").exists(), "error", "PROJECT_CONTEXT.md is present.", "Run init-agent-memory or copy PROJECT_CONTEXT.template.md.")
         add("agents-md", (root / "AGENTS.md").exists(), "error", "AGENTS.md is present.", "Run bootstrap-agent-memory for this repo.")
         add("claude-md", (root / "CLAUDE.md").exists(), "warning", "CLAUDE.md is present.", "Copy CLAUDE.template.md if Claude/Cowork is used.")
-    add("agent-memory-dir", (root / "agent-memory").is_dir(), "error", "agent-memory directory is present.", "Run init-agent-memory for this repo.")
+    add("agent-memory-dir", am_base.is_dir(), "error", "agent-memory directory is present.", "Run init-agent-memory for this repo." if effective_mode == "host" else "Restore templates/agent-memory/ from the kit source.")
     add("design-md", (root / "DESIGN.md").exists(), "warning", "DESIGN.md is present.", "Copy DESIGN.md from the kit if visual reports are used.")
     add("cli-local", (root / "tools" / "agent_memory_cli.py").exists(), "warning", "Local CLI exists.", "Copy tools/agent_memory_cli.py into the project or run from an Owledge repo checkout when local tooling is missing.")
     add("raw-events-ignored", bool(_gitignore_contains(root, "agent-memory/sessions/**/events.jsonl")), "warning", "Raw runtime event logs are ignored by git.", "Add agent-memory/sessions/**/events.jsonl to .gitignore for privacy.")
-    validation = validate_memory(root)
+    validation = validate_memory(am_base.parent if effective_mode == "kit" else root)
     add("memory-validation", bool(validation["passed"]), "error", f"Memory validation: {validation['failedChecks']} failed of {validation['totalChecks']}.", "Run python tools/agent_memory_cli.py --project-root . validate-memory --strict and fix reported frontmatter/edge issues.")
     version_file = root / "VERSION"
     readme = root / "README.md"
@@ -2161,12 +2166,12 @@ def memory_doctor(root: pathlib.Path, mode: str = "auto") -> dict[str, Any]:
     if hook_error_log.exists():
         hook_error_count = sum(1 for line in hook_error_log.read_text(encoding="utf-8", errors="replace").splitlines() if line.strip())
     add("runtime-hook-errors", hook_error_count == 0, "warning", f"Runtime hook error log entries: {hook_error_count}.", "Inspect .agent-control/logs/plugin-errors.jsonl and fix plugin install issues.")
-    session_events = list((root / "agent-memory" / "sessions").glob("**/events.jsonl")) if (root / "agent-memory" / "sessions").exists() else []
+    session_events = list((am_base / "sessions").glob("**/events.jsonl")) if (am_base / "sessions").exists() else []
     oversized_sessions = [path for path in session_events if path.stat().st_size > 5_000_000]
     add("runtime-session-log-size", not oversized_sessions, "warning", f"Oversized runtime event logs: {len(oversized_sessions)}.", "Close sessions, compact summaries, or rotate private runtime logs.")
     add("private-session-events", not session_events, "info", f"Private raw event logs found: {len(session_events)}.", "Keep raw events private; compact and redact before sharing.")
     shared_unsafe = []
-    for record in load_memory_records(root, include_sessions=False):
+    for record in load_memory_records(am_base.parent if effective_mode == "kit" else root, include_sessions=False):
         meta = record["metadata"]
         if meta.get("visibility") == "shared" and (
             meta.get("review_status") != "approved"
@@ -5065,14 +5070,22 @@ def test_contracts(root: pathlib.Path) -> dict[str, Any]:
     def add(name: str, passed: bool, details: str = "") -> None:
         results.append({"name": name, "passed": passed, "details": details})
 
+    is_source_repo = (root / "templates" / "agent-memory").is_dir() and not (root / "agent-memory").is_dir()
+
+    def resolve_source(rel: str) -> pathlib.Path:
+        if is_source_repo and rel.startswith("agent-memory/"):
+            return root / "templates" / rel
+        return root / rel
+
     for rel in REQUIRED_DIRS:
-        add(f"dir:{rel}", (root / rel).is_dir(), "Required directory exists.")
+        add(f"dir:{rel}", resolve_source(rel).is_dir(), "Required directory exists.")
     for rel in REQUIRED_FILES:
-        add(f"file:{rel}", (root / rel).is_file(), "Required file exists.")
+        add(f"file:{rel}", resolve_source(rel).is_file(), "Required file exists.")
     if (root / "addons" / "compliance-light").exists():
         for rel in ADDON_REQUIRED_FILES:
-            add(f"file:{rel}", (root / rel).is_file(), "Optional add-on file exists.")
-    for schema in (root / "agent-memory" / "schemas").glob("*.json"):
+            add(f"file:{rel}", resolve_source(rel).is_file(), "Optional add-on file exists.")
+    schema_dir = resolve_source("agent-memory/schemas")
+    for schema in schema_dir.glob("*.json") if schema_dir.exists() else []:
         try:
             json.loads(schema.read_text(encoding="utf-8"))
             add(f"schema-json:{schema.name}", True, "Valid JSON.")
@@ -5215,6 +5228,142 @@ def run_evals(root: pathlib.Path) -> dict[str, Any]:
             return summary
 
 
+def kit_integrity_check(root: pathlib.Path) -> dict[str, Any]:
+    """Assert a built kit contains zero dogfood artifacts.
+
+    Uses a negative-list approach: a built kit's ``agent-memory/`` tree should
+    only contain files that also exist in ``templates/agent-memory/`` (the
+    pristine product source). Any file not in the template set is a dogfood
+    leak. If the templates tree is unavailable (e.g. running on a standalone
+    kit without the source repo), falls back to a pattern-based positive list
+    of known dogfood categories.
+    """
+    am_base = root / "agent-memory"
+    violations: list[str] = []
+    if not am_base.exists():
+        return {"passed": True, "violations": [], "checked_files": 0, "method": "no-agent-memory", "project": str(root)}
+
+    import fnmatch as _fn
+
+    kit_files: list[str] = []
+    for path in sorted(am_base.rglob("*"), key=lambda item: item.as_posix()):
+        if path.is_file():
+            kit_files.append(path.relative_to(am_base).as_posix())
+
+    source_templates = root / "templates" / "agent-memory"
+    if source_templates.is_dir():
+        template_files: set[str] = set()
+        for path in source_templates.rglob("*"):
+            if path.is_file():
+                template_files.add(path.relative_to(source_templates).as_posix())
+        violations = [f"agent-memory/{rel}" for rel in kit_files if rel not in template_files]
+        method = "negative-list (templates/agent-memory/ baseline)"
+        checked = len(kit_files)
+    else:
+        dogfood_globs = [
+            "decision-trace/*.md",
+            "decision-trace/*.json",
+            "compiled/project-*.md",
+            "indexes/memory-index*.jsonl",
+            "indexes/memory-index*.json",
+            "exports/**/*.json",
+            "exports/**/*.jsonl",
+            "cross-project-hub/*.json",
+            "project-snapshot/profile.md",
+            "project-snapshot/*.json",
+            "enterprise-context-benchmark/profile.md",
+            "ideas/pi-agent-global-intelligence.md",
+            "sessions/*/events.jsonl",
+            "sessions/*/session.md",
+            "sessions/*/summary.md",
+        ]
+        for rel in kit_files:
+            for pattern in dogfood_globs:
+                if _fn.fnmatch(rel, pattern):
+                    violations.append(f"agent-memory/{rel}")
+                    break
+        method = "positive-list (fallback: no templates/ available)"
+        checked = len(kit_files)
+
+    return {
+        "passed": not violations,
+        "violations": sorted(violations),
+        "checked_files": checked,
+        "method": method,
+        "project": str(root),
+    }
+
+
+def addon_boundary_check(root: pathlib.Path) -> dict[str, Any]:
+    """For every addons/*/addon.json, assert install files stay inside declared targets."""
+    addons_dir = root / "addons"
+    if not addons_dir.exists():
+        return {"passed": True, "addons_checked": 0, "violations": []}
+    violations: list[dict[str, str]] = []
+    checked = 0
+    for addon_path in sorted(addons_dir.glob("*/addon.json")):
+        addon_name = addon_path.parent.name
+        manifest = json.loads(addon_path.read_text(encoding="utf-8"))
+        allowed_prefixes: list[str] = []
+        for d in manifest.get("install_directories", []):
+            allowed_prefixes.append(str(d).replace("\\", "/").rstrip("/") + "/")
+        for item in manifest.get("install_files", []):
+            target = str(item["target"]).replace("\\", "/")
+            allowed_prefixes.append(target)
+        for item in manifest.get("install_if_parent_exists", []):
+            target = str(item["target"]).replace("\\", "/")
+            allowed_prefixes.append(target)
+        checked += 1
+        for item in manifest.get("install_files", []):
+            target = str(item["target"]).replace("\\", "/")
+            matched = any(target == p or target.startswith(p) for p in allowed_prefixes if p.endswith("/"))
+            if not matched and target not in allowed_prefixes:
+                violations.append({"addon": addon_name, "file": target, "reason": "outside declared targets"})
+    return {
+        "passed": not violations,
+        "addons_checked": checked,
+        "violations": violations,
+        "project": str(root),
+    }
+
+
+def source_vs_target_audit(root: pathlib.Path) -> dict[str, Any]:
+    """Assert templates/agent-memory/ has all core dirs from AGENT_DIRS and no extra dogfood."""
+    templates_am = root / "templates" / "agent-memory"
+    if not templates_am.exists():
+        return {"passed": False, "reason": "templates/agent-memory/ not found", "project": str(root)}
+    core_dirs = [
+        "canonical", "compiled", "patterns", "lessons", "ideas", "decisions",
+        "evidence", "evidence/promotions", "handoffs", "indexes",
+        "exports/rag", "exports/lightrag", "exports/graphrag", "sessions",
+        "pi-agent/reports", "pi-agent/parallels", "pi-agent/trends",
+        "pi-agent/recurring-errors", "pi-agent/concepts", "pi-agent/red-team",
+        "pi-agent/evaluations", "pi-agent/scorecards", "pi-agent/indexes",
+    ]
+    missing: list[str] = []
+    for d in core_dirs:
+        if not (templates_am / d).is_dir():
+            missing.append(d)
+    dogfood_dirs = ["decision-trace", "cross-project-hub", "project-snapshot", "enterprise-context-benchmark"]
+    leaked: list[str] = []
+    for d in dogfood_dirs:
+        if (templates_am / d).exists():
+            leaked.append(d)
+    has_schemas = (templates_am / "schemas").is_dir()
+    has_templates = (templates_am / "templates").is_dir()
+    has_readme = (templates_am / "README.md").is_file()
+    passed = not missing and not leaked and has_schemas and has_templates and has_readme
+    return {
+        "passed": passed,
+        "missing_core_dirs": missing,
+        "leaked_dogfood_dirs": leaked,
+        "has_schemas": has_schemas,
+        "has_templates": has_templates,
+        "has_readme": has_readme,
+        "project": str(root),
+    }
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Agent Memory Kit control plane and harness")
     parser.add_argument("--project-root", default=os.getcwd())
@@ -5317,6 +5466,9 @@ def main(argv: list[str] | None = None) -> int:
     review_p.add_argument("--tenant-id")
     review_p.add_argument("--customer-id")
     review_p.add_argument("--project-id")
+    sub.add_parser("kit-integrity")
+    sub.add_parser("addon-boundary-check")
+    sub.add_parser("source-vs-target-audit")
 
     args = parser.parse_args(argv)
     root = resolve_root(args.project_root)
@@ -5486,6 +5638,18 @@ def main(argv: list[str] | None = None) -> int:
                     sort_keys=True,
                 )
             )
+        elif args.command == "kit-integrity":
+            result = kit_integrity_check(root)
+            print(json.dumps(result, indent=2, sort_keys=True))
+            return 0 if result["passed"] else 1
+        elif args.command == "addon-boundary-check":
+            result = addon_boundary_check(root)
+            print(json.dumps(result, indent=2, sort_keys=True))
+            return 0 if result["passed"] else 1
+        elif args.command == "source-vs-target-audit":
+            result = source_vs_target_audit(root)
+            print(json.dumps(result, indent=2, sort_keys=True))
+            return 0 if result["passed"] else 1
         return 0
     except Exception as exc:
         print(json.dumps({"error": str(exc), "type": type(exc).__name__}, indent=2, sort_keys=True), file=sys.stderr)

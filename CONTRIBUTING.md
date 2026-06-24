@@ -16,7 +16,7 @@ Run:
 
 ```bash
 python tools/owledge.py test public-docs --project-root .
-python tools/owledge.py finalization-gates --project-root . --include-compliance
+python tools/owledge.py finalization-gates --project-root internal --include-compliance
 ```
 
 ## Pull Request Rules
@@ -30,3 +30,10 @@ python tools/owledge.py finalization-gates --project-root . --include-compliance
 ## Scope Discipline
 
 This repository is a local/project utility layer. Avoid turning it into a hosted platform, enterprise control plane, or mandatory migration framework without an explicit design decision.
+
+## Dogfooding vs. Product
+
+- `templates/agent-memory/` is the shipped source. Only commit schemas, templates, and `.gitkeep` here.
+- `internal/agent-memory/` is the maintainers' live workspace. Generated artifacts (indexes, exports, decision traces, compiled snapshots) go here.
+- Never commit generated files to `templates/`.
+- Run dogfood gates against `internal/`: `python tools/owledge.py finalization-gates --project-root internal --include-compliance --include-exports`

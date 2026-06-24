@@ -1,3 +1,28 @@
+Metadata-Version: 2.4
+Name: owledge
+Version: 0.6.0
+Summary: Markdown-first durable memory for AI agents, existing repos, and knowledgebases.
+Author: Owledge maintainers
+License: MIT
+Project-URL: Documentation, https://github.com/elmokirk/owledge/tree/main/docs
+Project-URL: Issues, https://github.com/elmokirk/owledge/issues
+Project-URL: Source, https://github.com/elmokirk/owledge
+Keywords: agent-memory,ai-agents,markdown,codex,claude-code,knowledge-base
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Console
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Software Development :: Documentation
+Classifier: Topic :: Text Processing :: Markup :: Markdown
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Dynamic: license-file
+
 # Owledge
 
 **Drop-in durable project memory for existing Markdown repos and Obsidian-style vaults: no migration, no vector DB, no wiki-link rewrite.**

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "owledge"
-version = "0.5.0"
+version = "0.6.0"
 description = "Markdown-first durable memory for AI agents, existing repos, and knowledgebases."
 readme = "README.md"
 requires-python = ">=3.10"

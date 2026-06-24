@@ -4,7 +4,9 @@
 from __future__ import annotations
 
 import argparse
+import datetime as _dt
 import fnmatch
+import hashlib
 import json
 import os
 import pathlib
@@ -254,7 +256,7 @@ def build(args: argparse.Namespace) -> dict[str, object]:
     for source_rel, target_rel in ROOT_FILES:
         copy_file(source / source_rel, target / target_rel)
 
-    copy_tree_filtered(source / "agent-memory", target / "agent-memory", AGENT_EXCLUDES)
+    copy_tree_filtered(source / "templates" / "agent-memory", target / "agent-memory")
     ensure_gitkeep(target / "agent-memory", AGENT_DIRS)
 
     if args.include_global_memory:
@@ -281,6 +283,23 @@ def build(args: argparse.Namespace) -> dict[str, object]:
         install_compliance(source, target)
 
     write_local_readme(target, args.include_plugin_adapter, hook_profile, args.include_compliance)
+
+    manifest_entries: list[dict[str, str]] = []
+    for path in sorted(target.rglob("*"), key=lambda item: item.as_posix()):
+        if not path.is_file() or "__pycache__" in path.parts:
+            continue
+        rel = path.relative_to(target).as_posix()
+        digest = hashlib.sha256()
+        with path.open("rb") as handle:
+            for chunk in iter(lambda: handle.read(65536), b""):
+                digest.update(chunk)
+        manifest_entries.append({"path": rel, "sha256": digest.hexdigest()})
+    manifest = {
+        "generated_at": _dt.datetime.now(_dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+        "source": "templates/agent-memory/",
+        "files": manifest_entries,
+    }
+    (target / "kit-manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
     result: dict[str, object] = {
         "output_path": str(target),
