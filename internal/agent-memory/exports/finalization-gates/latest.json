@@ -4,12 +4,12 @@
     {
       "name": "python-compile",
       "passed": true,
-      "seconds": 0.207
+      "seconds": 0.255
     },
     {
       "name": "public-docs",
       "passed": true,
-      "seconds": 0.013
+      "seconds": 0.016
     },
     {
       "name": "release-trust",
@@ -19,7 +19,7 @@
     {
       "name": "principles-skill",
       "passed": true,
-      "seconds": 0.001
+      "seconds": 0.002
     },
     {
       "name": "principles-only",
@@ -29,102 +29,102 @@
     {
       "name": "principles-scenarios",
       "passed": true,
-      "seconds": 1.564
+      "seconds": 1.438
     },
     {
       "name": "poweruser-simulations",
       "passed": true,
-      "seconds": 8.149
+      "seconds": 9.196
     },
     {
       "name": "contracts",
       "passed": true,
-      "seconds": 0.01
+      "seconds": 0.006
     },
     {
       "name": "core-platform-neutral",
       "passed": true,
-      "seconds": 0.161
+      "seconds": 0.172
     },
     {
       "name": "generated-kit-surface",
       "passed": true,
-      "seconds": 1.927
+      "seconds": 1.901
     },
     {
       "name": "doctor",
       "passed": true,
-      "seconds": 0.005
+      "seconds": 0.006
     },
     {
       "name": "validate",
       "passed": true,
-      "seconds": 0.044
+      "seconds": 0.05
     },
     {
       "name": "index-full",
       "passed": true,
-      "seconds": 0.028
+      "seconds": 0.035
     },
     {
       "name": "index-incremental",
       "passed": true,
-      "seconds": 0.031
+      "seconds": 0.033
     },
     {
       "name": "retention",
       "passed": true,
-      "seconds": 0.008
+      "seconds": 0.011
     },
     {
       "name": "conflicts",
       "passed": true,
-      "seconds": 0.026
+      "seconds": 0.029
     },
     {
       "name": "sensitive-scan",
       "passed": true,
-      "seconds": 0.038
+      "seconds": 0.055
     },
     {
       "name": "runtime-adapters",
       "passed": true,
-      "seconds": 1.36
+      "seconds": 1.582
     },
     {
       "name": "memory-evals",
       "passed": true,
-      "seconds": 3.027
+      "seconds": 4.987
     },
     {
       "name": "retrieval-fixture",
       "passed": true,
-      "seconds": 0.02
+      "seconds": 0.021
     },
     {
       "name": "kb-ingestion-safety",
       "passed": true,
-      "seconds": 0.102
+      "seconds": 0.115
     },
     {
       "name": "benchmark",
       "passed": true,
-      "seconds": 1.769
+      "seconds": 1.789
     },
     {
       "name": "quality-ratchet",
       "passed": true,
-      "seconds": 5.44
+      "seconds": 5.348
     },
     {
       "name": "kb-module",
       "passed": true,
-      "seconds": 0.135
+      "seconds": 0.139
     },
     {
       "name": "project-folder-kit",
       "passed": true,
-      "seconds": 0.521
+      "seconds": 0.561
     },
     {
       "name": "compliance-addon-source",
@@ -134,35 +134,35 @@
     {
       "name": "project-folder-kit-compliance",
       "passed": true,
-      "seconds": 0.761
+      "seconds": 0.727
     },
     {
       "name": "compliance-gates",
       "passed": true,
-      "seconds": 0.01
+      "seconds": 0.009
     },
     {
       "name": "export-rag-shared",
       "passed": true,
-      "seconds": 0.035
+      "seconds": 0.04
     },
     {
       "name": "export-lightrag-shared",
       "passed": true,
-      "seconds": 0.039
+      "seconds": 0.046
     },
     {
       "name": "export-graphrag-shared",
       "passed": true,
-      "seconds": 0.032
+      "seconds": 0.039
     },
     {
       "name": "report-shared",
       "passed": true,
-      "seconds": 0.027
+      "seconds": 0.034
     }
   ],
-  "generated_at": "2026-06-24T08:02:20Z",
+  "generated_at": "2026-06-24T08:37:43Z",
   "include_compliance": true,
   "include_exports": true,
   "passed": true,

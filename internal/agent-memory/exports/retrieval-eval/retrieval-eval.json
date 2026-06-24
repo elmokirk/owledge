@@ -1,6 +1,6 @@
 {
   "corpus": {
-    "build_ms": 7.42,
+    "build_ms": 7.127,
     "documents": 11,
     "include_sessions": false,
     "total_chars": 7524
@@ -49,7 +49,7 @@
       ]
     }
   ],
-  "generated_at": "2026-06-24T08:02:17Z",
+  "generated_at": "2026-06-24T08:37:39Z",
   "metrics": {
     "avg_mrr": 0.9412,
     "avg_ndcg_at_k": 0.9184,
@@ -58,7 +58,7 @@
     "avg_recall_at_k": 0.6364,
     "cross_project_parallel_candidates": 16,
     "overall_score": 93.53,
-    "p95_query_latency_ms": 0.652,
+    "p95_query_latency_ms": 0.557,
     "parallel_score": 100,
     "precision_score": 78.45,
     "raw_session_docs_in_corpus": 0,
@@ -241,7 +241,7 @@
           "visibility": "shared"
         }
       ],
-      "latency_ms": 0.474,
+      "latency_ms": 0.482,
       "mrr": 1.0,
       "name": "lifecycle-safety",
       "ndcg_at_k": 1.0,
@@ -417,7 +417,7 @@
           "visibility": "tenant"
         }
       ],
-      "latency_ms": 0.417,
+      "latency_ms": 0.411,
       "mrr": 1.0,
       "name": "context-objective-scoring",
       "ndcg_at_k": 1.0,
@@ -564,7 +564,7 @@
           "visibility": "shared"
         }
       ],
-      "latency_ms": 0.507,
+      "latency_ms": 0.394,
       "mrr": 1.0,
       "name": "runtime-procedural-memory",
       "ndcg_at_k": 1.0,
@@ -711,7 +711,7 @@
           "visibility": "shared"
         }
       ],
-      "latency_ms": 0.502,
+      "latency_ms": 0.387,
       "mrr": 1.0,
       "name": "markdown-source-of-truth",
       "ndcg_at_k": 1.0,
@@ -858,7 +858,7 @@
           "visibility": "tenant"
         }
       ],
-      "latency_ms": 0.408,
+      "latency_ms": 0.486,
       "mrr": 1.0,
       "name": "privacy-export-gate",
       "ndcg_at_k": 0.9828920819566879,
@@ -1017,7 +1017,7 @@
           "visibility": "shared"
         }
       ],
-      "latency_ms": 0.396,
+      "latency_ms": 0.409,
       "mrr": 1.0,
       "name": "promotion-audit",
       "ndcg_at_k": 0.9828920819566879,
@@ -1340,7 +1340,7 @@
           "visibility": "shared"
         }
       ],
-      "latency_ms": 0.403,
+      "latency_ms": 0.396,
       "mrr": 1.0,
       "name": "cross-project-parallels",
       "ndcg_at_k": 0.9558295932317544,
@@ -1487,7 +1487,7 @@
           "visibility": "tenant"
         }
       ],
-      "latency_ms": 0.556,
+      "latency_ms": 0.383,
       "mrr": 1.0,
       "name": "progressive-disclosure-skillset",
       "ndcg_at_k": 1.0,
@@ -1663,7 +1663,7 @@
           "visibility": "shared"
         }
       ],
-      "latency_ms": 0.652,
+      "latency_ms": 0.394,
       "mrr": 1.0,
       "name": "freshness-warnings",
       "ndcg_at_k": 1.0,
@@ -1810,7 +1810,7 @@
           "visibility": "shared"
         }
       ],
-      "latency_ms": 0.646,
+      "latency_ms": 0.372,
       "mrr": 1.0,
       "name": "generated-views-boundary",
       "ndcg_at_k": 0.8529278650606567,
@@ -1957,7 +1957,7 @@
           "visibility": "tenant"
         }
       ],
-      "latency_ms": 0.649,
+      "latency_ms": 0.38,
       "mrr": 1.0,
       "name": "runtime-rag-safety",
       "ndcg_at_k": 1.0,
@@ -2116,7 +2116,7 @@
           "visibility": "tenant"
         }
       ],
-      "latency_ms": 0.619,
+      "latency_ms": 0.369,
       "mrr": 1.0,
       "name": "context-budget-exclusions",
       "ndcg_at_k": 0.9828920819566879,
@@ -2275,7 +2275,7 @@
           "visibility": "tenant"
         }
       ],
-      "latency_ms": 0.637,
+      "latency_ms": 0.436,
       "mrr": 1.0,
       "name": "red-team-quality-loop",
       "ndcg_at_k": 0.9674679834891693,
@@ -2382,7 +2382,7 @@
           "visibility": "tenant"
         }
       ],
-      "latency_ms": 0.607,
+      "latency_ms": 0.435,
       "mrr": 0.0,
       "name": "add-on-boundary",
       "ndcg_at_k": 0.0,
@@ -2529,7 +2529,7 @@
           "visibility": "shared"
         }
       ],
-      "latency_ms": 0.424,
+      "latency_ms": 0.397,
       "mrr": 1.0,
       "name": "knowledgebase-ingestion",
       "ndcg_at_k": 0.9047172294870751,
@@ -2693,7 +2693,7 @@
           "visibility": "shared"
         }
       ],
-      "latency_ms": 0.411,
+      "latency_ms": 0.557,
       "mrr": 1.0,
       "name": "typescript-eval-adapter",
       "ndcg_at_k": 0.9828920819566879,

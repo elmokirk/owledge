@@ -3,13 +3,13 @@
   "accepted_nodes": 0,
   "corpus_type": "shared",
   "customer_id": "",
-  "generated_at": "2026-06-24T08:02:20Z",
-  "generation_id": "shared-graphrag-20260624080220-36248-2f5cd3cb",
+  "generated_at": "2026-06-24T08:37:43Z",
+  "generation_id": "shared-graphrag-20260624083743-46308-f00936a0",
   "include_drafts": false,
   "policy_version": "graphrag-export-v0.2",
   "project_id": "",
   "rejected_counts": {
-    "doc_type_not_in_default_rag": 47,
+    "doc_type_not_in_default_rag": 48,
     "status_not_reviewed_or_promoted": 2
   },
   "tenant_id": ""
