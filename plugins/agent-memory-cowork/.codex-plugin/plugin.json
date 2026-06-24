@@ -1,6 +1,6 @@
 {
   "name": "agent-memory-cowork",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Codex-facing host-project adapter for Owledge's Markdown-first agent memory skills, commands, diagnostics, and reports. Claude hooks are packaged separately in the Claude manifest.",
   "author": {
     "name": "Owledge"

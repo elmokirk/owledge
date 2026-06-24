@@ -1,7 +1,7 @@
 ---
 title: "Global Agent Memory Kit Instructions"
 date: "2026-05-13"
-version: "0.5.0"
+version: "0.6.0"
 status: "active"
 type: "global-kit-instructions"
 ---
@@ -30,7 +30,7 @@ At the beginning of every agent session:
    - `templates/agent-memory/` is the pristine product source (shipped to users via `init-project` and `build-project-kit`).
    - `internal/agent-memory/` is the maintainers' live dogfood workspace (decision traces, compiled snapshots, indexes, exports, benchmarks).
    - For product health checks: `python tools/agent_memory_cli.py --project-root . doctor --mode kit`
-   - For dogfood gates: `python tools/owledge.py finalization-gates --project-root internal --include-compliance --include-exports`
+   - For dogfood gates: `python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports` (the function auto-detects `internal/agent-memory/` for memory operations)
    - Never write generated artifacts (decision traces, compiled snapshots, indexes, exports) into `templates/`. That directory is the shipped product source.
 
 ## Global vs Project Local

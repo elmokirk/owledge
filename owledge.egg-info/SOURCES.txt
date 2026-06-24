@@ -132,6 +132,7 @@ docs/README.md
 docs/agent-first-run-setup.md
 docs/agent-integration-guide.md
 docs/agentic-memory-architecture.md
+docs/agents-md-integration-block.md
 docs/command-reference.md
 docs/critique-derived-addons-roadmap.md
 docs/cross-platform-lean-setup.md
@@ -139,6 +140,7 @@ docs/cross-project-hub-kit.md
 docs/decision-trace-kit.md
 docs/distribution.md
 docs/enterprise-context-benchmark-kit.md
+docs/feedback-round-2026-06.md
 docs/global-user-knowledge-layer.md
 docs/harness-plugin-matrix.md
 docs/html-reports.md
@@ -152,16 +154,19 @@ docs/mvp-plan-example.md
 docs/operational-hardening.md
 docs/owledge-vs-agent-methods.md
 docs/performance-scale-notes.md
+docs/pi-agent-setup.md
 docs/power-user-objections.md
 docs/poweruser-positioning-kit.md
 docs/project-folder-only-quickstart.md
 docs/project-snapshot-kit.md
 docs/quickstart.md
 docs/reusable-review-evaluation-templates.md
+docs/roadmap-ideas-2026-06.md
 docs/superpowers-integration.md
 docs/swarm-coordination-kit.md
 docs/team-long-running-project-guide.md
 docs/try-owledge-in-5-minutes.md
+docs/v0.6.0-implementation-plan.md
 docs/archive/README.md
 docs/archive/ai-workos-vault-adapter-plan.md
 docs/archive/ai-workos-vault-merge-evaluation.md

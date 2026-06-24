@@ -2,7 +2,7 @@
 
 **Drop-in durable project memory for existing Markdown repos and Obsidian-style vaults: no migration, no vector DB, no wiki-link rewrite.**
 
-[![Version](https://img.shields.io/badge/version-0.5.0-blue)](VERSION)
+[![Version](https://img.shields.io/badge/version-0.6.0-blue)](VERSION)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Storage: Markdown](https://img.shields.io/badge/storage-Markdown-black)](docs/quickstart.md)
 [![Runtime support](https://img.shields.io/badge/runtimes-Codex%20%7C%20Claude%20Code%20%7C%20Cowork%20%7C%20OpenCode-orange)](docs/harness-plugin-matrix.md)
@@ -20,6 +20,14 @@ Core idea: **Markdown is the source of truth; indexes, reports, graphs, benchmar
 **Minimal by default:** start with principles and skills only. Add project files,
 runtime adapters, or add-ons only when the current project needs durable local
 artifacts, runtime capture, proof assets, or release evidence.
+
+## Repo Layout
+
+This repository ships product source from `templates/agent-memory/`. The
+`internal/agent-memory/` directory is the maintainers' dogfood workspace
+(generated artifacts, not shipped). The `tools/` directory holds the Python
+CLI. See [docs/distribution.md](docs/distribution.md) for the full
+Dogfooding vs. Product breakdown.
 
 ## Table Of Contents
 

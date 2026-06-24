@@ -1,7 +1,7 @@
 ---
 title: "Owledge Project Context"
 date: "2026-06-23"
-version: "0.5.0"
+version: "0.6.0"
 status: "active"
 owner: "Kirk"
 memory_id: "mem:owledge:global:owledge:project_context:project-router"
@@ -58,7 +58,7 @@ Drop-in durable project memory for existing Markdown repos and Obsidian-style va
 
 ## Current State
 
-- Core kit is at v0.5.0 and release-ready.
+- Core kit is at v0.6.0 and release-ready.
 - `tools/agent_memory_cli.py` and `tools/owledge.py` provide local Python-first commands.
 - 11 launch add-ons are packaged (demo, trust, conformance, PI proof, TS adapter, benchmark kits, decision trace, cross-project hub, swarm coordination, poweruser positioning, compliance light).
 - Runtime adapters exist for Codex, Claude Code, Cowork-compatible, and OpenCode-style agents.

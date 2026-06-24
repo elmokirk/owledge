@@ -9,6 +9,7 @@ Publish v0.5 as a project-ready Markdown-first Agent Memory Kit with lifecycle c
 | Priority | Area | Outcome |
 | --- | --- | --- |
 | P0 | Publish readiness | GitHub repo with docs, license, privacy, security, examples |
+| P0 | PyPI publishing | Publish `owledge` console script so users can `pip install owledge` instead of source checkout |
 | P1 | HTML reports | Visual decision, handoff, RAG readiness, and activity reports |
 | P1 | Project-folder setup | Implemented: minimal local folder generator with explicit copy manifest and verification |
 | P1 | Runtime adapters | Implemented: Claude/Cowork fixtures and generic CLI runtime smoke wrapper |
@@ -23,6 +24,43 @@ Publish v0.5 as a project-ready Markdown-first Agent Memory Kit with lifecycle c
 | P2 | Optional backend ownership | Leases, ownership journal, promotion queue while Markdown remains canonical |
 | P3 | Capture daemon | Reduce process overhead for high-frequency hooks |
 | P4 | Dashboard add-on | Optional read-only visual interface for health, retrieval, PI intelligence, QA, graph, reports, and later promotion workflows |
+
+## Feedback-Derived Roadmap (v0.5.x — 2026-06-23)
+
+Collected from a structured feedback round covering integration, privacy,
+planning discipline, cross-project intelligence, and publish readiness. See
+`docs/feedback-round-2026-06.md` for the full ticket and `docs/roadmap-ideas-2026-06.md`
+for idea log entries.
+
+| Priority | Area | Outcome | Source question |
+| --- | --- | --- | --- |
+| P0 | Publish owledge to PyPI | `pip install owledge` works; refactor made sdist clean, now execute the publish | Q1, Q3, vibe-coder, influencer |
+| P1 | AGENTS.md/CLAUDE.md copy-paste integration block | SOTA one-block paste for host projects that do not use the skills path; shipped in docs | Q3 |
+| P1 | Token cost benchmark with tokenizer baselines | Add tokenizer-based token measurements to benchmarks; publish before/after token comparison | Q2 |
+| P1 | Global privacy controls + folder whitelist | User controls which folders are scannable; per-project opt-in to global owlib registration with explicit consent prompt | Q6, Q10a |
+| P1 | Project abstract + project mode (PoC/MVP/Side/SaaS) | Force a one-paragraph project abstract combining goals + roadmap; mode selector sets planning discipline depth | Q10b |
+| P2 | Cross-project parallel notification | Owlib `find-parallels` writes a notification artifact the agent reads at session start; no background daemon in v1 | Q4, Q10a |
+| P2 | PI Agent setup guide + provider auth | Document how to set up PI Agent; clarify it runs deterministic signals locally (no LLM provider auth needed for v1) and when provider auth is needed for semantic mode | Q5 |
+| P2 | Plan completion detection contract | Standardize `status: done` + `acceptance_criteria` + `qa_gate_ids` as the harness-agnostic completion signal; document in planning-layer skill | Q7 |
+| P2 | Idea-duplicate handling + permission modes | Add `planning_mode: supervised/approve-automatically/full-access` toggle; when an idea already exists, agent behavior depends on mode | Q8 |
+| P2 | MVP goal/metric definition template | Add a `success_metrics` section to the MVP plan template with user-specific, measurable acceptance criteria | Q9 |
+| P3 | Idea-to-project pipeline | Filter upcoming ideas (project-scoped and global-scoped), collect in priority order, and scaffold a new `PROJECT_CONTEXT.md` from a promoted idea | Q10c |
+| P3 | Feedback round integration | Add a recurring feedback-round workflow to collect, triage, and promote user feedback into roadmap items | Q (meta) |
+
+### Round 2: Feature Ideas
+
+Feature ideas collected in the same 2026-06 round, focused on ticket board,
+harness hooks, supervised-mode UX, and schema extensions. See
+`docs/feedback-round-2026-06.md` tickets FB-013 through FB-017 and
+`docs/roadmap-ideas-2026-06.md` idea cards IDEA-2026-006-12 through -16.
+
+| Priority | Area | Outcome | Source |
+| --- | --- | --- | --- |
+| P1 | Minimal ticket board with timeline + frontmatter sync | `owledge ticket-board` renders a Markdown board grouped by `status` with priority sorting; frontmatter sync hook updates `status: done` when QA gates pass | Feature idea 1 (FB-013) |
+| P1 | Quick-read section on all tickets | Add a `quick_read` field (under 300 chars) to `TaskCard` schema as a maintained view; validation gate detects stale quick-reads; board uses `quick_read`, not full bodies | Feature idea 4 (FB-016) |
+| P1 | Cleanly defined project abstract + modes | Define 4 project modes (`poc`, `mvp`, `side`, `saas`) with intuitive definitions and per-mode planning discipline in `PROJECT_CONTEXT.template.md` | Feature idea 5 (FB-017) |
+| P2 | Harness hook extensions for Codex/Claude | Extend existing hook layer with `PostToolUse` frontmatter validation and `Stop`/`SessionEnd` `validate-memory --strict`; document extension points | Feature idea 2 (FB-014) |
+| P2 | Ticket summary in supervised approval | In `supervised` mode, render a compact 5-line ticket summary (title, priority, status, description, source link) inline before asking for approval | Feature idea 3 (FB-015) |
 
 ## Compliance Roadmap
 
