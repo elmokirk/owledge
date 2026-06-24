@@ -116,6 +116,20 @@ def resolve_path(value: str | pathlib.Path, base: pathlib.Path | None = None) ->
     return ((base or pathlib.Path.cwd()) / path).resolve()
 
 
+def resolve_memory_root(root: pathlib.Path) -> pathlib.Path:
+    """Return the directory holding the active agent-memory tree.
+
+    In the Owledge source repo (post-refactor), dogfood memory lives at
+    ``internal/agent-memory/`` while tools and docs live at the repo root.
+    This helper auto-detects that layout so gate functions can be invoked with
+    ``--project-root .`` and still operate on the dogfood memory tree.
+    In a normal host project (no ``internal/agent-memory/``), it falls back to
+    ``root`` itself, preserving backward compatibility.
+    """
+    internal = root / "internal" / "agent-memory"
+    return internal.parent if internal.is_dir() else root
+
+
 def relative_posix(path: pathlib.Path, root: pathlib.Path) -> str:
     return path.resolve().relative_to(root.resolve()).as_posix()
 
@@ -1335,7 +1349,7 @@ def project_folder_kit_gate(root: pathlib.Path, include_compliance: bool = False
 
 def finalization_gates(root: pathlib.Path, include_exports: bool, include_compliance: bool) -> dict[str, Any]:
     gates: list[dict[str, Any]] = []
-    memory_root = root / "internal" if (root / "internal" / "agent-memory").is_dir() else root
+    memory_root = resolve_memory_root(root)
 
     def add(name: str, func: Callable[[], Any]) -> None:
         gate = run_gate(name, func)
@@ -1528,7 +1542,7 @@ def write_deterministic_redteam_report(
 
 
 def redteam_qa(root: pathlib.Path, subject: str, question: str, gate_report_path: str) -> dict[str, Any]:
-    memory_root = root / "internal" if (root / "internal" / "agent-memory").is_dir() else root
+    memory_root = resolve_memory_root(root)
     gate_report = resolve_path(gate_report_path, root) if gate_report_path else memory_root / "agent-memory" / "exports" / "finalization-gates" / "latest.json"
     if not gate_report.exists():
         gate = finalization_gates(root, include_exports=False, include_compliance=False)
@@ -1640,7 +1654,7 @@ def redteam_qa_gate(root: pathlib.Path, gate_report_path: str, min_score: int = 
 
 
 def retrieval_fixture_gate(root: pathlib.Path) -> dict[str, Any]:
-    memory_root = root / "internal" if (root / "internal" / "agent-memory").is_dir() else root
+    memory_root = resolve_memory_root(root)
     return core.evaluate_memory_retrieval(
         memory_root,
         [root / "tests" / "fixtures" / "retrieval-corpus"],
@@ -1654,7 +1668,7 @@ def retrieval_fixture_gate(root: pathlib.Path) -> dict[str, Any]:
 
 
 def quality_ratchet_gate(root: pathlib.Path) -> dict[str, Any]:
-    memory_root = root / "internal" if (root / "internal" / "agent-memory").is_dir() else root
+    memory_root = resolve_memory_root(root)
     report_dir = memory_root / "agent-memory" / "exports" / "finalization-gates"
     report_dir.mkdir(parents=True, exist_ok=True)
     components: list[tuple[str, Callable[[], dict[str, Any]]]] = [

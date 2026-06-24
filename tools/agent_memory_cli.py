@@ -5229,40 +5229,67 @@ def run_evals(root: pathlib.Path) -> dict[str, Any]:
 
 
 def kit_integrity_check(root: pathlib.Path) -> dict[str, Any]:
-    """Assert a built kit contains zero dogfood artifacts."""
-    dogfood_globs = [
-        "decision-trace/*.md",
-        "decision-trace/*.json",
-        "compiled/project-*.md",
-        "indexes/memory-index*.jsonl",
-        "indexes/memory-index*.json",
-        "exports/**/*.json",
-        "exports/**/*.jsonl",
-        "cross-project-hub/*.json",
-        "project-snapshot/profile.md",
-        "project-snapshot/*.json",
-        "enterprise-context-benchmark/profile.md",
-        "ideas/pi-agent-global-intelligence.md",
-        "sessions/*/events.jsonl",
-        "sessions/*/session.md",
-        "sessions/*/summary.md",
-    ]
+    """Assert a built kit contains zero dogfood artifacts.
+
+    Uses a negative-list approach: a built kit's ``agent-memory/`` tree should
+    only contain files that also exist in ``templates/agent-memory/`` (the
+    pristine product source). Any file not in the template set is a dogfood
+    leak. If the templates tree is unavailable (e.g. running on a standalone
+    kit without the source repo), falls back to a pattern-based positive list
+    of known dogfood categories.
+    """
     am_base = root / "agent-memory"
     violations: list[str] = []
-    if am_base.exists():
-        import fnmatch as _fn
-        for path in sorted(am_base.rglob("*"), key=lambda item: item.as_posix()):
-            if not path.is_file():
-                continue
-            rel = path.relative_to(am_base).as_posix()
+    if not am_base.exists():
+        return {"passed": True, "violations": [], "checked_files": 0, "method": "no-agent-memory", "project": str(root)}
+
+    import fnmatch as _fn
+
+    kit_files: list[str] = []
+    for path in sorted(am_base.rglob("*"), key=lambda item: item.as_posix()):
+        if path.is_file():
+            kit_files.append(path.relative_to(am_base).as_posix())
+
+    source_templates = root / "templates" / "agent-memory"
+    if source_templates.is_dir():
+        template_files: set[str] = set()
+        for path in source_templates.rglob("*"):
+            if path.is_file():
+                template_files.add(path.relative_to(source_templates).as_posix())
+        violations = [f"agent-memory/{rel}" for rel in kit_files if rel not in template_files]
+        method = "negative-list (templates/agent-memory/ baseline)"
+        checked = len(kit_files)
+    else:
+        dogfood_globs = [
+            "decision-trace/*.md",
+            "decision-trace/*.json",
+            "compiled/project-*.md",
+            "indexes/memory-index*.jsonl",
+            "indexes/memory-index*.json",
+            "exports/**/*.json",
+            "exports/**/*.jsonl",
+            "cross-project-hub/*.json",
+            "project-snapshot/profile.md",
+            "project-snapshot/*.json",
+            "enterprise-context-benchmark/profile.md",
+            "ideas/pi-agent-global-intelligence.md",
+            "sessions/*/events.jsonl",
+            "sessions/*/session.md",
+            "sessions/*/summary.md",
+        ]
+        for rel in kit_files:
             for pattern in dogfood_globs:
                 if _fn.fnmatch(rel, pattern):
                     violations.append(f"agent-memory/{rel}")
                     break
+        method = "positive-list (fallback: no templates/ available)"
+        checked = len(kit_files)
+
     return {
         "passed": not violations,
         "violations": sorted(violations),
-        "checked_patterns": dogfood_globs,
+        "checked_files": checked,
+        "method": method,
         "project": str(root),
     }
 
