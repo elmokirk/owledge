@@ -44,6 +44,57 @@ owledge = "tools.owledge:main"
 [tool.setuptools]
 packages = ["tools"]
 py-modules = []
+include-package-data = true
 
 [tool.setuptools.package-data]
 tools = ["*.py"]
+
+# Ship root files + templates/ + skills/ alongside the package so that
+# ``owledge init-project`` works from a pip-installed package.
+# ``install-addon`` and ``build-project-kit`` that need addons/ or plugins/
+# require a source checkout — documented in README Install section.
+[tool.setuptools.data-files]
+"." = [
+    "PROJECT_CONTEXT.template.md",
+    "AGENTS.template.md",
+    "CLAUDE.template.md",
+    "USER_CONTEXT.template.md",
+    "DESIGN.md",
+    "REPORT_DESIGN_SELECTOR.html",
+    "VERSION",
+]
+"templates/agent-memory" = ["templates/agent-memory/README.md"]
+"templates/agent-memory/schemas" = ["templates/agent-memory/schemas/*.json"]
+"templates/agent-memory/templates" = ["templates/agent-memory/templates/*.md", "templates/agent-memory/templates/*.json"]
+"templates/agent-memory/canonical" = ["templates/agent-memory/canonical/.gitkeep"]
+"templates/agent-memory/compiled" = ["templates/agent-memory/compiled/.gitkeep"]
+"templates/agent-memory/decisions" = ["templates/agent-memory/decisions/.gitkeep"]
+"templates/agent-memory/evidence" = ["templates/agent-memory/evidence/.gitkeep"]
+"templates/agent-memory/evidence/promotions" = ["templates/agent-memory/evidence/promotions/.gitkeep"]
+"templates/agent-memory/exports/graphrag" = ["templates/agent-memory/exports/graphrag/.gitkeep"]
+"templates/agent-memory/exports/lightrag" = ["templates/agent-memory/exports/lightrag/.gitkeep"]
+"templates/agent-memory/exports/rag" = ["templates/agent-memory/exports/rag/.gitkeep"]
+"templates/agent-memory/handoffs" = ["templates/agent-memory/handoffs/.gitkeep"]
+"templates/agent-memory/ideas" = ["templates/agent-memory/ideas/.gitkeep"]
+"templates/agent-memory/indexes" = ["templates/agent-memory/indexes/.gitkeep"]
+"templates/agent-memory/lessons" = ["templates/agent-memory/lessons/.gitkeep"]
+"templates/agent-memory/patterns" = ["templates/agent-memory/patterns/.gitkeep"]
+"templates/agent-memory/plans" = ["templates/agent-memory/plans/.gitkeep"]
+"templates/agent-memory/sessions" = ["templates/agent-memory/sessions/.gitkeep"]
+"templates/agent-memory/pi-agent/concepts" = ["templates/agent-memory/pi-agent/concepts/.gitkeep"]
+"templates/agent-memory/pi-agent/evaluations" = ["templates/agent-memory/pi-agent/evaluations/.gitkeep"]
+"templates/agent-memory/pi-agent/indexes" = ["templates/agent-memory/pi-agent/indexes/.gitkeep"]
+"templates/agent-memory/pi-agent/parallels" = ["templates/agent-memory/pi-agent/parallels/.gitkeep"]
+"templates/agent-memory/pi-agent/recurring-errors" = ["templates/agent-memory/pi-agent/recurring-errors/.gitkeep"]
+"templates/agent-memory/pi-agent/red-team" = ["templates/agent-memory/pi-agent/red-team/.gitkeep"]
+"templates/agent-memory/pi-agent/reports" = ["templates/agent-memory/pi-agent/reports/.gitkeep"]
+"templates/agent-memory/pi-agent/scorecards" = ["templates/agent-memory/pi-agent/scorecards/.gitkeep"]
+"templates/agent-memory/pi-agent/trends" = ["templates/agent-memory/pi-agent/trends/.gitkeep"]
+"skills/agent-memory-principles" = ["skills/agent-memory-principles/*.md"]
+"skills/agent-memory-principles/references" = ["skills/agent-memory-principles/references/*.md"]
+"skills/agent-memory-runtime-bridge" = ["skills/agent-memory-runtime-bridge/*.md"]
+"skills/review-evaluation-workflow" = ["skills/review-evaluation-workflow/*.md"]
+"skills/render-memory-report" = ["skills/render-memory-report/*.md"]
+"skills/render-memory-report/references" = ["skills/render-memory-report/references/*.md"]
+"skills/owledge-planning-layer" = ["skills/owledge-planning-layer/*.md"]
+"skills/owledge-planning-layer/references" = ["skills/owledge-planning-layer/references/*.md"]

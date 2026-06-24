@@ -24,6 +24,24 @@ from typing import Any, Callable, Iterable
 
 SCRIPT_DIR = pathlib.Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parent
+# When installed via pip (site-packages/tools/), templates/ and root files live
+# at the install prefix (venv root or user site), not next to site-packages/.
+# Try SCRIPT_DIR.parent (repo checkout) first, then sys.prefix, then user site.
+if not (REPO_ROOT / "templates" / "agent-memory").is_dir():
+    for candidate in (pathlib.Path(sys.prefix).resolve(), pathlib.Path(sys.prefix).resolve().parent):
+        if (candidate / "templates" / "agent-memory").is_dir():
+            REPO_ROOT = candidate
+            break
+    else:
+        # Check user site-packages base (pip install --user puts data at the
+        # user base, which is sys.prefix + ../ for Python 3.14 on Windows).
+        import site
+        for base in (site.getusersitepackages(), site.getuserbase()):
+            if base:
+                p = pathlib.Path(base).resolve()
+                if (p / "templates" / "agent-memory").is_dir():
+                    REPO_ROOT = p
+                    break
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
