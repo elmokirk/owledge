@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.6.1 (2026-06-24)
+
+- E1: Version stamp every shipped file. Added `owledge_kit_version` frontmatter field to all shipped templates; formalized `version:` as `MEMORY_SCHEMA_VERSION` (1.0.0). `init-project` now writes `kit-manifest.json` with `kit_version`, `memory_schema_version`, and per-file `sha256_installed` + `sha256_original`.
+- E2: `doctor` gained a `version-drift` check comparing the manifest's `kit_version` against the running CLI's `KIT_VERSION`. Return shape extended with `outdated_files` and `user_edited_files`.
+- E3: New `owledge upgrade` command with `--dry-run`/`--apply` and `--mode=safe|force-templates|manual`. Safe mode preserves user-edited files; force-templates respects a hardcoded never-touch list; manual emits a `git apply`-able patch. File lock prevents concurrent runs. Idempotent.
+- E4: `init-project` gained `--link-global [<path>]` flag. Writes `agent-memory/global-link.json` resolving via flag → `OWLEDGE_GLOBAL_HOME` env → `~/.owledge/global` default. `doctor` gained a `global-link` check.
+- E5: New `dogfood-sync` finalization gate + `sync-dogfood` CLI subcommand. One-way mirror: `templates/agent-memory/templates/` → `internal/agent-memory/templates/`. Asserts one-way direction in code.
+- New finalization gates: `dogfood-sync`, `upgrade-drift`.
+- New CLI subcommands: `upgrade`, `sync-dogfood`, `dogfood-sync-check`.
+- FB-016 amendment: `quick_read` stale-detection stays `warning` until `owledge upgrade` (E3) ships; tracked via `ROADMAP.md`. See `docs/v0.6.0-implementation-plan.md` line 259.
+
+## Upgrade notes
+
+breaking: no
+
+This release is additive: it adds version stamping, drift detection, an upgrade command, a global-layer registry, and a dogfood-sync gate. No existing memory records, frontmatter fields, or schemas are removed or renamed. The `version:` frontmatter field is repurposed as `MEMORY_SCHEMA_VERSION` (was previously inconsistent: 0.1.0 on some templates, 0.4.0 on others); it is now consistently 1.0.0 everywhere. Users who pinned logic to the old inconsistent values should read `docs/upgrading.md`.
+
 ## 0.6.0 (2026-06-24)
 
 - Refactor: split development dogfood from product deliverables (commit `3440e30`).

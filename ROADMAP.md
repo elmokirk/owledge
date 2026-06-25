@@ -24,6 +24,12 @@ Publish v0.5 as a project-ready Markdown-first Agent Memory Kit with lifecycle c
 | P2 | Optional backend ownership | Leases, ownership journal, promotion queue while Markdown remains canonical |
 | P3 | Capture daemon | Reduce process overhead for high-frequency hooks |
 | P4 | Dashboard add-on | Optional read-only visual interface for health, retrieval, PI intelligence, QA, graph, reports, and later promotion workflows |
+| P0 | Kit version stamping | Every shipped template carries `owledge_kit_version`; `kit-manifest.json` records per-file hashes | 
+| P0 | Upgrade command | `owledge upgrade --dry-run/--apply` with safe/force-templates/manual modes; never-touch list; idempotent |
+| P1 | Drift detection | `doctor` reports `version-drift` + `outdated_files` + `user_edited_files` |
+| P1 | Global-layer registry | `init-project --link-global` writes `global-link.json`; `doctor` checks the link |
+| P1 | Dogfood-sync gate | `dogfood-sync` finalization gate + `sync-dogfood` CLI; one-way mirror templates → internal |
+| P1 | Concept blindspot skill | `concept-blindspot-audit` skill that stress-tests distribution, lifecycle, coherence (v0.6.1 Phase 5) |
 
 ## Feedback-Derived Roadmap (v0.5.x — 2026-06-23)
 

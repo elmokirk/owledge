@@ -40,6 +40,12 @@ Owledge is Python-first. Use `tools/owledge.py` for public workflows and
 | `python tools/owledge.py test runtime-adapters --project-root .` | Yes, temp project | Smoke-test plugin runtime capture |
 | `python tools/owledge.py finalization-gates --project-root . --include-compliance` | Yes | Run release gates |
 | `python tools/owledge.py benchmark --project-root . --scale-files 100,1000,10000` | Yes, ignored results | Run local benchmark harness |
+| `python tools/owledge.py upgrade --dry-run --project-root .` | No | Show what would change to bring the project to the current kit version |
+| `python tools/owledge.py upgrade --apply --project-root .` | Yes, templates | Apply pending kit updates in safe mode (preserves user-edited files) |
+| `python tools/owledge.py upgrade --apply --mode=force-templates --yes --project-root .` | Yes, templates | Force-update all updatable files (respects never-touch list) |
+| `python tools/owledge.py upgrade --dry-run --mode=manual --project-root .` | Yes, patch file | Emit a `git apply`-able patch to `agent-memory/exports/upgrade-pending.patch` |
+| `python tools/owledge.py sync-dogfood --dry-run --project-root .` | No | Show template drift between product and dogfood trees (maintainer-only) |
+| `python tools/owledge.py sync-dogfood --apply --project-root .` | Yes, internal templates | One-way mirror `templates/agent-memory/templates/` → `internal/agent-memory/templates/` (maintainer-only) |
 
 ## Lower-Level Memory CLI
 
@@ -57,6 +63,7 @@ Owledge is Python-first. Use `tools/owledge.py` for public workflows and
 | `python tools/agent_memory_cli.py --project-root . export-lightrag --corpus-type shared` | Yes | Generate LightRAG export |
 | `python tools/agent_memory_cli.py --project-root . export-graphrag --corpus-type shared` | Yes | Generate GraphRAG export |
 | `python tools/agent_memory_cli.py --project-root . render-memory-report --report-type project-dashboard --audience private` | Yes | Generate local HTML report |
+| `python tools/agent_memory_cli.py --project-root . dogfood-sync-check` | No | Check dogfood template drift (maintainer-only) |
 
 ## Existing Markdown Knowledgebase Module
 
