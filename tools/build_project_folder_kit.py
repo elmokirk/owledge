@@ -293,10 +293,26 @@ def build(args: argparse.Namespace) -> dict[str, object]:
         with path.open("rb") as handle:
             for chunk in iter(lambda: handle.read(65536), b""):
                 digest.update(chunk)
-        manifest_entries.append({"path": rel, "sha256": digest.hexdigest()})
+        sha_installed = digest.hexdigest()
+        src_path = source / rel
+        sha_original = ""
+        if src_path.is_file():
+            od = hashlib.sha256()
+            with src_path.open("rb") as handle:
+                for chunk in iter(lambda: handle.read(65536), b""):
+                    od.update(chunk)
+            sha_original = od.hexdigest()
+        manifest_entries.append({"path": rel, "sha256_installed": sha_installed, "sha256_original": sha_original})
+    kit_version = ""
+    vf = source / "VERSION"
+    if vf.is_file():
+        kit_version = vf.read_text(encoding="utf-8", errors="replace").strip()
     manifest = {
         "generated_at": _dt.datetime.now(_dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
         "source": "templates/agent-memory/",
+        "kit_version": kit_version,
+        "memory_schema_version": "1.0.0",
+        "source_version": kit_version,
         "files": manifest_entries,
     }
     (target / "kit-manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")

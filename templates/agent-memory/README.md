@@ -1,7 +1,8 @@
 ---
 title: "Agent Memory Workflow"
 date: "YYYY-MM-DD"
-version: "0.4.0"
+version: "1.0.0"
+owledge_kit_version: "0.6.0"
 status: "active"
 owner: "OWNER"
 tenant_id: "TENANT_ID"
