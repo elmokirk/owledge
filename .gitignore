@@ -103,3 +103,4 @@ internal/agent-memory/sessions/**/summary.md
 internal/agent-memory/sessions/**/.session.lock
 
 dist/
+build/
