@@ -17,8 +17,8 @@ The `version-drift` check compares the manifest's `kit_version` against the runn
 | Mode | Behavior | Never-touch list respected |
 | --- | --- | --- |
 | `safe` (default) | Updates only pristine files; skips user-edited files with a warning | Yes |
-| `force-templates` | Updates every updatable file except never-touch list; requires `--yes` | Yes |
-| `manual` | Emits a `git apply`-able patch to `agent-memory/exports/upgrade-pending.patch`; no writes | Yes |
+| `force-templates` | Updates every updatable file except never-touch list; requires `--yes` or interactive confirmation on a TTY | Yes |
+| `manual` | Emits a `git apply`-able patch to `agent-memory/exports/upgrade-pending.patch`; always dry-run (`--apply` is rejected) | Yes |
 
 Use `safe` for routine additive upgrades where you have lightly customized a few
 shipped files and want to preserve your edits. Use `force-templates` when you
@@ -27,6 +27,8 @@ version (for example after merging upstream fixes into a fork); it never touches
 the never-touch list, so project memory and user-content files remain intact.
 Use `manual` in CI or review workflows where you want to inspect the proposed
 diff as a single `git apply`-able patch before deciding whether to apply it.
+`manual` mode is always dry-run: `--apply --mode=manual` is rejected with exit
+code 2 (manual emits a patch, never writes).
 
 ## Never-touch list (hardcoded, no flag bypasses)
 
@@ -58,6 +60,7 @@ When a release ships an additive-only schema change (new optional field, new tem
 
 Upgrades are needed when the kit version (the `VERSION` file) bumps. Run
 `owledge doctor --project-root .` to detect `version-drift`; the report lists
+
 `outdated_files` (pristine, safe to update) and `user_edited_files` (yours,
 left alone by `safe` mode).
 
@@ -66,6 +69,18 @@ safe to apply with `safe` mode — they will not overwrite your edits and will n
 break existing memory records. Breaking changes (removed fields, renamed keys,
 changed required-vs-optional) require manual review: use `--mode=manual` to emit
 a patch, inspect it, and adapt your project before applying.
+
+## Skills and the manifest
+
+`init-project` installs the kit's skills (`skills/agent-memory-principles`,
+`skills/agent-memory-runtime-bridge`, `skills/review-evaluation-workflow`,
+`skills/render-memory-report`, `skills/concept-blindspot-audit`) into your
+project and records each skill file in `kit-manifest.json`. This means `doctor`
+detects skill drift and `upgrade --apply --mode=safe` updates skill files you
+have not edited. The `concept-blindspot-audit` skill was added in v0.6.1; if you
+installed owledge before v0.6.1, re-running `init-project` on your existing
+project will install the new skill (it uses `copy_file_if_missing`, so it will
+not overwrite files you already have).
 
 ## Global layer and upgrades
 
@@ -99,4 +114,5 @@ python tools/owledge.py sync-dogfood --apply --project-root .
 | "No kit-manifest.json found" | Run `owledge init-project --target .` first to write the manifest |
 | "Kit installed at vX, CLI is vY" | Run `owledge upgrade --dry-run --project-root .` to see the diff, then `--apply` |
 | "Lock held by PID" | Remove `agent-memory/.upgrade.lock` if the prior run is no longer active |
-| "force-templates requires --yes" | Add the `--yes` flag to confirm the destructive-by-default mode |
+| "force-templates requires --yes" | Add `--yes` (or run on a TTY for interactive confirmation) |
+| "manual mode is always dry-run" | Remove `--apply` from your `--mode=manual` invocation; manual emits a patch only |

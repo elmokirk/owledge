@@ -5993,6 +5993,8 @@ def concept_audit(root: pathlib.Path, profile: dict[str, Any] | None = None) -> 
     dimensions = [dim1, dim2, dim3, dim4, dim5, dim6, dim7, dim8]
     mechanical_scores = [d["score"] for d in dimensions[:4]]
     passed = all(score is not None and score >= 5 for score in mechanical_scores)
+    scored_dims = [d["score"] for d in dimensions if d.get("score") is not None]
+    aggregate_score = round(sum(scored_dims) / len(scored_dims), 1) if scored_dims else 0.0
 
     suggested_actions: list[str] = []
     for d in dimensions[:4]:
@@ -6005,6 +6007,7 @@ def concept_audit(root: pathlib.Path, profile: dict[str, Any] | None = None) -> 
 
     return {
         "passed": passed,
+        "score": aggregate_score,
         "project": str(root),
         "project_mode": project_mode,
         "planning_mode": planning_mode,

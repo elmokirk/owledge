@@ -24,12 +24,13 @@ Publish v0.5 as a project-ready Markdown-first Agent Memory Kit with lifecycle c
 | P2 | Optional backend ownership | Leases, ownership journal, promotion queue while Markdown remains canonical |
 | P3 | Capture daemon | Reduce process overhead for high-frequency hooks |
 | P4 | Dashboard add-on | Optional read-only visual interface for health, retrieval, PI intelligence, QA, graph, reports, and later promotion workflows |
-| P0 | Kit version stamping | Every shipped template carries `owledge_kit_version`; `kit-manifest.json` records per-file hashes | 
-| P0 | Upgrade command | `owledge upgrade --dry-run/--apply` with safe/force-templates/manual modes; never-touch list; idempotent |
-| P1 | Drift detection | `doctor` reports `version-drift` + `outdated_files` + `user_edited_files` |
-| P1 | Global-layer registry | `init-project --link-global` writes `global-link.json`; `doctor` checks the link |
-| P1 | Dogfood-sync gate | `dogfood-sync` finalization gate + `sync-dogfood` CLI; one-way mirror templates → internal |
-| P1 | Concept blindspot skill | `concept-blindspot-audit` skill that stress-tests distribution, lifecycle, coherence (v0.6.1 Phase 5) |
+| P0 | Kit version stamping | Every shipped template carries `owledge_kit_version`; `kit-manifest.json` records per-file hashes. **Shipped v0.6.1 (with fix-up).** | 
+| P0 | Upgrade command | `owledge upgrade --dry-run/--apply` with safe/force-templates/manual modes; never-touch list; idempotent. **Shipped v0.6.1 (with fix-up: skills enrolled in manifest; manual mode always dry-run; git-apply-able patch).** |
+| P1 | Drift detection | `doctor` reports `version-drift` + `outdated_files` + `user_edited_files`. **Shipped v0.6.1.** |
+| P1 | Global-layer registry | `init-project --link-global` writes `global-link.json`; `doctor` checks the link. **Shipped v0.6.1.** |
+| P1 | Dogfood-sync gate | `dogfood-sync` finalization gate + `sync-dogfood` CLI; one-way mirror templates → internal. **Shipped v0.6.1.** |
+| P1 | Concept blindspot skill | `concept-blindspot-audit` skill that stress-tests distribution, lifecycle, coherence (v0.6.1 Phase 5). **Shipped v0.6.1 (with fix-up: skill now installable + in manifest + upgradable).** |
+| P1 | Session-continuity checklists | Per-phase checkboxes (implementation/QA/review done) in multi-phase plans; resume rule; gate. **Shipped v0.6.1 fix-up (FB-018).** |
 
 ## Feedback-Derived Roadmap (v0.5.x — 2026-06-23)
 

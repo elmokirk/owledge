@@ -54,6 +54,8 @@ agent-plans/
 tests/*
 !tests/fixtures/
 !tests/fixtures/**
+!tests/unit/
+!tests/unit/**
 !plugins/agent-memory-cowork/tests/
 !plugins/agent-memory-cowork/tests/fixtures/
 !plugins/agent-memory-cowork/tests/fixtures/*.json

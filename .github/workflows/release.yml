@@ -42,15 +42,16 @@ jobs:
 
       - name: Verify upgrade notes on schema/template changes
         run: |
-          # Check if templates/ or schemas/ changed in this tag
-          if git diff --name-only HEAD~1 HEAD -- templates/ schemas/ | grep -q .; then
+          # Check if templates/ or schemas/ changed between the prior tag and HEAD
+          BASE=$(git describe --tags --abbrev=0 HEAD 2>/dev/null || echo HEAD~1)
+          if git diff --name-only $BASE HEAD -- templates/ schemas/ | grep -q .; then
             if ! grep -q "## Upgrade notes" CHANGELOG.md; then
               echo "ERROR: templates/ or schemas/ changed but CHANGELOG.md has no '## Upgrade notes' section"
               exit 1
             fi
             echo "OK: Upgrade notes present in CHANGELOG.md"
           else
-            echo "OK: No template/schema changes in this tag"
+            echo "OK: No template/schema changes since $BASE"
           fi
 
       - name: Upload dist artifacts

@@ -221,3 +221,34 @@ and either `elaborate` (accept into near-term roadmap) or `reject` with reason.
 - summary: Define 4 project modes cleanly: poc (prove it works), mvp (one user
   gets value), side (fun and bounded), saas (ship and charge). Each mode sets
   planning discipline depth and required fields.
+
+### IDEA-2026-006-17: Session-continuity checklists in plans
+
+- concept_tags: session-continuity, checklists, resume, subagents
+- problem_patterns: session-break-restart, lost-context, repeated-work
+- architecture_patterns: per-phase-checkboxes, resume-rule
+- feedback_ticket: FB-018
+- similar_to: none
+- status: captured
+- source: v0.6.1 red-team session (2026-06-25)
+- summary: Every multi-phase plan embeds three checkboxes per phase
+  (implementation done, QA checks done, quick review done). A new agent
+  resumes from the first unchecked box, never restarting completed phases.
+  Subagents check their own boxes before returning. The checkbox is a
+  navigation aid; the QA gate output is the durable evidence. Shipped in the
+  v0.6.1 fix-up; track adoption and harden the gate if plans drift.
+
+### IDEA-2026-006-18: Deferred P2 polish batch from v0.6.1 red-team
+
+- concept_tags: polish, deferred-fixes, v0.6.2
+- problem_patterns: metadata-only-behavior, over-broad-glob, stale-gate-logic
+- architecture_patterns: batch-fix-release
+- feedback_ticket: FB-019
+- similar_to: none
+- status: captured
+- source: v0.6.1 red-team P2-16..P2-21
+- summary: Batch of six P2 polish items deferred from the v0.6.1 fix-up to
+  keep scope tight: additive-change behavioral suppression (P2-16),
+  dogfood_sync glob restriction (P2-17), concept-audit-fresh self-audit
+  specificity (P2-18), upgrade_drift_check mode (P2-20), and historical
+  plan line-number staleness (P2-21). Target v0.6.2 "polish" release.

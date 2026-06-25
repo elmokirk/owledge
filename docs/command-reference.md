@@ -46,6 +46,10 @@ Owledge is Python-first. Use `tools/owledge.py` for public workflows and
 | `python tools/owledge.py upgrade --dry-run --mode=manual --project-root .` | Yes, patch file | Emit a `git apply`-able patch to `agent-memory/exports/upgrade-pending.patch` |
 | `python tools/owledge.py sync-dogfood --dry-run --project-root .` | No | Show template drift between product and dogfood trees (maintainer-only) |
 | `python tools/owledge.py sync-dogfood --apply --project-root .` | Yes, internal templates | One-way mirror `templates/agent-memory/templates/` → `internal/agent-memory/templates/` (maintainer-only) |
+| `python tools/owledge.py concept-audit --project-root .` | No | Run the 8-dimension concept blindspot audit (dims 1-4 mechanical, 5-8 guided) |
+| `python tools/owledge.py concept-audit --dimension lifecycle --project-root .` | No | Run a single audit dimension by name |
+| `python tools/owledge.py concept-audit --profile agent-memory/concept-audit-profile.json --project-root .` | No | Run the audit with a custom weights/overrides profile |
+| `python tools/owledge.py concept-audit --format summary --project-root .` | No | Print a one-line-per-dimension summary instead of JSON |
 
 ## Lower-Level Memory CLI
 

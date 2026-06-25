@@ -30,50 +30,50 @@
     {
       "name": "docs",
       "passed": true,
-      "seconds": 0.027
+      "seconds": 0.014
     },
     {
       "name": "platform",
       "passed": true,
-      "seconds": 0.582
+      "seconds": 0.234
     },
     {
       "name": "principles",
       "passed": true,
-      "seconds": 0.005
+      "seconds": 0.002
     },
     {
       "name": "ingestion",
       "passed": true,
-      "seconds": 0.315
+      "seconds": 0.122
     },
     {
       "name": "generated-kit",
       "passed": true,
-      "seconds": 6.573
+      "seconds": 3.933
     },
     {
       "name": "runtime",
       "passed": true,
-      "seconds": 2.631
+      "seconds": 1.62
     },
     {
       "name": "retrieval",
       "passed": true,
-      "seconds": 0.025
+      "seconds": 0.02
     },
     {
       "name": "benchmark",
       "passed": true,
-      "seconds": 3.271
+      "seconds": 2.073
     },
     {
       "name": "qa",
       "passed": true,
-      "seconds": 0.004
+      "seconds": 0.003
     }
   ],
-  "generated_at": "2026-06-25T08:39:35Z",
+  "generated_at": "2026-06-25T11:27:34Z",
   "passed": true,
   "project": "C:\\Users\\Kirk\\Documents\\Playground\\agent-memory-standalone",
   "scores": {

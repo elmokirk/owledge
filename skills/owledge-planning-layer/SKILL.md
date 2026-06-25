@@ -46,8 +46,9 @@ Use this skill when the user asks for:
    - task lanes
    - review gates
    - handoff expectations
-7. Write only to allowed Owledge locations if writing is requested or clearly needed.
-8. End with the next action and a handoff-ready summary.
+7. **Embed session-continuity checklists.** For each phase in the plan, add three checkboxes: `- [ ] implementation done`, `- [ ] QA checks done`, `- [ ] quick review done`. State the resume rule: a new agent reads the plan, finds the first unchecked box, and continues from there — never restarting the whole plan. See `references/session-continuity.md` for the full protocol.
+8. Write only to allowed Owledge locations if writing is requested or clearly needed.
+9. End with the next action and a handoff-ready summary.
 
 ## Hard Rules
 

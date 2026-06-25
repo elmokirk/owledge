@@ -83,3 +83,9 @@ edges: []
 - Owner:
 - Evidence:
 - Follow-up review date:
+
+## Checklist
+
+- [ ] implementation done
+- [ ] QA checks done
+- [ ] quick review done

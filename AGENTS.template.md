@@ -95,3 +95,7 @@ global user-memory directory (default `~/.owledge/global`). The agent loads
 preferences, goals, daily notes, and tasks from this layer at session start.
 Project-local memory is the source of truth for project decisions; global user
 memory must not override project decisions.
+
+## Session Continuity
+
+When working from a multi-phase plan with per-phase checklists, resume from the first unchecked box. Do not restart completed phases. If a session breaks mid-phase, re-run that phase's QA gate before continuing; if it fails, uncheck the box and redo the phase. Subagents check their own boxes before returning to the orchestrator. The checkbox is a navigation aid; the phase's QA gate output is the durable evidence.

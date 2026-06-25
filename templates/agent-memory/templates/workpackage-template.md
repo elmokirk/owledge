@@ -33,3 +33,9 @@ max_parallelism: 3
 ## Risks and Mitigation
 
 ## Planned Start and End
+
+### Checklist
+
+- [ ] implementation done
+- [ ] QA checks done
+- [ ] quick review done

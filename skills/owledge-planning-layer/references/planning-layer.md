@@ -87,3 +87,16 @@ A useful handoff includes:
 - exact next action
 - what not to do next
 
+## Session Continuity
+
+When producing or resuming a multi-phase plan, use per-phase checklists so a
+new agent can resume from the exact last-completed step.
+
+- Every phase in a multi-phase plan gets three checkboxes: `- [ ] implementation done`, `- [ ] QA checks done`, `- [ ] quick review done`.
+- **Resume rule:** find the first unchecked box and continue from there. Never restart a completed phase.
+- If a checkbox is stale (checked but work incomplete), re-run that phase's QA gate; if it fails, uncheck and redo.
+- Subagents check their own boxes before returning to the orchestrator.
+- The checkbox is a navigation aid, not an audit record; the QA gate output is the durable evidence.
+
+See `session-continuity.md` for the full protocol and worked examples.
+

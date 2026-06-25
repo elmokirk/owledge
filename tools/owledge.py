@@ -114,6 +114,7 @@ HOST_SKILL_DIRS = [
     "skills/agent-memory-runtime-bridge",
     "skills/review-evaluation-workflow",
     "skills/render-memory-report",
+    "skills/concept-blindspot-audit",
 ]
 
 
@@ -276,6 +277,22 @@ def _collect_kit_files(source_root: pathlib.Path, project_root: pathlib.Path) ->
             seen.add(rel_posix)
             sha_installed = sha256_file(target)
             sha_original = sha256_file(source) if source.is_file() else ""
+            entries.append({"path": rel_posix, "sha256_installed": sha_installed, "sha256_original": sha_original})
+    for skill_dir in HOST_SKILL_DIRS:
+        skill_dst = project_root / skill_dir
+        skill_src = source_root / skill_dir
+        if not skill_dst.is_dir():
+            continue
+        for path in sorted(skill_dst.rglob("*"), key=lambda item: item.as_posix()):
+            if not path.is_file() or "__pycache__" in path.parts:
+                continue
+            rel_posix = path.relative_to(project_root).as_posix()
+            if rel_posix in seen:
+                continue
+            seen.add(rel_posix)
+            sha_installed = sha256_file(path)
+            src = skill_src / pathlib.Path(rel_posix).relative_to(skill_dir)
+            sha_original = sha256_file(src) if src.is_file() else ""
             entries.append({"path": rel_posix, "sha256_installed": sha_installed, "sha256_original": sha_original})
     return entries
 
@@ -567,8 +584,15 @@ def upgrade_project(root: pathlib.Path, source_root: pathlib.Path, dry_run: bool
         if version_mismatch and item["state"] in {"pristine", "missing"} and not item["never_touch"]
     ]
 
+    if mode == "manual" and not dry_run:
+        return {"passed": False, "error": "manual mode is always dry-run; --apply ignored (manual emits a patch, never writes). Use --dry-run --mode=manual, or pick --mode=safe/force-templates for --apply.", "project": str(root)}
+
     if mode == "force-templates" and not yes:
-        return {"passed": False, "error": "force-templates mode requires --yes", "project": str(root)}
+        if sys.stdin.isatty():
+            if not prompt_yes_no("force-templates will overwrite user-edited files. Continue?"):
+                return {"passed": False, "error": "force-templates cancelled by user", "project": str(root)}
+        else:
+            return {"passed": False, "error": "force-templates mode requires --yes (or interactive confirmation via a TTY)", "project": str(root)}
 
     lock_path = root / "agent-memory" / ".upgrade.lock"
     if not dry_run:
@@ -641,10 +665,17 @@ def upgrade_project(root: pathlib.Path, source_root: pathlib.Path, dry_run: bool
                     current_lines = []
             else:
                 current_lines = []
-            diff = difflib.unified_diff(current_lines, source_lines, fromfile=rel, tofile=rel, lineterm="")
+            is_new_file = not current_path.is_file()
+            fromfile = f"a/{rel}"
+            tofile = f"b/{rel}"
+            diff = difflib.unified_diff(current_lines, source_lines, fromfile=fromfile, tofile=tofile, lineterm="")
             diff_lines = list(diff)
             if diff_lines:
-                diff_chunks.append("\n".join(diff_lines))
+                header_lines = [f"diff --git a/{rel} b/{rel}"]
+                if is_new_file:
+                    header_lines.append("new file mode 100644")
+                header_lines.append("")
+                diff_chunks.append("\n".join(header_lines + diff_lines))
         patch_text = "\n".join(diff_chunks)
         if dry_run:
             patch_dir = root / "agent-memory" / "exports"
@@ -2389,7 +2420,6 @@ def main(argv: list[str] | None = None) -> int:
 
     concept_audit_p = sub.add_parser("concept-audit", parents=[project_parent])
     concept_audit_p.add_argument("--dimension", default=None)
-    concept_audit_p.add_argument("--since", default=None)
     concept_audit_p.add_argument("--profile", default=None)
     concept_audit_p.add_argument("--format", choices=["json", "summary"], default="json")
 
@@ -2509,8 +2539,21 @@ def main(argv: list[str] | None = None) -> int:
             print_json(result)
             return 0 if result.get("passed", True) else 1
         if args.command == "upgrade":
+            if args.mode == "manual" and args.apply:
+                print_json({"passed": False, "error": "manual mode is always dry-run; --apply ignored. Use --dry-run --mode=manual to emit a patch, or --mode=safe/force-templates for --apply."})
+                return 2
             result = upgrade_project(root, resolve_path(args.source_root), dry_run=not args.apply, mode=args.mode, yes=args.yes, author=args.author)
-            print_json(result)
+            if args.format == "summary":
+                lines = []
+                lines.append(f"mode: {result.get('mode')}  dry_run: {result.get('dry_run')}")
+                lines.append(f"kit_version: {result.get('kit_version_from')} -> {result.get('kit_version_to')}  mismatch: {result.get('version_mismatch')}")
+                lines.append(f"alert_level: {result.get('alert_level')}")
+                lines.append(f"would_update: {len(result.get('would_update', []))}  would_create: {len(result.get('would_create', []))}  would_skip: {len(result.get('would_skip', []))}")
+                if result.get("error"):
+                    lines.append(f"error: {result['error']}")
+                print("\n".join(lines))
+            else:
+                print_json(result)
             return 0 if result.get("passed", False) else 1
         if args.command == "concept-audit":
             profile = None

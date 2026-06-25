@@ -319,3 +319,87 @@ refactor (`3440e30`).
 - **Acceptance:** `PROJECT_CONTEXT.template.md` has a `project_mode` field with
   the 4 modes documented inline. A new user reading the template understands
   which mode to pick without external docs.
+
+### FB-018: Session-continuity checklists in plans (shipped in v0.6.1 fix-up)
+
+- **Source:** v0.6.1 red-team session (2026-06-25)
+- **Connects to:** IDEA-2026-006-17
+- **Problem:** Agent sessions break mid-plan and the next agent restarts the
+  whole plan, wasting context and re-doing completed phases. There is no
+  per-phase checkpoint convention that lets a new agent resume from the exact
+  last-completed step.
+- **Action:**
+  1. Every multi-phase plan (`docs/*-plan.md` with >=2 `## Phase` headings)
+     must include three checkboxes per phase: `- [ ] implementation done`,
+     `- [ ] QA checks done`, `- [ ] quick review done`.
+  2. The resume rule: a new agent reads the plan, finds the first unchecked
+     box, and continues from there. Never restart a completed phase. If a
+     session breaks mid-phase, re-run that phase's QA gate; if it fails,
+     uncheck and redo the phase.
+  3. Subagents check their own boxes before returning to the orchestrator.
+  4. The checkbox is a navigation aid, not an audit record; the phase's QA
+     gate output (committed to `internal/agent-memory/exports/`) is the
+     durable evidence.
+  5. A new gate `test_planning_conventions.py::test_plan_has_continuity_checklists`
+     enforces the convention on multi-phase plans.
+- **Priority:** P1
+- **Acceptance:** `docs/v0.6.1-fix-up-plan.md` and
+  `docs/v0.6.1-upgrade-foundation-plan.md` both have per-phase checklists.
+  `AGENTS.md`, `AGENTS.template.md`, `CLAUDE.template.md` have a
+  `## Session Continuity` section. The planning-layer skill workflow includes
+  the checklist step. `test_planning_conventions.py` passes.
+
+### FB-019: Deferred P2 polish batch from v0.6.1 red-team
+
+- **Source:** v0.6.1 red-team `internal/agent-memory/decisions/red-team-v0.6.1-pr.md`
+  (P2-16..P2-21)
+- **Connects to:** IDEA-2026-006-18
+- **Problem:** Six P2 polish items were identified but deferred to keep the
+  v0.6.1 fix-up tightly scoped to P0/P1.
+- **Action:** Batch into a v0.6.2 "polish" release:
+  1. P2-16: additive-change awareness should suppress `would_update` lists
+     for `breaking: no|additive` (currently metadata-only).
+  2. P2-17: `dogfood_sync_check` should restrict to `*-template.md` glob,
+     not `rglob("*")` over `templates/`.
+  3. P2-18: `concept-audit-fresh` gate should require the report's frontmatter
+     `auditor: concept-blindspot-audit` to count, not just any
+     `concept-audit-*.md`.
+  4. P2-20: `upgrade_drift_check` should use `doctor --mode kit` on temp
+     projects (no host context), not `--mode host`.
+  5. P2-21: stale line numbers in `docs/v0.6.1-upgrade-foundation-plan.md`
+     (historical artifact; no fix needed).
+- **Priority:** P3
+- **Acceptance:** Each P2 item is either fixed in v0.6.2 or explicitly
+  retracted with a recorded reason in the CHANGELOG.
+
+### FB-020: `concept-audit --since` date filter
+
+- **Source:** v0.6.1 red-team P1-7 (dead flag)
+- **Connects to:** none
+- **Problem:** `concept-audit --since` is parsed by argparse but never read by
+  the dispatch. The v0.6.1 fix-up removes the dead flag rather than
+  half-implementing it.
+- **Action:** Implement `--since YYYY-MM-DD` in v0.6.2 to filter
+  `concept-audit` findings by date (e.g. only findings newer than the last
+  audit). Re-add the flag with working dispatch logic.
+- **Priority:** P3
+- **Acceptance:** `concept-audit --since 2026-06-01` returns only findings
+  dated on or after 2026-06-01. A new test
+  `test_concept_audit_since_filter` passes.
+
+### FB-021: `release.yml` upgrade-notes contract -> JSON schema
+
+- **Source:** v0.6.1 red-team R-3
+- **Connects to:** none
+- **Problem:** The `release.yml` upgrade-notes step greps
+  `## Upgrade notes` in `CHANGELOG.md`. This is brittle (depends on exact
+  heading text) and does not validate the `breaking: yes|no|additive` field
+  structure.
+- **Action:** Replace the grep with a JSON-schema contract: a
+  `docs/upgrade-notes-schema.json` that declares the required fields
+  (`breaking`, `summary`). The release step validates the latest
+  `## Upgrade notes` block against the schema. Keep the grep as a fallback.
+- **Priority:** P2
+- **Acceptance:** `release.yml` validates the upgrade-notes block against
+  `docs/upgrade-notes-schema.json`. A malformed block (missing `breaking`)
+  fails the job.
