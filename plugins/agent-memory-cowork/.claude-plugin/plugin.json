@@ -1,6 +1,6 @@
 {
   "name": "agent-memory-cowork",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Host-project adapter for Owledge's Markdown-first agent memory layer; captures private Claude/Cowork runtime events and helps initialize, diagnose, report, and curate project memory.",
   "author": {
     "name": "Owledge"

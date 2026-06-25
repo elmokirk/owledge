@@ -50,6 +50,19 @@ import build_kb_module  # noqa: E402
 import build_project_folder_kit  # noqa: E402
 
 
+def _read_version_file() -> str:
+    for candidate in (REPO_ROOT, pathlib.Path(sys.prefix).resolve(), pathlib.Path(sys.prefix).resolve().parent):
+        vf = candidate / "VERSION"
+        if vf.is_file():
+            return vf.read_text(encoding="utf-8", errors="replace").strip()
+    return ""
+
+
+KIT_VERSION = _read_version_file()
+MEMORY_SCHEMA_VERSION = "1.0.0"
+__version__ = KIT_VERSION
+
+
 PUBLIC_DOC_FILES = [
     "README.md",
     "docs/README.md",
@@ -101,6 +114,7 @@ HOST_SKILL_DIRS = [
     "skills/agent-memory-runtime-bridge",
     "skills/review-evaluation-workflow",
     "skills/render-memory-report",
+    "skills/concept-blindspot-audit",
 ]
 
 
@@ -225,7 +239,147 @@ def parse_json_stdout(process: subprocess.CompletedProcess[str]) -> Any:
     return json.loads(process.stdout)
 
 
-def init_project(project_root: pathlib.Path, source_root: pathlib.Path, include_plugin_adapter: bool, include_compliance: bool) -> dict[str, Any]:
+def _collect_kit_files(source_root: pathlib.Path, project_root: pathlib.Path) -> list[dict[str, str]]:
+    entries: list[dict[str, str]] = []
+    seen: set[str] = set()
+    for rel in ROOT_FILE_MAP:
+        source = source_root / rel[0]
+        target = project_root / rel[1]
+        if target.is_file():
+            rel_posix = rel[1]
+            if rel_posix in seen:
+                continue
+            seen.add(rel_posix)
+            sha_installed = sha256_file(target)
+            sha_original = sha256_file(source) if source.is_file() else ""
+            entries.append({"path": rel_posix, "sha256_installed": sha_installed, "sha256_original": sha_original})
+    agent_src = source_root / "templates" / "agent-memory"
+    agent_dst = project_root / "agent-memory"
+    if agent_dst.is_dir():
+        for path in sorted(agent_dst.rglob("*"), key=lambda item: item.as_posix()):
+            if not path.is_file() or "__pycache__" in path.parts:
+                continue
+            rel_posix = path.relative_to(project_root).as_posix()
+            if rel_posix in seen:
+                continue
+            seen.add(rel_posix)
+            sha_installed = sha256_file(path)
+            src = agent_src / pathlib.Path(rel_posix).relative_to("agent-memory")
+            sha_original = sha256_file(src) if src.is_file() else ""
+            entries.append({"path": rel_posix, "sha256_installed": sha_installed, "sha256_original": sha_original})
+    for tool in HOST_TOOL_FILES:
+        target = project_root / "tools" / tool
+        source = source_root / "tools" / tool
+        if target.is_file():
+            rel_posix = f"tools/{tool}"
+            if rel_posix in seen:
+                continue
+            seen.add(rel_posix)
+            sha_installed = sha256_file(target)
+            sha_original = sha256_file(source) if source.is_file() else ""
+            entries.append({"path": rel_posix, "sha256_installed": sha_installed, "sha256_original": sha_original})
+    for skill_dir in HOST_SKILL_DIRS:
+        skill_dst = project_root / skill_dir
+        skill_src = source_root / skill_dir
+        if not skill_dst.is_dir():
+            continue
+        for path in sorted(skill_dst.rglob("*"), key=lambda item: item.as_posix()):
+            if not path.is_file() or "__pycache__" in path.parts:
+                continue
+            rel_posix = path.relative_to(project_root).as_posix()
+            if rel_posix in seen:
+                continue
+            seen.add(rel_posix)
+            sha_installed = sha256_file(path)
+            src = skill_src / pathlib.Path(rel_posix).relative_to(skill_dir)
+            sha_original = sha256_file(src) if src.is_file() else ""
+            entries.append({"path": rel_posix, "sha256_installed": sha_installed, "sha256_original": sha_original})
+    return entries
+
+
+def _write_kit_manifest(project_root: pathlib.Path, source_root: pathlib.Path) -> None:
+    import datetime as _dt
+    entries = _collect_kit_files(source_root, project_root)
+    manifest = {
+        "kit_version": KIT_VERSION,
+        "memory_schema_version": MEMORY_SCHEMA_VERSION,
+        "generated_at": _dt.datetime.now(_dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+        "source_version": KIT_VERSION,
+        "files": entries,
+    }
+    (project_root / "kit-manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def _resolve_global_link(arg_value: str, source_root: pathlib.Path) -> dict[str, str]:
+    import os
+    import datetime as _dt
+    source = "flag"
+    if arg_value == "":
+        env_path = os.environ.get("OWLEDGE_GLOBAL_HOME", "")
+        if env_path:
+            resolved = pathlib.Path(env_path).expanduser().resolve()
+            source = "env"
+        else:
+            resolved = pathlib.Path.home() / ".owledge" / "global"
+            resolved = resolved.resolve()
+            source = "default"
+    else:
+        resolved = pathlib.Path(arg_value).expanduser().resolve()
+    kit_version = KIT_VERSION
+    return {
+        "path": str(resolved),
+        "resolved_at": _dt.datetime.now(_dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+        "kit_version": kit_version,
+        "source": source,
+    }
+
+
+def sync_dogfood(root: pathlib.Path, dry_run: bool = True) -> dict[str, Any]:
+    source_dir = root / "templates" / "agent-memory" / "templates"
+    internal_dir = root / "internal" / "agent-memory" / "templates"
+    if not source_dir.is_dir():
+        return {"passed": False, "reason": "templates/agent-memory/templates/ not found", "project": str(root)}
+    if not internal_dir.is_dir():
+        return {"passed": False, "reason": "internal/agent-memory/templates/ not found; nothing to sync", "project": str(root)}
+    report = core.dogfood_sync_check(root)
+    drifted = report.get("drifted_files", [])
+    missing = report.get("missing_in_internal", [])
+    if dry_run:
+        return {
+            "passed": not drifted and not missing,
+            "mode": "dry-run",
+            "would_update": drifted,
+            "would_create": missing,
+            "sync_direction": "templates->internal",
+            "project": str(root),
+        }
+    updated: list[str] = []
+    created: list[str] = []
+    for src_path in sorted(source_dir.rglob("*"), key=lambda p: p.as_posix()):
+        if not src_path.is_file():
+            continue
+        rel = src_path.relative_to(source_dir)
+        dst_path = internal_dir / rel
+        assert str(dst_path).startswith(str(internal_dir)), f"refuse path outside internal: {dst_path}"
+        if not dst_path.parent.exists():
+            dst_path.parent.mkdir(parents=True, exist_ok=True)
+        if not dst_path.is_file():
+            dst_path.write_bytes(src_path.read_bytes())
+            created.append(rel.as_posix())
+        elif hashlib.sha256(src_path.read_bytes()).hexdigest() != hashlib.sha256(dst_path.read_bytes()).hexdigest():
+            dst_path.write_bytes(src_path.read_bytes())
+            updated.append(rel.as_posix())
+    return {
+        "passed": True,
+        "mode": "apply",
+        "updated": updated,
+        "created": created,
+        "sync_direction": "templates->internal",
+        "project": str(root),
+    }
+
+
+def init_project(project_root: pathlib.Path, source_root: pathlib.Path, include_plugin_adapter: bool, include_compliance: bool, link_global: str | None = None) -> dict[str, Any]:
     project_root.mkdir(parents=True, exist_ok=True)
     created: list[str] = []
     skipped: list[str] = []
@@ -275,6 +429,13 @@ def init_project(project_root: pathlib.Path, source_root: pathlib.Path, include_
         created.append("agent-memory/compliance/")
 
     doctor = core.memory_doctor(project_root, mode="host")
+    _write_kit_manifest(project_root, source_root)
+    global_link_info = None
+    if link_global is not None:
+        global_link_info = _resolve_global_link(link_global, source_root)
+        (project_root / "agent-memory" / "global-link.json").write_text(
+            json.dumps(global_link_info, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+        )
     return {
         "project_root": str(project_root),
         "created": sorted(set(created)),
@@ -282,7 +443,331 @@ def init_project(project_root: pathlib.Path, source_root: pathlib.Path, include_
         "include_plugin_adapter": include_plugin_adapter,
         "include_compliance": include_compliance,
         "doctor_passed": doctor["passed"],
+        "kit_version": KIT_VERSION,
+        "global_link": global_link_info,
     }
+
+
+NEVER_TOUCH_FILES = {
+    "PROJECT_CONTEXT.md",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "USER_CONTEXT.md",
+}
+
+NEVER_TOUCH_DIRS = (
+    "agent-memory/decisions/",
+    "agent-memory/plans/",
+    "agent-memory/sessions/",
+    "agent-memory/evidence/",
+    "agent-memory/handoffs/",
+    "global-memory/",
+)
+
+
+def _is_never_touch(rel_posix: str) -> bool:
+    if rel_posix in NEVER_TOUCH_FILES:
+        return True
+    for prefix in NEVER_TOUCH_DIRS:
+        if rel_posix.startswith(prefix):
+            return True
+    return False
+
+
+def _resolve_source_path(rel_posix: str, source_root: pathlib.Path) -> pathlib.Path:
+    for source_rel, target_rel in ROOT_FILE_MAP:
+        if rel_posix == target_rel:
+            return source_root / source_rel
+    if rel_posix.startswith("agent-memory/"):
+        return source_root / "templates" / "agent-memory" / pathlib.Path(rel_posix).relative_to("agent-memory")
+    if rel_posix.startswith("tools/"):
+        return source_root / rel_posix
+    if rel_posix.startswith("skills/"):
+        return source_root / rel_posix
+    return source_root / rel_posix
+
+
+def _pid_running(pid: int) -> bool:
+    if pid <= 0:
+        return False
+    if sys.platform == "win32":
+        try:
+            import ctypes
+            kernel32 = ctypes.windll.kernel32
+            PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
+            handle = kernel32.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, False, pid)
+            if not handle:
+                return False
+            kernel32.CloseHandle(handle)
+            return True
+        except Exception:
+            return False
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True
+    except OSError:
+        return False
+    return True
+
+
+def _read_upgrade_notes(root: pathlib.Path) -> str:
+    changelog = root / "CHANGELOG.md"
+    if not changelog.is_file():
+        return "unknown"
+    try:
+        text = changelog.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return "unknown"
+    match = re.search(r"^##\s+Upgrade\s+notes\s*$", text, flags=re.IGNORECASE | re.MULTILINE)
+    if not match:
+        return "unknown"
+    tail = text[match.end():]
+    breaking_match = re.search(r"breaking:\s*(yes|no|additive)", tail, flags=re.IGNORECASE)
+    if not breaking_match:
+        return "unknown"
+    value = breaking_match.group(1).strip().lower()
+    if value in {"no", "additive"}:
+        return "additive"
+    return "breaking"
+
+
+def upgrade_project(root: pathlib.Path, source_root: pathlib.Path, dry_run: bool, mode: str, yes: bool, author: str = "owledge-cli") -> dict[str, Any]:
+    import datetime as _dt
+    import difflib
+
+    manifest_path = root / "kit-manifest.json"
+    if not manifest_path.is_file():
+        return {"passed": False, "error": "No kit-manifest.json found; run 'owledge init-project' first.", "project": str(root)}
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8", errors="replace"))
+    except (OSError, ValueError) as exc:
+        return {"passed": False, "error": f"kit-manifest.json is malformed: {exc}", "project": str(root)}
+
+    manifest_kit = str(manifest.get("kit_version") or "").strip()
+    target_kit = KIT_VERSION
+    version_mismatch = bool(manifest_kit and target_kit and manifest_kit != target_kit)
+    alert_level = _read_upgrade_notes(root) if version_mismatch else "current"
+
+    classified: list[dict[str, Any]] = []
+    for entry in manifest.get("files", []) or []:
+        rel_posix = str(entry.get("path") or "")
+        if not rel_posix:
+            continue
+        sha_original = str(entry.get("sha256_original") or "")
+        current_path = root / rel_posix
+        state = "missing"
+        current_hash = ""
+        if current_path.is_file():
+            try:
+                current_hash = sha256_file(current_path)
+            except OSError:
+                current_hash = ""
+            if sha_original and current_hash == sha_original:
+                state = "pristine"
+            elif sha_original and current_hash and current_hash != sha_original:
+                state = "user_edited"
+            elif not sha_original:
+                state = "user_edited"
+        classified.append({
+            "path": rel_posix,
+            "state": state,
+            "sha256_current": current_hash,
+            "sha256_original": sha_original,
+            "never_touch": _is_never_touch(rel_posix),
+        })
+
+    outdated_paths = [
+        item["path"] for item in classified
+        if version_mismatch and item["state"] in {"pristine", "missing"} and not item["never_touch"]
+    ]
+
+    if mode == "manual" and not dry_run:
+        return {"passed": False, "error": "manual mode is always dry-run; --apply ignored (manual emits a patch, never writes). Use --dry-run --mode=manual, or pick --mode=safe/force-templates for --apply.", "project": str(root)}
+
+    if mode == "force-templates" and not yes:
+        if sys.stdin.isatty():
+            if not prompt_yes_no("force-templates will overwrite user-edited files. Continue?"):
+                return {"passed": False, "error": "force-templates cancelled by user", "project": str(root)}
+        else:
+            return {"passed": False, "error": "force-templates mode requires --yes (or interactive confirmation via a TTY)", "project": str(root)}
+
+    lock_path = root / "agent-memory" / ".upgrade.lock"
+    if not dry_run:
+        if lock_path.is_file():
+            try:
+                lock_data = json.loads(lock_path.read_text(encoding="utf-8", errors="replace"))
+            except (OSError, ValueError):
+                lock_data = {}
+            held_pid = int(lock_data.get("pid") or 0)
+            if held_pid and _pid_running(held_pid):
+                return {"passed": False, "error": f"Upgrade in progress (lock held by PID {held_pid}). Remove agent-memory/.upgrade.lock if stale.", "project": str(root)}
+
+    def select_targets() -> tuple[list[str], list[str], list[str]]:
+        update_list: list[str] = []
+        create_list: list[str] = []
+        skip_list: list[str] = []
+        for item in classified:
+            rel = item["path"]
+            if item["never_touch"]:
+                skip_list.append(f"{rel} (never-touch)")
+                continue
+            is_outdated = version_mismatch and item["state"] in {"pristine", "missing"}
+            if mode == "safe":
+                if is_outdated and item["state"] == "pristine":
+                    update_list.append(rel)
+                elif is_outdated and item["state"] == "missing":
+                    create_list.append(rel)
+                elif item["state"] == "user_edited":
+                    skip_list.append(f"{rel} (user-edited)")
+                elif item["state"] == "pristine" and not version_mismatch:
+                    pass
+                elif item["state"] == "missing" and not version_mismatch:
+                    create_list.append(rel)
+            elif mode == "force-templates":
+                if item["state"] == "pristine":
+                    update_list.append(rel)
+                elif item["state"] == "missing":
+                    create_list.append(rel)
+                elif item["state"] == "user_edited":
+                    update_list.append(rel)
+            elif mode == "manual":
+                if is_outdated and item["state"] == "pristine":
+                    update_list.append(rel)
+                elif is_outdated and item["state"] == "missing":
+                    create_list.append(rel)
+                elif item["state"] == "user_edited":
+                    skip_list.append(f"{rel} (user-edited)")
+                elif item["state"] == "missing" and not version_mismatch:
+                    create_list.append(rel)
+        return update_list, create_list, skip_list
+
+    update_targets, create_targets, skip_targets = select_targets()
+
+    patch_text = ""
+    if mode == "manual":
+        diff_chunks: list[str] = []
+        for rel in update_targets + create_targets:
+            source_path = _resolve_source_path(rel, source_root)
+            if not source_path.is_file():
+                continue
+            current_path = root / rel
+            try:
+                source_lines = source_path.read_text(encoding="utf-8", errors="replace").splitlines()
+            except OSError:
+                continue
+            if current_path.is_file():
+                try:
+                    current_lines = current_path.read_text(encoding="utf-8", errors="replace").splitlines()
+                except OSError:
+                    current_lines = []
+            else:
+                current_lines = []
+            is_new_file = not current_path.is_file()
+            fromfile = f"a/{rel}"
+            tofile = f"b/{rel}"
+            diff = difflib.unified_diff(current_lines, source_lines, fromfile=fromfile, tofile=tofile, lineterm="")
+            diff_lines = list(diff)
+            if diff_lines:
+                header_lines = [f"diff --git a/{rel} b/{rel}"]
+                if is_new_file:
+                    header_lines.append("new file mode 100644")
+                header_lines.append("")
+                diff_chunks.append("\n".join(header_lines + diff_lines))
+        patch_text = "\n".join(diff_chunks)
+        if dry_run:
+            patch_dir = root / "agent-memory" / "exports"
+            patch_dir.mkdir(parents=True, exist_ok=True)
+            (patch_dir / "upgrade-pending.patch").write_text(patch_text + "\n", encoding="utf-8", newline="\n")
+
+    if dry_run:
+        report: dict[str, Any] = {
+            "passed": True,
+            "mode": mode,
+            "dry_run": True,
+            "project": str(root),
+            "kit_version_from": manifest_kit,
+            "kit_version_to": target_kit,
+            "version_mismatch": version_mismatch,
+            "alert_level": alert_level,
+            "would_update": update_targets,
+            "would_create": create_targets,
+            "would_skip": skip_targets,
+            "outdated_files": outdated_paths,
+            "classified": classified,
+        }
+        if mode == "manual":
+            report["patch"] = patch_text
+            report["patch_path"] = str((root / "agent-memory" / "exports" / "upgrade-pending.patch"))
+        return report
+
+    lock_held_by_us = False
+    try:
+        lock_path.parent.mkdir(parents=True, exist_ok=True)
+        lock_path.write_text(json.dumps({"pid": os.getpid(), "started_at": _dt.datetime.now(_dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")}, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        lock_held_by_us = True
+
+        updated: list[str] = []
+        created: list[str] = []
+        skipped: list[str] = list(skip_targets)
+
+        for rel in update_targets:
+            assert not _is_never_touch(rel), f"refuse to write never-touch file: {rel}"
+            source_path = _resolve_source_path(rel, source_root)
+            if not source_path.is_file():
+                skipped.append(f"{rel} (source missing)")
+                continue
+            target_path = root / rel
+            target_path.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source_path, target_path)
+            updated.append(rel)
+
+        for rel in create_targets:
+            assert not _is_never_touch(rel), f"refuse to write never-touch file: {rel}"
+            source_path = _resolve_source_path(rel, source_root)
+            if not source_path.is_file():
+                skipped.append(f"{rel} (source missing)")
+                continue
+            target_path = root / rel
+            if target_path.exists():
+                skipped.append(f"{rel} (already exists)")
+                continue
+            target_path.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source_path, target_path)
+            created.append(rel)
+
+        _write_kit_manifest(root, source_root)
+        manifest_out_path = root / "kit-manifest.json"
+        try:
+            manifest_out = json.loads(manifest_out_path.read_text(encoding="utf-8", errors="replace"))
+            manifest_out["upgraded_at"] = _dt.datetime.now(_dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+            manifest_out["upgraded_by"] = author
+            manifest_out_path.write_text(json.dumps(manifest_out, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+        except (OSError, ValueError):
+            pass
+
+        return {
+            "passed": True,
+            "mode": mode,
+            "dry_run": False,
+            "project": str(root),
+            "kit_version_from": manifest_kit,
+            "kit_version_to": target_kit,
+            "version_mismatch": version_mismatch,
+            "alert_level": alert_level,
+            "updated": updated,
+            "created": created,
+            "skipped": skipped,
+            "outdated_files": outdated_paths,
+        }
+    finally:
+        if lock_held_by_us and lock_path.is_file():
+            try:
+                lock_path.unlink()
+            except OSError:
+                pass
 
 
 def addon_relative_path(value: str) -> pathlib.Path:
@@ -1365,6 +1850,82 @@ def project_folder_kit_gate(root: pathlib.Path, include_compliance: bool = False
     return {"passed": True, **result}
 
 
+def upgrade_drift_check(root: pathlib.Path) -> dict[str, Any]:
+    """On a temp-init'd project at current version, doctor --check-version must pass."""
+    tmp = pathlib.Path(tempfile.mkdtemp(prefix="owledge-upgrade-drift-"))
+    try:
+        init_project(tmp, REPO_ROOT, include_plugin_adapter=False, include_compliance=False)
+        doc = core.memory_doctor(tmp, mode="host")
+        vd = [c for c in doc.get("checks", []) if c.get("name") == "version-drift"]
+        passed = doc.get("passed", False) and all(c.get("passed") for c in vd)
+        return {"passed": passed, "project": str(root), "temp_project": str(tmp), "version_drift_check": vd}
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
+def concept_audit_fresh_gate(root: pathlib.Path) -> dict[str, Any]:
+    """Check that a concept audit exists and is fresher than the last VERSION bump.
+
+    Severity adapts to ``project_mode`` (Q6): fail at ``saas``, warn at ``mvp``,
+    skip at ``poc``/``side``. The gate never crashes on a missing audit.
+    """
+    import datetime as _dt
+
+    decisions_dir = root / "internal" / "agent-memory" / "decisions"
+    if not decisions_dir.is_dir():
+        decisions_dir = root / "agent-memory" / "decisions"
+    audit_files = sorted(decisions_dir.glob("concept-audit-*.md")) if decisions_dir.is_dir() else []
+    version_file = root / "VERSION"
+    version_mtime = version_file.stat().st_mtime if version_file.exists() else 0
+    if not audit_files:
+        project_mode = _read_project_mode_from_context(root)
+        severity = "error" if project_mode == "saas" else ("warning" if project_mode == "mvp" else "info")
+        passed = project_mode not in {"saas"}
+        return {
+            "passed": passed,
+            "project": str(root),
+            "reason": "No concept audit found; run 'owledge concept-audit'",
+            "fresh": False,
+            "project_mode": project_mode,
+            "severity": severity,
+        }
+    latest_audit = audit_files[-1]
+    audit_mtime = latest_audit.stat().st_mtime
+    version_fresh = audit_mtime >= version_mtime
+    days_old = (_dt.datetime.now().timestamp() - audit_mtime) / 86400
+    time_fresh = days_old <= 30
+    fresh = version_fresh and time_fresh
+    project_mode = _read_project_mode_from_context(root)
+    if project_mode == "saas":
+        passed = fresh
+    else:
+        passed = True
+    severity = "error" if project_mode == "saas" else ("warning" if project_mode == "mvp" else "info")
+    return {
+        "passed": passed,
+        "project": str(root),
+        "fresh": fresh,
+        "latest_audit": str(latest_audit),
+        "days_old": int(days_old),
+        "version_fresh": version_fresh,
+        "project_mode": project_mode,
+        "severity": severity,
+    }
+
+
+def _read_project_mode_from_context(root: pathlib.Path) -> str:
+    pc = root / "PROJECT_CONTEXT.md"
+    if not pc.exists():
+        return "mvp"
+    text = pc.read_text(encoding="utf-8", errors="ignore")
+    m = re.search(r'project_mode:\s*"?(\w+)"?', text)
+    if m:
+        mode = m.group(1).lower()
+        if mode in {"poc", "mvp", "side", "saas"}:
+            return mode
+    return "mvp"
+
+
 def finalization_gates(root: pathlib.Path, include_exports: bool, include_compliance: bool) -> dict[str, Any]:
     gates: list[dict[str, Any]] = []
     memory_root = resolve_memory_root(root)
@@ -1400,6 +1961,9 @@ def finalization_gates(root: pathlib.Path, include_exports: bool, include_compli
     add("quality-ratchet", lambda: quality_ratchet_gate(root))
     add("kb-module", lambda: kb_module_gate(root))
     add("project-folder-kit", lambda: project_folder_kit_gate(root, include_compliance=False))
+    add("dogfood-sync", lambda: core.dogfood_sync_check(root))
+    add("upgrade-drift", lambda: upgrade_drift_check(root))
+    add("concept-audit-fresh", lambda: concept_audit_fresh_gate(root))
     if include_compliance:
         add("compliance-addon-source", lambda: compliance_source_gate(root))
         add("project-folder-kit-compliance", lambda: project_folder_kit_gate(root, include_compliance=True))
@@ -1758,6 +2322,7 @@ def main(argv: list[str] | None = None) -> int:
     init_p.add_argument("--source-root", default=str(REPO_ROOT))
     init_p.add_argument("--include-plugin-adapter", action="store_true")
     init_p.add_argument("--include-compliance", action="store_true")
+    init_p.add_argument("--link-global", nargs="?", const="", default=None, help="Link a global user-memory layer. With no arg, uses OWLEDGE_GLOBAL_HOME env or ~/.owledge/global default.")
 
     quickstart_p = sub.add_parser("quickstart")
     quickstart_p.add_argument("--target", dest="target", required=True)
@@ -1840,6 +2405,24 @@ def main(argv: list[str] | None = None) -> int:
     benchmark_p.add_argument("--scale-files", default="100")
     benchmark_p.add_argument("--seed", type=int, default=1)
 
+    sync_dogfood_p = sub.add_parser("sync-dogfood", parents=[project_parent])
+    sync_dogfood_p.add_argument("--dry-run", action="store_true", default=True)
+    sync_dogfood_p.add_argument("--apply", action="store_true")
+
+    upgrade_p = sub.add_parser("upgrade", parents=[project_parent])
+    upgrade_p.add_argument("--dry-run", action="store_true", default=True)
+    upgrade_p.add_argument("--apply", action="store_true")
+    upgrade_p.add_argument("--mode", choices=["safe", "force-templates", "manual"], default="safe")
+    upgrade_p.add_argument("--yes", action="store_true")
+    upgrade_p.add_argument("--source-root", default=str(REPO_ROOT))
+    upgrade_p.add_argument("--author", default="owledge-cli")
+    upgrade_p.add_argument("--format", choices=["json", "summary"], default="json")
+
+    concept_audit_p = sub.add_parser("concept-audit", parents=[project_parent])
+    concept_audit_p.add_argument("--dimension", default=None)
+    concept_audit_p.add_argument("--profile", default=None)
+    concept_audit_p.add_argument("--format", choices=["json", "summary"], default="json")
+
     args = parser.parse_args(argv)
     root = resolve_path(getattr(args, "command_project_root", None) or args.project_root)
 
@@ -1849,7 +2432,7 @@ def main(argv: list[str] | None = None) -> int:
             print_json(result)
             return 0 if result["passed"] else 1
         if args.command == "init-project":
-            print_json(init_project(resolve_path(args.target), resolve_path(args.source_root), args.include_plugin_adapter, args.include_compliance))
+            print_json(init_project(resolve_path(args.target), resolve_path(args.source_root), args.include_plugin_adapter, args.include_compliance, link_global=getattr(args, "link_global", None)))
             return 0
         if args.command == "quickstart":
             result = quickstart_project(resolve_path(args.target), resolve_path(args.source_root), args.include_plugin_adapter)
@@ -1951,6 +2534,45 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "benchmark":
             print_json(run_benchmarks(root, args.scale_files, args.seed))
             return 0
+        if args.command == "sync-dogfood":
+            result = sync_dogfood(root, dry_run=not args.apply)
+            print_json(result)
+            return 0 if result.get("passed", True) else 1
+        if args.command == "upgrade":
+            if args.mode == "manual" and args.apply:
+                print_json({"passed": False, "error": "manual mode is always dry-run; --apply ignored. Use --dry-run --mode=manual to emit a patch, or --mode=safe/force-templates for --apply."})
+                return 2
+            result = upgrade_project(root, resolve_path(args.source_root), dry_run=not args.apply, mode=args.mode, yes=args.yes, author=args.author)
+            if args.format == "summary":
+                lines = []
+                lines.append(f"mode: {result.get('mode')}  dry_run: {result.get('dry_run')}")
+                lines.append(f"kit_version: {result.get('kit_version_from')} -> {result.get('kit_version_to')}  mismatch: {result.get('version_mismatch')}")
+                lines.append(f"alert_level: {result.get('alert_level')}")
+                lines.append(f"would_update: {len(result.get('would_update', []))}  would_create: {len(result.get('would_create', []))}  would_skip: {len(result.get('would_skip', []))}")
+                if result.get("error"):
+                    lines.append(f"error: {result['error']}")
+                print("\n".join(lines))
+            else:
+                print_json(result)
+            return 0 if result.get("passed", False) else 1
+        if args.command == "concept-audit":
+            profile = None
+            if getattr(args, "profile", None):
+                profile = json.loads(pathlib.Path(args.profile).read_text(encoding="utf-8"))
+            result = core.concept_audit(root, profile=profile)
+            if args.dimension:
+                result["dimensions"] = [d for d in result.get("dimensions", []) if d.get("name") == args.dimension]
+            if args.format == "summary":
+                lines = []
+                for d in result.get("dimensions", []):
+                    score = d.get("score")
+                    score_str = str(score) if score is not None else "guided"
+                    lines.append(f"{d['name']}: {score_str} ({d['mode']}, {len(d.get('findings', []))} findings)")
+                lines.append(f"passed: {result.get('passed')}")
+                print("\n".join(lines))
+            else:
+                print_json(result)
+            return 0 if result.get("passed", False) else 1
     except Exception as exc:
         print_json({"passed": False, "error": str(exc)})
         return 1

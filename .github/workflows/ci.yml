@@ -53,6 +53,12 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Install pytest
+        run: python -m pip install --quiet pytest
+
+      - name: Stress tests (v0.6.1 fix-up suite)
+        run: python -m pytest tests/unit/ -q --tb=short
+
       - name: Finalization gates (dogfood)
         run: python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports
 
@@ -73,3 +79,26 @@ jobs:
           python -m pip install --quiet build
           python -m build --sdist
           python tools/agent_memory_cli.py --project-root . sdist-clean
+
+  fresh-install-cycle:
+    name: fresh-install-cycle
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install owledge from source
+        run: python -m pip install --quiet -e .
+
+      - name: Fresh init-project + doctor + upgrade --dry-run
+        run: |
+          tmp=$(mktemp -d /tmp/owledge-fresh-XXXXXX)
+          owledge init-project --target "$tmp"
+          owledge doctor --project-root "$tmp" --mode host
+          owledge upgrade --project-root "$tmp" --dry-run
+          echo "Fresh install cycle completed successfully"

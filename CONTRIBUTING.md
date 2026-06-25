@@ -27,6 +27,17 @@ python tools/owledge.py finalization-gates --project-root internal --include-com
 - Keep public docs concise and GitHub-readable.
 - Add or update tests when behavior, contracts, docs integrity, or packaging changes.
 
+## Schema & Template Changes
+
+Any PR touching `templates/` or `schemas/` MUST:
+
+1. Bump `VERSION` (the kit version stamp).
+2. Add a `## Upgrade notes` section to `CHANGELOG.md` declaring `breaking: yes|no|additive`.
+3. Paste `owledge upgrade --dry-run` output (run against a prior install) into the PR description.
+4. Run `python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports` and confirm green.
+
+The release workflow enforces the `## Upgrade notes` requirement when templates or schemas changed in the tag diff.
+
 ## Scope Discipline
 
 This repository is a local/project utility layer. Avoid turning it into a hosted platform, enterprise control plane, or mandatory migration framework without an explicit design decision.

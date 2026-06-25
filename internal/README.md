@@ -33,3 +33,24 @@ python tools/owledge.py benchmark --project-root . --scale-files 100 --seed 1
 Never write dogfood artifacts (decision traces, compiled snapshots, indexes,
 exports) into `templates/`. That directory is the shipped product source. This
 directory is the only place generated dogfood content should accumulate.
+
+## Keeping dogfood in sync
+
+The `internal/agent-memory/templates/` tree must mirror `templates/agent-memory/templates/`
+(one-way: product source -> dogfood). Dogfood-only artifacts (decisions, sessions, evidence,
+handoffs, decision-trace) are NOT synced and live only in `internal/`.
+
+Check for drift:
+
+```bash
+python tools/agent_memory_cli.py --project-root . dogfood-sync-check
+```
+
+Reconcile drift:
+
+```bash
+python tools/owledge.py sync-dogfood --dry-run   # default, shows what would change
+python tools/owledge.py sync-dogfood --apply     # copies templates -> internal
+```
+
+The `dogfood-sync` finalization gate fails if template files drift.

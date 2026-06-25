@@ -65,3 +65,7 @@ Global plugins and skills are runtime bridges. Project-local Markdown is the sou
 PI Agent intelligence and Red Team evaluations are candidate artifacts. They can guide planning and curator review, but they do not become canonical memory without explicit promotion.
 
 Daily notes, personal tasks, onboarding profiles, and private user preferences are not shared RAG input by default.
+
+## Session Continuity
+
+When working from a multi-phase plan with per-phase checklists, resume from the first unchecked box. Do not restart completed phases. If a session breaks mid-phase, re-run that phase's QA gate before continuing; if it fails, uncheck the box and redo the phase. Subagents check their own boxes before returning to the orchestrator. The checkbox is a navigation aid; the phase's QA gate output is the durable evidence.
