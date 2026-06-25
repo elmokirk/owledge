@@ -136,6 +136,7 @@ REQUIRED_DIRS = [
     "skills/render-memory-report",
     "skills/review-evaluation-workflow",
     "skills/personal-pi-agent",
+    "skills/concept-blindspot-audit",
     "plugins/agent-memory-cowork",
     "plugins/agent-memory-cowork/.claude-plugin",
     "plugins/agent-memory-cowork/.codex-plugin",
@@ -214,6 +215,7 @@ REQUIRED_FILES = [
     "agent-memory/templates/orchestration-delta-template.md",
     "agent-memory/templates/root-review-template.md",
     "agent-memory/templates/adr-template.md",
+    "agent-memory/templates/concept-audit-template.md",
     "agent-memory/templates/canonical-memory-template.md",
     "agent-memory/templates/compiled-memory-template.md",
     "agent-memory/templates/pattern-card-template.md",
@@ -315,6 +317,9 @@ REQUIRED_FILES = [
     "skills/personal-pi-agent/SKILL.md",
     "skills/render-memory-report/SKILL.md",
     "skills/review-evaluation-workflow/SKILL.md",
+    "skills/concept-blindspot-audit/SKILL.md",
+    "skills/concept-blindspot-audit/references/audit-dimensions.md",
+    "skills/concept-blindspot-audit/references/profile-template.json",
     "skills/render-memory-report/references/decision-report.md",
     "skills/render-memory-report/references/handoff-report.md",
     "skills/render-memory-report/references/rag-readiness-report.md",
@@ -2125,6 +2130,25 @@ def scan_sensitive_data(root: pathlib.Path) -> dict[str, Any]:
     }
 
 
+def _detect_kit_version(root: pathlib.Path) -> str:
+    candidates = [root / "VERSION"]
+    here = pathlib.Path(__file__).resolve().parent
+    cursor = here
+    for _ in range(8):
+        if cursor == cursor.parent:
+            break
+        candidates.append(cursor / "VERSION")
+        cursor = cursor.parent
+    candidates.append(pathlib.Path(sys.prefix).resolve() / "VERSION")
+    for vf in candidates:
+        try:
+            if vf.is_file():
+                return vf.read_text(encoding="utf-8", errors="replace").strip()
+        except OSError:
+            continue
+    return ""
+
+
 def memory_doctor(root: pathlib.Path, mode: str = "auto") -> dict[str, Any]:
     checks = []
 
@@ -2180,9 +2204,63 @@ def memory_doctor(root: pathlib.Path, mode: str = "auto") -> dict[str, Any]:
         ):
             shared_unsafe.append(record["source_path"])
     add("shared-export-safe", not shared_unsafe, "error", f"Unsafe shared records: {len(shared_unsafe)}.", "Approve review and sanitization before shared export.")
+    global_link_path = root / "agent-memory" / "global-link.json"
+    if not global_link_path.exists():
+        add("global-link", True, "info", "No global layer linked.", "Use owledge init-project --link-global to link a global user-memory layer.")
+    else:
+        try:
+            gl = json.loads(global_link_path.read_text(encoding="utf-8"))
+            gp = pathlib.Path(gl.get("path", "")).expanduser()
+            if not gp or str(gp) == ".":
+                add("global-link", False, "error", "global-link.json has empty path.", "Re-run owledge init-project --link-global with a valid path.")
+            elif not gp.exists():
+                add("global-link", False, "error", f"Global layer moved/unmounted: {gp}", "Restore the global layer at the linked path or re-run owledge init-project --link-global.")
+            elif not os.access(str(gp), os.R_OK):
+                add("global-link", False, "warning", f"Global layer unreadable (possibly transient): {gp}", "Check permissions on the global layer path.")
+            else:
+                add("global-link", True, "info", f"Global layer linked: {gp}", "")
+        except json.JSONDecodeError as exc:
+            add("global-link", False, "warning", f"global-link.json is malformed: {exc}", "Re-run owledge init-project --link-global to regenerate.")
+    outdated_files: list[str] = []
+    user_edited_files: list[str] = []
+    manifest_path = root / "kit-manifest.json"
+    cli_kit = _detect_kit_version(root)
+    if not manifest_path.is_file():
+        add("version-drift", False, "warning", "No kit-manifest.json found; run 'owledge init-project' or 'owledge upgrade --dry-run'.", "Run owledge init-project to install the kit manifest.")
+    else:
+        try:
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8", errors="replace"))
+        except (OSError, ValueError) as exc:
+            add("version-drift", False, "error", f"kit-manifest.json is malformed: {exc}", "Re-run owledge init-project to regenerate the manifest.")
+            manifest = None
+        if manifest is not None:
+            manifest_kit = str(manifest.get("kit_version") or "").strip()
+            if not manifest_kit:
+                add("version-drift", False, "warning", "kit-manifest.json has no kit_version field; old install. Run 'owledge upgrade --dry-run'.", "Re-run owledge init-project to refresh the manifest.")
+            elif cli_kit and manifest_kit != cli_kit:
+                add("version-drift", False, "error", f"Kit installed at v{manifest_kit}, CLI is v{cli_kit}; run 'owledge upgrade --dry-run'.", "Run owledge upgrade --dry-run to see what would change.")
+            else:
+                add("version-drift", True, "info", f"Kit version matches CLI (v{cli_kit}).", "")
+            version_mismatch = bool(cli_kit and manifest_kit and manifest_kit != cli_kit)
+            for entry in manifest.get("files", []) or []:
+                rel_path = str(entry.get("path") or "")
+                if not rel_path:
+                    continue
+                sha_original = str(entry.get("sha256_original") or "")
+                current_installed = ""
+                target_file = (root / rel_path).resolve()
+                try:
+                    if target_file.is_file():
+                        current_installed = sha256_file(target_file)
+                except OSError:
+                    current_installed = ""
+                if sha_original and current_installed and current_installed != sha_original:
+                    user_edited_files.append(rel_path)
+                elif current_installed and sha_original and current_installed == sha_original and version_mismatch:
+                    outdated_files.append(rel_path)
     failed = [check for check in checks if not check["passed"] and check["severity"] in {"error", "warning"}]
     score = max(0, 100 - sum(15 if check["severity"] == "error" else 5 for check in failed))
-    return {"project": str(root), "score": score, "passed": not any(check for check in checks if not check["passed"] and check["severity"] == "error"), "checks": checks, "unsafe_shared_records": shared_unsafe}
+    return {"project": str(root), "score": score, "passed": not any(check for check in checks if not check["passed"] and check["severity"] == "error"), "checks": checks, "unsafe_shared_records": shared_unsafe, "outdated_files": outdated_files, "user_edited_files": user_edited_files}
 
 
 def compliance_bool(meta: dict[str, Any], key: str, default: bool = False) -> bool:
@@ -5364,6 +5442,38 @@ def source_vs_target_audit(root: pathlib.Path) -> dict[str, Any]:
     }
 
 
+def dogfood_sync_check(root: pathlib.Path) -> dict[str, Any]:
+    """Verify internal/agent-memory/templates/ mirrors templates/agent-memory/templates/ (one-way)."""
+    source_dir = root / "templates" / "agent-memory" / "templates"
+    internal_dir = root / "internal" / "agent-memory" / "templates"
+    if not source_dir.is_dir():
+        return {"passed": False, "reason": "templates/agent-memory/templates/ not found", "project": str(root), "drifted_files": [], "sync_direction": "templates->internal"}
+    if not internal_dir.is_dir():
+        return {"passed": True, "project": str(root), "drifted_files": [], "sync_direction": "templates->internal", "details": "internal/agent-memory/templates/ not found; nothing to sync"}
+    drifted_files: list[str] = []
+    missing_in_internal: list[str] = []
+    for src_path in sorted(source_dir.rglob("*"), key=lambda p: p.as_posix()):
+        if not src_path.is_file():
+            continue
+        rel = src_path.relative_to(source_dir).as_posix()
+        dst_path = internal_dir / rel
+        if not dst_path.is_file():
+            missing_in_internal.append(rel)
+            continue
+        src_hash = hashlib.sha256(src_path.read_bytes()).hexdigest()
+        dst_hash = hashlib.sha256(dst_path.read_bytes()).hexdigest()
+        if src_hash != dst_hash:
+            drifted_files.append(rel)
+    all_drifted = drifted_files + missing_in_internal
+    return {
+        "passed": not all_drifted,
+        "project": str(root),
+        "drifted_files": all_drifted,
+        "missing_in_internal": missing_in_internal,
+        "sync_direction": "templates->internal",
+    }
+
+
 def sdist_clean_check(root: pathlib.Path, sdist_glob: str = "dist/owledge-*.tar.gz") -> dict[str, Any]:
     """Assert the built PyPI sdist is clean and complete.
 
@@ -5442,6 +5552,465 @@ def sdist_clean_check(root: pathlib.Path, sdist_glob: str = "dist/owledge-*.tar.
         "missing_root_files": missing_root,
         "missing_trees": missing_trees,
         "project": str(root),
+    }
+
+
+_CONCEPT_AUDIT_DEFAULT_PROFILE = {
+    "project_mode": "mvp",
+    "planning_mode": "supervised",
+    "weights": {
+        "lifecycle": 1.0,
+        "distribution": 1.0,
+        "dogfood": 1.0,
+        "contracts": 1.0,
+        "cross_layer": 0.7,
+        "failure_modes": 0.7,
+        "coherence": 0.5,
+        "self_description": 0.8,
+    },
+    "dimension_overrides": {},
+    "freshness_days": 30,
+}
+
+_PROJECT_MODE_ORDER = {"poc": 0, "mvp": 1, "side": 2, "saas": 3}
+
+
+def _project_mode_at_least(mode: str, threshold: str) -> bool:
+    return _PROJECT_MODE_ORDER.get(mode, 1) >= _PROJECT_MODE_ORDER.get(threshold, 1)
+
+
+def _read_project_mode(root: pathlib.Path) -> tuple[str, str]:
+    pc = root / "PROJECT_CONTEXT.md"
+    project_mode = "mvp"
+    planning_mode = "supervised"
+    if not pc.exists():
+        return project_mode, planning_mode
+    text = pc.read_text(encoding="utf-8", errors="ignore")
+    m = re.search(r'project_mode:\s*"?(\w+)"?', text)
+    if m:
+        project_mode = m.group(1).lower()
+    m2 = re.search(r'planning_mode:\s*"?(\w+)"?', text)
+    if m2:
+        planning_mode = m2.group(1).lower()
+    if project_mode not in _PROJECT_MODE_ORDER:
+        project_mode = "mvp"
+    if planning_mode not in {"supervised", "approve-automatically", "full-access"}:
+        planning_mode = "supervised"
+    return project_mode, planning_mode
+
+
+def _owledge_subcommand_help(root: pathlib.Path, subcommand: str) -> bool:
+    import subprocess as _sp
+
+    cli = root / "tools" / "owledge.py"
+    if not cli.exists():
+        return False
+    try:
+        proc = _sp.run(
+            [sys.executable, str(cli), subcommand, "--help"],
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+        return proc.returncode == 0
+    except Exception:
+        return False
+
+
+def _owledge_upgrade_dry_run(root: pathlib.Path) -> bool:
+    import subprocess as _sp
+
+    cli = root / "tools" / "owledge.py"
+    if not cli.exists():
+        return False
+    tmp = pathlib.Path(tempfile.mkdtemp(prefix="concept-audit-upgrade-"))
+    try:
+        init_proc = _sp.run(
+            [sys.executable, str(cli), "init-project", "--target", str(tmp)],
+            capture_output=True,
+            text=True,
+            timeout=60,
+        )
+        if init_proc.returncode != 0:
+            return False
+        upgrade_proc = _sp.run(
+            [sys.executable, str(cli), "upgrade", "--dry-run", "--project-root", str(tmp)],
+            capture_output=True,
+            text=True,
+            timeout=60,
+        )
+        return upgrade_proc.returncode == 0
+    except Exception:
+        return False
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
+def _count_owledge_subcommands(root: pathlib.Path) -> list[str]:
+    cli = root / "tools" / "owledge.py"
+    if not cli.exists():
+        return []
+    try:
+        text = cli.read_text(encoding="utf-8", errors="ignore")
+    except OSError:
+        return []
+    names: list[str] = []
+    for m in re.finditer(r'sub\.add_parser\("([^"]+)"', text):
+        names.append(m.group(1))
+    seen: list[str] = []
+    for name in names:
+        if name not in seen:
+            seen.append(name)
+    return seen
+
+
+def _concept_audit_dimension_1(root: pathlib.Path, project_mode: str) -> dict[str, Any]:
+    findings: list[dict[str, str]] = []
+    upgrade_ok = _owledge_subcommand_help(root, "upgrade")
+    doctor_ok = _owledge_subcommand_help(root, "doctor")
+    init_ok = _owledge_subcommand_help(root, "init-project")
+    findings.append({
+        "severity": "info" if upgrade_ok else "error",
+        "detail": "owledge upgrade --help exits 0" if upgrade_ok else "owledge upgrade subcommand missing",
+        "evidence": "subprocess: owledge.py upgrade --help",
+    })
+    findings.append({
+        "severity": "info" if doctor_ok else "error",
+        "detail": "owledge doctor --help exits 0" if doctor_ok else "owledge doctor subcommand missing",
+        "evidence": "subprocess: owledge.py doctor --help",
+    })
+    findings.append({
+        "severity": "info" if init_ok else "error",
+        "detail": "owledge init-project --help exits 0" if init_ok else "owledge init-project subcommand missing",
+        "evidence": "subprocess: owledge.py init-project --help",
+    })
+    manifest_path = root / "kit-manifest.json"
+    manifest_exists = manifest_path.exists()
+    manifest_kit_version = ""
+    if manifest_exists:
+        try:
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            manifest_kit_version = str(manifest.get("kit_version") or "")
+        except (json.JSONDecodeError, OSError):
+            manifest_kit_version = ""
+    if manifest_exists:
+        if manifest_kit_version:
+            findings.append({
+                "severity": "info",
+                "detail": f"kit-manifest.json present with kit_version={manifest_kit_version}",
+                "evidence": str(manifest_path),
+            })
+        else:
+            findings.append({
+                "severity": "error",
+                "detail": "kit-manifest.json present but has no kit_version field",
+                "evidence": str(manifest_path),
+            })
+    else:
+        findings.append({
+            "severity": "warning",
+            "detail": "kit-manifest.json absent at project root (present after init-project)",
+            "evidence": str(manifest_path),
+        })
+    if _project_mode_at_least(project_mode, "mvp"):
+        upgrade_dry_ok = _owledge_upgrade_dry_run(root)
+        findings.append({
+            "severity": "info" if upgrade_dry_ok else "warning",
+            "detail": "upgrade --dry-run on a temp-init project succeeds" if upgrade_dry_ok else "upgrade --dry-run on a temp-init project failed",
+            "evidence": "subprocess: init-project + upgrade --dry-run",
+        })
+    if _project_mode_at_least(project_mode, "saas"):
+        rollback_present = "--rollback" in (root / "tools" / "owledge.py").read_text(encoding="utf-8", errors="ignore") if (root / "tools" / "owledge.py").exists() else False
+        findings.append({
+            "severity": "info" if rollback_present else "warning",
+            "detail": "rollback capability present" if rollback_present else "no rollback capability detected (--rollback flag absent)",
+            "evidence": "grep: --rollback in tools/owledge.py",
+        })
+    errors = sum(1 for f in findings if f["severity"] == "error")
+    warnings = sum(1 for f in findings if f["severity"] == "warning")
+    if errors:
+        score = 0 if errors >= 2 else 5
+    elif warnings:
+        score = 7
+    else:
+        score = 10
+    return {"name": "lifecycle", "score": score, "findings": findings, "mode": "mechanical"}
+
+
+def _concept_audit_dimension_2(root: pathlib.Path, project_mode: str) -> dict[str, Any]:
+    findings: list[dict[str, str]] = []
+    version_path = root / "VERSION"
+    version = ""
+    if version_path.exists():
+        version = version_path.read_text(encoding="utf-8", errors="replace").strip()
+        findings.append({
+            "severity": "info",
+            "detail": f"VERSION present ({version})",
+            "evidence": str(version_path),
+        })
+    else:
+        findings.append({
+            "severity": "error",
+            "detail": "VERSION file absent",
+            "evidence": str(version_path),
+        })
+    readme_path = root / "README.md"
+    badge_ok = False
+    if readme_path.exists() and version:
+        readme = readme_path.read_text(encoding="utf-8", errors="replace")
+        badge_ok = f"version-{version}-" in readme or f"version-{version}" in readme
+        findings.append({
+            "severity": "info" if badge_ok else "warning",
+            "detail": "README badge matches VERSION" if badge_ok else "README badge does not match VERSION",
+            "evidence": str(readme_path),
+        })
+    else:
+        findings.append({
+            "severity": "warning",
+            "detail": "README absent or VERSION empty; cannot verify badge",
+            "evidence": str(readme_path),
+        })
+    sdist_result = sdist_clean_check(root)
+    sdist_passed = bool(sdist_result.get("passed"))
+    if sdist_passed:
+        findings.append({
+            "severity": "info",
+            "detail": "sdist-clean passes (no internal/decision-trace leak, required trees present)",
+            "evidence": str(sdist_result.get("sdist", "sdist-clean")),
+        })
+    else:
+        findings.append({
+            "severity": "warning",
+            "detail": f"sdist-clean failed: {len(sdist_result.get('violations', []))} violations",
+            "evidence": "; ".join(sdist_result.get("violations", [])[:3]) or sdist_result.get("reason", "sdist-clean"),
+        })
+    if _project_mode_at_least(project_mode, "side"):
+        cowork_plugin = root / "plugins" / "agent-memory-cowork" / ".claude-plugin" / "plugin.json"
+        if cowork_plugin.exists():
+            try:
+                payload = json.loads(cowork_plugin.read_text(encoding="utf-8"))
+                plugin_version = str(payload.get("version") or "")
+                matches = plugin_version == version
+                findings.append({
+                    "severity": "info" if matches else "warning",
+                    "detail": f"plugin manifest version ({plugin_version}) matches VERSION ({version})" if matches else f"plugin manifest version ({plugin_version}) does not match VERSION ({version})",
+                    "evidence": str(cowork_plugin),
+                })
+            except (json.JSONDecodeError, OSError) as exc:
+                findings.append({
+                    "severity": "warning",
+                    "detail": f"plugin manifest unreadable: {exc}",
+                    "evidence": str(cowork_plugin),
+                })
+    if _project_mode_at_least(project_mode, "saas"):
+        trust_addon = root / "addons" / "trust-readiness-kit"
+        sbom_present = trust_addon.is_dir()
+        findings.append({
+            "severity": "info" if sbom_present else "warning",
+            "detail": "SBOM/provenance artifact present" if sbom_present else "no SBOM/provenance artifact detected (trust-readiness-kit absent)",
+            "evidence": str(trust_addon),
+        })
+    errors = sum(1 for f in findings if f["severity"] == "error")
+    warnings = sum(1 for f in findings if f["severity"] == "warning")
+    if errors:
+        score = 0
+    elif warnings:
+        score = 7
+    else:
+        score = 10
+    return {"name": "distribution", "score": score, "findings": findings, "mode": "mechanical"}
+
+
+def _concept_audit_dimension_3(root: pathlib.Path, project_mode: str) -> dict[str, Any]:
+    findings: list[dict[str, str]] = []
+    sync_result = dogfood_sync_check(root)
+    sync_passed = bool(sync_result.get("passed"))
+    drifted = sync_result.get("drifted_files", [])
+    if sync_passed:
+        findings.append({
+            "severity": "info",
+            "detail": "dogfood-sync-check passes (internal/agent-memory/templates/ mirrors templates/agent-memory/templates/)",
+            "evidence": "dogfood_sync_check: drifted_files empty",
+        })
+    else:
+        findings.append({
+            "severity": "error",
+            "detail": f"dogfood-sync-check failed: {len(drifted)} drifted/missing files",
+            "evidence": "; ".join(drifted[:3]) or sync_result.get("reason", "dogfood-sync"),
+        })
+    if _project_mode_at_least(project_mode, "saas"):
+        findings.append({
+            "severity": "info",
+            "detail": "no telemetry-parity mechanism between dogfood and product installs (saas-depth)",
+            "evidence": "no telemetry-parity gate registered",
+        })
+    errors = sum(1 for f in findings if f["severity"] == "error")
+    if errors:
+        score = 5 if sync_result.get("drifted_files") is not None else 0
+    else:
+        score = 10
+    return {"name": "dogfood", "score": score, "findings": findings, "mode": "mechanical"}
+
+
+def _concept_audit_dimension_4(root: pathlib.Path, project_mode: str) -> dict[str, Any]:
+    findings: list[dict[str, str]] = []
+    try:
+        contracts_result = test_contracts(root)
+        contracts_passed = bool(contracts_result.get("passed"))
+        failed_checks = contracts_result.get("failedChecks", 0)
+    except Exception as exc:
+        contracts_result = {"passed": False, "failedChecks": 1, "results": [], "error": str(exc)}
+        contracts_passed = False
+        failed_checks = 1
+        findings.append({
+            "severity": "warning",
+            "detail": f"test-contracts could not run on this project layout: {exc}",
+            "evidence": "test_contracts raised an exception (likely a host project without .template.md files)",
+        })
+    if contracts_passed:
+        findings.append({
+            "severity": "info",
+            "detail": f"test-contracts passes ({contracts_result.get('totalChecks', 0)} checks, 0 failed)",
+            "evidence": "test_contracts: failedChecks=0",
+        })
+    elif not any(f.get("detail", "").startswith("test-contracts could not run") for f in findings):
+        sample = [r.get("name", "") for r in contracts_result.get("results", []) if not r.get("passed")][:3]
+        findings.append({
+            "severity": "error",
+            "detail": f"test-contracts failed: {failed_checks} failed checks",
+            "evidence": "; ".join(sample) or "test_contracts",
+        })
+    subcommands = _count_owledge_subcommands(root)
+    cmd_ref = root / "docs" / "command-reference.md"
+    documented: list[str] = []
+    undocumented: list[str] = []
+    if cmd_ref.exists():
+        ref_text = cmd_ref.read_text(encoding="utf-8", errors="ignore")
+        for name in subcommands:
+            if name in ref_text:
+                documented.append(name)
+            else:
+                undocumented.append(name)
+    findings.append({
+        "severity": "info",
+        "detail": f"{len(subcommands)} CLI subcommands registered; {len(documented)} documented in command-reference.md",
+        "evidence": "subcommands: " + ", ".join(subcommands[:6]) + ("..." if len(subcommands) > 6 else ""),
+    })
+    if _project_mode_at_least(project_mode, "side") and undocumented:
+        findings.append({
+            "severity": "warning",
+            "detail": f"{len(undocumented)} subcommands undocumented in command-reference.md: {', '.join(undocumented[:5])}",
+            "evidence": "undocumented: " + ", ".join(undocumented[:5]),
+        })
+    if _project_mode_at_least(project_mode, "saas"):
+        findings.append({
+            "severity": "info",
+            "detail": "saas-depth: every public API should have a test (heuristic not yet enforced)",
+            "evidence": "no public-API test-count gate registered",
+        })
+    errors = sum(1 for f in findings if f["severity"] == "error")
+    warnings = sum(1 for f in findings if f["severity"] == "warning")
+    if errors:
+        score = 5
+    elif warnings:
+        score = 7
+    else:
+        score = 10
+    return {"name": "contracts", "score": score, "findings": findings, "mode": "mechanical"}
+
+
+def _concept_audit_guided_checklists(project_mode: str) -> dict[str, list[str]]:
+    cross_layer = [
+        "If global-link.json exists, does the linked path resolve and is it readable? Run doctor and inspect the global-link check.",
+        "Are the never-touch files (PROJECT_CONTEXT.md, AGENTS.md, CLAUDE.md, USER_CONTEXT.md) byte-identical before and after upgrade --apply --mode=force-templates --yes?",
+        "If the global user-memory layer is enabled, is there an explicit consent record?",
+        "Does USER_CONTEXT.md stay private (not exported into shared RAG) unless explicitly approved?",
+        "Are PI Agent intelligence and Red Team evaluations treated as candidate artifacts until promoted?",
+    ]
+    failure_modes = [
+        "List the kit's external dependencies (Python stdlib only). For each, what happens if it is absent?",
+        "List the install paths (PyPI, source, project-folder kit, plugin adapter). For each, what breakage would a user see if init-project silently skipped files?",
+        "List the consent boundaries (global user-memory, shared RAG export, PI promotion). For each, what is the failure mode if consent is missing?",
+        "For each audience (maintainer, contributor, end user), which failure modes are visible and which are silent?",
+    ]
+    if _project_mode_at_least(project_mode, "saas"):
+        failure_modes.append("Run a chaos drill: delete kit-manifest.json, move the global layer, corrupt a template. Verify each is caught with a friendly error.")
+    coherence = [
+        "Build a glossary from AGENTS.md, README.md, and CHANGELOG.md headers.",
+        "For each term, count occurrences across the three files. A term in only one file is a coherence risk.",
+        "List synonyms (kit vs Agent Memory Kit vs Owledge). Are they used consistently?",
+        "Check version strings: VERSION, templates/agent-memory/README.md version, PROJECT_CONTEXT.template.md version, plugin VERSION files. Do they agree?",
+    ]
+    if _project_mode_at_least(project_mode, "saas"):
+        coherence.append("Is there a cross-team term contract (a reviewed glossary file)?")
+    self_description = [
+        "List every claim in README.md's first screen. For each, run the command or check the file. Does the claim hold?",
+        "List every 'Owledge does X' statement in AGENTS.md. For each, does the behavior match?",
+        "List every ## heading in CHANGELOG.md. For each, does the described change exist in the codebase?",
+        "Is there a skill that stress-tests the kit's own concepts (this one)? If absent, this is a self-description gap.",
+    ]
+    if _project_mode_at_least(project_mode, "saas"):
+        self_description.append("Build a traceability matrix: claim -> file -> test -> gate.")
+    return {
+        "cross_layer": cross_layer,
+        "failure_modes": failure_modes,
+        "coherence": coherence,
+        "self_description": self_description,
+    }
+
+
+def concept_audit(root: pathlib.Path, profile: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Run the 4 mechanical concept-audit dimensions and emit guided checklists for dims 5-8.
+
+    Dimensions 1-4 are scored here. Dimensions 5-8 are guided: the caller (agent
+    or user) works through the returned checklists and scores them. Findings are
+    candidate artifacts only; this function writes nothing.
+    """
+    context_mode, context_planning = _read_project_mode(root)
+    project_mode = context_mode
+    planning_mode = context_planning
+    if profile:
+        if profile.get("project_mode"):
+            project_mode = str(profile.get("project_mode")).lower()
+        if profile.get("planning_mode"):
+            planning_mode = str(profile.get("planning_mode")).lower()
+    if project_mode not in _PROJECT_MODE_ORDER:
+        project_mode = "mvp"
+    if planning_mode not in {"supervised", "approve-automatically", "full-access"}:
+        planning_mode = "supervised"
+
+    dim1 = _concept_audit_dimension_1(root, project_mode)
+    dim2 = _concept_audit_dimension_2(root, project_mode)
+    dim3 = _concept_audit_dimension_3(root, project_mode)
+    dim4 = _concept_audit_dimension_4(root, project_mode)
+
+    guided = _concept_audit_guided_checklists(project_mode)
+    dim5 = {"name": "cross_layer", "score": None, "findings": guided["cross_layer"], "mode": "guided"}
+    dim6 = {"name": "failure_modes", "score": None, "findings": guided["failure_modes"], "mode": "guided"}
+    dim7 = {"name": "coherence", "score": None, "findings": guided["coherence"], "mode": "guided"}
+    dim8 = {"name": "self_description", "score": None, "findings": guided["self_description"], "mode": "guided"}
+
+    dimensions = [dim1, dim2, dim3, dim4, dim5, dim6, dim7, dim8]
+    mechanical_scores = [d["score"] for d in dimensions[:4]]
+    passed = all(score is not None and score >= 5 for score in mechanical_scores)
+
+    suggested_actions: list[str] = []
+    for d in dimensions[:4]:
+        for f in d.get("findings", []):
+            sev = f.get("severity")
+            if sev in {"error", "warning"}:
+                suggested_actions.append(f"[{sev.upper()}] {d['name']}: {f.get('detail', '')}")
+    if not suggested_actions:
+        suggested_actions.append("No mechanical errors or warnings. Score dimensions 5-8 and promote any guided findings through curator review.")
+
+    return {
+        "passed": passed,
+        "project": str(root),
+        "project_mode": project_mode,
+        "planning_mode": planning_mode,
+        "dimensions": dimensions,
+        "guided_checklists": guided,
+        "suggested_actions": suggested_actions,
     }
 
 
@@ -5552,6 +6121,12 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("source-vs-target-audit")
     sdist_p = sub.add_parser("sdist-clean")
     sdist_p.add_argument("--sdist-glob", default="dist/owledge-*.tar.gz")
+    sub.add_parser("dogfood-sync-check")
+    concept_audit_p = sub.add_parser("concept-audit")
+    concept_audit_p.add_argument("--dimension", default=None, help="Run only one dimension")
+    concept_audit_p.add_argument("--since", default=None, help="Only consider findings since this date")
+    concept_audit_p.add_argument("--profile", default=None, help="Path to concept-audit-profile.json")
+    concept_audit_p.add_argument("--format", choices=["json", "summary"], default="json")
 
     args = parser.parse_args(argv)
     root = resolve_root(args.project_root)
@@ -5737,6 +6312,28 @@ def main(argv: list[str] | None = None) -> int:
             result = sdist_clean_check(root, sdist_glob=args.sdist_glob)
             print(json.dumps(result, indent=2, sort_keys=True))
             return 0 if result["passed"] else 1
+        elif args.command == "dogfood-sync-check":
+            result = dogfood_sync_check(root)
+            print(json.dumps(result, indent=2, sort_keys=True))
+            return 0 if result["passed"] else 1
+        elif args.command == "concept-audit":
+            profile = None
+            if args.profile:
+                profile = json.loads(pathlib.Path(args.profile).read_text(encoding="utf-8"))
+            result = concept_audit(root, profile=profile)
+            if args.dimension:
+                result["dimensions"] = [d for d in result.get("dimensions", []) if d.get("name") == args.dimension]
+            if args.format == "summary":
+                lines = []
+                for d in result.get("dimensions", []):
+                    score = d.get("score")
+                    score_str = str(score) if score is not None else "guided"
+                    lines.append(f"{d['name']}: {score_str} ({d['mode']}, {len(d.get('findings', []))} findings)")
+                lines.append(f"passed: {result.get('passed')}")
+                print("\n".join(lines))
+            else:
+                print(json.dumps(result, indent=2, sort_keys=True))
+            return 0 if result.get("passed", False) else 1
         return 0
     except Exception as exc:
         print(json.dumps({"error": str(exc), "type": type(exc).__name__}, indent=2, sort_keys=True), file=sys.stderr)

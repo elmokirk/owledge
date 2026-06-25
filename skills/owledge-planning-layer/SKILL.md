@@ -29,15 +29,16 @@ Use this skill when the user asks for:
 
 ## Workflow
 
-1. Read existing project instructions and treat them as higher-priority local operating rules.
-2. Detect Owledge mode:
+1. **Concept audit freshness check**: if the last concept audit (`agent-memory/decisions/concept-audit-*.md`) is older than the last `VERSION` change OR older than 30 days, remind the user to run `owledge concept-audit`. This is a reminder only — never blocks planning.
+2. Read existing project instructions and treat them as higher-priority local operating rules.
+3. Detect Owledge mode:
    - project-local `agent-memory/`
    - mapped knowledgebase via `agent-memory-map.json`
    - `agent-memory-module/`
    - principles-only fallback
-3. Identify the initial user goal, non-goals, MVP cutline, constraints, and source evidence.
-4. Load metadata and scoped sources first; do not load full vaults or raw logs by default.
-5. Produce a plan with:
+4. Identify the initial user goal, non-goals, MVP cutline, constraints, and source evidence.
+5. Load metadata and scoped sources first; do not load full vaults or raw logs by default.
+6. Produce a plan with:
    - goal
    - non-goals
    - MVP cutline
@@ -45,8 +46,8 @@ Use this skill when the user asks for:
    - task lanes
    - review gates
    - handoff expectations
-6. Write only to allowed Owledge locations if writing is requested or clearly needed.
-7. End with the next action and a handoff-ready summary.
+7. Write only to allowed Owledge locations if writing is requested or clearly needed.
+8. End with the next action and a handoff-ready summary.
 
 ## Hard Rules
 

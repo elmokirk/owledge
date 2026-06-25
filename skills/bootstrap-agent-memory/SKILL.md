@@ -18,6 +18,10 @@ Use this skill when a user asks to add Owledge to an existing coding project.
 python tools/owledge.py init-project --target /path/to/project --include-plugin-adapter
 ```
 
+Optional: link a global user-memory layer so preferences and goals persist across projects:
+`python tools/owledge.py init-project --target /path/to/project --link-global`
+With no path argument, uses `OWLEDGE_GLOBAL_HOME` env var or `~/.owledge/global` default.
+
 4. Verify:
 
 ```bash
