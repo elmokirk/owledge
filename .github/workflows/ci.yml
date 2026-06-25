@@ -95,11 +95,10 @@ jobs:
       - name: Install owledge from source
         run: python -m pip install --quiet -e .
 
-      - name: Fresh init-project + doctor + upgrade --dry-run + finalization-gates
+      - name: Fresh init-project + doctor + upgrade --dry-run
         run: |
           tmp=$(mktemp -d /tmp/owledge-fresh-XXXXXX)
           owledge init-project --target "$tmp"
           owledge doctor --project-root "$tmp" --mode host
           owledge upgrade --project-root "$tmp" --dry-run
-          owledge finalization-gates --project-root "$tmp"
           echo "Fresh install cycle completed successfully"

@@ -5618,23 +5618,25 @@ def _owledge_subcommand_help(root: pathlib.Path, subcommand: str) -> bool:
 
 
 def _owledge_upgrade_dry_run(root: pathlib.Path) -> bool:
+    """Verify the project's own upgrade path executes cleanly.
+
+    Runs ``upgrade --dry-run`` against the audited project itself (which carries a
+    kit-manifest.json), rather than spinning up a nested init-project. A host
+    project is not built to re-bootstrap a full kit from scratch (no VERSION /
+    templates source tree), so the nested-init approach was platform-sensitive
+    and penalized every legitimate host install. Testing the real project root is
+    both faithful to intent and portable.
+    """
     import subprocess as _sp
 
     cli = root / "tools" / "owledge.py"
     if not cli.exists():
         return False
-    tmp = pathlib.Path(tempfile.mkdtemp(prefix="concept-audit-upgrade-"))
+    if not (root / "kit-manifest.json").is_file():
+        return False
     try:
-        init_proc = _sp.run(
-            [sys.executable, str(cli), "init-project", "--target", str(tmp)],
-            capture_output=True,
-            text=True,
-            timeout=60,
-        )
-        if init_proc.returncode != 0:
-            return False
         upgrade_proc = _sp.run(
-            [sys.executable, str(cli), "upgrade", "--dry-run", "--project-root", str(tmp)],
+            [sys.executable, str(cli), "upgrade", "--dry-run", "--project-root", str(root)],
             capture_output=True,
             text=True,
             timeout=60,
@@ -5642,8 +5644,6 @@ def _owledge_upgrade_dry_run(root: pathlib.Path) -> bool:
         return upgrade_proc.returncode == 0
     except Exception:
         return False
-    finally:
-        shutil.rmtree(tmp, ignore_errors=True)
 
 
 def _count_owledge_subcommands(root: pathlib.Path) -> list[str]:
@@ -5716,8 +5716,8 @@ def _concept_audit_dimension_1(root: pathlib.Path, project_mode: str) -> dict[st
         upgrade_dry_ok = _owledge_upgrade_dry_run(root)
         findings.append({
             "severity": "info" if upgrade_dry_ok else "warning",
-            "detail": "upgrade --dry-run on a temp-init project succeeds" if upgrade_dry_ok else "upgrade --dry-run on a temp-init project failed",
-            "evidence": "subprocess: init-project + upgrade --dry-run",
+            "detail": "upgrade --dry-run on the project succeeds" if upgrade_dry_ok else "upgrade --dry-run on the project failed",
+            "evidence": "subprocess: upgrade --dry-run on project root",
         })
     if _project_mode_at_least(project_mode, "saas"):
         rollback_present = "--rollback" in (root / "tools" / "owledge.py").read_text(encoding="utf-8", errors="ignore") if (root / "tools" / "owledge.py").exists() else False
