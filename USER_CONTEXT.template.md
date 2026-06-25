@@ -1,6 +1,6 @@
 ---
 memory_id: "mem:user-local:personal:global-user-memory:user_context:user-profile"
-owledge_kit_version: "0.6.0"
+owledge_kit_version: "0.6.1"
 tenant_id: "user-local"
 customer_id: "personal"
 project_id: "global-user-memory"

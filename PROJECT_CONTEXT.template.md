@@ -2,7 +2,7 @@
 title: "PROJECT_NAME Project Context"
 date: "YYYY-MM-DD"
 version: "1.0.0"
-owledge_kit_version: "0.6.0"
+owledge_kit_version: "0.6.1"
 status: "active"
 owner: "OWNER"
 memory_id: "mem:TENANT_ID:CUSTOMER_ID:PROJECT_ID:project_context:project-router"

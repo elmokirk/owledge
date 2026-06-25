@@ -3,11 +3,11 @@
   "customer_id": "",
   "document_count": 0,
   "documents": [],
-  "generated_at": "2026-06-24T13:28:03Z",
-  "generation_id": "shared-lightrag-20260624132803-63884-2698581a",
+  "generated_at": "2026-06-25T08:39:37Z",
+  "generation_id": "shared-lightrag-20260625083937-31740-7a764b5e",
   "policy_version": "lightrag-export-v0.2",
   "project_id": "",
-  "rag_generation_id": "shared-rag-20260624132803-63884-04518b95",
-  "rag_manifest": "agent-memory\\exports\\rag\\shared-rag-20260624132803-63884-04518b95\\manifest.json",
+  "rag_generation_id": "shared-rag-20260625083937-31740-a82996d7",
+  "rag_manifest": "agent-memory\\exports\\rag\\shared-rag-20260625083937-31740-a82996d7\\manifest.json",
   "tenant_id": ""
 }

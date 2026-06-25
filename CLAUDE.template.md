@@ -2,7 +2,7 @@
 title: "Agent Operating Notes Template"
 date: "YYYY-MM-DD"
 version: "1.0.0"
-owledge_kit_version: "0.6.0"
+owledge_kit_version: "0.6.1"
 status: "template"
 owner: "OWNER"
 tenant_id: "TENANT_ID"

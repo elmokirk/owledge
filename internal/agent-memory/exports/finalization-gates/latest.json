@@ -4,22 +4,22 @@
     {
       "name": "python-compile",
       "passed": true,
-      "seconds": 0.236
+      "seconds": 0.516
     },
     {
       "name": "public-docs",
       "passed": true,
-      "seconds": 0.014
+      "seconds": 0.021
     },
     {
       "name": "release-trust",
       "passed": true,
-      "seconds": 0.001
+      "seconds": 0.002
     },
     {
       "name": "principles-skill",
       "passed": true,
-      "seconds": 0.001
+      "seconds": 0.003
     },
     {
       "name": "principles-only",
@@ -29,102 +29,117 @@
     {
       "name": "principles-scenarios",
       "passed": true,
-      "seconds": 1.393
+      "seconds": 2.039
     },
     {
       "name": "poweruser-simulations",
       "passed": true,
-      "seconds": 9.009
+      "seconds": 16.597
     },
     {
       "name": "contracts",
       "passed": true,
-      "seconds": 0.006
+      "seconds": 0.011
     },
     {
       "name": "core-platform-neutral",
       "passed": true,
-      "seconds": 0.162
+      "seconds": 0.416
     },
     {
       "name": "generated-kit-surface",
       "passed": true,
-      "seconds": 2.044
+      "seconds": 4.369
     },
     {
       "name": "doctor",
       "passed": true,
-      "seconds": 0.005
+      "seconds": 0.012
     },
     {
       "name": "validate",
       "passed": true,
-      "seconds": 0.07
+      "seconds": 0.107
     },
     {
       "name": "index-full",
       "passed": true,
-      "seconds": 0.035
+      "seconds": 0.068
     },
     {
       "name": "index-incremental",
       "passed": true,
-      "seconds": 0.038
+      "seconds": 0.076
     },
     {
       "name": "retention",
       "passed": true,
-      "seconds": 0.011
+      "seconds": 0.021
     },
     {
       "name": "conflicts",
       "passed": true,
-      "seconds": 0.037
+      "seconds": 0.069
     },
     {
       "name": "sensitive-scan",
       "passed": true,
-      "seconds": 0.046
+      "seconds": 0.109
     },
     {
       "name": "runtime-adapters",
       "passed": true,
-      "seconds": 1.338
+      "seconds": 3.459
     },
     {
       "name": "memory-evals",
       "passed": true,
-      "seconds": 3.949
+      "seconds": 2.898
     },
     {
       "name": "retrieval-fixture",
       "passed": true,
-      "seconds": 0.021
+      "seconds": 0.059
     },
     {
       "name": "kb-ingestion-safety",
       "passed": true,
-      "seconds": 0.125
+      "seconds": 0.3
     },
     {
       "name": "benchmark",
       "passed": true,
-      "seconds": 1.844
+      "seconds": 3.431
     },
     {
       "name": "quality-ratchet",
       "passed": true,
-      "seconds": 6.056
+      "seconds": 13.435
     },
     {
       "name": "kb-module",
       "passed": true,
-      "seconds": 0.129
+      "seconds": 0.12
     },
     {
       "name": "project-folder-kit",
       "passed": true,
-      "seconds": 0.773
+      "seconds": 0.786
+    },
+    {
+      "name": "dogfood-sync",
+      "passed": true,
+      "seconds": 0.011
+    },
+    {
+      "name": "upgrade-drift",
+      "passed": true,
+      "seconds": 0.305
+    },
+    {
+      "name": "concept-audit-fresh",
+      "passed": true,
+      "seconds": 0.001
     },
     {
       "name": "compliance-addon-source",
@@ -134,35 +149,35 @@
     {
       "name": "project-folder-kit-compliance",
       "passed": true,
-      "seconds": 0.732
+      "seconds": 1.032
     },
     {
       "name": "compliance-gates",
       "passed": true,
-      "seconds": 0.012
+      "seconds": 0.013
     },
     {
       "name": "export-rag-shared",
       "passed": true,
-      "seconds": 0.042
+      "seconds": 0.06
     },
     {
       "name": "export-lightrag-shared",
       "passed": true,
-      "seconds": 0.055
+      "seconds": 0.06
     },
     {
       "name": "export-graphrag-shared",
       "passed": true,
-      "seconds": 0.062
+      "seconds": 0.049
     },
     {
       "name": "report-shared",
       "passed": true,
-      "seconds": 0.057
+      "seconds": 0.045
     }
   ],
-  "generated_at": "2026-06-24T13:28:03Z",
+  "generated_at": "2026-06-25T08:39:37Z",
   "include_compliance": true,
   "include_exports": true,
   "passed": true,

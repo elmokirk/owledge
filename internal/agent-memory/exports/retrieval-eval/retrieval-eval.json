@@ -1,6 +1,6 @@
 {
   "corpus": {
-    "build_ms": 10.078,
+    "build_ms": 8.919,
     "documents": 11,
     "include_sessions": false,
     "total_chars": 7524
@@ -31,6 +31,19 @@
       ]
     },
     {
+      "memory_id": "mem:fixture:demo:retrieval-fixture:compiled:context-pack-scoring",
+      "project_id": "retrieval-fixture",
+      "source_path": "agent-memory/compiled/context-pack-scoring.md",
+      "warnings": [
+        {
+          "field": "last_reviewed_at",
+          "reason": "review_due",
+          "review_cycle": "monthly",
+          "value": "2026-05-26T00:00:00Z"
+        }
+      ]
+    },
+    {
       "memory_id": "mem:fixture:demo:retrieval-reference:compiled:stale-conflict-review",
       "project_id": "retrieval-reference",
       "source_path": "agent-memory/compiled/stale-conflict-review.md",
@@ -49,7 +62,7 @@
       ]
     }
   ],
-  "generated_at": "2026-06-24T13:27:59Z",
+  "generated_at": "2026-06-25T08:39:31Z",
   "metrics": {
     "avg_mrr": 0.9412,
     "avg_ndcg_at_k": 0.9184,
@@ -58,7 +71,7 @@
     "avg_recall_at_k": 0.6364,
     "cross_project_parallel_candidates": 16,
     "overall_score": 93.53,
-    "p95_query_latency_ms": 0.65,
+    "p95_query_latency_ms": 0.781,
     "parallel_score": 100,
     "precision_score": 78.45,
     "raw_session_docs_in_corpus": 0,
@@ -241,7 +254,7 @@
           "visibility": "shared"
         }
       ],
-      "latency_ms": 0.65,
+      "latency_ms": 0.597,
       "mrr": 1.0,
       "name": "lifecycle-safety",
       "ndcg_at_k": 1.0,
@@ -259,7 +272,14 @@
       "hits": [
         {
           "doc_type": "compiled",
-          "freshness_warnings": [],
+          "freshness_warnings": [
+            {
+              "field": "last_reviewed_at",
+              "reason": "review_due",
+              "review_cycle": "monthly",
+              "value": "2026-05-26T00:00:00Z"
+            }
+          ],
           "memory_id": "mem:fixture:demo:retrieval-fixture:compiled:context-pack-scoring",
           "project_id": "retrieval-fixture",
           "score": 226.186217,
@@ -417,7 +437,7 @@
           "visibility": "tenant"
         }
       ],
-      "latency_ms": 0.489,
+      "latency_ms": 0.536,
       "mrr": 1.0,
       "name": "context-objective-scoring",
       "ndcg_at_k": 1.0,
@@ -564,7 +584,7 @@
           "visibility": "shared"
         }
       ],
-      "latency_ms": 0.491,
+      "latency_ms": 0.497,
       "mrr": 1.0,
       "name": "runtime-procedural-memory",
       "ndcg_at_k": 1.0,
@@ -711,7 +731,7 @@
           "visibility": "shared"
         }
       ],
-      "latency_ms": 0.473,
+      "latency_ms": 0.538,
       "mrr": 1.0,
       "name": "markdown-source-of-truth",
       "ndcg_at_k": 1.0,
@@ -858,7 +878,7 @@
           "visibility": "tenant"
         }
       ],
-      "latency_ms": 0.434,
+      "latency_ms": 0.486,
       "mrr": 1.0,
       "name": "privacy-export-gate",
       "ndcg_at_k": 0.9828920819566879,
@@ -1017,7 +1037,7 @@
           "visibility": "shared"
         }
       ],
-      "latency_ms": 0.433,
+      "latency_ms": 0.485,
       "mrr": 1.0,
       "name": "promotion-audit",
       "ndcg_at_k": 0.9828920819566879,
@@ -1193,7 +1213,7 @@
           "visibility": "shared"
         }
       ],
-      "latency_ms": 0.413,
+      "latency_ms": 0.621,
       "mrr": 1.0,
       "name": "stale-conflict-review",
       "ndcg_at_k": 1.0,
@@ -1340,7 +1360,7 @@
           "visibility": "shared"
         }
       ],
-      "latency_ms": 0.418,
+      "latency_ms": 0.72,
       "mrr": 1.0,
       "name": "cross-project-parallels",
       "ndcg_at_k": 0.9558295932317544,
@@ -1410,7 +1430,14 @@
         },
         {
           "doc_type": "compiled",
-          "freshness_warnings": [],
+          "freshness_warnings": [
+            {
+              "field": "last_reviewed_at",
+              "reason": "review_due",
+              "review_cycle": "monthly",
+              "value": "2026-05-26T00:00:00Z"
+            }
+          ],
           "memory_id": "mem:fixture:demo:retrieval-fixture:compiled:context-pack-scoring",
           "project_id": "retrieval-fixture",
           "score": 27.13425,
@@ -1487,7 +1514,7 @@
           "visibility": "tenant"
         }
       ],
-      "latency_ms": 0.5,
+      "latency_ms": 0.62,
       "mrr": 1.0,
       "name": "progressive-disclosure-skillset",
       "ndcg_at_k": 1.0,
@@ -1586,7 +1613,14 @@
         },
         {
           "doc_type": "compiled",
-          "freshness_warnings": [],
+          "freshness_warnings": [
+            {
+              "field": "last_reviewed_at",
+              "reason": "review_due",
+              "review_cycle": "monthly",
+              "value": "2026-05-26T00:00:00Z"
+            }
+          ],
           "memory_id": "mem:fixture:demo:retrieval-fixture:compiled:context-pack-scoring",
           "project_id": "retrieval-fixture",
           "score": 27.080731,
@@ -1663,7 +1697,7 @@
           "visibility": "shared"
         }
       ],
-      "latency_ms": 0.48,
+      "latency_ms": 0.732,
       "mrr": 1.0,
       "name": "freshness-warnings",
       "ndcg_at_k": 1.0,
@@ -1810,7 +1844,7 @@
           "visibility": "shared"
         }
       ],
-      "latency_ms": 0.474,
+      "latency_ms": 0.696,
       "mrr": 1.0,
       "name": "generated-views-boundary",
       "ndcg_at_k": 0.8529278650606567,
@@ -1957,7 +1991,7 @@
           "visibility": "tenant"
         }
       ],
-      "latency_ms": 0.541,
+      "latency_ms": 0.576,
       "mrr": 1.0,
       "name": "runtime-rag-safety",
       "ndcg_at_k": 1.0,
@@ -1975,7 +2009,14 @@
       "hits": [
         {
           "doc_type": "compiled",
-          "freshness_warnings": [],
+          "freshness_warnings": [
+            {
+              "field": "last_reviewed_at",
+              "reason": "review_due",
+              "review_cycle": "monthly",
+              "value": "2026-05-26T00:00:00Z"
+            }
+          ],
           "memory_id": "mem:fixture:demo:retrieval-fixture:compiled:context-pack-scoring",
           "project_id": "retrieval-fixture",
           "score": 147.910125,
@@ -2116,7 +2157,7 @@
           "visibility": "tenant"
         }
       ],
-      "latency_ms": 0.439,
+      "latency_ms": 0.781,
       "mrr": 1.0,
       "name": "context-budget-exclusions",
       "ndcg_at_k": 0.9828920819566879,
@@ -2250,7 +2291,14 @@
         },
         {
           "doc_type": "compiled",
-          "freshness_warnings": [],
+          "freshness_warnings": [
+            {
+              "field": "last_reviewed_at",
+              "reason": "review_due",
+              "review_cycle": "monthly",
+              "value": "2026-05-26T00:00:00Z"
+            }
+          ],
           "memory_id": "mem:fixture:demo:retrieval-fixture:compiled:context-pack-scoring",
           "project_id": "retrieval-fixture",
           "score": 7.452796,
@@ -2275,7 +2323,7 @@
           "visibility": "tenant"
         }
       ],
-      "latency_ms": 0.485,
+      "latency_ms": 0.594,
       "mrr": 1.0,
       "name": "red-team-quality-loop",
       "ndcg_at_k": 0.9674679834891693,
@@ -2293,7 +2341,14 @@
       "hits": [
         {
           "doc_type": "compiled",
-          "freshness_warnings": [],
+          "freshness_warnings": [
+            {
+              "field": "last_reviewed_at",
+              "reason": "review_due",
+              "review_cycle": "monthly",
+              "value": "2026-05-26T00:00:00Z"
+            }
+          ],
           "memory_id": "mem:fixture:demo:retrieval-fixture:compiled:context-pack-scoring",
           "project_id": "retrieval-fixture",
           "score": 5.651144,
@@ -2382,7 +2437,7 @@
           "visibility": "tenant"
         }
       ],
-      "latency_ms": 0.511,
+      "latency_ms": 0.567,
       "mrr": 0.0,
       "name": "add-on-boundary",
       "ndcg_at_k": 0.0,
@@ -2478,7 +2533,14 @@
         },
         {
           "doc_type": "compiled",
-          "freshness_warnings": [],
+          "freshness_warnings": [
+            {
+              "field": "last_reviewed_at",
+              "reason": "review_due",
+              "review_cycle": "monthly",
+              "value": "2026-05-26T00:00:00Z"
+            }
+          ],
           "memory_id": "mem:fixture:demo:retrieval-fixture:compiled:context-pack-scoring",
           "project_id": "retrieval-fixture",
           "score": 4.520915,
@@ -2529,7 +2591,7 @@
           "visibility": "shared"
         }
       ],
-      "latency_ms": 0.498,
+      "latency_ms": 0.501,
       "mrr": 1.0,
       "name": "knowledgebase-ingestion",
       "ndcg_at_k": 0.9047172294870751,
@@ -2693,7 +2755,7 @@
           "visibility": "shared"
         }
       ],
-      "latency_ms": 0.437,
+      "latency_ms": 0.605,
       "mrr": 1.0,
       "name": "typescript-eval-adapter",
       "ndcg_at_k": 0.9828920819566879,

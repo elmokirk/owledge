@@ -169,6 +169,7 @@ docs/swarm-coordination-kit.md
 docs/team-long-running-project-guide.md
 docs/try-owledge-in-5-minutes.md
 docs/v0.6.0-implementation-plan.md
+docs/v0.6.1-upgrade-foundation-plan.md
 docs/archive/README.md
 docs/archive/ai-workos-vault-adapter-plan.md
 docs/archive/ai-workos-vault-merge-evaluation.md
