@@ -1319,11 +1319,11 @@ def benchmark_addon_gate(root: pathlib.Path) -> dict[str, Any]:
                 results.add("benchmark-addon:json-relative-fixture", not pathlib.PurePosixPath(str(report_payload.get("fixture_dir", ""))).is_absolute() and "Users/" not in str(report_payload.get("fixture_dir", "")), "Benchmark JSON fixture path is relative/share-safe.")
             if latest_md.exists():
                 md_text = latest_md.read_text(encoding="utf-8", errors="replace")
-                for required in ["## Run Summary", "Before vs Owledge", "Privacy Trap Explained", "What This Means", "## Final Verdict", "Tokens per correct answer", "Context pollution"]:
+                for required in ["## Run Summary", "Before vs Owledge", "Privacy Trap Explained", "Privacy Trap Result", "Prevented", "What This Means", "## Final Verdict", "Tokens per correct answer", "Context pollution"]:
                     results.add(f"benchmark-addon:md:{required}", required in md_text, "Benchmark Markdown includes verdict and interpretation.")
             if html_report.exists():
                 html_text = html_report.read_text(encoding="utf-8", errors="replace")
-                for required in ["Run Summary", "Before vs Owledge", "Final Verdict", "Privacy Trap", "Total tokens", "Tokens per correct answer", "Context pollution", "Privacy failures", "Stale failures", "<svg"]:
+                for required in ["Run Summary", "Before vs Owledge", "Final Verdict", "Privacy Trap", "Privacy Trap Result", "Prevented", "Owledge selected private trap files", "Total tokens", "Tokens per correct answer", "Context pollution", "Privacy failures", "Stale failures", "<svg"]:
                     results.add(f"benchmark-addon:html:{required}", required in html_text, "Benchmark HTML includes verdict, interpretation, and embedded charts.")
         payload = results.payload(project=str(root), install=install)
     finally:

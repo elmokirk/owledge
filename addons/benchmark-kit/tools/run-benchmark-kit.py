@@ -540,6 +540,24 @@ def scenario_status(item: dict[str, Any]) -> str:
     return "pass"
 
 
+def privacy_trap_result(records: list[dict[str, Any]]) -> dict[str, Any]:
+    by_profile = {item["profile"]: item for item in records if item.get("scenario") == "privacy-trap"}
+    baseline = by_profile.get("metadata_scan", {})
+    owledge = by_profile.get("owledge_context_pack", {})
+    oracle = by_profile.get("oracle", {})
+    prevented = int(owledge.get("privacy_failure_count") or 0) == 0
+    return {
+        "baseline_files": baseline.get("selected_files", []),
+        "owledge_files": owledge.get("selected_files", []),
+        "oracle_files": oracle.get("selected_files", []),
+        "baseline_failures": int(baseline.get("privacy_failure_count") or 0),
+        "owledge_failures": int(owledge.get("privacy_failure_count") or 0),
+        "oracle_failures": int(oracle.get("privacy_failure_count") or 0),
+        "prevented": prevented,
+        "label": "Prevented" if prevented else "Not prevented",
+    }
+
+
 def report_rel(root: pathlib.Path, path: pathlib.Path) -> str:
     try:
         return path.resolve().relative_to(root.resolve()).as_posix()
@@ -587,6 +605,7 @@ def render_markdown(results: dict[str, Any]) -> str:
     baseline = verdicts["baseline"]
     owledge = verdicts["owledge"]
     oracle = verdicts["oracle"]
+    privacy = privacy_trap_result(results["records"])
     lines = [
         "# Owledge Benchmark Kit Report",
         "",
@@ -622,6 +641,16 @@ def render_markdown(results: dict[str, Any]) -> str:
         "## Privacy Trap Explained",
         "",
         "The benchmark injects private Markdown notes that look relevant to the question. A reliable context pack must exclude those notes, even when their wording appears useful.",
+        "",
+        "### Privacy Trap Result",
+        "",
+        f"- Result: `{privacy['label']}`",
+        f"- Baseline selected private trap files: `{privacy['baseline_failures']}`",
+        f"- Owledge selected private trap files: `{privacy['owledge_failures']}`",
+        f"- Baseline selected files: `{', '.join(privacy['baseline_files'])}`",
+        f"- Owledge selected files: `{', '.join(privacy['owledge_files'])}`",
+        "",
+        "Interpretation: if the baseline includes a private trap file and Owledge does not, Owledge prevented the privacy leak for this scenario.",
         "",
         "## What This Means",
         "",
@@ -667,6 +696,7 @@ def render_html(results: dict[str, Any], svg_text: str | None = None) -> str:
     baseline = verdicts["baseline"]
     owledge = verdicts["owledge"]
     oracle = verdicts["oracle"]
+    privacy = privacy_trap_result(results["records"])
     svg_text = svg_text or render_svg(results)
     record_rows = []
     for item in results["records"]:
@@ -701,6 +731,8 @@ def render_html(results: dict[str, Any], svg_text: str | None = None) -> str:
     .verdict.warn {{ border-color: #d97706; }}
     .verdict.fail {{ border-color: #dc2626; }}
     .summary {{ border-left: 6px solid #2563eb; }}
+    .trap-result {{ border-left: 6px solid #16a34a; background: #f0fdf4; }}
+    .trap-result.fail {{ border-left-color: #dc2626; background: #fef2f2; }}
     .product {{ background: #f0fdf4; }}
     .baseline {{ background: #fff7ed; }}
     .oracle {{ background: #f8fafc; }}
@@ -750,6 +782,15 @@ def render_html(results: dict[str, Any], svg_text: str | None = None) -> str:
   </table>
   <h2>Privacy Trap Explained</h2>
   <p>The benchmark injects private Markdown notes that look relevant to the question. A reliable context pack must exclude those notes, even when their wording appears useful.</p>
+  <section class="card trap-result {'pass' if privacy['prevented'] else 'fail'}">
+    <div class="label">Privacy Trap Result</div>
+    <div class="value">{html.escape(privacy['label'])}</div>
+    <p><strong>Baseline selected private trap files:</strong> {privacy['baseline_failures']}</p>
+    <p><strong>Owledge selected private trap files:</strong> {privacy['owledge_failures']}</p>
+    <p><strong>Baseline selected files:</strong> <code>{html.escape(', '.join(privacy['baseline_files']))}</code></p>
+    <p><strong>Owledge selected files:</strong> <code>{html.escape(', '.join(privacy['owledge_files']))}</code></p>
+    <p class="hint">Interpretation: if the baseline includes a private trap file and Owledge does not, Owledge prevented the privacy leak for this scenario.</p>
+  </section>
   <h2>Benchmark Charts</h2>
   <p class="hint">Chart direction: lower pollution, duration, and token cost are better; higher tokens/sec is better. The standalone SVG is also written to <code>.owledge/reports/generated/benchmark-kit/charts.svg</code>.</p>
   <div class="charts">{svg_text}</div>
