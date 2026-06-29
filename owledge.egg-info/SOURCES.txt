@@ -18,6 +18,7 @@ addons/benchmark-kit/BENCHMARK_EXPLAINED.md
 addons/benchmark-kit/README.md
 addons/benchmark-kit/addon.json
 addons/benchmark-kit/starter/.owledge/benchmark-kit/profile.md
+addons/benchmark-kit/tools/compare-benchmark-runs.py
 addons/benchmark-kit/tools/render-benchmark-report.py
 addons/benchmark-kit/tools/run-benchmark-kit.py
 addons/compliance-light/README.md
