@@ -1353,10 +1353,12 @@ def benchmark_addon_gate(root: pathlib.Path) -> dict[str, Any]:
                     compare_payload = json.loads(compare_json.read_text(encoding="utf-8"))
                     results.add("benchmark-addon:compare-json-models", len(compare_payload.get("models", [])) >= 2, "Benchmark comparison JSON includes multiple model rows.")
                     results.add("benchmark-addon:compare-json-executive", "executive" in compare_payload, "Benchmark comparison JSON includes executive verdict.")
+                    results.add("benchmark-addon:compare-json-costs", len(compare_payload.get("api_cost_estimates", [])) >= 9, "Benchmark comparison JSON includes API cost estimates.")
                 if compare_html.exists():
                     compare_text = compare_html.read_text(encoding="utf-8", errors="replace")
-                    for required in ["Executive Verdict", "Creator Pull Quote", "Model Matrix", "Before vs Owledge", "Scenario Heatmap", "Privacy failures prevented", "Context pollution", "Tokens per correct answer", "Oracle", "Lower", "Higher"]:
+                    for required in ["Executive Verdict", "Creator Pull Quote", "Model Matrix", "Before vs Owledge", "Estimated API Cost Impact", "Anthropic", "Google", "OpenAI", "Scenario Heatmap", "Privacy failures prevented", "Context pollution", "Tokens per correct answer", "How To Read This Report", "Oracle", "Lower", "Higher"]:
                         results.add(f"benchmark-addon:compare-html:{required}", required in compare_text, "Benchmark comparison HTML includes publishing proof sections.")
+                    results.add("benchmark-addon:compare-html:no-audience-targeting", "Interpretation for Audiences" not in compare_text and "AI YouTubers" not in compare_text, "Benchmark comparison HTML avoids audience-targeting language.")
         payload = results.payload(project=str(root), install=install)
     finally:
         shutil.rmtree(temp_dir, ignore_errors=True)

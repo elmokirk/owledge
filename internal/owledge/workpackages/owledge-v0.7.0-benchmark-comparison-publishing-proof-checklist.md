@@ -103,7 +103,7 @@ Current resume point: **Phase 6 - Final QA and Audience Evaluation**.
 
 - Added `tools/benchmark-kit/compare-benchmark-runs.py` as an optional add-on
   command. It reads completed `latest.json` reports and does not call Ollama.
-- `benchmark-kit-ci`: passed, 69 checks, including comparison JSON/MD/HTML/SVG
+- `benchmark-kit-ci`: passed, 76 checks, including comparison JSON/MD/HTML/SVG
   outputs and required proof sections.
 - Local comparison report created from:
   - `gemma4:latest`
@@ -116,6 +116,11 @@ Current resume point: **Phase 6 - Final QA and Audience Evaluation**.
   pollution reduction `88.36%`; average tokens/correct reduction `83.54%`.
 - Generated local review report:
   `.agent-control/tmp/owledge-benchmark-release-proof/.owledge/reports/generated/benchmark-kit-comparison/index.html`.
+- Comparison report now includes `Estimated API Cost Impact` with Anthropic,
+  Google, and OpenAI price presets, plus a neutral `How To Read This Report`
+  section.
+- The report no longer contains the previous audience-targeting interpretation
+  section.
 - `private-path-clean`: passed with zero findings.
 - `public-docs`: passed, 224 checks.
 - `publish-readiness`: passed, score `110`, verdict `promote-candidate`.

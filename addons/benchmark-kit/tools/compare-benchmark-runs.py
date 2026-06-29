@@ -11,6 +11,23 @@ from typing import Any
 
 
 PROFILES = ("metadata_scan", "owledge_context_pack", "oracle")
+API_PRICE_CATALOG = [
+    {"provider": "Anthropic", "model": "Claude Opus 4.8", "input_per_mtok": 5.00, "output_per_mtok": 25.00},
+    {"provider": "Anthropic", "model": "Claude Sonnet 4.6", "input_per_mtok": 3.00, "output_per_mtok": 15.00},
+    {"provider": "Anthropic", "model": "Claude Haiku 4.5", "input_per_mtok": 1.00, "output_per_mtok": 5.00},
+    {"provider": "Google", "model": "Gemini 3 Pro", "input_per_mtok": 2.00, "output_per_mtok": 12.00},
+    {"provider": "Google", "model": "Gemini 2.5 Pro", "input_per_mtok": 1.25, "output_per_mtok": 10.00},
+    {"provider": "Google", "model": "Gemini 2.5 Flash", "input_per_mtok": 0.30, "output_per_mtok": 2.50},
+    {"provider": "OpenAI", "model": "gpt-5.5", "input_per_mtok": 5.00, "output_per_mtok": 30.00},
+    {"provider": "OpenAI", "model": "gpt-5.5-pro", "input_per_mtok": 30.00, "output_per_mtok": 180.00},
+    {"provider": "OpenAI", "model": "gpt-5.4", "input_per_mtok": 2.50, "output_per_mtok": 15.00},
+]
+PRICE_SOURCE_NOTE = (
+    "Illustrative API prices per 1M tokens. Verify current provider pricing before using these numbers for budgets. "
+    "Sources checked: Anthropic Claude pricing (docs.anthropic.com/en/docs/about-claude/pricing), "
+    "Google Gemini API pricing (ai.google.dev/gemini-api/docs/pricing), "
+    "and OpenAI API pricing (platform.openai.com/docs/pricing)."
+)
 
 
 def pct_reduction(before: float, after: float) -> float:
@@ -147,6 +164,10 @@ def comparison_row(report: dict[str, Any]) -> dict[str, Any]:
         ),
         "baseline_total_tokens": int(baseline.get("total_tokens") or 0),
         "owledge_total_tokens": int(owledge.get("total_tokens") or 0),
+        "baseline_prompt_tokens": int(baseline.get("prompt_tokens") or 0),
+        "owledge_prompt_tokens": int(owledge.get("prompt_tokens") or 0),
+        "baseline_completion_tokens": int(baseline.get("completion_tokens") or 0),
+        "owledge_completion_tokens": int(owledge.get("completion_tokens") or 0),
         "total_token_reduction_percent": pct_reduction(
             float(baseline.get("total_tokens") or 0),
             float(owledge.get("total_tokens") or 0),
@@ -159,6 +180,38 @@ def comparison_row(report: dict[str, Any]) -> dict[str, Any]:
         "owledge_tokens_per_second": float(owledge.get("avg_tokens_per_second") or 0),
         "heatmap": scenario_heatmap(report),
     }
+
+
+def cost_for_tokens(input_tokens: int, output_tokens: int, price: dict[str, Any]) -> float:
+    return round(
+        (input_tokens / 1_000_000) * float(price["input_per_mtok"])
+        + (output_tokens / 1_000_000) * float(price["output_per_mtok"]),
+        6,
+    )
+
+
+def cost_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    baseline_prompt = sum(int(row["baseline_prompt_tokens"]) for row in rows)
+    baseline_completion = sum(int(row["baseline_completion_tokens"]) for row in rows)
+    owledge_prompt = sum(int(row["owledge_prompt_tokens"]) for row in rows)
+    owledge_completion = sum(int(row["owledge_completion_tokens"]) for row in rows)
+    items: list[dict[str, Any]] = []
+    for price in API_PRICE_CATALOG:
+        baseline_cost = cost_for_tokens(baseline_prompt, baseline_completion, price)
+        owledge_cost = cost_for_tokens(owledge_prompt, owledge_completion, price)
+        items.append(
+            {
+                "provider": price["provider"],
+                "model": price["model"],
+                "input_per_mtok": price["input_per_mtok"],
+                "output_per_mtok": price["output_per_mtok"],
+                "baseline_cost_usd": baseline_cost,
+                "owledge_cost_usd": owledge_cost,
+                "estimated_savings_usd": round(baseline_cost - owledge_cost, 6),
+                "estimated_savings_percent": pct_reduction(baseline_cost, owledge_cost),
+            }
+        )
+    return items
 
 
 def executive(rows: list[dict[str, Any]], skipped: list[str]) -> dict[str, Any]:
@@ -189,6 +242,7 @@ def render_svg(rows: list[dict[str, Any]]) -> str:
     metrics = [
         ("Pollution reduction %", "pollution_reduction_percent"),
         ("Token reduction %", "token_reduction_percent"),
+        ("Owledge tokens/sec", "owledge_tokens_per_second"),
         ("Privacy prevented", "privacy_failures_prevented"),
         ("Stale prevented", "stale_failures_prevented"),
     ]
@@ -223,6 +277,7 @@ def render_svg(rows: list[dict[str, Any]]) -> str:
 
 def render_markdown(payload: dict[str, Any]) -> str:
     rows = payload["models"]
+    costs = payload["api_cost_estimates"]
     lines = [
         "# Owledge Benchmark Comparison Report",
         "",
@@ -251,6 +306,21 @@ def render_markdown(payload: dict[str, Any]) -> str:
             "",
             "Lower privacy failures, stale failures, context pollution, and tokens per correct answer are better. Higher scenario pass rate, handoff score, and tokens/sec are better.",
             "",
+            "## Estimated API Cost Impact",
+            "",
+            PRICE_SOURCE_NOTE,
+            "",
+            "| Provider | Model | Input $/1M | Output $/1M | Baseline cost | Owledge cost | Estimated savings | Savings |",
+            "| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |",
+        ]
+    )
+    for item in costs:
+        lines.append(
+            f"| {item['provider']} | {item['model']} | {item['input_per_mtok']} | {item['output_per_mtok']} | ${item['baseline_cost_usd']} | ${item['owledge_cost_usd']} | ${item['estimated_savings_usd']} | {item['estimated_savings_percent']}% |"
+        )
+    lines.extend(
+        [
+            "",
             "## Scenario Heatmap",
             "",
             "| Model | Scenario | Baseline | Owledge |",
@@ -263,18 +333,19 @@ def render_markdown(payload: dict[str, Any]) -> str:
     lines.extend(
         [
             "",
-            "## Audience Interpretation",
+            "## How To Read This Report",
             "",
-            "- Powerusers: inspect token reduction, local model viability, and reproduction commands.",
-            "- AI YouTubers: use the model matrix and creator pull quote for the before/after story.",
-            "- Experts: inspect methodology, caveats, and oracle boundary before quoting claims.",
-            "- Researchers: treat deterministic synthetic fixtures as controlled probes, not universal benchmarks.",
-            "- Senior agentic architects: focus on context safety before inference, handoff continuity, and scale implications.",
+            "- Baseline shows what happens when retrieval over-selects noisy, stale, or private context.",
+            "- Owledge shows the product behavior under test: cleaner selected context before model inference.",
+            "- Token reduction estimates cost pressure avoided by cleaner context, not total project ROI.",
+            "- tokens/sec is runtime throughput for the tested model and environment, not an Owledge quality score.",
+            "- Oracle is the ground-truth reference ceiling from the fixture generator.",
             "",
             "## Caveats",
             "",
             "- Inputs are completed Benchmark Kit reports; this command does not run models.",
             "- Oracle is ground-truth reference, not a model or product claim.",
+            "- API prices are illustrative snapshots and must be verified against provider pricing before budgeting.",
             "- Small scale is release proof for v0.7.0; larger scales and own-vault benchmarking are roadmap items.",
         ]
     )
@@ -292,6 +363,7 @@ def pill(status: str) -> str:
 
 def render_html(payload: dict[str, Any], svg: str) -> str:
     rows = payload["models"]
+    costs = payload["api_cost_estimates"]
     matrix = []
     for row in rows:
         matrix.append(
@@ -318,6 +390,20 @@ def render_html(payload: dict[str, Any], svg: str) -> str:
                 f"<td>{pill(item['owledge_status'])}</td>"
                 "</tr>"
             )
+    cost_table = []
+    for item in costs:
+        cost_table.append(
+            "<tr>"
+            f"<td>{html.escape(item['provider'])}</td>"
+            f"<td>{html.escape(item['model'])}</td>"
+            f"<td>${item['input_per_mtok']}</td>"
+            f"<td>${item['output_per_mtok']}</td>"
+            f"<td>${item['baseline_cost_usd']}</td>"
+            f"<td>${item['owledge_cost_usd']}</td>"
+            f"<td>${item['estimated_savings_usd']}</td>"
+            f"<td>{item['estimated_savings_percent']}%</td>"
+            "</tr>"
+        )
     skipped = "".join(f"<li><code>{html.escape(item)}</code></li>" for item in payload["executive"].get("skipped_inputs", []))
     skipped_section = f"<h2>Skipped Inputs</h2><ul>{skipped}</ul>" if skipped else ""
     return f"""<!doctype html>
@@ -372,23 +458,30 @@ def render_html(payload: dict[str, Any], svg: str) -> str:
   <h2>Before vs Owledge Charts</h2>
   <p>Lower privacy failures, stale failures, <strong>Context pollution</strong>, and <strong>Tokens per correct answer</strong> are better. Higher reduction/prevention is better in these charts.</p>
   <div class="charts">{svg}</div>
+  <h2>Estimated API Cost Impact</h2>
+  <p>{html.escape(PRICE_SOURCE_NOTE)}</p>
+  <p>This table applies provider API prices to the measured baseline and Owledge token counts. It estimates cost pressure avoided by cleaner context; it is not a full project ROI calculation.</p>
+  <table>
+    <thead><tr><th>Provider</th><th>Model</th><th>Input $/1M</th><th>Output $/1M</th><th>Baseline cost</th><th>Owledge cost</th><th>Estimated savings</th><th>Savings</th></tr></thead>
+    <tbody>{''.join(cost_table)}</tbody>
+  </table>
   <h2>Scenario Heatmap</h2>
   <table>
     <thead><tr><th>Model</th><th>Scenario</th><th>Baseline</th><th>Owledge</th></tr></thead>
     <tbody>{''.join(heatmap)}</tbody>
   </table>
-  <h2>Interpretation for Audiences</h2>
+  <h2>How To Read This Report</h2>
   <table>
     <tbody>
-      <tr><th>Powerusers</th><td>Use token reduction, local model viability, and reproduction commands.</td></tr>
-      <tr><th>AI YouTubers</th><td>Use the model matrix and creator pull quote for a before/after proof story.</td></tr>
-      <tr><th>Experts</th><td>Inspect metric definitions, caveats, and the oracle boundary before quoting claims.</td></tr>
-      <tr><th>Researchers</th><td>Treat deterministic synthetic fixtures as controlled probes, not universal benchmarks.</td></tr>
-      <tr><th>Senior agentic architects</th><td>Focus on context safety before inference, handoff continuity, and scaling implications.</td></tr>
+      <tr><th>Baseline</th><td>Shows what happens when retrieval over-selects noisy, stale, or private context.</td></tr>
+      <tr><th>Owledge</th><td>Shows the product behavior under test: cleaner selected context before model inference.</td></tr>
+      <tr><th>Token reduction</th><td>Estimates cost pressure avoided by cleaner context, not total project ROI.</td></tr>
+      <tr><th>tokens/sec</th><td>Runtime throughput for the tested model and environment, not an Owledge quality score.</td></tr>
+      <tr><th>Oracle</th><td>Ground-truth reference ceiling from the fixture generator.</td></tr>
     </tbody>
   </table>
   <h2>Caveats</h2>
-  <p>Inputs are completed Benchmark Kit reports; this command does not run models. Oracle is ground-truth reference, not a model or product claim. Small scale is release proof for v0.7.0.</p>
+  <p>Inputs are completed Benchmark Kit reports; this command does not run models. Oracle is ground-truth reference, not a model or product claim. API prices are illustrative snapshots and must be verified against provider pricing before budgeting. Small scale is release proof for v0.7.0.</p>
   {skipped_section}
 </body>
 </html>
@@ -428,6 +521,8 @@ def compare(root: pathlib.Path, inputs: list[str], output: str) -> dict[str, Any
         "inputs": [report["_input"] for report in reports],
         "executive": executive(rows, skipped),
         "models": rows,
+        "api_price_source_note": PRICE_SOURCE_NOTE,
+        "api_cost_estimates": cost_rows(rows),
     }
     payload["paths"] = write_outputs(root, payload, pathlib.Path(output))
     return payload
