@@ -69,3 +69,47 @@ Daily notes, personal tasks, onboarding profiles, and private user preferences a
 ## Session Continuity
 
 When working from a multi-phase plan with per-phase checklists, resume from the first unchecked box. Do not restart completed phases. If a session breaks mid-phase, re-run that phase's QA gate before continuing; if it fails, uncheck the box and redo the phase. Subagents check their own boxes before returning to the orchestrator. The checkbox is a navigation aid; the phase's QA gate output is the durable evidence.
+
+## Owledge-Native Planning Rule
+
+When the user asks for a plan, release plan, implementation plan, roadmap cut,
+or multi-phase QA workflow while working inside this Owledge repository:
+
+1. Write the plan first as Markdown under `internal/owledge/plans/`.
+2. Write the phase checklist or agent tasklist under
+   `internal/owledge/workpackages/`.
+3. Include frontmatter, phase QA gates, DoD, resume state, and subagent lanes
+   when the task is larger than a single-file change.
+4. Only start implementation after the plan and checklist exist, unless the user
+   explicitly asks for analysis-only or explicitly declines writing Owledge
+   artifacts.
+5. Update the checklist after each phase with evidence, not just with checked
+   boxes.
+
+This rule exists because Owledge treats local Markdown as the durable project
+truth. A plan described only in chat is not sufficient for release-critical work.
+
+## Agentic Major Release Discipline
+
+For major releases, migrations, packaging changes, public docs, or benchmark
+work, agents must use release-engineering discipline:
+
+- Start from a named branch and record the branch in the Owledge plan.
+- Split large work into phase commits when feasible: foundation, feature,
+  gates, docs, release artifacts.
+- Commit immediately after broad renames or filesystem migrations so later
+  diffs remain reviewable.
+- Keep generated state ignored before running benchmarks, exports, snapshots,
+  or visual report tools.
+- Do not publish, tag, or call a release final from a dirty tracked worktree.
+- Build artifacts only after source changes are committed or intentionally
+  frozen.
+- Run release gates from a clean source state, then rebuild wheel/sdist and run
+  install smoke tests.
+- Keep docs last when interfaces, CLI commands, gates, or package paths are
+  still changing.
+- Orchestrator owns central README, CI, release notes, and final tasklists;
+  subagents write lane handoffs and scoped changes.
+- If a benchmark report compares baselines to Owledge, the public verdict must
+  not collapse an intentionally failing baseline into a product-level failure.
+  Show baseline failures as contrast, and score the Owledge profile separately.

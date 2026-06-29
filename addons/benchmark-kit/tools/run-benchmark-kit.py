@@ -459,28 +459,75 @@ def metric_state(value: float, good_max: float | None = None, warn_max: float | 
     return "fail"
 
 
-def benchmark_verdict(results: dict[str, Any]) -> dict[str, str]:
-    totals = results["totals"]
+def profile_totals(records: list[dict[str, Any]]) -> dict[str, Any]:
+    totals = aggregate(records)
+    totals["record_count"] = len(records)
+    return totals
+
+
+def build_profile_totals(records: list[dict[str, Any]]) -> dict[str, Any]:
+    return {profile: profile_totals([item for item in records if item.get("profile") == profile]) for profile in PROFILES}
+
+
+def profile_verdict(profile: str, totals: dict[str, Any], file_count: int, *, required: bool = True) -> dict[str, Any]:
     states = {
         "context_pollution": metric_state(float(totals["avg_irrelevant_token_ratio"]), good_max=0.20, warn_max=0.40),
         "privacy": "pass" if int(totals["privacy_failures"]) == 0 else "fail",
         "staleness": metric_state(float(totals["staleness_failures"]), good_max=0, warn_max=2),
         "failed_scenarios": metric_state(float(totals["failed_scenarios"]), good_max=0, warn_max=1),
-        "tokens_per_correct_answer": "warn" if float(totals["tokens_per_correct_answer"]) > max(2500, int(results["file_count"]) * 8) else "pass",
+        "tokens_per_correct_answer": "warn" if float(totals["tokens_per_correct_answer"]) > max(2500, file_count * 8) else "pass",
     }
-    if not results.get("passed") or "fail" in states.values():
+    if "fail" in states.values():
         verdict = "fail"
     elif "warn" in states.values():
         verdict = "warn"
     else:
         verdict = "pass"
-    if verdict == "pass":
-        conclusion = "The benchmark passed with low practical risk: no privacy leaks, no stale-context failures, and context pollution stayed inside the target band."
-    elif verdict == "warn":
-        conclusion = "The benchmark passed with caveats. Inspect the warning metrics before using this setup for larger vaults or weaker local models."
+    if profile == "metadata_scan":
+        if verdict == "fail":
+            conclusion = "Baseline failed as expected: naive metadata scanning over-selected unsafe, stale, or noisy context."
+        elif verdict == "warn":
+            conclusion = "Baseline passed with caveats, but still carries enough noise to justify comparing against the Owledge context pack."
+        else:
+            conclusion = "Baseline passed on this run; compare token cost and pollution against Owledge before drawing conclusions."
+    elif profile == "owledge_context_pack":
+        if verdict == "pass":
+            conclusion = "Owledge passed: the context-pack profile kept private and stale records out while staying inside the target pollution band."
+        elif verdict == "warn":
+            conclusion = "Owledge passed with caveats: safety held, but pollution or token cost should be inspected before scaling up."
+        else:
+            conclusion = "Owledge failed: the product profile leaked unsafe/stale context or missed required scenario behavior."
     else:
-        conclusion = "The benchmark failed or exposed high-risk behavior. Fix privacy, stale-context, scenario failures, or context pollution before treating the setup as reliable."
-    return {"verdict": verdict, "conclusion": conclusion, "states": states}
+        conclusion = "Oracle is the reference ceiling and should be treated as an ideal comparison point, not a product claim."
+    return {"profile": profile, "verdict": verdict, "conclusion": conclusion, "states": states, "totals": totals}
+
+
+def benchmark_verdicts(results: dict[str, Any]) -> dict[str, Any]:
+    profiles = results.get("profile_totals") or build_profile_totals(results["records"])
+    file_count = int(results["file_count"])
+    baseline = profile_verdict("metadata_scan", profiles["metadata_scan"], file_count, required=False)
+    owledge = profile_verdict("owledge_context_pack", profiles["owledge_context_pack"], file_count, required=True)
+    oracle = profile_verdict("oracle", profiles["oracle"], file_count, required=False)
+    final_verdict = owledge["verdict"]
+    if final_verdict == "pass":
+        final_conclusion = "Owledge passed: the baseline profile over-selected unsafe or stale context, while the Owledge context-pack profile kept private and stale records out."
+    elif final_verdict == "warn":
+        final_conclusion = "Owledge passed with caveats: safety held, but token cost or context pollution should be reviewed before using this setup at a larger scale."
+    else:
+        final_conclusion = "Owledge failed: fix the context-pack profile before using this benchmark as release proof."
+    return {
+        "baseline": baseline,
+        "owledge": owledge,
+        "oracle": oracle,
+        "final_verdict": final_verdict,
+        "final_conclusion": final_conclusion,
+    }
+
+
+def benchmark_verdict(results: dict[str, Any]) -> dict[str, Any]:
+    verdicts = results.get("verdicts") or benchmark_verdicts(results)
+    owledge = verdicts["owledge"]
+    return {"verdict": verdicts["final_verdict"], "conclusion": verdicts["final_conclusion"], "states": owledge["states"]}
 
 
 def scenario_status(item: dict[str, Any]) -> str:
@@ -535,26 +582,22 @@ def write_reports(root: pathlib.Path, results: dict[str, Any]) -> dict[str, str]
 
 def render_markdown(results: dict[str, Any]) -> str:
     totals = results["totals"]
-    verdict = results.get("verdict") or benchmark_verdict(results)
+    profile_data = results.get("profile_totals") or build_profile_totals(results["records"])
+    verdicts = results.get("verdicts") or benchmark_verdicts(results)
+    baseline = verdicts["baseline"]
+    owledge = verdicts["owledge"]
+    oracle = verdicts["oracle"]
     lines = [
         "# Owledge Benchmark Kit Report",
         "",
-        "## Verdict",
-        "",
-        f"- Verdict: `{verdict['verdict']}`",
-        f"- Conclusion: {verdict['conclusion']}",
-        f"- Context pollution state: `{verdict['states']['context_pollution']}`",
-        f"- Token usage state: `{verdict['states']['tokens_per_correct_answer']}`",
-        f"- Privacy state: `{verdict['states']['privacy']}`",
-        f"- Stale context state: `{verdict['states']['staleness']}`",
-        "",
-        "## Summary",
+        "## Run Summary",
         "",
         f"- Passed: `{str(results['passed']).lower()}`",
         f"- Mode: `{results['mode']}`",
         f"- Scale mode: `{results['scale_mode']}`",
         f"- File count: `{results['file_count']}`",
         f"- Model(s): `{', '.join(results['models'])}`",
+        f"- Profiles tested: `{', '.join(PROFILES)}`",
         f"- Total tokens: `{totals['total_tokens']}`",
         f"- Context pollution: `{totals['avg_irrelevant_token_ratio']}`",
         f"- Duration ms: `{totals['total_duration_ms']}`",
@@ -563,6 +606,22 @@ def render_markdown(results: dict[str, Any]) -> str:
         f"- Stale failures: `{totals['staleness_failures']}`",
         f"- Fixture directory: `{results['fixture_dir']}`",
         f"- Explanation: `.owledge/benchmark-kit/BENCHMARK_EXPLAINED.md`",
+        "",
+        "## Before vs Owledge",
+        "",
+        "| Metric | Baseline metadata_scan | Owledge context pack | Oracle reference |",
+        "| --- | ---: | ---: | ---: |",
+        f"| Context pollution | {profile_data['metadata_scan']['avg_irrelevant_token_ratio']} | {profile_data['owledge_context_pack']['avg_irrelevant_token_ratio']} | {profile_data['oracle']['avg_irrelevant_token_ratio']} |",
+        f"| Privacy failures | {profile_data['metadata_scan']['privacy_failures']} | {profile_data['owledge_context_pack']['privacy_failures']} | {profile_data['oracle']['privacy_failures']} |",
+        f"| Stale failures | {profile_data['metadata_scan']['staleness_failures']} | {profile_data['owledge_context_pack']['staleness_failures']} | {profile_data['oracle']['staleness_failures']} |",
+        f"| Tokens per correct answer | {profile_data['metadata_scan']['tokens_per_correct_answer']} | {profile_data['owledge_context_pack']['tokens_per_correct_answer']} | {profile_data['oracle']['tokens_per_correct_answer']} |",
+        f"| Verdict | {baseline['verdict']} | {owledge['verdict']} | {oracle['verdict']} |",
+        "",
+        "Baseline failures are expected contrast when the naive profile over-selects noisy, stale, or private context. The Owledge verdict is the product proof.",
+        "",
+        "## Privacy Trap Explained",
+        "",
+        "The benchmark injects private Markdown notes that look relevant to the question. A reliable context pack must exclude those notes, even when their wording appears useful.",
         "",
         "## What This Means",
         "",
@@ -580,20 +639,41 @@ def render_markdown(results: dict[str, Any]) -> str:
     ]
     for item in results["records"]:
         lines.append(
-            f"| {scenario_status(item)} | {item['scenario']} | {item['profile']} | {item['model']} | {item['precision_at_k']} | {item['recall_at_k']} | {item['irrelevant_token_ratio']} | {item['total_tokens']} | {item['total_duration_ms']} |"
+        f"| {scenario_status(item)} | {item['scenario']} | {item['profile']} | {item['model']} | {item['precision_at_k']} | {item['recall_at_k']} | {item['irrelevant_token_ratio']} | {item['total_tokens']} | {item['total_duration_ms']} |"
         )
+    lines.extend(
+        [
+            "",
+            "## Caveats",
+            "",
+            "Fixture content is deterministic and synthetic. Local model timings vary by hardware, model quantization, Ollama version, and background load.",
+            "",
+            "## Final Verdict",
+            "",
+            f"- Baseline verdict: `{baseline['verdict']}` - {baseline['conclusion']}",
+            f"- Owledge verdict: `{owledge['verdict']}` - {owledge['conclusion']}",
+            f"- Oracle verdict: `{oracle['verdict']}` - {oracle['conclusion']}",
+            f"- Product verdict: `{verdicts['final_verdict']}`",
+            f"- Conclusion: {verdicts['final_conclusion']}",
+        ]
+    )
     return "\n".join(lines) + "\n"
 
 
 def render_html(results: dict[str, Any], svg_text: str | None = None) -> str:
     totals = results["totals"]
-    verdict = results.get("verdict") or benchmark_verdict(results)
+    profile_data = results.get("profile_totals") or build_profile_totals(results["records"])
+    verdicts = results.get("verdicts") or benchmark_verdicts(results)
+    baseline = verdicts["baseline"]
+    owledge = verdicts["owledge"]
+    oracle = verdicts["oracle"]
     svg_text = svg_text or render_svg(results)
     record_rows = []
     for item in results["records"]:
         status = scenario_status(item)
+        profile_class = "product" if item["profile"] == "owledge_context_pack" else "baseline" if item["profile"] == "metadata_scan" else "oracle"
         record_rows.append(
-            "<tr>"
+            f"<tr class=\"{profile_class}\">"
             f"<td><span class=\"pill {status}\">{status.title()}</span></td>"
             f"<td>{html.escape(item['scenario'])}</td>"
             f"<td>{html.escape(item['profile'])}</td>"
@@ -620,6 +700,10 @@ def render_html(results: dict[str, Any], svg_text: str | None = None) -> str:
     .verdict.pass {{ border-color: #16a34a; }}
     .verdict.warn {{ border-color: #d97706; }}
     .verdict.fail {{ border-color: #dc2626; }}
+    .summary {{ border-left: 6px solid #2563eb; }}
+    .product {{ background: #f0fdf4; }}
+    .baseline {{ background: #fff7ed; }}
+    .oracle {{ background: #f8fafc; }}
     .label {{ color: #64748b; font-size: 13px; }}
     .value {{ font-size: 24px; font-weight: 700; margin-top: 6px; }}
     .hint {{ color: #64748b; font-size: 13px; margin-top: 6px; line-height: 1.45; }}
@@ -637,10 +721,10 @@ def render_html(results: dict[str, Any], svg_text: str | None = None) -> str:
 <body>
   <h1>Owledge Benchmark Kit Report</h1>
   <p>This report uses real synthetic Markdown fixtures. Read <code>.owledge/benchmark-kit/BENCHMARK_EXPLAINED.md</code> before interpreting the scores.</p>
-  <section class="card verdict {html.escape(verdict['verdict'])}">
-    <div class="label">Verdict</div>
-    <div class="value">{html.escape(verdict['verdict'].title())}</div>
-    <p><strong>Conclusion:</strong> {html.escape(verdict['conclusion'])}</p>
+  <section class="card summary">
+    <div class="label">Run Summary</div>
+    <div class="value">{html.escape(results['mode'].title())} / {html.escape(results['scale_mode'])}</div>
+    <p>Profiles tested: <code>{html.escape(', '.join(PROFILES))}</code>. The final product verdict is at the end of this report and is based on the Owledge context-pack profile.</p>
   </section>
   <div class="grid">
     <div class="card"><div class="label">Scale mode</div><div class="value">{html.escape(results['scale_mode'])}</div></div>
@@ -652,6 +736,20 @@ def render_html(results: dict[str, Any], svg_text: str | None = None) -> str:
     <div class="card"><div class="label">Privacy failures</div><div class="value">{totals['privacy_failures']}</div><div class="hint">Must be zero for team-safe or shareable context.</div></div>
     <div class="card"><div class="label">Stale failures</div><div class="value">{totals['staleness_failures']}</div><div class="hint">Lower is better. Stale context means outdated notes entered the selected pack.</div></div>
   </div>
+  <h2>Before vs Owledge</h2>
+  <p>Baseline <code>metadata_scan</code> is the naive before-state. <code>owledge_context_pack</code> is the product behavior under test. <code>oracle</code> is the ideal reference ceiling.</p>
+  <table>
+    <thead><tr><th>Metric</th><th>Baseline metadata_scan</th><th>Owledge context pack</th><th>Oracle reference</th></tr></thead>
+    <tbody>
+      <tr><th>Context pollution</th><td>{profile_data['metadata_scan']['avg_irrelevant_token_ratio']}</td><td>{profile_data['owledge_context_pack']['avg_irrelevant_token_ratio']}</td><td>{profile_data['oracle']['avg_irrelevant_token_ratio']}</td></tr>
+      <tr><th>Privacy failures</th><td>{profile_data['metadata_scan']['privacy_failures']}</td><td>{profile_data['owledge_context_pack']['privacy_failures']}</td><td>{profile_data['oracle']['privacy_failures']}</td></tr>
+      <tr><th>Stale failures</th><td>{profile_data['metadata_scan']['staleness_failures']}</td><td>{profile_data['owledge_context_pack']['staleness_failures']}</td><td>{profile_data['oracle']['staleness_failures']}</td></tr>
+      <tr><th>Tokens per correct answer</th><td>{profile_data['metadata_scan']['tokens_per_correct_answer']}</td><td>{profile_data['owledge_context_pack']['tokens_per_correct_answer']}</td><td>{profile_data['oracle']['tokens_per_correct_answer']}</td></tr>
+      <tr><th>Verdict</th><td><span class="pill {baseline['verdict']}">{baseline['verdict'].title()}</span></td><td><span class="pill {owledge['verdict']}">{owledge['verdict'].title()}</span></td><td><span class="pill {oracle['verdict']}">{oracle['verdict'].title()}</span></td></tr>
+    </tbody>
+  </table>
+  <h2>Privacy Trap Explained</h2>
+  <p>The benchmark injects private Markdown notes that look relevant to the question. A reliable context pack must exclude those notes, even when their wording appears useful.</p>
   <h2>Benchmark Charts</h2>
   <p class="hint">Chart direction: lower pollution, duration, and token cost are better; higher tokens/sec is better. The standalone SVG is also written to <code>.owledge/reports/generated/benchmark-kit/charts.svg</code>.</p>
   <div class="charts">{svg_text}</div>
@@ -682,6 +780,15 @@ def render_html(results: dict[str, Any], svg_text: str | None = None) -> str:
   <h2>Caveats</h2>
   <p>Fixture content is deterministic and synthetic. Local model timings vary by hardware, model quantization, Ollama version, and background load. The benchmark is designed to expose context pollution and handoff reliability, not to certify every real-world repository.</p>
   <p>Fixture directory: <code>{html.escape(results['fixture_dir'])}</code></p>
+  <h2>Final Verdict</h2>
+  <section class="card verdict {html.escape(verdicts['final_verdict'])}">
+    <div class="label">Product Verdict</div>
+    <div class="value">{html.escape(verdicts['final_verdict'].title())}</div>
+    <p><strong>Baseline:</strong> {html.escape(baseline['conclusion'])}</p>
+    <p><strong>Owledge:</strong> {html.escape(owledge['conclusion'])}</p>
+    <p><strong>Oracle:</strong> {html.escape(oracle['conclusion'])}</p>
+    <p><strong>Conclusion:</strong> {html.escape(verdicts['final_conclusion'])}</p>
+  </section>
 </body>
 </html>
 """
@@ -721,7 +828,7 @@ def render_svg(results: dict[str, Any]) -> str:
     return "\n".join(parts)
 
 
-def run(root: pathlib.Path, mode: str, scale_mode: str, seed: int, models: str, ollama_url: str, yes: bool) -> dict[str, Any]:
+def run(root: pathlib.Path, mode: str, scale_mode: str, seed: int, models: str, ollama_url: str, yes: bool, primary_profile: str = "owledge_context_pack") -> dict[str, Any]:
     if mode not in {"ci", "local"}:
         return {"passed": False, "error": f"Unsupported mode for v0.7.0 benchmark-kit: {mode}"}
     if scale_mode not in SCALE_MODES:
@@ -802,6 +909,7 @@ def run(root: pathlib.Path, mode: str, scale_mode: str, seed: int, models: str, 
         "queries": report_rel(root, fixture_dir / "queries.json"),
         "oracle": report_rel(root, fixture_dir / "oracle.json"),
         "models": selected_models,
+        "primary_profile": primary_profile,
         "installed_models": installed_models,
         "platform": {"system": platform.system(), "release": platform.release(), "machine": platform.machine(), "python": sys.version.split()[0]},
         "scenarios": SCENARIOS,
@@ -810,6 +918,10 @@ def run(root: pathlib.Path, mode: str, scale_mode: str, seed: int, models: str, 
         "errors": errors,
         "explanation": ".owledge/benchmark-kit/BENCHMARK_EXPLAINED.md",
     }
+    results["profile_totals"] = build_profile_totals(records)
+    results["verdicts"] = benchmark_verdicts(results)
+    results["final_verdict"] = results["verdicts"]["final_verdict"]
+    results["final_conclusion"] = results["verdicts"]["final_conclusion"]
     results["verdict"] = benchmark_verdict(results)
     results["paths"] = write_reports(root, results)
     return results
@@ -822,10 +934,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--scale-mode", choices=sorted(SCALE_MODES), default="small")
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--models", default="")
+    parser.add_argument("--primary-profile", choices=PROFILES, default="owledge_context_pack")
     parser.add_argument("--ollama-url", default="http://localhost:11434")
     parser.add_argument("--yes", action="store_true")
     args = parser.parse_args(argv)
-    result = run(pathlib.Path(args.project_root).resolve(), args.mode, args.scale_mode, args.seed, args.models, args.ollama_url, args.yes)
+    result = run(pathlib.Path(args.project_root).resolve(), args.mode, args.scale_mode, args.seed, args.models, args.ollama_url, args.yes, args.primary_profile)
     print(json.dumps(result, indent=2))
     return 0 if result.get("passed") else 1
 

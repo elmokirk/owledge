@@ -1309,15 +1309,21 @@ def benchmark_addon_gate(root: pathlib.Path) -> dict[str, Any]:
             if latest_json.exists():
                 report_payload = json.loads(latest_json.read_text(encoding="utf-8"))
                 results.add("benchmark-addon:json-verdict", str(report_payload.get("verdict", {}).get("verdict") or "") in {"pass", "warn", "fail"}, "Benchmark JSON includes a verdict.")
+                results.add("benchmark-addon:json-verdicts-owledge", str(report_payload.get("verdicts", {}).get("owledge", {}).get("verdict") or "") in {"pass", "warn", "fail"}, "Benchmark JSON includes an Owledge product verdict.")
+                results.add("benchmark-addon:json-final-verdict", str(report_payload.get("final_verdict") or "") in {"pass", "warn", "fail"}, "Benchmark JSON includes a final product verdict.")
+                results.add("benchmark-addon:json-profile-totals", all(profile in report_payload.get("profile_totals", {}) for profile in ["metadata_scan", "owledge_context_pack", "oracle"]), "Benchmark JSON includes profile-level totals.")
+                baseline_verdict = str(report_payload.get("verdicts", {}).get("baseline", {}).get("verdict") or "")
+                owledge_verdict = str(report_payload.get("verdicts", {}).get("owledge", {}).get("verdict") or "")
+                results.add("benchmark-addon:baseline-does-not-force-product-fail", not (baseline_verdict == "fail" and owledge_verdict == "pass" and report_payload.get("final_verdict") == "fail"), "Baseline failures do not force a product-level fail when Owledge passes.")
                 results.add("benchmark-addon:json-relative-project", report_payload.get("project_root") == ".", "Benchmark JSON uses a share-safe project root.")
                 results.add("benchmark-addon:json-relative-fixture", not pathlib.PurePosixPath(str(report_payload.get("fixture_dir", ""))).is_absolute() and "Users/" not in str(report_payload.get("fixture_dir", "")), "Benchmark JSON fixture path is relative/share-safe.")
             if latest_md.exists():
                 md_text = latest_md.read_text(encoding="utf-8", errors="replace")
-                for required in ["## Verdict", "Conclusion", "Tokens per correct answer", "Context pollution", "What This Means"]:
+                for required in ["## Run Summary", "Before vs Owledge", "Privacy Trap Explained", "What This Means", "## Final Verdict", "Tokens per correct answer", "Context pollution"]:
                     results.add(f"benchmark-addon:md:{required}", required in md_text, "Benchmark Markdown includes verdict and interpretation.")
             if html_report.exists():
                 html_text = html_report.read_text(encoding="utf-8", errors="replace")
-                for required in ["Verdict", "Conclusion", "Total tokens", "Tokens per correct answer", "Context pollution", "Privacy failures", "Stale failures", "<svg"]:
+                for required in ["Run Summary", "Before vs Owledge", "Final Verdict", "Privacy Trap", "Total tokens", "Tokens per correct answer", "Context pollution", "Privacy failures", "Stale failures", "<svg"]:
                     results.add(f"benchmark-addon:html:{required}", required in html_text, "Benchmark HTML includes verdict, interpretation, and embedded charts.")
         payload = results.payload(project=str(root), install=install)
     finally:

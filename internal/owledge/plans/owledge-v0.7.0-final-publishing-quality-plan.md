@@ -85,6 +85,20 @@ Tasks:
 - Add "What This Means" explanations for token usage, pollution, failures,
   performance, and duration.
 
+Release-facing fix:
+
+- Separate `baseline_verdict` from `owledge_verdict`.
+- Treat intentionally weak baseline profiles as contrast evidence, not as the
+  product-level release verdict.
+- Move the final product verdict to the end of the report as `Final Verdict`.
+- Keep a top summary near the top, but make it read as a neutral run summary,
+  not the final judgment.
+- The release demo should show: baseline context pollution fails, Owledge
+  context-pack passes privacy/stale filters and uses fewer useful tokens.
+- If any Owledge profile includes private records, stale records, or failed
+  scenarios, the product verdict must still fail. Only baseline failures are
+  allowed to be framed as expected contrast.
+
 QA gate:
 
 ```powershell
@@ -96,6 +110,8 @@ Metric target:
 - Benchmark Kit CI gate passes.
 - HTML and Markdown include `Verdict`, `Conclusion`, `Tokens per correct answer`,
   `Context pollution`, `Privacy failures`, and `Stale failures`.
+- Release demo report shows a positive `owledge_verdict` when the Owledge
+  profile passes even if the baseline profile fails.
 
 ## Phase 2 - Embedded Benchmark Charts
 
@@ -220,6 +236,10 @@ Metric target:
 - `release-trust`: passed.
 - `legacy-naming-clean`: passed.
 - `private-path-clean`: passed with zero findings.
-- `benchmark-kit-ci`: passed, 36 checks.
+- `benchmark-kit-ci`: passed, 44 checks after split verdict implementation.
+- Local release proof benchmarks passed for `gemma4:latest`, `qwen3.5:4b`,
+  and `glm-5.1:cloud`: baseline profile failed as expected, while the Owledge
+  context-pack profile passed with zero privacy failures and zero stale
+  failures.
 - Wheel-based `uvx` help, quickstart, and doctor smoke passed.
 - `twine check` remains pending in an environment with `twine` installed.

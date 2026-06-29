@@ -69,6 +69,14 @@ Checklist:
 - [x] Add scenario-level status labels.
 - [x] Add "What This Means" explanations.
 - [x] Phase 1 QA gate passed.
+- [x] Split release-facing benchmark verdict into baseline verdict and Owledge
+  verdict.
+- [x] Move final benchmark verdict to the end of Markdown and HTML reports.
+- [x] Keep the top of the report as a neutral run summary.
+- [x] Ensure baseline privacy/stale failures are shown as contrast, not as a
+  product-level failure.
+- [x] Ensure Owledge profile privacy/stale/scenario failures still fail the
+  product verdict.
 
 QA gate:
 
@@ -78,7 +86,23 @@ python tools\owledge.py test benchmark-kit-ci --project-root .
 
 Evidence:
 
-- `benchmark-kit-ci`: passed, 36 checks.
+- `benchmark-kit-ci`: passed, 44 checks after split verdict implementation.
+- JSON now contains `profile_totals`, `verdicts.owledge`, and
+  `final_verdict`.
+- Markdown and HTML now start with `Run Summary`, include `Before vs Owledge`
+  and `Privacy Trap Explained`, and end with `Final Verdict`.
+- Local release proof benchmarks:
+  - `gemma4:latest`: final `pass`; baseline `fail`; Owledge `pass`;
+    Owledge pollution `0.0856`; privacy failures `0`; stale failures `0`;
+    tokens/correct `1190.67`; avg tok/s `74.5858`.
+  - `qwen3.5:4b`: final `pass`; baseline `fail`; Owledge `pass`;
+    Owledge pollution `0.0856`; privacy failures `0`; stale failures `0`;
+    tokens/correct `2002.17`; avg tok/s `37.6034`.
+  - `glm-5.1:cloud`: final `pass`; baseline `fail`; Owledge `pass`;
+    Owledge pollution `0.0856`; privacy failures `0`; stale failures `0`;
+    tokens/correct `1062.67`; avg tok/s `89.4848`.
+- Local report copies are stored under
+  `.agent-control/tmp/owledge-benchmark-release-proof/.owledge/reports/generated/`.
 
 ## Phase 2 - Embedded Benchmark Charts
 
