@@ -105,6 +105,21 @@ owledge doctor --project-root .agent-control/tmp/owledge-five-minute-demo
 Expected result: the demo project contains evidence, a next-agent handoff, and
 a static proof report. Full walk-through: [Try Owledge in 5 minutes](docs/try-owledge-in-5-minutes.md).
 
+Benchmark proof path:
+
+```bash
+python tools/benchmark-kit/compare-benchmark-runs.py --inputs \
+  .owledge/exports/benchmark-kit-gemma4-latest/latest.json \
+  .owledge/exports/benchmark-kit-qwen3-5-4b/latest.json \
+  .owledge/exports/benchmark-kit-glm-5-1-cloud/latest.json \
+  --output .owledge/reports/generated/benchmark-kit-comparison
+```
+
+Expected result: a comparison report shows baseline retrieval versus Owledge
+context packs across model tiers. It highlights privacy failures prevented,
+stale context avoided, context pollution reduction, and tokens per correct
+answer. The report is proof-oriented, not a universal model benchmark.
+
 ## Quickstart Paths
 
 ### 0. Use Only The Principles Or Skills
@@ -281,7 +296,7 @@ flowchart LR
 | Token strategy | Paths and refs first, full bodies only on demand |
 | Write policy | Additive module or mapped writes; existing notes unchanged by default |
 | Scale guard | `--max-files`, excluded generated dirs, truncation reporting |
-| Benchmarks | Optional `benchmark-kit` add-on with real Markdown fixtures, deterministic CI mode, and opt-in sequential Ollama local mode |
+| Benchmarks | Optional `benchmark-kit` add-on with real Markdown fixtures, deterministic CI mode, opt-in sequential Ollama local mode, and multi-model comparison reports |
 
 Benchmarks and scale notes: [Performance and scale notes](docs/performance-scale-notes.md)
 
@@ -413,7 +428,7 @@ The core stays small. Broad-launch proof is handled by optional add-ons:
 | `runtime-conformance-kit` | Read-only runtime contracts for Codex, Claude Code, and Cowork-compatible adapters. |
 | `pi-proof-kit` | Synthetic PI loop proving observe, detect, red-team, promote, and measure. |
 | `ts-adapter-kit` | Optional Node/TypeScript CI validation for the Markdown contract. |
-| `benchmark-kit` | Optional real Markdown fixture benchmark with token, performance, context pollution, JSON, Markdown, HTML, and SVG reports. |
+| `benchmark-kit` | Optional real Markdown fixture benchmark with token, performance, context pollution, single-run reports, and multi-model comparison proof reports. |
 | `decision-trace-kit` | Read-only JSON and HTML trace from memory records to decision tree. |
 | `cross-project-hub-kit` | Reviewed export map from project-local lessons, patterns, decisions, and summaries into a central reusable hub. |
 | `swarm-coordination-kit` | Role-lane templates for Codex, Claude Code, Hermes, and generic agent swarms without hard distributed locking. |

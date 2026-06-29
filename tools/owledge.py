@@ -1269,16 +1269,18 @@ def benchmark_addon_gate(root: pathlib.Path) -> dict[str, Any]:
     explanation = root / "addons" / "benchmark-kit" / "BENCHMARK_EXPLAINED.md"
     runner = root / "addons" / "benchmark-kit" / "tools" / "run-benchmark-kit.py"
     renderer = root / "addons" / "benchmark-kit" / "tools" / "render-benchmark-report.py"
+    comparer = root / "addons" / "benchmark-kit" / "tools" / "compare-benchmark-runs.py"
     results = ResultSet()
     results.add("benchmark-addon:manifest", manifest.exists(), "Benchmark Kit add-on manifest exists.")
     results.add("benchmark-addon:runner", runner.exists(), "Benchmark Kit runner exists.")
     results.add("benchmark-addon:renderer", renderer.exists(), "Benchmark Kit report renderer exists.")
+    results.add("benchmark-addon:comparer", comparer.exists(), "Benchmark Kit comparison renderer exists.")
     results.add("benchmark-addon:explanation", explanation.exists(), "Benchmark explanation Markdown exists.")
     if explanation.exists():
         text = explanation.read_text(encoding="utf-8", errors="replace").lower()
         for required in ["distractor", "stale", "private", "multi-hop", "handoff", "context pollution"]:
             results.add(f"benchmark-addon:explanation:{required}", required in text, "Benchmark explanation documents injected failure modes.")
-    if not (manifest.exists() and runner.exists() and renderer.exists() and explanation.exists()):
+    if not (manifest.exists() and runner.exists() and renderer.exists() and comparer.exists() and explanation.exists()):
         return results.payload(project=str(root))
 
     temp_dir = pathlib.Path(tempfile.mkdtemp(prefix="owledge-benchmark-addon-"))
@@ -1286,11 +1288,13 @@ def benchmark_addon_gate(root: pathlib.Path) -> dict[str, Any]:
         install = install_addon(temp_dir, root, "benchmark-kit")
         installed_runner = temp_dir / "tools" / "benchmark-kit" / "run-benchmark-kit.py"
         installed_renderer = temp_dir / "tools" / "benchmark-kit" / "render-benchmark-report.py"
+        installed_comparer = temp_dir / "tools" / "benchmark-kit" / "compare-benchmark-runs.py"
         installed_explanation = temp_dir / ".owledge" / "benchmark-kit" / "BENCHMARK_EXPLAINED.md"
         results.add("benchmark-addon:install-runner", installed_runner.exists(), "Installed Benchmark Kit runner exists.")
         results.add("benchmark-addon:install-renderer", installed_renderer.exists(), "Installed Benchmark Kit renderer exists.")
+        results.add("benchmark-addon:install-comparer", installed_comparer.exists(), "Installed Benchmark Kit comparison renderer exists.")
         results.add("benchmark-addon:install-explanation", installed_explanation.exists(), "Installed Benchmark Kit explanation exists.")
-        if installed_runner.exists() and installed_renderer.exists():
+        if installed_runner.exists() and installed_renderer.exists() and installed_comparer.exists():
             run = run_subprocess([sys.executable, str(installed_runner), "--mode", "ci", "--scale-mode", "small", "--yes"], cwd=temp_dir)
             results.add("benchmark-addon:ci-run", run.returncode == 0, "Benchmark Kit CI run exits successfully." if run.returncode == 0 else f"Benchmark Kit CI run failed: {run.stderr[-800:]}")
             render = run_subprocess([sys.executable, str(installed_renderer), "--format", "html"], cwd=temp_dir)
@@ -1325,6 +1329,34 @@ def benchmark_addon_gate(root: pathlib.Path) -> dict[str, Any]:
                 html_text = html_report.read_text(encoding="utf-8", errors="replace")
                 for required in ["Run Summary", "Before vs Owledge", "Final Verdict", "Privacy Trap", "Privacy Trap Result", "Prevented", "Owledge selected private trap files", "Total tokens", "Tokens per correct answer", "Context pollution", "Privacy failures", "Stale failures", "<svg"]:
                     results.add(f"benchmark-addon:html:{required}", required in html_text, "Benchmark HTML includes verdict, interpretation, and embedded charts.")
+            if latest_json.exists():
+                compare = run_subprocess(
+                    [
+                        sys.executable,
+                        str(installed_comparer),
+                        "--inputs",
+                        str(latest_json),
+                        str(latest_json),
+                        "--output",
+                        ".owledge/reports/generated/benchmark-kit-comparison",
+                    ],
+                    cwd=temp_dir,
+                )
+                results.add("benchmark-addon:compare-run", compare.returncode == 0, "Benchmark comparison report render exits successfully." if compare.returncode == 0 else f"Benchmark comparison failed: {compare.stderr[-800:]}")
+                compare_json = temp_dir / ".owledge" / "exports" / "benchmark-kit-comparison" / "latest.json"
+                compare_md = temp_dir / ".owledge" / "exports" / "benchmark-kit-comparison" / "latest.md"
+                compare_html = temp_dir / ".owledge" / "reports" / "generated" / "benchmark-kit-comparison" / "index.html"
+                compare_svg = temp_dir / ".owledge" / "reports" / "generated" / "benchmark-kit-comparison" / "charts.svg"
+                for rel_path in [compare_json, compare_md, compare_html, compare_svg]:
+                    results.add(f"benchmark-addon:compare-output:{rel_path.name}", rel_path.exists(), "Benchmark comparison output exists.")
+                if compare_json.exists():
+                    compare_payload = json.loads(compare_json.read_text(encoding="utf-8"))
+                    results.add("benchmark-addon:compare-json-models", len(compare_payload.get("models", [])) >= 2, "Benchmark comparison JSON includes multiple model rows.")
+                    results.add("benchmark-addon:compare-json-executive", "executive" in compare_payload, "Benchmark comparison JSON includes executive verdict.")
+                if compare_html.exists():
+                    compare_text = compare_html.read_text(encoding="utf-8", errors="replace")
+                    for required in ["Executive Verdict", "Creator Pull Quote", "Model Matrix", "Before vs Owledge", "Scenario Heatmap", "Privacy failures prevented", "Context pollution", "Tokens per correct answer", "Oracle", "Lower", "Higher"]:
+                        results.add(f"benchmark-addon:compare-html:{required}", required in compare_text, "Benchmark comparison HTML includes publishing proof sections.")
         payload = results.payload(project=str(root), install=install)
     finally:
         shutil.rmtree(temp_dir, ignore_errors=True)

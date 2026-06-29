@@ -43,6 +43,23 @@ python tools/owledge.py doctor --project-root .agent-control/tmp/owledge-five-mi
 
 Expected result: `passed` is `true`.
 
+## Optional Benchmark Proof
+
+After installing `benchmark-kit` and running one or more model benchmarks
+sequentially, generate a comparison report:
+
+```bash
+python tools/benchmark-kit/compare-benchmark-runs.py --inputs \
+  .owledge/exports/benchmark-kit-gemma4-latest/latest.json \
+  .owledge/exports/benchmark-kit-qwen3-5-4b/latest.json \
+  .owledge/exports/benchmark-kit-glm-5-1-cloud/latest.json \
+  --output .owledge/reports/generated/benchmark-kit-comparison
+```
+
+Expected result: the report shows baseline retrieval versus Owledge context
+packs across model tiers, with privacy failures prevented, stale context
+avoided, pollution reduction, and token efficiency in one proof-oriented view.
+
 ## Next agent prompt
 
 Paste this into Codex, Claude Code, Cowork, or another coding agent from the

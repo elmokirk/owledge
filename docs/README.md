@@ -49,6 +49,7 @@ Start with the path that matches your setup.
 - Install `benchmark-kit` for optional real Markdown fixture benchmark reports
 - Run `python tools/benchmark-kit/run-benchmark-kit.py --mode ci --scale-mode small --yes` for deterministic benchmark reports
 - Use `python tools/benchmark-kit/run-benchmark-kit.py --mode local --scale-mode small --models <model> --yes` for opt-in sequential Ollama testing
+- Use `python tools/benchmark-kit/compare-benchmark-runs.py --inputs <reports...> --output .owledge/reports/generated/benchmark-kit-comparison` for multi-model baseline-vs-Owledge proof reports
 - Use [../standalone-skills/README.md](../standalone-skills/README.md) when you only want one Owledge skill without the full kit
 - Read [critique-derived-addons-roadmap.md](critique-derived-addons-roadmap.md) for the power-user critique that shaped the optional add-on layer
 - Read [power-user-objections.md](power-user-objections.md) for durable pitch objections and product guardrails

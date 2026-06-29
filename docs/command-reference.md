@@ -33,6 +33,7 @@ Package examples can be run as `uvx owledge ...` or, after `uv tool install owle
 | `python tools/benchmark-kit/run-benchmark-kit.py --mode ci --scale-mode small --yes` | Yes, ignored reports | Run optional Benchmark Kit deterministic real Markdown fixture benchmark |
 | `python tools/benchmark-kit/run-benchmark-kit.py --mode local --scale-mode small --models gemma4:latest --yes` | Yes, ignored reports | Run selected Ollama model sequentially against real Markdown fixtures |
 | `python tools/benchmark-kit/render-benchmark-report.py --format html` | Yes, ignored reports | Re-render the latest Benchmark Kit result as HTML/SVG |
+| `python tools/benchmark-kit/compare-benchmark-runs.py --inputs <reports...> --output .owledge/reports/generated/benchmark-kit-comparison` | Yes, ignored reports | Compare completed Benchmark Kit reports without running models |
 | `python tools/owledge.py test mcp-readonly --project-root .` | Yes, temp project | Smoke-test the read-only MCP stdio server |
 | `python tools/owledge.py test public-docs --project-root .` | No | Check public docs integrity |
 | `python tools/owledge.py test release-trust --project-root .` | No | Check version alignment, product naming, and bounded runtime claims |
@@ -176,6 +177,7 @@ and `handoff-resume`.
 python tools/benchmark-kit/run-benchmark-kit.py --mode ci --scale-mode small --yes
 python tools/benchmark-kit/run-benchmark-kit.py --mode local --scale-mode small --models gemma4:latest --yes
 python tools/benchmark-kit/render-benchmark-report.py --format html
+python tools/benchmark-kit/compare-benchmark-runs.py --inputs .owledge/exports/benchmark-kit-gemma4-latest/latest.json .owledge/exports/benchmark-kit-qwen3-5-4b/latest.json --output .owledge/reports/generated/benchmark-kit-comparison
 ```
 
 Local mode scans Ollama models, requires explicit consent unless `--yes` is
@@ -189,6 +191,10 @@ Benchmark Kit outputs are generated views:
 .owledge/exports/benchmark-kit/results.jsonl
 .owledge/reports/generated/benchmark-kit/index.html
 .owledge/reports/generated/benchmark-kit/charts.svg
+.owledge/exports/benchmark-kit-comparison/latest.json
+.owledge/exports/benchmark-kit-comparison/latest.md
+.owledge/reports/generated/benchmark-kit-comparison/index.html
+.owledge/reports/generated/benchmark-kit-comparison/charts.svg
 ```
 
 Decision trace and positioning outputs are also generated views:

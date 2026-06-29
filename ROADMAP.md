@@ -22,7 +22,7 @@ Public contract:
 | Done | REL-004 | Read-only MCP | `tools/owledge_mcp.py` exposes entrypoint, doctor, search, context-pack, tasks, and reviews without write tools; MCP smoke gate passes. | v0.7.0 |
 | Done | REL-005 | Wikilink Audit | `owledge wikilink-audit --check` reports valid, broken, and ambiguous wiki links without rewriting Markdown. | v0.7.0 |
 | Done | REL-006 | Native planning layers | Reviews, audiences, research, and brainstorm candidate layers exist under `.owledge/` and ship with templates/skills. | v0.7.0 |
-| Done | REL-007 | Benchmark Kit Add-on | Optional `benchmark-kit` add-on supports `small`, `mid`, and `large` real Markdown fixture simulations, retrieval challenge scenarios, sequential Ollama local runs, and JSON/MD/HTML/SVG outputs. | v0.7.0 |
+| Done | REL-007 | Benchmark Kit Add-on | Optional `benchmark-kit` add-on supports `small`, `mid`, and `large` real Markdown fixture simulations, retrieval challenge scenarios, sequential Ollama local runs, single-run reports, and multi-model comparison proof reports. | v0.7.0 |
 | Done | REL-008 | Standalone skills | `standalone-skills/` ships independently usable blindspot audit, agentic review, brainstorm, and planning-layer skills with manifest and install notes. | v0.7.0 |
 | Done | REL-009 | Release gates and CI | CI and local gates check naming, public docs, release trust, launch readiness, MCP read-only, Wikilinks, Benchmark Kit CI, standalone skills, contracts, and publish readiness. | v0.7.0 |
 | In progress | REL-010 | Final publishing docs | README, docs index, quickstart, command reference, roadmap, changelog, troubleshooting, Mermaid workflows, plugin docs, and benchmark docs match the implemented v0.7 surface. | v0.7.0 |
