@@ -7,7 +7,7 @@ Start with the path that matches your setup.
 - This is the default minimal path
 - Read [agent-integration-guide.md](agent-integration-guide.md)
 - Read [integration-decision-guide.md](integration-decision-guide.md) when you are unsure which path to choose
-- Use `skills/agent-memory-principles` as the portable rule set
+- Use `skills/owledge-principles` as the portable rule set
 - Add project files only when the team wants local validation and indexes
 
 ## I want to see value in five minutes
@@ -26,11 +26,14 @@ Start with the path that matches your setup.
 
 - Read [quickstart.md](quickstart.md)
 - Then read [command-reference.md](command-reference.md)
+- Use `uvx owledge quickstart --target <path>` for the package-first path
+- Expect `OWLEDGE.md` and `.owledge/` in new v0.7.0 projects
 
 ## I want plugin or harness setup
 
 - Read [install-plugin.md](install-plugin.md)
 - Then read [harness-plugin-matrix.md](harness-plugin-matrix.md)
+- Read-only MCP is available through `tools/owledge_mcp.py`; write-enabled MCP and harness benchmarks are roadmap items
 
 ## I want an optional project cockpit
 
@@ -41,9 +44,14 @@ Start with the path that matches your setup.
 ## I want to understand scale and quality
 
 - Read [performance-scale-notes.md](performance-scale-notes.md)
+- Read [benchmark-kit.md](benchmark-kit.md)
+- Run `owledge wikilink-audit --project-root . --check` for Markdown/Obsidian link health
+- Install `benchmark-kit` for optional real Markdown fixture benchmark reports
+- Run `python tools/benchmark-kit/run-benchmark-kit.py --mode ci --scale-mode small --yes` for deterministic benchmark reports
+- Use `python tools/benchmark-kit/run-benchmark-kit.py --mode local --scale-mode small --models <model> --yes` for opt-in sequential Ollama testing
+- Use [../standalone-skills/README.md](../standalone-skills/README.md) when you only want one Owledge skill without the full kit
 - Read [critique-derived-addons-roadmap.md](critique-derived-addons-roadmap.md) for the power-user critique that shaped the optional add-on layer
 - Read [power-user-objections.md](power-user-objections.md) for durable pitch objections and product guardrails
-- Install `enterprise-context-benchmark-kit` when you need research-grade token/context proof with generated charts
 - Install `decision-trace-kit` when you need a visual, read-only decision tree from Markdown memory records
 - Install `cross-project-hub-kit` when reviewed lessons from separate projects should feed a central reusable hub
 - Install `swarm-coordination-kit` when multiple agents need role lanes, handoffs, and promotion proposals
@@ -67,13 +75,13 @@ Start with the path that matches your setup.
 
 ## Integration And Setup Guides
 
-- [agents-md-integration-block.md](agents-md-integration-block.md) — copy-paste Owledge rules into an existing AGENTS.md or CLAUDE.md
-- [pi-agent-setup.md](pi-agent-setup.md) — how to set up and run the PI Agent (deterministic mode, no auth needed)
+- [agents-md-integration-block.md](agents-md-integration-block.md) - copy-paste Owledge rules into an existing AGENTS.md or CLAUDE.md
+- [pi-agent-setup.md](pi-agent-setup.md) - how to set up and run the PI Agent (deterministic mode, no auth needed)
 
 ## Feedback And Roadmap
 
-- [feedback-round-2026-06.md](feedback-round-2026-06.md) — structured feedback triage with tickets FB-001 through FB-017 (including Round 2 feature ideas FB-013 through FB-017)
-- [roadmap-ideas-2026-06.md](roadmap-ideas-2026-06.md) — idea log from the 2026-06 feedback round with 16 idea cards (including Round 2 feature ideas)
+- [feedback-round-2026-06.md](feedback-round-2026-06.md) - structured feedback triage with tickets FB-001 through FB-017 (including Round 2 feature ideas FB-013 through FB-017)
+- [roadmap-ideas-2026-06.md](roadmap-ideas-2026-06.md) - idea log from the 2026-06 feedback round with 16 idea cards (including Round 2 feature ideas)
 
 ## Maintainer And Historical Docs
 

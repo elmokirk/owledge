@@ -18,7 +18,7 @@ USER_CONTEXT.md
 -> global-memory/research/
 -> global-memory/patterns/
 -> global-memory/coach/
--> project-local agent-memory/
+-> project-local .owledge/
 -> reviewed RAG / GraphRAG / LightRAG adapters
 ```
 
@@ -57,8 +57,8 @@ Markdown remains canonical. RAG, dashboards, MCP, LightRAG, GraphRAG and vector 
 2. Relevant `global-memory/preferences/`
 3. Relevant `global-memory/goals/`
 4. Relevant `global-memory/research/`
-5. Active `PROJECT_CONTEXT.md`
-6. Project `agent-memory/indexes/memory-index.jsonl`
+5. Active `OWLEDGE.md`
+6. Project `.owledge/indexes/memory-index.jsonl`
 7. Project compiled, canonical, decisions, lessons and patterns
 
 Daily notes, personal tasks and onboarding profiles are deep-dive sources only.

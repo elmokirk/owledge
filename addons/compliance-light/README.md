@@ -19,7 +19,7 @@ python tools/owledge.py build-project-kit --output-path /tmp/owledge-project-kit
 ## Check Compliance State
 
 ```bash
-python tools/agent_memory_cli.py --project-root . compliance-doctor
+python tools/owledge_core.py --project-root . compliance-doctor
 ```
 
 The file copy contract for this add-on lives in `addon.json`.

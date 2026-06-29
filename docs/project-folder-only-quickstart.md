@@ -22,8 +22,8 @@ generator refuses unsafe replacement outside known temp roots.
 
 The generated folder contains:
 
-- `PROJECT_CONTEXT.md`, `AGENTS.md`, `CLAUDE.md`, `DESIGN.md`, `.gitignore`
-- `agent-memory/` schemas, templates, empty memory folders, and `.gitkeep` files
+- `OWLEDGE.md`, `AGENTS.md`, `CLAUDE.md`, `DESIGN.md`, `.gitignore`
+- `.owledge/` schemas, templates, empty memory folders, and `.gitkeep` files
 - `global-memory/` empty private user-memory folders
 - core Python tools
 - selected skills
@@ -44,8 +44,8 @@ From inside the generated or copied project folder:
 
 ```bash
 python tools/owledge.py doctor --project-root .
-python tools/agent_memory_cli.py --project-root . validate-memory --strict
-python tools/agent_memory_cli.py --project-root . build-memory-index
+python tools/owledge_core.py --project-root . validate-memory --strict
+python tools/owledge_core.py --project-root . build-memory-index
 ```
 
 Agents can then build scoped context packs:

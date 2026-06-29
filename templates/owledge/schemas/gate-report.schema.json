@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "GateReport",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["id", "type", "status", "tenant_id", "customer_id", "project_id", "task_id", "final_verdict"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^gate-" },
+    "type": { "const": "GateReport" },
+    "status": { "type": "string", "enum": ["draft", "active", "reviewed", "archived"] },
+    "tenant_id": { "type": "string", "minLength": 1 },
+    "customer_id": { "type": "string", "minLength": 1 },
+    "project_id": { "type": "string", "minLength": 1 },
+    "task_id": { "type": "string", "pattern": "^task-" },
+    "final_verdict": { "type": "string", "enum": ["pending", "pass", "fail", "pass_with_concerns"] }
+  }
+}

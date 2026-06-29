@@ -228,13 +228,13 @@ def main() -> int:
     parser.add_argument("--project-root", default=".")
     args = parser.parse_args()
     root = pathlib.Path(args.project_root).resolve()
-    out = root / "agent-memory" / "reports" / "poweruser-positioning"
+    out = root / "owledge" / "reports" / "poweruser-positioning"
     out.mkdir(parents=True, exist_ok=True)
     data = payload()
     (out / "positioning.json").write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
     (out / "positioning.md").write_text(render_markdown(data), encoding="utf-8", newline="\n")
     (out / "index.html").write_text(render_html(data), encoding="utf-8", newline="\n")
-    print(json.dumps({"json": "agent-memory/reports/poweruser-positioning/positioning.json", "html": "agent-memory/reports/poweruser-positioning/index.html"}, indent=2, sort_keys=True))
+    print(json.dumps({"json": ".owledge/reports/poweruser-positioning/positioning.json", "html": ".owledge/reports/poweruser-positioning/index.html"}, indent=2, sort_keys=True))
     return 0
 
 

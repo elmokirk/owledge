@@ -9,13 +9,13 @@ Use this skill when the user asks for workspace quality, PI Agent review, planni
 
 ## Read Order
 
-1. `PROJECT_CONTEXT.md`
-2. `agent-memory/indexes/memory-index.jsonl`
-3. `agent-memory/ideas/`
-4. `agent-memory/compiled/`
-5. `agent-memory/canonical/`
-6. `agent-memory/decisions/`
-7. `agent-memory/patterns/` and `agent-memory/lessons/`
+1. `OWLEDGE.md`
+2. `.owledge/indexes/memory-index.jsonl`
+3. `.owledge/ideas/`
+4. `.owledge/compiled/`
+5. `.owledge/canonical/`
+6. `.owledge/decisions/`
+7. `.owledge/patterns/` and `.owledge/lessons/`
 
 ## Default Check
 
@@ -38,12 +38,12 @@ Then answer with:
 
 ## Ideation Rule
 
-Before a new plan, inspect `agent-memory/ideas/` for matching `concept_tags`, `problem_patterns`, `architecture_patterns`, and `similar_to` edges.
+Before a new plan, inspect `.owledge/ideas/` for matching `concept_tags`, `problem_patterns`, `architecture_patterns`, and `similar_to` edges.
 
 When the user captures a new idea, use:
 
 ```bash
-python tools/agent_memory_cli.py --project-root . run-review-workflow --review-type review-to-task-plan --subject agent-memory/ideas --question "Idea title: Short summary"
+python tools/owledge_core.py --project-root . run-review-workflow --review-type review-to-task-plan --subject .owledge/ideas --question "Idea title: Short summary"
 ```
 
 ## Write Rules

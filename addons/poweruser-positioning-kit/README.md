@@ -27,9 +27,9 @@ python tools/poweruser-positioning/render-poweruser-positioning.py --project-roo
 Outputs:
 
 ```text
-agent-memory/reports/poweruser-positioning/positioning.json
-agent-memory/reports/poweruser-positioning/positioning.md
-agent-memory/reports/poweruser-positioning/index.html
+.owledge/reports/poweruser-positioning/positioning.json
+.owledge/reports/poweruser-positioning/positioning.md
+.owledge/reports/poweruser-positioning/index.html
 ```
 
 ## Guardrails

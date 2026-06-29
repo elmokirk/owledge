@@ -18,7 +18,7 @@ from typing import Iterable
 
 
 ROOT_FILES = [
-    ("PROJECT_CONTEXT.template.md", "PROJECT_CONTEXT.md"),
+    ("OWLEDGE.template.md", "OWLEDGE.md"),
     ("AGENTS.template.md", "AGENTS.md"),
     ("CLAUDE.template.md", "CLAUDE.md"),
     ("DESIGN.md", "DESIGN.md"),
@@ -54,11 +54,23 @@ AGENT_EXCLUDES = [
 ]
 
 AGENT_DIRS = [
+    "context",
     "canonical",
     "compiled",
     "patterns",
     "lessons",
     "ideas",
+    "plans",
+    "tasks",
+    "workpackages",
+    "reviews",
+    "audiences",
+    "research",
+    "research/briefs",
+    "research/sources",
+    "research/findings",
+    "research/syntheses",
+    "research/lanes",
     "decisions",
     "evidence",
     "evidence/promotions",
@@ -67,6 +79,9 @@ AGENT_DIRS = [
     "exports/rag",
     "exports/lightrag",
     "exports/graphrag",
+    "reports/generated",
+    "tmp",
+    "cache",
     "sessions",
     "pi-agent/reports",
     "pi-agent/parallels",
@@ -96,16 +111,18 @@ GLOBAL_DIRS = [
 
 CORE_TOOLS = [
     "owledge.py",
-    "agent_memory_cli.py",
+    "owledge_core.py",
     "build_project_folder_kit.py",
     "build_kb_module.py",
 ]
 
 SKILL_DIRS = [
-    "skills/agent-memory-principles",
-    "skills/agent-memory-runtime-bridge",
+    "skills/owledge-principles",
+    "skills/owledge-runtime-bridge",
     "skills/review-evaluation-workflow",
     "skills/render-memory-report",
+    "skills/owledge-planning-layer",
+    "skills/owledge-brainstorm",
 ]
 
 
@@ -162,18 +179,18 @@ def install_compliance(source: pathlib.Path, target: pathlib.Path) -> None:
         copy_file(addon_root / item["source"], target / pathlib.Path(item["target"]))
     gitignore = target / ".gitignore"
     text = gitignore.read_text(encoding="utf-8") if gitignore.exists() else ""
-    if "agent-memory/exports/compliance/" not in text.splitlines():
+    if ".owledge/exports/compliance/" not in text.splitlines():
         with gitignore.open("a", encoding="utf-8") as handle:
             if text and not text.endswith("\n"):
                 handle.write("\n")
-            handle.write("agent-memory/exports/compliance/\n")
+            handle.write(".owledge/exports/compliance/\n")
 
 
 def apply_plugin_hook_profile(target: pathlib.Path, profile: str) -> str:
     if profile != "python":
         raise SystemExit("Only the Python hook profile is supported by the core kit.")
-    python_hooks = target / "plugins" / "agent-memory-cowork" / "hooks" / "hooks.python.json"
-    hooks = target / "plugins" / "agent-memory-cowork" / "hooks" / "hooks.json"
+    python_hooks = target / "plugins" / "owledge-cowork" / "hooks" / "hooks.python.json"
+    hooks = target / "plugins" / "owledge-cowork" / "hooks" / "hooks.json"
     if python_hooks.exists():
         copy_file(python_hooks, hooks)
     return profile
@@ -182,7 +199,7 @@ def apply_plugin_hook_profile(target: pathlib.Path, profile: str) -> str:
 def write_local_readme(target: pathlib.Path, include_plugin: bool, hook_profile: str, include_compliance: bool) -> None:
     plugin_note = "Claude/Cowork plugin adapter is included." if include_plugin else "Claude/Cowork plugin adapter is not included."
     compliance_note = (
-        "Compliance Light is included; run `python3 tools/agent_memory_cli.py --project-root . compliance-doctor`."
+        "Compliance Light is included; run `python3 tools/owledge_core.py --project-root . compliance-doctor`."
         if include_compliance
         else "Compliance Light is not included in this lean folder."
     )
@@ -198,13 +215,13 @@ installation.
 
 ```bash
 python tools/owledge.py doctor --project-root .
-python tools/agent_memory_cli.py --project-root . validate-memory --strict
-python tools/agent_memory_cli.py --project-root . build-memory-index
+python tools/owledge_core.py --project-root . validate-memory --strict
+python tools/owledge_core.py --project-root . build-memory-index
 ```
 
 ## Agents
 
-1. Read `PROJECT_CONTEXT.md`.
+1. Read `OWLEDGE.md`.
 2. Use `AGENTS.md` / `CLAUDE.md` for local operating rules.
 3. Build task context with:
 
@@ -212,7 +229,7 @@ python tools/agent_memory_cli.py --project-root . build-memory-index
 python tools/owledge.py build-context-pack --project-root . --task-id "<task-id>" --agent-role worker
 ```
 
-4. Write durable findings to `agent-memory/` using the templates; do not treat
+4. Write durable findings to `.owledge/` using the templates; do not treat
 generated indexes or exports as canonical memory.
 
 ## Optional Adapters
@@ -226,7 +243,7 @@ Plugin hook profile: `{hook_profile}`.
 
 
 def run_verify(target: pathlib.Path, include_compliance: bool) -> None:
-    cli = target / "tools" / "agent_memory_cli.py"
+    cli = target / "tools" / "owledge_core.py"
     commands = [
         [sys.executable, str(cli), "--project-root", str(target), "doctor", "--mode", "host"],
         [sys.executable, str(cli), "--project-root", str(target), "validate-memory", "--strict"],
@@ -256,8 +273,8 @@ def build(args: argparse.Namespace) -> dict[str, object]:
     for source_rel, target_rel in ROOT_FILES:
         copy_file(source / source_rel, target / target_rel)
 
-    copy_tree_filtered(source / "templates" / "agent-memory", target / "agent-memory")
-    ensure_gitkeep(target / "agent-memory", AGENT_DIRS)
+    copy_tree_filtered(source / "templates" / "owledge", target / ".owledge")
+    ensure_gitkeep(target / ".owledge", AGENT_DIRS)
 
     if args.include_global_memory:
         copy_tree_filtered(source / "global-memory", target / "global-memory", ["exports/*", "indexes/*.json*"])
@@ -273,8 +290,8 @@ def build(args: argparse.Namespace) -> dict[str, object]:
     hook_profile = "none"
     if args.include_plugin_adapter:
         copy_tree_filtered(
-            source / "plugins" / "agent-memory-cowork",
-            target / "plugins" / "agent-memory-cowork",
+            source / "plugins" / "owledge-cowork",
+            target / "plugins" / "owledge-cowork",
             ["tests/*"],
         )
         hook_profile = apply_plugin_hook_profile(target, args.plugin_hook_profile)
@@ -309,7 +326,7 @@ def build(args: argparse.Namespace) -> dict[str, object]:
         kit_version = vf.read_text(encoding="utf-8", errors="replace").strip()
     manifest = {
         "generated_at": _dt.datetime.now(_dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
-        "source": "templates/agent-memory/",
+        "source": "templates/owledge/",
         "kit_version": kit_version,
         "memory_schema_version": "1.0.0",
         "source_version": kit_version,
@@ -332,7 +349,7 @@ def build(args: argparse.Namespace) -> dict[str, object]:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Build a minimal project-local Agent Memory folder.")
+    parser = argparse.ArgumentParser(description="Build a minimal project-local Owledge folder.")
     parser.add_argument("--output-path", required=True)
     parser.add_argument("--project-root", default="")
     parser.add_argument("--force", action="store_true")

@@ -33,10 +33,10 @@ and keep project knowledge durable.
 2. Let Owledge scan Superpowers plans read-only, especially
    `docs/superpowers/plans/*.md`.
 3. Write Owledge evidence, reviews, handoffs, decisions, and MVP follow-up
-   plans in `agent-memory-module/`, project `agent-memory/`, or mapped KB
+   plans in `owledge-module/`, project `.owledge/`, or mapped KB
    folders.
 4. Do not rewrite Superpowers artifacts unless the user explicitly asks.
-5. Promote only reviewed and sanitized Agent Memory records to shared exports.
+5. Promote only reviewed and sanitized Owledge records to shared exports.
 
 ## Agent Instruction
 
@@ -48,7 +48,7 @@ When you see docs/superpowers/plans/*.md:
 - read them as source evidence
 - do not rewrite them
 - cite their paths in Owledge plans, evidence, handoffs, or reviews
-- keep Owledge writes inside agent-memory-module/, project agent-memory/,
+- keep Owledge writes inside owledge-module/, project .owledge/,
   or validated mapped folders
 ```
 

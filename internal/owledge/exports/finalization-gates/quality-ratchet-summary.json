@@ -1,0 +1,90 @@
+{
+  "components": {
+    "benchmark": {
+      "passed": true
+    },
+    "docs": {
+      "passed": true
+    },
+    "generated-kit": {
+      "passed": true
+    },
+    "ingestion": {
+      "passed": true
+    },
+    "platform": {
+      "passed": true
+    },
+    "principles": {
+      "passed": true
+    },
+    "retrieval": {
+      "passed": true
+    },
+    "runtime": {
+      "passed": true
+    }
+  },
+  "failed": 0,
+  "gates": [
+    {
+      "name": "docs",
+      "passed": true,
+      "seconds": 0.014
+    },
+    {
+      "name": "platform",
+      "passed": true,
+      "seconds": 0.175
+    },
+    {
+      "name": "principles",
+      "passed": true,
+      "seconds": 0.001
+    },
+    {
+      "name": "ingestion",
+      "passed": true,
+      "seconds": 0.134
+    },
+    {
+      "name": "generated-kit",
+      "passed": true,
+      "seconds": 2.712
+    },
+    {
+      "name": "runtime",
+      "passed": true,
+      "seconds": 1.419
+    },
+    {
+      "name": "retrieval",
+      "passed": true,
+      "seconds": 0.02
+    },
+    {
+      "name": "benchmark",
+      "passed": true,
+      "seconds": 1.903
+    },
+    {
+      "name": "qa",
+      "passed": true,
+      "seconds": 0.004
+    }
+  ],
+  "generated_at": "2026-06-26T19:26:25Z",
+  "passed": true,
+  "project": "C:\\Users\\Kirk\\Documents\\Playground\\owledge-standalone",
+  "scores": {
+    "benchmark": 100,
+    "docs": 100,
+    "generated-kit": 100,
+    "ingestion": 100,
+    "platform": 100,
+    "principles": 100,
+    "qa": 100,
+    "retrieval": 100,
+    "runtime": 100
+  }
+}

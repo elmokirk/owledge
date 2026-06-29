@@ -6,10 +6,10 @@
     "fixtures/user-prompt.json"
   ],
   "expected_artifacts": [
-    "PROJECT_CONTEXT.md",
+    "OWLEDGE.md",
     "AGENTS.md",
-    "agent-memory/",
-    "tools/agent_memory_cli.py"
+    ".owledge/",
+    "tools/owledge_core.py"
   ],
   "failure_modes": [
     "missing-project-context",

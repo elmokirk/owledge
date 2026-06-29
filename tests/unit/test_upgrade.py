@@ -74,7 +74,7 @@ def test_manual_patch_is_git_applyable(tmp_path):
     """
     fake_src = tmp_path / "fake-old-src"
     fake_src.mkdir()
-    for item in ["VERSION", "AGENTS.template.md", "CLAUDE.template.md", "PROJECT_CONTEXT.template.md", "USER_CONTEXT.template.md", "DESIGN.md", "REPORT_DESIGN_SELECTOR.html", ".gitignore"]:
+    for item in ["VERSION", "AGENTS.template.md", "CLAUDE.template.md", "OWLEDGE.template.md", "USER_CONTEXT.template.md", "DESIGN.md", "REPORT_DESIGN_SELECTOR.html", ".gitignore"]:
         src = REPO_ROOT / item
         if src.is_file():
             shutil.copy2(src, fake_src / item)
@@ -82,11 +82,11 @@ def test_manual_patch_is_git_applyable(tmp_path):
     shutil.copytree(REPO_ROOT / "skills", fake_src / "skills", dirs_exist_ok=True)
     fake_tools = fake_src / "tools"
     fake_tools.mkdir(exist_ok=True)
-    for tool in ["owledge.py", "agent_memory_cli.py", "build_kb_module.py", "build_project_folder_kit.py"]:
+    for tool in ["owledge.py", "owledge_core.py", "build_kb_module.py", "build_project_folder_kit.py"]:
         shutil.copy2(REPO_ROOT / "tools" / tool, fake_tools / tool)
     (fake_src / "VERSION").write_text("0.6.0\n", encoding="utf-8")
     old_template = "# Old v0.6.0 task card\n\nThis is the old version.\n"
-    (fake_src / "templates" / "agent-memory" / "templates" / "task-card-template.md").write_text(old_template, encoding="utf-8", newline="\n")
+    (fake_src / "templates" / "owledge" / "templates" / "task-card-template.md").write_text(old_template, encoding="utf-8", newline="\n")
     project = tmp_path / "patch-project"
     project.mkdir()
     init = run_owledge(["init-project", "--target", str(project), "--source-root", str(fake_src)])
@@ -98,7 +98,7 @@ def test_manual_patch_is_git_applyable(tmp_path):
     patch_text = out.get("patch", "")
     assert "diff --git" in patch_text, f"patch missing diff --git header: {patch_text[:200]}"
     assert "a/" in patch_text and "b/" in patch_text, "patch missing a/ b/ prefixes"
-    patch_path = project / "agent-memory" / "exports" / "upgrade-pending.patch"
+    patch_path = project / "owledge" / "exports" / "upgrade-pending.patch"
     assert patch_path.is_file(), "patch file not written"
     git_check = subprocess.run(
         ["git", "-C", str(project), "apply", "--check", str(patch_path)],
@@ -114,7 +114,7 @@ def test_safe_preserves_edits(fresh_project_with_old_manifest):
     safe mode must skip it. We verify the file is byte-identical before/after.
     """
     project = fresh_project_with_old_manifest
-    editable_rel = "agent-memory/templates/task-card-template.md"
+    editable_rel = ".owledge/templates/task-card-template.md"
     write_file(project, editable_rel, "# user-edited content\n")
     editable_sha_before = file_sha(project, editable_rel)
     result = run_owledge(["upgrade", "--apply", "--mode=safe"], project)
@@ -129,7 +129,7 @@ def test_safe_preserves_edits(fresh_project_with_old_manifest):
 def test_force_templates_respects_never_touch(fresh_project_with_old_manifest):
     """Plan: all 4 never-touch files byte-identical before/after force-templates --yes."""
     project = fresh_project_with_old_manifest
-    never_touch = ["PROJECT_CONTEXT.md", "AGENTS.md", "CLAUDE.md", "DESIGN.md"]
+    never_touch = ["OWLEDGE.md", "AGENTS.md", "CLAUDE.md", "DESIGN.md"]
     shas_before = {rel: file_sha(project, rel) for rel in never_touch}
     result = run_owledge(["upgrade", "--apply", "--mode=force-templates", "--yes"], project)
     assert result.returncode == 0, f"force-templates failed: {result.stderr}"
@@ -165,7 +165,7 @@ def test_manifest_deleted_graceful(fresh_project):
 def test_concurrent_run_blocked(fresh_project_with_old_manifest):
     """Plan: hold .upgrade.lock with a live PID, second --apply -> refused."""
     project = fresh_project_with_old_manifest
-    lock_path = project / "agent-memory" / ".upgrade.lock"
+    lock_path = project / "owledge" / ".upgrade.lock"
     lock_path.parent.mkdir(parents=True, exist_ok=True)
     live_pid = os.getpid()
     lock_path.write_text(json.dumps({"pid": live_pid, "started_at": "2026-01-01T00:00:00Z"}), encoding="utf-8")

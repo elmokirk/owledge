@@ -15,7 +15,7 @@ def main() -> int:
     args = parser.parse_args()
     root = pathlib.Path(args.project_root).resolve()
     shared = root / "shared"
-    out_dir = root / "agent-memory" / "cross-project-hub"
+    out_dir = root / ".owledge" / "cross-project-hub"
     out_dir.mkdir(parents=True, exist_ok=True)
     records = []
     if shared.exists():
@@ -27,10 +27,9 @@ def main() -> int:
         "note": "Generated view. Shared Markdown remains the source of truth.",
     }
     (out_dir / "cross-project-map.json").write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    print(json.dumps({"path": "agent-memory/cross-project-hub/cross-project-map.json", "records": len(records)}, indent=2))
+    print(json.dumps({"path": ".owledge/cross-project-hub/cross-project-map.json", "records": len(records)}, indent=2))
     return 0
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

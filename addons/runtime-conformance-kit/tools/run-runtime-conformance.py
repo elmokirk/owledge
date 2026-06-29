@@ -14,7 +14,7 @@ def main() -> int:
     parser.add_argument("--project-root", default=".")
     args = parser.parse_args()
     root = pathlib.Path(args.project_root).resolve()
-    contract_dir = root / "agent-memory" / "runtime-conformance"
+    contract_dir = root / ".owledge" / "runtime-conformance"
     fixture_dir = contract_dir / "fixtures"
     results = []
     for name in ["codex", "claude-code", "cowork-compatible"]:
@@ -38,4 +38,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

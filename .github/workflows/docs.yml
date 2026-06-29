@@ -23,5 +23,11 @@ jobs:
       - name: Release trust gate
         run: python tools/owledge.py test release-trust --project-root .
 
-      - name: Benchmark harness smoke
-        run: python tools/owledge.py benchmark --project-root . --scale-files 100
+      - name: Wikilink audit
+        run: python tools/owledge.py wikilink-audit --project-root . --check
+
+      - name: Benchmark kit docs smoke
+        run: python tools/owledge.py test benchmark-kit-ci --project-root .
+
+      - name: Read-only MCP smoke
+        run: python tools/owledge.py test mcp-readonly --project-root .

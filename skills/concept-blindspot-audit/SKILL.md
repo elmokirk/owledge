@@ -18,7 +18,7 @@ behavior, undetected global-link breakage, dogfood drift, and the absence of a
 self-audit loop.
 
 Dimensions 1-4 are mechanical (deterministic checks run by the
-`concept_audit` function in `tools/agent_memory_cli.py`). Dimensions 5-8 are
+`concept_audit` function in `tools/owledge_core.py`). Dimensions 5-8 are
 guided: the function emits a checklist and evidence packet, and the agent or
 user scores them after working through the questions. Findings are candidate
 artifacts only. They never auto-promote into canonical memory.
@@ -46,10 +46,10 @@ Use this skill when the user asks to:
   `lessons/`.
 - **No destructive writes.** Never delete or overwrite existing memory. New
   findings are appended as new files only.
-- **No edits outside `agent-memory/`.** The only writes this skill performs are:
-  - `agent-memory/decisions/concept-audit-YYYY-MM-DD.md` (in
+- **No edits outside `.owledge/`.** The only writes this skill performs are:
+  - `.owledge/decisions/concept-audit-YYYY-MM-DD.md` (in
     `approve-automatically` mode only)
-  - draft idea cards under `agent-memory/ideas/` (in `approve-automatically`
+  - draft idea cards under `.owledge/ideas/` (in `approve-automatically`
     mode only, one card per `fail` finding, `status: captured`, edges to the
     report)
   - a feedback ticket via `docs/feedback-round-YYYY-MM.template.md` (in
@@ -60,16 +60,16 @@ Use this skill when the user asks to:
 
 ## Workflow
 
-1. **Detect `project_mode`** (poc/mvp/side/saas) from `PROJECT_CONTEXT.md`
+1. **Detect `project_mode`** (poc/mvp/side/saas) from `OWLEDGE.md`
    frontmatter. Default to `mvp` if the field is absent.
 2. **Detect `planning_mode`** (supervised/approve-automatically/full-access)
-   from `PROJECT_CONTEXT.md` frontmatter. Default to `supervised` if absent.
-3. **Load the profile.** If `agent-memory/concept-audit-profile.json` exists,
+   from `OWLEDGE.md` frontmatter. Default to `supervised` if absent.
+3. **Load the profile.** If `.owledge/concept-audit-profile.json` exists,
    load it; otherwise use the defaults from
    `references/profile-template.json`. The profile carries per-dimension
    weights, dimension overrides, and `freshness_days` (default 30).
 4. **Run dimensions 1-4 mechanically.** Invoke the deterministic checks via the
-   `concept_audit` function (`python tools/agent_memory_cli.py --project-root .
+   `concept_audit` function (`python tools/owledge_core.py --project-root .
    concept-audit`). These return concrete findings with severity
    (`error`/`warning`/`info`), detail, and evidence.
 5. **Run dimensions 5-8 as a guided self-audit.** Work through the checklists
@@ -83,8 +83,8 @@ Use this skill when the user asks to:
    - `supervised` (default): present findings inline. Write no files. Create no
      idea cards or tickets.
    - `approve-automatically`: write `concept-audit-YYYY-MM-DD.md` to
-     `agent-memory/decisions/` using the report template. Promote each `fail`
-     finding to a draft idea card under `agent-memory/ideas/` with
+     `.owledge/decisions/` using the report template. Promote each `fail`
+     finding to a draft idea card under `.owledge/ideas/` with
      `status: captured` and an edge to the report. No canonical promotion.
    - `full-access`: do everything `approve-automatically` does, plus open a
      feedback ticket via `docs/feedback-round-YYYY-MM.template.md` when

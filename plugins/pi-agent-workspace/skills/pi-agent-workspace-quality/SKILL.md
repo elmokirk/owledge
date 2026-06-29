@@ -5,7 +5,7 @@ description: Use as a PI Agent workspace guardian for Owledge projects. Checks q
 
 # PI Agent Workspace Quality
 
-Read `PROJECT_CONTEXT.md`, `agent-memory/indexes/memory-index.jsonl`, `agent-memory/ideas/`, compiled memory, canonical memory, decisions, patterns, and lessons.
+Read `OWLEDGE.md`, `.owledge/indexes/memory-index.jsonl`, `.owledge/ideas/`, compiled memory, canonical memory, decisions, patterns, and lessons.
 
 Run:
 

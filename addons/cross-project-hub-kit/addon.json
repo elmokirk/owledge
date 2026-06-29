@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Optional reviewed cross-project learning hub add-on for Owledge.",
   "install_directories": [
-    "agent-memory/cross-project-hub",
+    ".owledge/cross-project-hub",
     "shared/lessons",
     "shared/patterns",
     "shared/decisions",
@@ -16,7 +16,7 @@
     },
     {
       "source": "templates/cross-project-import-manifest-template.md",
-      "target": "agent-memory/templates/cross-project-import-manifest-template.md"
+      "target": ".owledge/templates/cross-project-import-manifest-template.md"
     },
     {
       "source": "tools/build-cross-project-map.py",
@@ -24,7 +24,7 @@
     }
   ],
   "gitignore": [
-    "agent-memory/cross-project-hub/cross-project-map.json"
+    ".owledge/cross-project-hub/cross-project-map.json"
   ]
 }
 

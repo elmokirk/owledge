@@ -167,7 +167,7 @@ def markdown_for(record: Record) -> str:
         f'  - "{record.area}"',
         '  - "context-hygiene"',
         "stack_tags:",
-        '  - "agent-memory"',
+        '  - "owledge"',
         "problem_patterns:",
         '  - "context-loss"',
         "architecture_patterns:",
@@ -241,7 +241,7 @@ def write_corpus(base: pathlib.Path, count: int, seed: int) -> list[Record]:
                 "Privacy note: shared benchmark strategies must avoid raw private or unsanitized records.",
             ]
         )
-        relative = pathlib.Path("agent-memory") / doc_type / f"{record_id}.md"
+        relative = pathlib.Path(".owledge") / doc_type / f"{record_id}.md"
         record = Record(
             record_id=record_id,
             path=relative,
@@ -682,7 +682,7 @@ def main() -> int:
     root = pathlib.Path(args.project_root).resolve()
     tmp = root / ".agent-control" / "tmp" / "enterprise-context-benchmark" / f"{args.profile}-seed-{args.seed}"
     results_dir = root / "benchmarks" / "results"
-    report_dir = root / "agent-memory" / "reports" / "enterprise-context-benchmark"
+    report_dir = root / ".owledge" / "reports" / "enterprise-context-benchmark"
     results_dir.mkdir(parents=True, exist_ok=True)
     report_dir.mkdir(parents=True, exist_ok=True)
 
@@ -728,7 +728,7 @@ def main() -> int:
                 "report": "benchmarks/results/context-growth.json",
                 "charts": "benchmarks/results/context-growth-charts.json",
                 "markdown": "benchmarks/results/token-efficiency.md",
-                "html": "agent-memory/reports/enterprise-context-benchmark/index.html",
+                "html": ".owledge/reports/enterprise-context-benchmark/index.html",
                 "profile": args.profile,
                 "seed": args.seed,
             },

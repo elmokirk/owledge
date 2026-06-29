@@ -1,0 +1,39 @@
+{
+  "name": "benchmark-kit",
+  "version": "0.1.0",
+  "description": "Optional real-file Markdown benchmark kit for Owledge retrieval, token usage, performance, and context pollution proof.",
+  "install_directories": [
+    ".owledge/benchmark-kit",
+    ".owledge/tmp/benchmark-kit/fixtures",
+    ".owledge/exports/benchmark-kit",
+    ".owledge/reports/generated/benchmark-kit",
+    "tools/benchmark-kit"
+  ],
+  "install_files": [
+    {
+      "source": "README.md",
+      "target": "docs/benchmark-kit.md"
+    },
+    {
+      "source": "BENCHMARK_EXPLAINED.md",
+      "target": ".owledge/benchmark-kit/BENCHMARK_EXPLAINED.md"
+    },
+    {
+      "source": "starter/.owledge/benchmark-kit/profile.md",
+      "target": ".owledge/benchmark-kit/profile.md"
+    },
+    {
+      "source": "tools/run-benchmark-kit.py",
+      "target": "tools/benchmark-kit/run-benchmark-kit.py"
+    },
+    {
+      "source": "tools/render-benchmark-report.py",
+      "target": "tools/benchmark-kit/render-benchmark-report.py"
+    }
+  ],
+  "gitignore": [
+    ".owledge/tmp/benchmark-kit/fixtures/",
+    ".owledge/exports/benchmark-kit/",
+    ".owledge/reports/generated/benchmark-kit/"
+  ]
+}

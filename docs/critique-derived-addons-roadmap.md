@@ -35,7 +35,7 @@ Purpose: connect project-local Owledge installs with a central knowledgebase wit
 Install shape:
 
 ```text
-agent-memory/cross-project-hub/
+.owledge/cross-project-hub/
 global-memory/
 shared/lessons/
 shared/patterns/
@@ -69,13 +69,13 @@ Generated views:
 Data source:
 
 - Existing typed frontmatter edges.
-- `PROJECT_CONTEXT.md`.
+- `OWLEDGE.md`.
 - Plans, tasks, evidence, reviews, ADRs, lessons, and patterns.
 
 Output:
 
 ```text
-agent-memory/reports/decision-trace/
+.owledge/reports/decision-trace/
 ```
 
 Guardrails:
@@ -119,7 +119,7 @@ Metrics:
 Output:
 
 ```text
-agent-memory/reports/enterprise-context-benchmark/
+.owledge/reports/enterprise-context-benchmark/
 benchmarks/results/context-growth.json
 benchmarks/results/token-efficiency.md
 ```

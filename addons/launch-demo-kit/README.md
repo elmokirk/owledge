@@ -14,10 +14,10 @@ python tools/owledge.py install-addon --project-root . --addon launch-demo-kit
 
 | Path | Purpose |
 | --- | --- |
-| `agent-memory/evidence/launch-demo-before.md` | Shows that evidence can leave chat and become durable Markdown. |
-| `agent-memory/handoffs/launch-demo-resume-handoff.md` | Gives the next agent concrete resume instructions. |
-| `agent-memory/reports/launch-demo/project-memory-cockpit.html` | Static proof asset for README, demos, and screenshots. |
-| `agent-memory/templates/launch-demo-next-agent-prompt.md` | Copy-paste prompt for the next agent. |
+| `.owledge/evidence/launch-demo-before.md` | Shows that evidence can leave chat and become durable Markdown. |
+| `.owledge/handoffs/launch-demo-resume-handoff.md` | Gives the next agent concrete resume instructions. |
+| `.owledge/reports/launch-demo/project-memory-cockpit.html` | Static proof asset for README, demos, and screenshots. |
+| `.owledge/templates/launch-demo-next-agent-prompt.md` | Copy-paste prompt for the next agent. |
 
 The add-on does not change the core memory contract or runtime behavior.
 

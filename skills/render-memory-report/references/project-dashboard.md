@@ -8,11 +8,11 @@ Use for stakeholder summaries, project status reports, executive updates, and no
 
 Prefer:
 
-- `PROJECT_CONTEXT.md`
-- `agent-memory/canonical/`
-- `agent-memory/compiled/`
-- `agent-memory/decisions/`
-- `agent-memory/lessons/`
+- `OWLEDGE.md`
+- `.owledge/canonical/`
+- `.owledge/compiled/`
+- `.owledge/decisions/`
+- `.owledge/lessons/`
 
 ## Sections
 

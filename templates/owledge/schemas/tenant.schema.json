@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Tenant",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["tenant_id", "name", "status"],
+  "properties": {
+    "tenant_id": { "type": "string", "minLength": 1 },
+    "name": { "type": "string", "minLength": 1 },
+    "status": { "type": "string", "enum": ["active", "paused", "archived"] },
+    "shared_scope": { "type": "array", "items": { "type": "string" } },
+    "data_class": { "type": "string", "enum": ["public", "internal", "confidential", "personal", "special-category"] }
+  }
+}

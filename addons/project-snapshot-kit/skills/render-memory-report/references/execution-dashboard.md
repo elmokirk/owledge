@@ -8,8 +8,8 @@ QA gates, and latest agent activity.
 
 Prefer:
 
-- `agent-memory/compiled/project-execution-snapshot.md`
-- `agent-memory/project-snapshot/project-snapshot-manifest.json`
+- `.owledge/compiled/project-execution-snapshot.md`
+- `.owledge/project-snapshot/project-snapshot-manifest.json`
 - Owledge-local TaskCard, WorkPackage, EpicOverview, plans, handoffs, and evidence
 
 ## Sections

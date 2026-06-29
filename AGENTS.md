@@ -1,36 +1,36 @@
 ---
-title: "Global Agent Memory Kit Instructions"
+title: "Global Owledge Instructions"
 date: "2026-05-13"
-version: "0.6.0"
+version: "0.7.0"
 status: "active"
 type: "global-kit-instructions"
 ---
 
-# Global Agent Memory Kit Instructions
+# Global Owledge Instructions
 
-This repository can be used as a global Agent Memory Kit.
+This repository can be used as a global Owledge.
 
 ## Session Start Rule
 
 At the beginning of every agent session:
 
 1. Check whether the current repo has:
-   - `PROJECT_CONTEXT.md`
+   - `OWLEDGE.md`
    - `USER_CONTEXT.md` when personal/global context is used
    - `AGENTS.md`
    - `CLAUDE.md`
    - `DESIGN.md`
-   - `agent-memory/`
+   - `.owledge/`
    - `global-memory/` when the private user layer is enabled
-   - `tools/agent_memory_cli.py`
-2. If anything is missing in a host project, use the `bootstrap-agent-memory` skill.
-3. Prefer project-local Python tools when `tools/agent_memory_cli.py` exists. Otherwise initialize from an explicit local Owledge checkout.
+   - `tools/owledge_core.py`
+2. If anything is missing in a host project, use the `bootstrap-owledge` skill.
+3. Prefer project-local Python tools when `tools/owledge_core.py` exists. Otherwise initialize from an explicit local Owledge checkout.
 4. Do not overwrite existing project memory unless the user explicitly asks for force/overwrite.
 5. Repo layout:
-   - `templates/agent-memory/` is the pristine product source (shipped to users via `init-project` and `build-project-kit`).
-   - `internal/agent-memory/` is the maintainers' live dogfood workspace (decision traces, compiled snapshots, indexes, exports, benchmarks).
-   - For product health checks: `python tools/agent_memory_cli.py --project-root . doctor --mode kit`
-   - For dogfood gates: `python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports` (the function auto-detects `internal/agent-memory/` for memory operations)
+   - `templates/owledge/` is the pristine product source (shipped to users via `init-project` and `build-project-kit`).
+   - `internal/owledge/` is the maintainers' live dogfood workspace (decision traces, compiled snapshots, indexes, exports, benchmarks).
+   - For product health checks: `python tools/owledge_core.py --project-root . doctor --mode kit`
+   - For dogfood gates: `python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports` (the function auto-detects `internal/owledge/` for memory operations)
    - Never write generated artifacts (decision traces, compiled snapshots, indexes, exports) into `templates/`. That directory is the shipped product source.
 
 ## Global vs Project Local
@@ -42,8 +42,8 @@ At the beginning of every agent session:
 | Global user context | `USER_CONTEXT.md` | Private user profile, preferences, goals, and agent collaboration defaults |
 | Global user memory | `global-memory/` | Private preferences, goals, daily notes, tasks, ideas, research, patterns, and coach reports |
 | Project memory | active repo | Durable project truth |
-| PI intelligence | `agent-memory/pi-agent/` | Candidate parallels, trends, recurring errors, and central project ideas |
-| PI red team | `agent-memory/pi-agent/red-team/` | 1-100 scorecards and challenge reports |
+| PI intelligence | `.owledge/pi-agent/` | Candidate parallels, trends, recurring errors, and central project ideas |
+| PI red team | `.owledge/pi-agent/red-team/` | 1-100 scorecards and challenge reports |
 | Enterprise hub | optional central vault | Reviewed cross-project aggregation |
 
 ## Bootstrap Command
@@ -55,7 +55,7 @@ python tools/owledge.py init-project --target /path/to/project --include-plugin-
 Project-folder-only setup:
 
 ```bash
-python tools/owledge.py build-project-kit --output-path /tmp/agent-memory-project-kit --verify
+python tools/owledge.py build-project-kit --output-path /tmp/owledge-project-kit --verify
 ```
 
 ## Core Rule

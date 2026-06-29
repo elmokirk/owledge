@@ -6,7 +6,7 @@ developers and agents.
 ## Operating Rules
 
 - Keep existing project and vault structure intact.
-- Use `agent-memory-map.json` when the team already has folder conventions.
+- Use `owledge-map.json` when the team already has folder conventions.
 - Require handoffs at the end of agent sessions and developer work blocks.
 - Use reviews before promotion to canonical/shared memory.
 - Run stale, conflict, sensitive-data, and finalization gates before releases.

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Optional snapshot-first positioning scorecard for Owledge against adjacent AI agent power-user tool categories.",
   "install_directories": [
-    "agent-memory/reports/poweruser-positioning",
+    ".owledge/reports/poweruser-positioning",
     "tools/poweruser-positioning"
   ],
   "install_files": [
@@ -17,6 +17,6 @@
     }
   ],
   "gitignore": [
-    "agent-memory/reports/poweruser-positioning/"
+    ".owledge/reports/poweruser-positioning/"
   ]
 }

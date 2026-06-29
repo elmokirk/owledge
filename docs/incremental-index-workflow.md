@@ -1,17 +1,17 @@
 # Incremental Index Workflow
 
-Agent Memory is Markdown-first. Files under `agent-memory/` and approved project context files are the source of truth. Indexes, manifests, tombstones, RAG exports, LightRAG exports, GraphRAG exports, and hub payloads are generated operational views. They can be deleted and rebuilt from Markdown.
+Owledge is Markdown-first. Files under `.owledge/` and approved project context files are the source of truth. Indexes, manifests, tombstones, RAG exports, LightRAG exports, GraphRAG exports, and hub payloads are generated operational views. They can be deleted and rebuilt from Markdown.
 
 ## Generated Files
 
 | Artifact | Role |
 | --- | --- |
-| `agent-memory/indexes/memory-index.jsonl` | Generated JSONL view of memory records for agents, QA, reports, and export tools |
-| `agent-memory/indexes/memory-index-manifest.json` | Generated run metadata: mode, counts, source hashes, generated timestamp, and indexed records |
-| `agent-memory/indexes/memory-index-tombstones.jsonl` | Generated deletion metadata for files that previously appeared in an index but no longer exist |
-| `agent-memory/exports/rag/` | Generated RAG documents from reviewed/promoted, exportable memory |
-| `agent-memory/exports/lightrag/` | Generated LightRAG arrays and manifest |
-| `agent-memory/exports/graphrag/` | Generated graph nodes, edges, and manifest |
+| `.owledge/indexes/memory-index.jsonl` | Generated JSONL view of memory records for agents, QA, reports, and export tools |
+| `.owledge/indexes/memory-index-manifest.json` | Generated run metadata: mode, counts, source hashes, generated timestamp, and indexed records |
+| `.owledge/indexes/memory-index-tombstones.jsonl` | Generated deletion metadata for files that previously appeared in an index but no longer exist |
+| `.owledge/exports/rag/` | Generated RAG documents from reviewed/promoted, exportable memory |
+| `.owledge/exports/lightrag/` | Generated LightRAG arrays and manifest |
+| `.owledge/exports/graphrag/` | Generated graph nodes, edges, and manifest |
 
 Do not edit generated index rows, manifests, tombstones, or exports as canonical memory. Fix the Markdown source, then rebuild.
 
@@ -55,13 +55,13 @@ An incremental index run is ready for phase QA when:
 - output reports `changed`, `unchanged`, `deleted`, and `tombstoned`
 - deleted records have tombstones with `memory_id`, path, hash, `deleted_at`, and reason
 - generated export folders are not indexed as memory sources:
-  - `agent-memory/exports/rag/`
-  - `agent-memory/exports/lightrag/`
-  - `agent-memory/exports/graphrag/`
+  - `.owledge/exports/rag/`
+  - `.owledge/exports/lightrag/`
+  - `.owledge/exports/graphrag/`
   - `global-memory/exports/rag/`
   - `global-memory/exports/lightrag/`
   - `global-memory/exports/graphrag/`
-- `agent-memory/indexes/memory-index.jsonl` remains valid JSONL: every non-empty line parses as one JSON object
+- `.owledge/indexes/memory-index.jsonl` remains valid JSONL: every non-empty line parses as one JSON object
 - index rows point back to source Markdown paths and source hashes
 - manifests and tombstones are treated as generated metadata and are not promoted as canonical memory
 - tombstones do not enter shared RAG by default
@@ -70,16 +70,16 @@ An incremental index run is ready for phase QA when:
 Validate the generated index with a full rebuild:
 
 ```bash
-python tools/agent_memory_cli.py --project-root . build-memory-index
+python tools/owledge_core.py --project-root . build-memory-index
 ```
 
 Run an incremental update with tombstone tracking:
 
 ```bash
-python tools/agent_memory_cli.py --project-root . build-memory-index --incremental --track-tombstones
+python tools/owledge_core.py --project-root . build-memory-index --incremental --track-tombstones
 ```
 
-The command writes `agent-memory/indexes/memory-index.jsonl`, `agent-memory/indexes/memory-index-manifest.json`, and, when requested, `agent-memory/indexes/memory-index-tombstones.jsonl`.
+The command writes `.owledge/indexes/memory-index.jsonl`, `.owledge/indexes/memory-index-manifest.json`, and, when requested, `.owledge/indexes/memory-index-tombstones.jsonl`.
 
 ## RAG And Hub Safety
 

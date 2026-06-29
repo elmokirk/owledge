@@ -12,11 +12,11 @@ def test_dogfood_sync_one_way(fresh_project):
     """E5: sync-dogfood reconciles internal->templates; reverse-edit internal leaves templates unchanged.
 
     Uses the repo root (maintainer context) since dogfood-sync operates on
-    templates/agent-memory/templates vs internal/agent-memory/templates.
+    templates/owledge/templates vs internal/owledge/templates.
     """
     repo = REPO_ROOT
-    internal_template = repo / "internal" / "agent-memory" / "templates" / "task-card-template.md"
-    product_template = repo / "templates" / "agent-memory" / "templates" / "task-card-template.md"
+    internal_template = repo / "internal" / "owledge" / "templates" / "task-card-template.md"
+    product_template = repo / "templates" / "owledge" / "templates" / "task-card-template.md"
     if not internal_template.is_file() or not product_template.is_file():
         import pytest
         pytest.skip("dogfood templates not present in this checkout")
@@ -36,12 +36,12 @@ def test_dogfood_sync_one_way(fresh_project):
 
 
 def test_dogfood_sync_ignores_dogfood_only(fresh_project):
-    """E5: editing internal/agent-memory/decision-trace/* leaves dogfood-sync gate passed=True."""
+    """E5: editing internal/owledge/decision-trace/* leaves dogfood-sync gate passed=True."""
     repo = REPO_ROOT
-    decision_trace_dir = repo / "internal" / "agent-memory" / "decision-trace"
+    decision_trace_dir = repo / "internal" / "owledge" / "decision-trace"
     if not decision_trace_dir.is_dir():
         import pytest
-        pytest.skip("internal/agent-memory/decision-trace not present")
+        pytest.skip("internal/owledge/decision-trace not present")
     sentinel = decision_trace_dir / "_test_sentinel.md"
     sentinel_existed = sentinel.exists()
     original = sentinel.read_bytes() if sentinel_existed else None

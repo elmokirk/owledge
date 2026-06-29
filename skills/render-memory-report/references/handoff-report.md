@@ -8,10 +8,10 @@ Use for PM to dev, dev to QA, agent to agent, orchestrator to worker, or client 
 
 Prefer:
 
-- `agent-memory/handoffs/`
-- `agent-memory/sessions/`
-- `agent-memory/compiled/`
-- `agent-memory/evidence/`
+- `.owledge/handoffs/`
+- `.owledge/sessions/`
+- `.owledge/compiled/`
+- `.owledge/evidence/`
 - task cards or QA reports when present
 
 ## Sections

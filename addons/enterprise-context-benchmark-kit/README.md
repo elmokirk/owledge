@@ -51,8 +51,8 @@ Outputs:
 benchmarks/results/context-growth.json
 benchmarks/results/context-growth-charts.json
 benchmarks/results/token-efficiency.md
-agent-memory/reports/enterprise-context-benchmark/index.html
-agent-memory/reports/enterprise-context-benchmark/*.svg
+.owledge/reports/enterprise-context-benchmark/index.html
+.owledge/reports/enterprise-context-benchmark/*.svg
 ```
 
 ## Guardrails

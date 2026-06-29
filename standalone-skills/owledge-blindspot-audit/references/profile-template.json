@@ -1,0 +1,16 @@
+{
+  "project_mode": "mvp",
+  "planning_mode": "supervised",
+  "weights": {
+    "lifecycle": 1.0,
+    "distribution": 1.0,
+    "dogfood": 1.0,
+    "contracts": 1.0,
+    "cross_layer": 0.7,
+    "failure_modes": 0.7,
+    "coherence": 0.5,
+    "self_description": 0.8
+  },
+  "dimension_overrides": {},
+  "freshness_days": 30
+}

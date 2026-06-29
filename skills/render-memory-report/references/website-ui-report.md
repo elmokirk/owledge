@@ -9,8 +9,8 @@ Use for website decisions, UI build reports, visual design explanation, branding
 Prefer:
 
 - website or UI decision docs
-- `agent-memory/canonical/`
-- `agent-memory/decisions/`
+- `.owledge/canonical/`
+- `.owledge/decisions/`
 - screenshots or evidence files
 - design-token files when present
 

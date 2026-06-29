@@ -37,31 +37,70 @@ baseline comparisons. Public token-saving claims should compare at least:
 
 ## Release Benchmark Recommendation
 
-Use the reproducible local harness under `benchmarks/` before making any public
-performance or token-efficiency claims.
+Install the optional Benchmark Kit before making public performance or
+token-efficiency claims:
 
-Minimum benchmark scenarios:
+```bash
+python tools/owledge.py install-addon --project-root . --addon benchmark-kit
+python tools/benchmark-kit/run-benchmark-kit.py --mode ci --scale-mode small --yes
+python tools/benchmark-kit/render-benchmark-report.py --format html
+```
 
-- KB scan on an existing-style Markdown vault
-- context-pack generation for a scoped task
-- runtime handoff/resume through durable session artifacts
+Local model testing is opt-in and runs selected models sequentially:
 
-Track at least:
+```bash
+python tools/benchmark-kit/run-benchmark-kit.py --mode local --scale-mode small --models gemma4:latest --yes
+```
 
-- wall-clock runtime
-- commit SHA, OS, Python version, CPU count, and command
-- files scanned
-- truncation status
-- records per second
-- peak Python allocation bytes
-- output bytes or record count
-- included source count
-- tokenizer-based prompt tokens when making public token claims
+Supported scale modes:
+
+| Scale mode | Files | Use |
+| --- | ---: | --- |
+| `small` | 100 | CI smoke, laptop-safe sanity, release gate proof |
+| `mid` | 500 | Solo or power-user project vault simulation |
+| `large` | 1000 | Team-sized local benchmark |
+
+Scenario families:
+
+| Scenario | Challenge |
+| --- | --- |
+| `needle` | One relevant fact is hidden in a large corpus. |
+| `multi-hop` | The answer requires two or three linked notes. |
+| `stale-conflict` | A newer record must override an older contradictory record. |
+| `privacy-trap` | Private or unsafe records must be excluded or refused. |
+| `distractor-heavy` | Similar but wrong notes compete with the target. |
+| `handoff-resume` | The model must continue from a compact handoff plus selected context. |
+
+Stable metrics are:
+
+- retrieval precision/recall
+- context pack tokens
+- irrelevant-token ratio
+- answer correctness
+- citation accuracy
+- privacy and staleness failures
+- contradiction handling
+- handoff resume score
+- prompt/eval token counts
+- duration and tokens per second
+- failure frontier scale
+
+Harness benchmarks for Claude Code, Codex, OpenCode, Cursor, and Zed are
+roadmap items. Frontier/cloud benchmark matrices are also roadmap items. The
+v0.7.0 pre-release kit focuses on deterministic CI proof and optional local
+Ollama validation.
+
+The older reproducible local harness under `benchmarks/` remains useful for
+assembly-strategy baselines, but public v0.7 benchmark claims should prefer
+the optional Benchmark Kit add-on because it uses real generated Markdown
+fixture files.
 
 Example local matrix:
 
 ```bash
-python tools/owledge.py benchmark --project-root . --scale-files 100,1000,10000
+python tools/benchmark-kit/run-benchmark-kit.py --mode ci --scale-mode small --yes
+python tools/benchmark-kit/run-benchmark-kit.py --mode ci --scale-mode mid --yes
+python tools/benchmark-kit/run-benchmark-kit.py --mode ci --scale-mode large --yes
 ```
 
 ## Benchmark Gate

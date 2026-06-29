@@ -9,9 +9,9 @@ The goal is not to turn a vector database, dashboard, or runtime plugin into the
 | Memory type | What it means for agents | Current implementation | Production boundary |
 | --- | --- | --- | --- |
 | Working memory | The scoped context an agent sees while doing one task | Runtime context window, generated context packs, private session logs, evidence links, handoffs | Keep compact, task-scoped, and disposable. Do not promote raw transcripts directly. |
-| Semantic memory | Stable facts, policies, decisions, project knowledge, and retrieval summaries | `PROJECT_CONTEXT.md`, `USER_CONTEXT.md`, `agent-memory/canonical/`, `agent-memory/compiled/`, `patterns/`, `lessons/`, typed edges, generated indexes | Promote only reviewed stable knowledge. Markdown is canonical; RAG is a consumer. |
+| Semantic memory | Stable facts, policies, decisions, project knowledge, and retrieval summaries | `OWLEDGE.md`, `USER_CONTEXT.md`, `.owledge/canonical/`, `.owledge/compiled/`, `patterns/`, `lessons/`, typed edges, generated indexes | Promote only reviewed stable knowledge. Markdown is canonical; RAG is a consumer. |
 | Procedural memory | How agents should do work | `AGENTS.md`, `CLAUDE.md`, `skills/*/SKILL.md`, plugin commands, Python CLI, templates, command reference | Use progressive disclosure: skill index first, full skill only when relevant. Runtime tools adapt to the contract. |
-| Episodic memory | What happened, what was decided, what worked, what failed, and what should be learned | `agent-memory/sessions/`, `evidence/`, `handoffs/`, review artifacts, PI reports, red-team scorecards, `compact-sessions`, promotion manifests | Raw episodes stay private. Stable deltas are distilled into compiled/canonical/pattern/lesson records after review. |
+| Episodic memory | What happened, what was decided, what worked, what failed, and what should be learned | `.owledge/sessions/`, `evidence/`, `handoffs/`, review artifacts, PI reports, red-team scorecards, `compact-sessions`, promotion manifests | Raw episodes stay private. Stable deltas are distilled into compiled/canonical/pattern/lesson records after review. |
 
 ## Current Handling
 
@@ -21,7 +21,7 @@ Working memory is represented by context packs and private session artifacts.
 
 - `python tools/owledge.py build-context-pack` creates a scoped pack from project and memory records.
 - Context packs use a character budget and list dropped sources so agents can see what was excluded.
-- Runtime plugin hooks can write private events under `agent-memory/sessions/`.
+- Runtime plugin hooks can write private events under `.owledge/sessions/`.
 - Handoffs and evidence records keep task state outside the model context window.
 
 This is release-ready for local/project use when agents treat generated context as disposable and rebuild it from Markdown.
@@ -30,7 +30,7 @@ This is release-ready for local/project use when agents treat generated context 
 
 Semantic memory is the strongest part of the kit.
 
-- `PROJECT_CONTEXT.md` routes project-level truth.
+- `OWLEDGE.md` routes project-level truth.
 - `USER_CONTEXT.md` and `global-memory/` hold optional private user context.
 - `canonical/` stores approved stable project knowledge.
 - `compiled/` stores retrieval-optimized summaries.
@@ -46,8 +46,8 @@ Procedural memory is implemented through runtime-neutral instructions and progre
 
 - `AGENTS.md` and `CLAUDE.md` define global operating rules for coding agents.
 - `skills/*/SKILL.md` files describe reusable procedures such as bootstrap, runtime bridge, report rendering, PI intelligence, and review workflows.
-- `plugins/agent-memory-cowork/` packages commands, hooks, and skills for Claude/Cowork and Codex-compatible use.
-- `tools/owledge.py` and `tools/agent_memory_cli.py` expose repeatable procedures for validation, indexing, promotion, reports, exports, and evals.
+- `plugins/owledge-cowork/` packages commands, hooks, and skills for Claude/Cowork and Codex-compatible use.
+- `tools/owledge.py` and `tools/owledge_core.py` expose repeatable procedures for validation, indexing, promotion, reports, exports, and evals.
 
 This is a local adapter model. The important boundary is that skills and plugins do not own memory; they operate on the Markdown contract.
 
@@ -60,7 +60,7 @@ retention enforcement remains out of scope for this local release.
 - `compact-sessions` converts session records into private draft compiled summaries.
 - QA/review workflows produce scored review artifacts.
 - Promotion requires review approval, source hash checks, tenant/customer/project scope, and target policy checks.
-- Promotion writes audit manifests under `agent-memory/evidence/promotions/`.
+- Promotion writes audit manifests under `.owledge/evidence/promotions/`.
 - `audit-retention`, `review-memory-conflicts`, and `scan-memory-sensitive-data` are read-only gates for stale, contradictory, expired, and sensitive memory.
 
 The implementation correctly avoids raw transcript promotion. For publish, call

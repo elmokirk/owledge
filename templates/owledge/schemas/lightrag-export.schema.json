@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "LightRAGExportRow",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["doc_id", "memory_id", "tenant_id", "customer_id", "project_id", "source_path", "source_hash", "data_class", "acl", "content"],
+  "properties": {
+    "doc_id": { "type": "string", "minLength": 1 },
+    "memory_id": { "type": "string", "pattern": "^mem:" },
+    "tenant_id": { "type": "string", "minLength": 1 },
+    "customer_id": { "type": "string", "minLength": 1 },
+    "project_id": { "type": "string", "minLength": 1 },
+    "source_path": { "type": "string", "minLength": 1 },
+    "source_hash": { "type": "string", "minLength": 64, "maxLength": 64 },
+    "data_class": { "type": "string", "enum": ["public", "internal", "confidential", "personal", "special-category"] },
+    "acl": { "type": "array", "items": { "type": "string" } },
+    "content": { "type": "string" }
+  }
+}

@@ -15,9 +15,9 @@ Challenge PI Agent findings before anyone treats them as reliable. Look for weak
 ## Procedure
 
 1. Read the PI report or candidate artifact.
-2. Use `python tools/agent_memory_cli.py --project-root . run-review-workflow --review-type multi-perspective-red-team --subject agent-memory/pi-agent/reports` when a deterministic review artifact is useful.
+2. Use `python tools/owledge_core.py --project-root . run-review-workflow --review-type multi-perspective-red-team --subject .owledge/pi-agent/reports` when a deterministic review artifact is useful.
 3. Score the artifact from 1-100.
-4. Write only under `agent-memory/pi-agent/red-team/`, `evaluations/`, or `scorecards/` unless instructed otherwise.
+4. Write only under `.owledge/pi-agent/red-team/`, `evaluations/`, or `scorecards/` unless instructed otherwise.
 5. Recommend `block`, `revise`, `accept`, or `promote-candidate`.
 
 ## Boundary

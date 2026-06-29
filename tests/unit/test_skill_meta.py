@@ -103,11 +103,11 @@ def test_skill_respects_planning_mode(fresh_project):
     import pytest
     profile_supervised = fresh_project / "supervised-profile.json"
     profile_supervised.open("w", encoding="utf-8").write(json.dumps({"planning_mode": "supervised", "project_mode": "mvp"}))
-    decisions_before = list((fresh_project / "agent-memory" / "decisions").glob("concept-audit-*.md"))
+    decisions_before = list((fresh_project / "owledge" / "decisions").glob("concept-audit-*.md"))
     result = run_owledge(["concept-audit", "--profile", str(profile_supervised)], fresh_project)
     out = json.loads(result.stdout)
     assert out["planning_mode"] == "supervised", f"planning_mode not honored: {out.get('planning_mode')}"
-    decisions_after = list((fresh_project / "agent-memory" / "decisions").glob("concept-audit-*.md"))
+    decisions_after = list((fresh_project / "owledge" / "decisions").glob("concept-audit-*.md"))
     assert len(decisions_after) == len(decisions_before), "supervised mode wrote a concept-audit file"
 
 

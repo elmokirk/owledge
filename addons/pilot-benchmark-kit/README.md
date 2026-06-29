@@ -10,10 +10,10 @@ Charts are generated views. They do not become canonical memory.
 The report builder reads whichever files exist:
 
 - `benchmarks/results/latest.json`
-- `agent-memory/exports/retrieval-eval/retrieval-eval.json`
-- `agent-memory/exports/finalization-gates/quality-ratchet-summary.json`
-- `agent-memory/exports/finalization-gates/latest.json`
-- optional installed fixture inputs under `agent-memory/pilot-benchmark/fixtures/`
+- `.owledge/exports/retrieval-eval/retrieval-eval.json`
+- `.owledge/exports/finalization-gates/quality-ratchet-summary.json`
+- `.owledge/exports/finalization-gates/latest.json`
+- optional installed fixture inputs under `.owledge/pilot-benchmark/fixtures/`
 
 ## Install
 
@@ -28,7 +28,7 @@ python tools/pilot-benchmark/render-pilot-benchmark.py --project-root .
 ```
 
 The script writes generated views under
-`agent-memory/reports/pilot-benchmark/`.
+`.owledge/reports/pilot-benchmark/`.
 
 ## Guardrails
 

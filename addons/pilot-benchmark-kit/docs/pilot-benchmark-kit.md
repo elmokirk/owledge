@@ -10,8 +10,8 @@ The renderer accepts any subset of these JSON files:
 | Input | Typical source |
 | --- | --- |
 | Benchmark result | `benchmarks/results/latest.json` |
-| Retrieval eval | `agent-memory/exports/retrieval-eval/retrieval-eval.json` |
-| Quality ratchet or finalization gates | `agent-memory/exports/finalization-gates/quality-ratchet-summary.json` or `agent-memory/exports/finalization-gates/latest.json` |
+| Retrieval eval | `.owledge/exports/retrieval-eval/retrieval-eval.json` |
+| Quality ratchet or finalization gates | `.owledge/exports/finalization-gates/quality-ratchet-summary.json` or `.owledge/exports/finalization-gates/latest.json` |
 
 ## Output
 
@@ -39,9 +39,9 @@ Render from the installed starter fixtures:
 ```bash
 python tools/pilot-benchmark/render-pilot-benchmark.py ^
   --project-root . ^
-  --benchmark agent-memory/pilot-benchmark/fixtures/benchmark-latest.json ^
-  --retrieval agent-memory/pilot-benchmark/fixtures/retrieval-eval.json ^
-  --finalization agent-memory/pilot-benchmark/fixtures/finalization-summary.json
+  --benchmark .owledge/pilot-benchmark/fixtures/benchmark-latest.json ^
+  --retrieval .owledge/pilot-benchmark/fixtures/retrieval-eval.json ^
+  --finalization .owledge/pilot-benchmark/fixtures/finalization-summary.json
 ```
 
 Write to a custom report directory:

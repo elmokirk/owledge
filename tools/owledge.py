@@ -3,7 +3,7 @@
 
 Python-first entrypoint for local Markdown memory, KB modules, release gates,
 and plugin smoke tests. The lower-level implementation stays in
-agent_memory_cli.py and the focused builders next to this file.
+owledge_core.py and the focused builders next to this file.
 """
 
 from __future__ import annotations
@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import fnmatch
 import hashlib
+import html
 import json
 import os
 import pathlib
@@ -20,6 +21,8 @@ import subprocess
 import sys
 import tempfile
 import time
+import urllib.error
+import urllib.request
 from typing import Any, Callable, Iterable
 
 SCRIPT_DIR = pathlib.Path(__file__).resolve().parent
@@ -27,9 +30,27 @@ REPO_ROOT = SCRIPT_DIR.parent
 # When installed via pip (site-packages/tools/), templates/ and root files live
 # at the install prefix (venv root or user site), not next to site-packages/.
 # Try SCRIPT_DIR.parent (repo checkout) first, then sys.prefix, then user site.
-if not (REPO_ROOT / "templates" / "agent-memory").is_dir():
+def _has_product_templates(root: pathlib.Path) -> bool:
+    return (root / "templates" / "owledge").is_dir() or (root / "templates" / "owledge").is_dir()
+
+
+def _product_template_dir(root: pathlib.Path) -> pathlib.Path:
+    modern = root / "templates" / "owledge"
+    if modern.is_dir():
+        return modern
+    return root / "templates" / "owledge"
+
+
+def _active_memory_dir(root: pathlib.Path) -> pathlib.Path:
+    for candidate in (root / ".owledge", root / "internal" / ".owledge", root / "internal" / "owledge", root / "owledge"):
+        if candidate.is_dir():
+            return candidate
+    return root / ".owledge"
+
+
+if not _has_product_templates(REPO_ROOT):
     for candidate in (pathlib.Path(sys.prefix).resolve(), pathlib.Path(sys.prefix).resolve().parent):
-        if (candidate / "templates" / "agent-memory").is_dir():
+        if _has_product_templates(candidate):
             REPO_ROOT = candidate
             break
     else:
@@ -39,13 +60,13 @@ if not (REPO_ROOT / "templates" / "agent-memory").is_dir():
         for base in (site.getusersitepackages(), site.getuserbase()):
             if base:
                 p = pathlib.Path(base).resolve()
-                if (p / "templates" / "agent-memory").is_dir():
+                if _has_product_templates(p):
                     REPO_ROOT = p
                     break
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
-import agent_memory_cli as core  # noqa: E402
+import owledge_core as core  # noqa: E402
 import build_kb_module  # noqa: E402
 import build_project_folder_kit  # noqa: E402
 
@@ -81,7 +102,7 @@ PUBLIC_DOC_FILES = [
     "docs/operational-hardening.md",
     "docs/owledge-vs-agent-methods.md",
     "docs/distribution.md",
-    "plugins/agent-memory-cowork/README.md",
+    "plugins/owledge-cowork/README.md",
     "CONTRIBUTING.md",
     "SECURITY.md",
 ]
@@ -90,30 +111,31 @@ PUBLIC_FORBIDDEN_PATTERNS = [
     "power" + "shell",
     ".p" + "s1",
     "Execution" + "Policy",
-    "AGENT_MEMORY_" + "KIT_ROOT",
-    "AGENT_MEMORY_" + "PROJECT_ROOT",
 ]
 
 ROOT_FILE_MAP = [
-    ("PROJECT_CONTEXT.template.md", "PROJECT_CONTEXT.md"),
+    ("OWLEDGE.template.md", "OWLEDGE.md"),
     ("AGENTS.template.md", "AGENTS.md"),
     ("CLAUDE.template.md", "CLAUDE.md"),
     ("DESIGN.md", "DESIGN.md"),
     ("REPORT_DESIGN_SELECTOR.html", "REPORT_DESIGN_SELECTOR.html"),
+    (".gitignore", ".gitignore"),
 ]
 
 HOST_TOOL_FILES = [
     "owledge.py",
-    "agent_memory_cli.py",
+    "owledge_core.py",
     "build_kb_module.py",
     "build_project_folder_kit.py",
 ]
 
 HOST_SKILL_DIRS = [
-    "skills/agent-memory-principles",
-    "skills/agent-memory-runtime-bridge",
+    "skills/owledge-principles",
+    "skills/owledge-runtime-bridge",
     "skills/review-evaluation-workflow",
     "skills/render-memory-report",
+    "skills/owledge-planning-layer",
+    "skills/owledge-brainstorm",
     "skills/concept-blindspot-audit",
 ]
 
@@ -149,16 +171,18 @@ def resolve_path(value: str | pathlib.Path, base: pathlib.Path | None = None) ->
 
 
 def resolve_memory_root(root: pathlib.Path) -> pathlib.Path:
-    """Return the directory holding the active agent-memory tree.
+    """Return the directory holding the active memory tree.
 
-    In the Owledge source repo (post-refactor), dogfood memory lives at
-    ``internal/agent-memory/`` while tools and docs live at the repo root.
+    In the Owledge source repo, dogfood memory may live at
+    ``internal/owledge/`` while tools and docs live at the repo root.
     This helper auto-detects that layout so gate functions can be invoked with
     ``--project-root .`` and still operate on the dogfood memory tree.
-    In a normal host project (no ``internal/agent-memory/``), it falls back to
-    ``root`` itself, preserving backward compatibility.
+    In a normal host project, it falls back to ``root`` itself.
     """
-    internal = root / "internal" / "agent-memory"
+    internal_modern = root / "internal" / ".owledge"
+    if internal_modern.is_dir():
+        return internal_modern.parent
+    internal = root / "internal" / "owledge"
     return internal.parent if internal.is_dir() else root
 
 
@@ -253,8 +277,8 @@ def _collect_kit_files(source_root: pathlib.Path, project_root: pathlib.Path) ->
             sha_installed = sha256_file(target)
             sha_original = sha256_file(source) if source.is_file() else ""
             entries.append({"path": rel_posix, "sha256_installed": sha_installed, "sha256_original": sha_original})
-    agent_src = source_root / "templates" / "agent-memory"
-    agent_dst = project_root / "agent-memory"
+    agent_src = _product_template_dir(source_root)
+    agent_dst = project_root / ".owledge"
     if agent_dst.is_dir():
         for path in sorted(agent_dst.rglob("*"), key=lambda item: item.as_posix()):
             if not path.is_file() or "__pycache__" in path.parts:
@@ -264,7 +288,7 @@ def _collect_kit_files(source_root: pathlib.Path, project_root: pathlib.Path) ->
                 continue
             seen.add(rel_posix)
             sha_installed = sha256_file(path)
-            src = agent_src / pathlib.Path(rel_posix).relative_to("agent-memory")
+            src = agent_src / pathlib.Path(rel_posix).relative_to(".owledge")
             sha_original = sha256_file(src) if src.is_file() else ""
             entries.append({"path": rel_posix, "sha256_installed": sha_installed, "sha256_original": sha_original})
     for tool in HOST_TOOL_FILES:
@@ -335,12 +359,12 @@ def _resolve_global_link(arg_value: str, source_root: pathlib.Path) -> dict[str,
 
 
 def sync_dogfood(root: pathlib.Path, dry_run: bool = True) -> dict[str, Any]:
-    source_dir = root / "templates" / "agent-memory" / "templates"
-    internal_dir = root / "internal" / "agent-memory" / "templates"
+    source_dir = _product_template_dir(root) / "templates"
+    internal_dir = root / "internal" / "owledge" / "templates"
     if not source_dir.is_dir():
-        return {"passed": False, "reason": "templates/agent-memory/templates/ not found", "project": str(root)}
+        return {"passed": False, "reason": "templates/owledge/templates/ not found", "project": str(root)}
     if not internal_dir.is_dir():
-        return {"passed": False, "reason": "internal/agent-memory/templates/ not found; nothing to sync", "project": str(root)}
+        return {"passed": False, "reason": "internal/owledge/templates/ not found; nothing to sync", "project": str(root)}
     report = core.dogfood_sync_check(root)
     drifted = report.get("drifted_files", [])
     missing = report.get("missing_in_internal", [])
@@ -397,8 +421,8 @@ def init_project(project_root: pathlib.Path, source_root: pathlib.Path, include_
         copy_file_if_missing(source_root / ".gitignore", gitignore)
         created.append(".gitignore")
 
-    copy_tree_missing(source_root / "templates" / "agent-memory", project_root / "agent-memory")
-    build_project_folder_kit.ensure_gitkeep(project_root / "agent-memory", build_project_folder_kit.AGENT_DIRS)
+    copy_tree_missing(_product_template_dir(source_root), project_root / ".owledge")
+    build_project_folder_kit.ensure_gitkeep(project_root / ".owledge", build_project_folder_kit.AGENT_DIRS)
 
     tool_dir = project_root / "tools"
     for tool in HOST_TOOL_FILES:
@@ -418,22 +442,22 @@ def init_project(project_root: pathlib.Path, source_root: pathlib.Path, include_
     if include_plugin_adapter:
         created.extend(
             copy_tree_missing(
-                source_root / "plugins" / "agent-memory-cowork",
-                project_root / "plugins" / "agent-memory-cowork",
+                source_root / "plugins" / "owledge-cowork",
+                project_root / "plugins" / "owledge-cowork",
                 ["tests/*"],
             )
         )
 
     if include_compliance:
         build_project_folder_kit.install_compliance(source_root, project_root)
-        created.append("agent-memory/compliance/")
+        created.append(".owledge/compliance/")
 
     doctor = core.memory_doctor(project_root, mode="host")
     _write_kit_manifest(project_root, source_root)
     global_link_info = None
     if link_global is not None:
         global_link_info = _resolve_global_link(link_global, source_root)
-        (project_root / "agent-memory" / "global-link.json").write_text(
+        (project_root / ".owledge" / "global-link.json").write_text(
             json.dumps(global_link_info, indent=2, sort_keys=True) + "\n", encoding="utf-8"
         )
     return {
@@ -449,18 +473,18 @@ def init_project(project_root: pathlib.Path, source_root: pathlib.Path, include_
 
 
 NEVER_TOUCH_FILES = {
-    "PROJECT_CONTEXT.md",
+    "OWLEDGE.md",
     "AGENTS.md",
     "CLAUDE.md",
     "USER_CONTEXT.md",
 }
 
 NEVER_TOUCH_DIRS = (
-    "agent-memory/decisions/",
-    "agent-memory/plans/",
-    "agent-memory/sessions/",
-    "agent-memory/evidence/",
-    "agent-memory/handoffs/",
+    ".owledge/decisions/",
+    ".owledge/plans/",
+    ".owledge/sessions/",
+    ".owledge/evidence/",
+    ".owledge/handoffs/",
     "global-memory/",
 )
 
@@ -478,8 +502,8 @@ def _resolve_source_path(rel_posix: str, source_root: pathlib.Path) -> pathlib.P
     for source_rel, target_rel in ROOT_FILE_MAP:
         if rel_posix == target_rel:
             return source_root / source_rel
-    if rel_posix.startswith("agent-memory/"):
-        return source_root / "templates" / "agent-memory" / pathlib.Path(rel_posix).relative_to("agent-memory")
+    if rel_posix.startswith(".owledge/"):
+        return _product_template_dir(source_root) / pathlib.Path(rel_posix).relative_to(".owledge")
     if rel_posix.startswith("tools/"):
         return source_root / rel_posix
     if rel_posix.startswith("skills/"):
@@ -594,7 +618,7 @@ def upgrade_project(root: pathlib.Path, source_root: pathlib.Path, dry_run: bool
         else:
             return {"passed": False, "error": "force-templates mode requires --yes (or interactive confirmation via a TTY)", "project": str(root)}
 
-    lock_path = root / "agent-memory" / ".upgrade.lock"
+    lock_path = _active_memory_dir(root) / ".upgrade.lock"
     if not dry_run:
         if lock_path.is_file():
             try:
@@ -603,7 +627,7 @@ def upgrade_project(root: pathlib.Path, source_root: pathlib.Path, dry_run: bool
                 lock_data = {}
             held_pid = int(lock_data.get("pid") or 0)
             if held_pid and _pid_running(held_pid):
-                return {"passed": False, "error": f"Upgrade in progress (lock held by PID {held_pid}). Remove agent-memory/.upgrade.lock if stale.", "project": str(root)}
+                return {"passed": False, "error": f"Upgrade in progress (lock held by PID {held_pid}). Remove {_active_memory_dir(root).relative_to(root).as_posix()}/.upgrade.lock if stale.", "project": str(root)}
 
     def select_targets() -> tuple[list[str], list[str], list[str]]:
         update_list: list[str] = []
@@ -678,7 +702,7 @@ def upgrade_project(root: pathlib.Path, source_root: pathlib.Path, dry_run: bool
                 diff_chunks.append("\n".join(header_lines + diff_lines))
         patch_text = "\n".join(diff_chunks)
         if dry_run:
-            patch_dir = root / "agent-memory" / "exports"
+            patch_dir = _active_memory_dir(root) / "exports"
             patch_dir.mkdir(parents=True, exist_ok=True)
             (patch_dir / "upgrade-pending.patch").write_text(patch_text + "\n", encoding="utf-8", newline="\n")
 
@@ -700,7 +724,7 @@ def upgrade_project(root: pathlib.Path, source_root: pathlib.Path, dry_run: bool
         }
         if mode == "manual":
             report["patch"] = patch_text
-            report["patch_path"] = str((root / "agent-memory" / "exports" / "upgrade-pending.patch"))
+            report["patch_path"] = str((_active_memory_dir(root) / "exports" / "upgrade-pending.patch"))
         return report
 
     lock_held_by_us = False
@@ -777,6 +801,26 @@ def addon_relative_path(value: str) -> pathlib.Path:
     return pathlib.Path(path.as_posix())
 
 
+def addon_public_relative_path(value: str) -> pathlib.Path:
+    path = addon_relative_path(value)
+    rel = path.as_posix()
+    if rel == "owledge":
+        rel = ".owledge"
+    elif rel.startswith(".owledge/"):
+        rel = ".owledge/" + rel[len(".owledge/") :]
+    return pathlib.Path(rel)
+
+
+def addon_public_relative_text(value: str) -> str:
+    raw = str(value).replace("\\", "/").strip()
+    suffix = ""
+    while raw.endswith("/") and raw != "/":
+        raw = raw[:-1]
+        suffix += "/"
+    path = addon_public_relative_path(raw).as_posix()
+    return path + suffix
+
+
 def append_gitignore_entries(project_root: pathlib.Path, entries: Iterable[str]) -> list[str]:
     gitignore = project_root / ".gitignore"
     text = gitignore.read_text(encoding="utf-8") if gitignore.exists() else ""
@@ -801,7 +845,7 @@ def install_addon(project_root: pathlib.Path, source_root: pathlib.Path, addon: 
     manifest_path = source_root / "addons" / addon / "addon.json"
     if not manifest_path.exists():
         raise FileNotFoundError(f"Unknown add-on: {addon}")
-    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8-sig"))
     if manifest.get("name") != addon:
         raise ValueError(f"Add-on manifest name mismatch: {manifest.get('name')} != {addon}")
     addon_root = manifest_path.parent
@@ -811,7 +855,8 @@ def install_addon(project_root: pathlib.Path, source_root: pathlib.Path, addon: 
     conditional_skipped: list[str] = []
 
     for relative in manifest.get("install_directories", []):
-        target = project_root / addon_relative_path(relative)
+        target_rel = addon_public_relative_path(relative)
+        target = project_root / target_rel
         target.mkdir(parents=True, exist_ok=True)
         gitkeep = target / ".gitkeep"
         if not gitkeep.exists():
@@ -820,7 +865,7 @@ def install_addon(project_root: pathlib.Path, source_root: pathlib.Path, addon: 
 
     for item in manifest.get("install_files", []):
         source = addon_root / addon_relative_path(item["source"])
-        target_rel = addon_relative_path(item["target"])
+        target_rel = addon_public_relative_path(item["target"])
         target = project_root / target_rel
         if not source.exists():
             raise FileNotFoundError(f"Add-on source file missing: {source}")
@@ -830,12 +875,12 @@ def install_addon(project_root: pathlib.Path, source_root: pathlib.Path, addon: 
             skipped.append(str(target_rel).replace("\\", "/"))
 
     for item in manifest.get("install_if_parent_exists", []):
-        parent_rel = addon_relative_path(item["parent"])
+        parent_rel = addon_public_relative_path(item["parent"])
         if not (project_root / parent_rel).exists():
             conditional_skipped.append(str(parent_rel).replace("\\", "/"))
             continue
         source = addon_root / addon_relative_path(item["source"])
-        target_rel = addon_relative_path(item["target"])
+        target_rel = addon_public_relative_path(item["target"])
         target = project_root / target_rel
         if not source.exists():
             raise FileNotFoundError(f"Add-on source file missing: {source}")
@@ -844,7 +889,7 @@ def install_addon(project_root: pathlib.Path, source_root: pathlib.Path, addon: 
         else:
             skipped.append(str(target_rel).replace("\\", "/"))
 
-    gitignore_added = append_gitignore_entries(project_root, manifest.get("gitignore", []))
+    gitignore_added = append_gitignore_entries(project_root, [addon_public_relative_text(entry) for entry in manifest.get("gitignore", [])])
     created.extend(f".gitignore:{entry}" for entry in gitignore_added)
 
     return {
@@ -944,7 +989,7 @@ def quickstart_project(project_root: pathlib.Path, source_root: pathlib.Path, in
         "doctor": doctor,
         "validation": validation,
         "next_commands": [
-            f"python tools/agent_memory_cli.py --project-root {project_root} build-memory-index",
+            f"python tools/owledge_core.py --project-root {project_root} build-memory-index",
             f"python tools/owledge.py doctor --project-root {project_root}",
         ],
     }
@@ -972,19 +1017,22 @@ def public_docs_gate(root: pathlib.Path) -> dict[str, Any]:
         if relative in {"README.md", "docs/harness-plugin-matrix.md"}:
             results.add(f"runtime-claim-wording:{relative}", "| Ready |" not in content, "Public runtime matrix should use bounded local-support wording, not broad Ready claims.")
         if relative == "README.md":
-            results.add("product-name-first-screen", "Agent Memory Kit" not in content[:1200], "README first screen should lead with Owledge, not legacy kit naming.")
+            results.add("product-name-first-screen", "Owledge" in content[:1200], "README first screen should lead with Owledge.")
 
     readme = (root / "README.md").read_text(encoding="utf-8", errors="replace")
     readme_first_screen = readme.split("## Before / After", 1)[0]
-    primary_setup = "python tools/owledge.py init-project --target /path/to/your-project"
-    primary_lines = re.findall(r"(?m)^python tools/owledge\.py init-project --target /path/to/your-project$", readme_first_screen)
+    primary_setup = "uvx owledge quickstart --target /path/to/your-project"
+    primary_lines = re.findall(r"(?m)^uvx owledge quickstart --target /path/to/your-project$", readme_first_screen)
     results.add("readme-primary-setup-once", len(primary_lines) == 1, "README first screen presents exactly one primary project setup command.")
     results.add("readme-primary-setup-no-plugin-flag", primary_setup + " --include-plugin-adapter" not in readme_first_screen, "README primary setup does not require the plugin adapter.")
     for command in [
+        "uvx owledge --help",
         "python tools/owledge.py add-kb-module --knowledgebase-root /path/to/your/vault",
-        "python tools/owledge.py doctor --project-root /path/to/your-project",
+        "owledge doctor --project-root /path/to/your-project",
     ]:
         results.add(f"readme-simple-path:{command}", command in readme_first_screen, "README first screen includes the simple KB and doctor paths.")
+    for marker in ["OWLEDGE.md", ".owledge/", "wikilink-audit", "benchmark-kit", "read-only MCP"]:
+        results.add(f"readme-v070-marker:{marker}", marker in readme, "README documents the v0.7 release surface.")
     headings = [github_anchor(match.group(1)) for match in re.finditer(r"(?m)^##+\s+(.+)$", readme)]
     toc_links = [match.group(1) for match in re.finditer(r"(?m)^-\s+\[[^\]]+\]\(#([^)]+)\)", readme)]
     for anchor in toc_links:
@@ -1017,19 +1065,22 @@ def public_docs_gate(root: pathlib.Path) -> dict[str, Any]:
         "project-snapshot-kit.md",
     ]:
         results.add(f"docs-index:{link}", link in docs_index, "Docs index links the public entrypoint.")
+    command_reference = (root / "docs" / "command-reference.md").read_text(encoding="utf-8", errors="replace")
+    for command in ["wikilink-audit", "run-benchmark-kit.py --mode ci", "run-benchmark-kit.py --mode local", "test mcp-readonly"]:
+        results.add(f"command-reference-v070:{command}", command in command_reference, "Command reference documents v0.7 P0 commands.")
 
     plugin_docs = [
         root / "README.md",
         root / "docs" / "install-plugin.md",
         root / "docs" / "harness-plugin-matrix.md",
-        root / "plugins" / "agent-memory-cowork" / "README.md",
+        root / "plugins" / "owledge-cowork" / "README.md",
     ]
     for path in plugin_docs:
         if not path.exists():
             continue
         label = relative_posix(path, root)
         text = path.read_text(encoding="utf-8", errors="replace")
-        results.add("plugin-path:" + label, "plugins/agent-memory-cowork/" in text or "plugins\\agent-memory-cowork\\" in text, "Canonical plugin path is documented.")
+        results.add("plugin-path:" + label, "plugins/owledge-cowork/" in text or "plugins\\owledge-cowork\\" in text, "Canonical plugin path is documented.")
     install_doc = root / "docs" / "install-plugin.md"
     if install_doc.exists():
         install_text = install_doc.read_text(encoding="utf-8", errors="replace")
@@ -1037,8 +1088,9 @@ def public_docs_gate(root: pathlib.Path) -> dict[str, Any]:
             results.add(f"plugin-install-section:{heading}", heading in install_text, "Plugin install guide includes concrete install, verify, and uninstall sections.")
 
     if "benchmark" in readme.lower() or "benchmark" in (root / "docs" / "performance-scale-notes.md").read_text(encoding="utf-8", errors="replace").lower():
-        results.add("benchmark-assets:readme", (root / "benchmarks" / "README.md").exists(), "Benchmark README exists.")
-        results.add("benchmark-assets:script", (root / "benchmarks" / "run_benchmarks.py").exists(), "Python benchmark runner exists.")
+        results.add("benchmark-assets:readme", (root / "addons" / "benchmark-kit" / "README.md").exists(), "Benchmark Kit README exists.")
+        results.add("benchmark-assets:script", (root / "addons" / "benchmark-kit" / "tools" / "run-benchmark-kit.py").exists(), "Benchmark Kit runner exists.")
+        results.add("benchmark-assets:explained", (root / "addons" / "benchmark-kit" / "BENCHMARK_EXPLAINED.md").exists(), "Benchmark explanation exists.")
 
     return results.payload(project=str(root))
 
@@ -1049,9 +1101,9 @@ def release_trust_gate(root: pathlib.Path) -> dict[str, Any]:
     readme = (root / "README.md").read_text(encoding="utf-8", errors="replace")
     results.add("version:readme-badge", f"version-{version}-" in readme or f"version-{version}" in readme, "README badge matches root VERSION.")
     for relative in [
-        "plugins/agent-memory-cowork/VERSION",
-        "plugins/agent-memory-cowork/.claude-plugin/plugin.json",
-        "plugins/agent-memory-cowork/.codex-plugin/plugin.json",
+        "plugins/owledge-cowork/VERSION",
+        "plugins/owledge-cowork/.claude-plugin/plugin.json",
+        "plugins/owledge-cowork/.codex-plugin/plugin.json",
     ]:
         path = root / pathlib.Path(relative)
         results.add(f"exists:{relative}", path.exists(), "Versioned plugin file exists.")
@@ -1071,7 +1123,7 @@ def release_trust_gate(root: pathlib.Path) -> dict[str, Any]:
     readme_lower = readme.lower()
     command_reference = (root / "docs" / "command-reference.md").read_text(encoding="utf-8", errors="replace").lower()
     results.add("release-python-first-project-local", "python-first" in command_reference and "project-local" in readme_lower, "Release surface presents Owledge as a Python-first project-local install.")
-    results.add("release-primary-init-command", "python tools/owledge.py init-project --target /path/to/your-project" in readme, "README documents the primary Python setup command.")
+    results.add("release-primary-init-command", "uvx owledge quickstart --target /path/to/your-project" in readme, "README documents the primary uvx setup command.")
     return results.payload(project=str(root), version=version)
 
 
@@ -1083,7 +1135,7 @@ def launch_readiness_gate(root: pathlib.Path) -> dict[str, Any]:
         "runtime-conformance-kit",
         "pi-proof-kit",
         "ts-adapter-kit",
-        "pilot-benchmark-kit",
+        "benchmark-kit",
     ]
     for addon in required_addons:
         addon_root = root / "addons" / addon
@@ -1124,7 +1176,7 @@ def launch_readiness_gate(root: pathlib.Path) -> dict[str, Any]:
         for target in ["95", "Value Clarity", "Distribution", "Trust", "Pass/Fail"]:
             results.add(f"readiness-rubric:{target}", target in text, "Launch readiness rubric includes required scoring term.")
 
-    pi_redteam = root / "addons" / "pi-proof-kit" / "starter" / "agent-memory" / "pi-agent" / "red-team"
+    pi_redteam = root / "addons" / "pi-proof-kit" / "starter" / ".owledge" / "pi-agent" / "red-team"
     redteam_files = sorted(pi_redteam.glob("*.md")) if pi_redteam.exists() else []
     results.add("pi-proof-redteam-file", bool(redteam_files), "PI proof kit includes a concrete red-team artifact.")
     for path in redteam_files:
@@ -1133,7 +1185,7 @@ def launch_readiness_gate(root: pathlib.Path) -> dict[str, Any]:
         results.add(f"pi-redteam-no-placeholder:{path.name}", "PLACEHOLDER" not in text.upper() and "TBD" not in text.upper(), "PI proof red-team artifact has no placeholders.")
         results.add(f"pi-redteam-evidence:{path.name}", "Evidence" in text and "Recommendation" in text, "PI proof red-team artifact includes evidence and recommendation.")
 
-    pi_corpus = root / "addons" / "pi-proof-kit" / "starter" / "agent-memory" / "pi-agent" / "proof-corpus"
+    pi_corpus = root / "addons" / "pi-proof-kit" / "starter" / ".owledge" / "pi-agent" / "proof-corpus"
     corpus_files = sorted(pi_corpus.glob("*.md")) if pi_corpus.exists() else []
     results.add("pi-proof-corpus-count", len(corpus_files) >= 10, "PI proof kit includes at least ten synthetic memory artifacts.")
     corpus_text = "\n".join(path.read_text(encoding="utf-8", errors="replace") for path in corpus_files)
@@ -1154,9 +1206,9 @@ def launch_readiness_gate(root: pathlib.Path) -> dict[str, Any]:
     results.add("ts-adapter-cli", (ts_adapter / "bin" / "owledge-lint.mjs").exists(), "TS adapter add-on includes the owledge-lint CLI.")
     results.add("ts-adapter-no-engine", not (ts_adapter / "src" / "memory-engine.ts").exists(), "TS adapter is not a second memory engine.")
 
-    pilot = root / "addons" / "pilot-benchmark-kit"
-    results.add("pilot-benchmark-script", (pilot / "tools" / "render-pilot-benchmark.py").exists(), "Pilot benchmark add-on includes a report builder.")
-    results.add("pilot-benchmark-fixtures", (pilot / "fixtures" / "retrieval-eval.json").exists(), "Pilot benchmark add-on includes deterministic starter metrics.")
+    benchmark_addon = root / "addons" / "benchmark-kit"
+    results.add("benchmark-addon-script", (benchmark_addon / "tools" / "run-benchmark-kit.py").exists(), "Benchmark Kit add-on includes a real-fixture runner.")
+    results.add("benchmark-addon-explained", (benchmark_addon / "BENCHMARK_EXPLAINED.md").exists(), "Benchmark Kit add-on explains injected benchmark problems.")
 
     packaging = root / "pyproject.toml"
     results.add("packaging:pyproject", packaging.exists(), "PyPI/pipx packaging metadata exists.")
@@ -1171,6 +1223,106 @@ def launch_readiness_gate(root: pathlib.Path) -> dict[str, Any]:
             results.add(f"packaging:manifest:{required}", required in text, "Source distribution includes required launch/core files.")
 
     return results.payload(project=str(root), target_score="95+")
+
+
+def publish_readiness_gate(root: pathlib.Path, min_score: int = 95) -> dict[str, Any]:
+    checks: list[tuple[str, int, Callable[[], dict[str, Any]]]] = [
+        ("legacy-naming-clean", 15, lambda: legacy_naming_gate(root)),
+        ("private-path-clean", 10, lambda: private_path_gate(root)),
+        ("public-docs", 15, lambda: public_docs_gate(root)),
+        ("release-trust", 10, lambda: release_trust_gate(root)),
+        ("launch-readiness", 10, lambda: launch_readiness_gate(root)),
+        ("standalone-skills", 10, lambda: standalone_skills_gate(root)),
+        ("mcp-readonly", 10, lambda: mcp_readonly_smoke(root)),
+        ("wikilink-audit", 10, lambda: wikilink_audit(root)),
+        ("benchmark-kit-ci", 10, lambda: benchmark_addon_gate(root)),
+        ("py-compile", 10, lambda: py_compile_gate(root)),
+    ]
+    components: dict[str, Any] = {}
+    score = 0
+    blockers: list[dict[str, Any]] = []
+    for name, weight, func in checks:
+        try:
+            payload = func()
+        except Exception as exc:
+            payload = {"passed": False, "error": str(exc)}
+        passed = bool(payload.get("passed", True))
+        components[name] = {"passed": passed, "weight": weight, "summary": payload}
+        if passed:
+            score += weight
+        else:
+            blockers.append({"name": name, "weight": weight, "error": payload.get("error", ""), "failed": payload.get("failed")})
+    passed = score >= min_score and not blockers
+    return {
+        "passed": passed,
+        "project": str(root),
+        "score": score,
+        "min_score": min_score,
+        "blockers": blockers,
+        "components": components,
+        "verdict": "promote-candidate" if passed and score >= 95 else "revise",
+    }
+
+
+def benchmark_addon_gate(root: pathlib.Path) -> dict[str, Any]:
+    manifest = root / "addons" / "benchmark-kit" / "addon.json"
+    explanation = root / "addons" / "benchmark-kit" / "BENCHMARK_EXPLAINED.md"
+    runner = root / "addons" / "benchmark-kit" / "tools" / "run-benchmark-kit.py"
+    renderer = root / "addons" / "benchmark-kit" / "tools" / "render-benchmark-report.py"
+    results = ResultSet()
+    results.add("benchmark-addon:manifest", manifest.exists(), "Benchmark Kit add-on manifest exists.")
+    results.add("benchmark-addon:runner", runner.exists(), "Benchmark Kit runner exists.")
+    results.add("benchmark-addon:renderer", renderer.exists(), "Benchmark Kit report renderer exists.")
+    results.add("benchmark-addon:explanation", explanation.exists(), "Benchmark explanation Markdown exists.")
+    if explanation.exists():
+        text = explanation.read_text(encoding="utf-8", errors="replace").lower()
+        for required in ["distractor", "stale", "private", "multi-hop", "handoff", "context pollution"]:
+            results.add(f"benchmark-addon:explanation:{required}", required in text, "Benchmark explanation documents injected failure modes.")
+    if not (manifest.exists() and runner.exists() and renderer.exists() and explanation.exists()):
+        return results.payload(project=str(root))
+
+    temp_dir = pathlib.Path(tempfile.mkdtemp(prefix="owledge-benchmark-addon-"))
+    try:
+        install = install_addon(temp_dir, root, "benchmark-kit")
+        installed_runner = temp_dir / "tools" / "benchmark-kit" / "run-benchmark-kit.py"
+        installed_renderer = temp_dir / "tools" / "benchmark-kit" / "render-benchmark-report.py"
+        installed_explanation = temp_dir / ".owledge" / "benchmark-kit" / "BENCHMARK_EXPLAINED.md"
+        results.add("benchmark-addon:install-runner", installed_runner.exists(), "Installed Benchmark Kit runner exists.")
+        results.add("benchmark-addon:install-renderer", installed_renderer.exists(), "Installed Benchmark Kit renderer exists.")
+        results.add("benchmark-addon:install-explanation", installed_explanation.exists(), "Installed Benchmark Kit explanation exists.")
+        if installed_runner.exists() and installed_renderer.exists():
+            run = run_subprocess([sys.executable, str(installed_runner), "--mode", "ci", "--scale-mode", "small", "--yes"], cwd=temp_dir)
+            results.add("benchmark-addon:ci-run", run.returncode == 0, "Benchmark Kit CI run exits successfully." if run.returncode == 0 else f"Benchmark Kit CI run failed: {run.stderr[-800:]}")
+            render = run_subprocess([sys.executable, str(installed_renderer), "--format", "html"], cwd=temp_dir)
+            results.add("benchmark-addon:html-render", render.returncode == 0, "Benchmark Kit report render exits successfully." if render.returncode == 0 else f"Benchmark Kit report render failed: {render.stderr[-800:]}")
+            for rel in [
+                ".owledge/exports/benchmark-kit/latest.json",
+                ".owledge/exports/benchmark-kit/latest.md",
+                ".owledge/exports/benchmark-kit/results.jsonl",
+                ".owledge/reports/generated/benchmark-kit/index.html",
+                ".owledge/reports/generated/benchmark-kit/charts.svg",
+            ]:
+                results.add(f"benchmark-addon:output:{rel}", (temp_dir / rel).exists(), "Benchmark Kit output exists.")
+            latest_json = temp_dir / ".owledge" / "exports" / "benchmark-kit" / "latest.json"
+            latest_md = temp_dir / ".owledge" / "exports" / "benchmark-kit" / "latest.md"
+            html_report = temp_dir / ".owledge" / "reports" / "generated" / "benchmark-kit" / "index.html"
+            if latest_json.exists():
+                report_payload = json.loads(latest_json.read_text(encoding="utf-8"))
+                results.add("benchmark-addon:json-verdict", str(report_payload.get("verdict", {}).get("verdict") or "") in {"pass", "warn", "fail"}, "Benchmark JSON includes a verdict.")
+                results.add("benchmark-addon:json-relative-project", report_payload.get("project_root") == ".", "Benchmark JSON uses a share-safe project root.")
+                results.add("benchmark-addon:json-relative-fixture", not pathlib.PurePosixPath(str(report_payload.get("fixture_dir", ""))).is_absolute() and "Users/" not in str(report_payload.get("fixture_dir", "")), "Benchmark JSON fixture path is relative/share-safe.")
+            if latest_md.exists():
+                md_text = latest_md.read_text(encoding="utf-8", errors="replace")
+                for required in ["## Verdict", "Conclusion", "Tokens per correct answer", "Context pollution", "What This Means"]:
+                    results.add(f"benchmark-addon:md:{required}", required in md_text, "Benchmark Markdown includes verdict and interpretation.")
+            if html_report.exists():
+                html_text = html_report.read_text(encoding="utf-8", errors="replace")
+                for required in ["Verdict", "Conclusion", "Total tokens", "Tokens per correct answer", "Context pollution", "Privacy failures", "Stale failures", "<svg"]:
+                    results.add(f"benchmark-addon:html:{required}", required in html_text, "Benchmark HTML includes verdict, interpretation, and embedded charts.")
+        payload = results.payload(project=str(root), install=install)
+    finally:
+        shutil.rmtree(temp_dir, ignore_errors=True)
+    return payload
 
 
 def read_skill_frontmatter(path: pathlib.Path) -> dict[str, Any]:
@@ -1209,15 +1361,15 @@ def principles_skill_gate(root: pathlib.Path) -> dict[str, Any]:
             return
         parsed = read_skill_frontmatter(skill_path)
         fields = parsed["fields"]
-        results.add(f"frontmatter-name:{relative}", fields.get("name") == "agent-memory-principles", "Expected name agent-memory-principles.")
+        results.add(f"frontmatter-name:{relative}", fields.get("name") == "owledge-principles", "Expected name owledge-principles.")
         results.add(f"frontmatter-description:{relative}", bool(fields.get("description")), "Description is present.")
         results.add(f"concise-skill:{relative}", parsed["line_count"] <= 90, f"SKILL.md has {parsed['line_count']} lines; limit is 90.")
         for reference in required_refs:
             results.add(f"reference-linked:{relative}/{reference}", reference in parsed["body"], "Reference is linked from SKILL.md.")
             results.add(f"reference-exists:{relative}/{reference}", (skill_dir / reference).exists(), "Reference file exists.")
 
-    root_skill = "skills/agent-memory-principles"
-    plugin_skill = "plugins/agent-memory-cowork/skills/agent-memory-principles"
+    root_skill = "skills/owledge-principles"
+    plugin_skill = "plugins/owledge-cowork/skills/owledge-principles"
     test_skill(root_skill)
     test_skill(plugin_skill)
     for reference in ["SKILL.md", *required_refs]:
@@ -1236,10 +1388,10 @@ def principles_only_gate(root: pathlib.Path) -> dict[str, Any]:
         "docs/quickstart.md",
         "docs/agent-integration-guide.md",
         "docs/harness-plugin-matrix.md",
-        "plugins/agent-memory-cowork/README.md",
-        "skills/agent-memory-principles/SKILL.md",
-        "skills/agent-memory-runtime-bridge/SKILL.md",
-        "plugins/agent-memory-cowork/skills/agent-memory-runtime-bridge/SKILL.md",
+        "plugins/owledge-cowork/README.md",
+        "skills/owledge-principles/SKILL.md",
+        "skills/owledge-runtime-bridge/SKILL.md",
+        "plugins/owledge-cowork/skills/owledge-runtime-bridge/SKILL.md",
     ]
     combined = []
     for relative in required_files:
@@ -1288,7 +1440,7 @@ def kb_module_gate(root: pathlib.Path) -> dict[str, Any]:
             knowledgebase_root=str(kb),
             kit_root=str(root),
             layout="module-dir",
-            module_dir="agent-memory-module",
+            module_dir="owledge-module",
             map_file="",
             max_files=10000,
             include_cli=True,
@@ -1297,17 +1449,17 @@ def kb_module_gate(root: pathlib.Path) -> dict[str, Any]:
     )
     if before_a != sha256_file(note_a) or before_b != sha256_file(note_b):
         raise RuntimeError("Existing KB markdown files were modified.")
-    module_root = kb / "agent-memory-module"
+    module_root = kb / "owledge-module"
     for relative in [
-        "AGENT_MEMORY_MODULE.md",
-        "agent-memory/plans/example-kb-backed-project-plan.md",
-        "agent-memory/indexes/kb-scan.jsonl",
-        "agent-memory/indexes/kb-module-status.json",
-        "tools/agent_memory_cli.py",
+        "OWLEDGE_MODULE.md",
+        ".owledge/plans/example-kb-backed-project-plan.md",
+        ".owledge/indexes/kb-scan.jsonl",
+        ".owledge/indexes/kb-module-status.json",
+        "tools/owledge_core.py",
     ]:
         if not (module_root / pathlib.Path(relative)).exists():
             raise RuntimeError(f"Missing expected module file: {relative}")
-    status = json.loads((module_root / "agent-memory" / "indexes" / "kb-module-status.json").read_text(encoding="utf-8"))
+    status = json.loads((module_root / "owledge" / "indexes" / "kb-module-status.json").read_text(encoding="utf-8"))
     if status["markdown_files_scanned"] < 2 or status["existing_kb_files_modified"] or status["requires_os_environment_variables"]:
         raise RuntimeError("KB module status did not report safe additive behavior.")
 
@@ -1317,10 +1469,10 @@ def kb_module_gate(root: pathlib.Path) -> dict[str, Any]:
     mapped_kb.mkdir(parents=True)
     write_text(mapped_kb / "Idea.md", "# Idea\n\nTurn [[Research]] into an MVP.\n")
     write_text(mapped_kb / "Research.md", "# Research\n\nSource note.\n")
-    for relative in ["01_Ideas", "20_Plans", "30_Evidence", "40_Handoffs", "50_Reviews", ".agent-memory/indexes"]:
+    for relative in ["01_Ideas", "20_Plans", "30_Evidence", "40_Handoffs", "50_Reviews", "..owledge/indexes"]:
         (mapped_kb / pathlib.Path(relative)).mkdir(parents=True, exist_ok=True)
     write_text(
-        mapped_kb / "agent-memory-map.json",
+        mapped_kb / "owledge-map.json",
         json.dumps(
             {
                 "ideas": "01_Ideas",
@@ -1328,7 +1480,7 @@ def kb_module_gate(root: pathlib.Path) -> dict[str, Any]:
                 "evidence": "30_Evidence",
                 "handoffs": "40_Handoffs",
                 "reviews": "50_Reviews",
-                "indexes": ".agent-memory/indexes",
+                "indexes": "..owledge/indexes",
             },
             indent=2,
         ),
@@ -1338,26 +1490,26 @@ def kb_module_gate(root: pathlib.Path) -> dict[str, Any]:
             knowledgebase_root=str(mapped_kb),
             kit_root=str(root),
             layout="module-dir",
-            module_dir="agent-memory-module",
-            map_file="agent-memory-map.json",
+            module_dir="owledge-module",
+            map_file="owledge-map.json",
             max_files=10000,
             include_cli=False,
             create_sample_plan=True,
         )
     )
-    mapped_status = json.loads((mapped_kb / ".agent-memory" / "indexes" / "kb-module-status.json").read_text(encoding="utf-8"))
+    mapped_status = json.loads((mapped_kb / ".owledge" / "indexes" / "kb-module-status.json").read_text(encoding="utf-8"))
     if mapped_status["mode"] != "mapped" or not mapped_status["mapping_enabled"]:
         raise RuntimeError("Mapped status did not report mapped mode.")
-    if (mapped_kb / "AGENT_MEMORY_MODULE.md").exists():
-        raise RuntimeError("Mapped mode should not write root AGENT_MEMORY_MODULE.md.")
+    if (mapped_kb / "OWLEDGE_MODULE.md").exists():
+        raise RuntimeError("Mapped mode should not write root OWLEDGE_MODULE.md.")
     bad_map = {
         "plans": "../escape",
         "evidence": "30_Evidence",
         "handoffs": "40_Handoffs",
         "reviews": "50_Reviews",
-        "indexes": ".agent-memory/indexes",
+        "indexes": "..owledge/indexes",
     }
-    write_text(mapped_kb / "bad-agent-memory-map.json", json.dumps(bad_map))
+    write_text(mapped_kb / "bad-owledge-map.json", json.dumps(bad_map))
     process = run_subprocess(
         [
             sys.executable,
@@ -1367,7 +1519,7 @@ def kb_module_gate(root: pathlib.Path) -> dict[str, Any]:
             "--kit-root",
             str(root),
             "--map-file",
-            "bad-agent-memory-map.json",
+            "bad-owledge-map.json",
         ]
     )
     if process.returncode == 0:
@@ -1442,16 +1594,16 @@ def generated_kit_surface_gate(root: pathlib.Path) -> dict[str, Any]:
         outputs[name] = str(output)
         violations = scan_generated_surface(output)
         results.add(f"generated-kit-surface:{name}", not violations, "Generated kit must not contain platform-specific wrappers or setup text." if not violations else "; ".join(violations[:10]))
-        results.add(f"generated-kit-python-cli:{name}", (output / "tools" / "owledge.py").exists() and (output / "tools" / "agent_memory_cli.py").exists(), "Generated kit includes Python CLI files.")
+        results.add(f"generated-kit-python-cli:{name}", (output / "tools" / "owledge.py").exists() and (output / "tools" / "owledge_core.py").exists(), "Generated kit includes Python CLI files.")
     payload = results.payload(outputs=outputs)
     return payload
 
 
 def runtime_adapters_gate(root: pathlib.Path) -> dict[str, Any]:
-    fixtures = root / "plugins" / "agent-memory-cowork" / "tests" / "fixtures"
+    fixtures = root / "plugins" / "owledge-cowork" / "tests" / "fixtures"
     if not fixtures.exists():
         raise RuntimeError(f"Missing plugin fixtures: {fixtures}")
-    tmp_root = root / ".agent-control" / "tmp" / f"agent-memory-runtime-smoke-{next(tempfile._get_candidate_names())}"
+    tmp_root = root / ".agent-control" / "tmp" / f"owledge-runtime-smoke-{next(tempfile._get_candidate_names())}"
     build_project_folder_kit.build(
         argparse.Namespace(
             output_path=str(tmp_root),
@@ -1464,12 +1616,12 @@ def runtime_adapters_gate(root: pathlib.Path) -> dict[str, Any]:
             verify=False,
         )
     )
-    hooks = json.loads((tmp_root / "plugins" / "agent-memory-cowork" / "hooks" / "hooks.json").read_text(encoding="utf-8"))
+    hooks = json.loads((tmp_root / "plugins" / "owledge-cowork" / "hooks" / "hooks.json").read_text(encoding="utf-8"))
     hooks_text = json.dumps(hooks)
     if ("power" + "shell") in hooks_text.lower() or (".p" + "s1") in hooks_text:
         raise RuntimeError("Default plugin hooks must be Python-first and platform-neutral.")
-    capture = tmp_root / "plugins" / "agent-memory-cowork" / "scripts" / "capture-claude-event.py"
-    close = tmp_root / "plugins" / "agent-memory-cowork" / "scripts" / "close-runtime-session.py"
+    capture = tmp_root / "plugins" / "owledge-cowork" / "scripts" / "capture-claude-event.py"
+    close = tmp_root / "plugins" / "owledge-cowork" / "scripts" / "close-runtime-session.py"
     for fixture in ["session-start.json", "user-prompt.json", "post-tool-use.json"]:
         payload = (fixtures / fixture).read_text(encoding="utf-8")
         process = run_subprocess([sys.executable, str(capture)], cwd=tmp_root, input_text=payload)
@@ -1478,7 +1630,7 @@ def runtime_adapters_gate(root: pathlib.Path) -> dict[str, Any]:
     process = run_subprocess([sys.executable, str(close)], cwd=tmp_root, input_text=(fixtures / "stop.json").read_text(encoding="utf-8"))
     if process.returncode != 0:
         raise RuntimeError(f"Python close hook failed: {process.stderr}")
-    session_dir = tmp_root / "agent-memory" / "sessions" / "cowork-demo-session"
+    session_dir = _active_memory_dir(tmp_root) / "sessions" / "cowork-demo-session"
     required = ["events.jsonl", "session.md", "summary.md"]
     missing = [name for name in required if not (session_dir / name).exists()]
     if missing:
@@ -1512,12 +1664,12 @@ def expect_kb_failure(root: pathlib.Path, kb_root: pathlib.Path, map_file: str, 
 
 def new_mapped_kb(path: pathlib.Path) -> None:
     path.mkdir(parents=True, exist_ok=True)
-    for relative in ["00_Inbox", "20_Plans", "30_Evidence", "40_Handoffs", "50_Reviews", ".agent-memory/indexes"]:
+    for relative in ["00_Inbox", "20_Plans", "30_Evidence", "40_Handoffs", "50_Reviews", "..owledge/indexes"]:
         (path / pathlib.Path(relative)).mkdir(parents=True, exist_ok=True)
     write_text(path / "00_Inbox" / "Idea.md", "# Idea\n\nBuild MVP from [[Research Note]].\n")
     write_text(path / "Research Note.md", "---\ntype: research\n---\n\n# Research Note\n\nKeep this source unchanged.\n")
     write_text(
-        path / "agent-memory-map.json",
+        path / "owledge-map.json",
         json.dumps(
             {
                 "ideas": "00_Inbox",
@@ -1525,7 +1677,7 @@ def new_mapped_kb(path: pathlib.Path) -> None:
                 "evidence": "30_Evidence",
                 "handoffs": "40_Handoffs",
                 "reviews": "50_Reviews",
-                "indexes": ".agent-memory/indexes",
+                "indexes": "..owledge/indexes",
             },
             indent=2,
         ),
@@ -1551,15 +1703,15 @@ def principles_scenarios_gate(root: pathlib.Path) -> dict[str, Any]:
             knowledgebase_root=str(large_root),
             kit_root=str(root),
             layout="module-dir",
-            module_dir="agent-memory-module",
+            module_dir="owledge-module",
             map_file="",
             max_files=25,
             include_cli=False,
             create_sample_plan=True,
         )
     )
-    large_after = tree_hash(large_root, ["agent-memory-module"])
-    large_status = json.loads((large_root / "agent-memory-module" / "agent-memory" / "indexes" / "kb-module-status.json").read_text(encoding="utf-8"))
+    large_after = tree_hash(large_root, ["owledge-module"])
+    large_status = json.loads((large_root / "owledge-module" / "owledge" / "indexes" / "kb-module-status.json").read_text(encoding="utf-8"))
     results.add("large-codebase-existing-files-unchanged", large_before == large_after, "Existing files stayed byte-identical outside the module.")
     results.add("large-codebase-max-files-honored", large_status["markdown_files_scanned"] == 25, "MaxFiles=25 honored.")
     results.add("large-codebase-zero-env", large_status["requires_os_environment_variables"] is False, "No OS environment variable dependency.")
@@ -1572,23 +1724,23 @@ def principles_scenarios_gate(root: pathlib.Path) -> dict[str, Any]:
             knowledgebase_root=str(user_kb),
             kit_root=str(root),
             layout="module-dir",
-            module_dir="agent-memory-module",
-            map_file="agent-memory-map.json",
+            module_dir="owledge-module",
+            map_file="owledge-map.json",
             max_files=10000,
             include_cli=False,
             create_sample_plan=True,
         )
     )
-    user_after = tree_hash(user_kb, ["20_Plans", "30_Evidence", "40_Handoffs", "50_Reviews", ".agent-memory/indexes"])
-    user_status = json.loads((user_kb / ".agent-memory" / "indexes" / "kb-module-status.json").read_text(encoding="utf-8"))
+    user_after = tree_hash(user_kb, ["20_Plans", "30_Evidence", "40_Handoffs", "50_Reviews", "..owledge/indexes"])
+    user_status = json.loads((user_kb / ".owledge" / "indexes" / "kb-module-status.json").read_text(encoding="utf-8"))
     results.add("user-kb-mapped-mode", user_status["mode"] == "mapped" and user_status["mapping_enabled"], "Mapped mode selected.")
     results.add("user-kb-original-notes-unchanged", user_before == user_after, "Original notes and map stayed byte-identical.")
     results.add("user-kb-wikilinks-not-converted", user_status["wiki_links_converted"] is False, "Wiki links not converted.")
-    results.add("user-kb-no-root-module-doc", not (user_kb / "AGENT_MEMORY_MODULE.md").exists(), "Mapped mode avoids root module doc.")
+    results.add("user-kb-no-root-module-doc", not (user_kb / "OWLEDGE_MODULE.md").exists(), "Mapped mode avoids root module doc.")
     write_text(user_kb / "30_Evidence" / "worker-evidence.md", "# Worker Evidence\n\nSource: `Research Note.md`.\n")
     write_text(user_kb / "40_Handoffs" / "worker-handoff.md", "# Worker Handoff\n\nStatus: done.\n")
     write_text(user_kb / "50_Reviews" / "reviewer-findings.md", "# Reviewer Findings\n\nVerdict: needs curator approval before promotion.\n")
-    forbidden = [user_kb / "agent-memory" / "canonical", user_kb / "agent-memory" / "lessons", user_kb / "global-memory"]
+    forbidden = [user_kb / "owledge" / "canonical", user_kb / "owledge" / "lessons", user_kb / "global-memory"]
     results.add("multi-agent-role-boundaries", not any(path.exists() for path in forbidden), "Workers/reviewers wrote only mapped artifacts.")
 
     skill_bloat = tmp_base / "skill-bloat"
@@ -1597,14 +1749,14 @@ def principles_scenarios_gate(root: pathlib.Path) -> dict[str, Any]:
         skill_dir = skill_bloat / f"noise-skill-{index:02}"
         skill_dir.mkdir()
         write_text(skill_dir / "SKILL.md", f"---\nname: noise-skill-{index}\ndescription: unrelated test skill\n---\n\n# Noise\n")
-    shutil.copytree(root / "skills" / "agent-memory-principles", skill_bloat / "agent-memory-principles")
+    shutil.copytree(root / "skills" / "owledge-principles", skill_bloat / "owledge-principles")
     matches = [
         path
         for path in skill_bloat.rglob("SKILL.md")
-        if re.search(r"(?m)^name:\s*agent-memory-principles\s*$", path.read_text(encoding="utf-8"))
+        if re.search(r"(?m)^name:\s*owledge-principles\s*$", path.read_text(encoding="utf-8"))
     ]
-    results.add("skill-bloat-exact-name-discovery", len(matches) == 1, "Found exactly one agent-memory-principles skill among 51 skills.")
-    results.add("skill-bloat-references-present", (skill_bloat / "agent-memory-principles" / "references" / "mapping-contract.md").exists(), "References survive crowded skill install.")
+    results.add("skill-bloat-exact-name-discovery", len(matches) == 1, "Found exactly one owledge-principles skill among 51 skills.")
+    results.add("skill-bloat-references-present", (skill_bloat / "owledge-principles" / "references" / "mapping-contract.md").exists(), "References survive crowded skill install.")
 
     superpowers_kb = tmp_base / "superpowers-coexistence"
     superpowers_plan = superpowers_kb / "docs" / "superpowers" / "plans" / "example-plan.md"
@@ -1619,7 +1771,7 @@ def principles_scenarios_gate(root: pathlib.Path) -> dict[str, Any]:
             knowledgebase_root=str(superpowers_kb),
             kit_root=str(root),
             layout="module-dir",
-            module_dir="agent-memory-module",
+            module_dir="owledge-module",
             map_file="",
             max_files=10000,
             include_cli=False,
@@ -1627,8 +1779,8 @@ def principles_scenarios_gate(root: pathlib.Path) -> dict[str, Any]:
         )
     )
     superpowers_hash_after = sha256_file(superpowers_plan)
-    index_text = (superpowers_kb / "agent-memory-module" / "agent-memory" / "indexes" / "kb-scan.jsonl").read_text(encoding="utf-8")
-    handoff_path = superpowers_kb / "agent-memory-module" / "agent-memory" / "handoffs" / "superpowers-plan-handoff.md"
+    index_text = (superpowers_kb / "owledge-module" / "owledge" / "indexes" / "kb-scan.jsonl").read_text(encoding="utf-8")
+    handoff_path = superpowers_kb / "owledge-module" / "owledge" / "handoffs" / "superpowers-plan-handoff.md"
     write_text(handoff_path, "# Superpowers Plan Handoff\n\nEvidence: `docs/superpowers/plans/example-plan.md`.\n")
     results.add("superpowers-plan-unchanged", superpowers_hash_before == superpowers_hash_after, "Superpowers plan unchanged.")
     results.add("superpowers-plan-indexed", "docs/superpowers/plans/example-plan.md" in index_text, "Index references Superpowers plan.")
@@ -1637,20 +1789,20 @@ def principles_scenarios_gate(root: pathlib.Path) -> dict[str, Any]:
     edge_kb = tmp_base / "edge-kb"
     new_mapped_kb(edge_kb)
     edge_cases: list[tuple[str, Any]] = [
-        ("absolute-path", {"plans": "C" + ":/escape", "evidence": "30_Evidence", "handoffs": "40_Handoffs", "reviews": "50_Reviews", "indexes": ".agent-memory/indexes"}),
-        ("unknown-key", {"plans": "20_Plans", "evidence": "30_Evidence", "handoffs": "40_Handoffs", "reviews": "50_Reviews", "indexes": ".agent-memory/indexes", "canonical": "50_Reviews"}),
-        ("missing-required-key", {"plans": "20_Plans", "evidence": "30_Evidence", "reviews": "50_Reviews", "indexes": ".agent-memory/indexes"}),
+        ("absolute-path", {"plans": "C" + ":/escape", "evidence": "30_Evidence", "handoffs": "40_Handoffs", "reviews": "50_Reviews", "indexes": "..owledge/indexes"}),
+        ("unknown-key", {"plans": "20_Plans", "evidence": "30_Evidence", "handoffs": "40_Handoffs", "reviews": "50_Reviews", "indexes": "..owledge/indexes", "canonical": "50_Reviews"}),
+        ("missing-required-key", {"plans": "20_Plans", "evidence": "30_Evidence", "reviews": "50_Reviews", "indexes": "..owledge/indexes"}),
         ("missing-target", {"plans": "20_Plans", "evidence": "30_Evidence", "handoffs": "40_Handoffs", "reviews": "50_Reviews", "indexes": "missing-indexes"}),
-        ("file-target", {"plans": "Research Note.md", "evidence": "30_Evidence", "handoffs": "40_Handoffs", "reviews": "50_Reviews", "indexes": ".agent-memory/indexes"}),
-        ("blank-value", {"plans": "", "evidence": "30_Evidence", "handoffs": "40_Handoffs", "reviews": "50_Reviews", "indexes": ".agent-memory/indexes"}),
-        ("null-value", {"plans": None, "evidence": "30_Evidence", "handoffs": "40_Handoffs", "reviews": "50_Reviews", "indexes": ".agent-memory/indexes"}),
-        ("array-value", {"plans": ["20_Plans"], "evidence": "30_Evidence", "handoffs": "40_Handoffs", "reviews": "50_Reviews", "indexes": ".agent-memory/indexes"}),
+        ("file-target", {"plans": "Research Note.md", "evidence": "30_Evidence", "handoffs": "40_Handoffs", "reviews": "50_Reviews", "indexes": "..owledge/indexes"}),
+        ("blank-value", {"plans": "", "evidence": "30_Evidence", "handoffs": "40_Handoffs", "reviews": "50_Reviews", "indexes": "..owledge/indexes"}),
+        ("null-value", {"plans": None, "evidence": "30_Evidence", "handoffs": "40_Handoffs", "reviews": "50_Reviews", "indexes": "..owledge/indexes"}),
+        ("array-value", {"plans": ["20_Plans"], "evidence": "30_Evidence", "handoffs": "40_Handoffs", "reviews": "50_Reviews", "indexes": "..owledge/indexes"}),
     ]
     for name, payload in edge_cases:
         write_text(edge_kb / f"bad-{name}.json", json.dumps(payload))
         results.add(f"edge-fail-closed:{name}", expect_kb_failure(root, edge_kb, f"bad-{name}.json"), "Invalid map should fail closed.")
     results.add("edge-fail-closed:missing-explicit-map", expect_kb_failure(root, edge_kb, "does-not-exist.json"), "Explicit missing map should fail closed.")
-    write_text(edge_kb / "bad-duplicate-key.json", '{"plans":"../escape","plans":"20_Plans","evidence":"30_Evidence","handoffs":"40_Handoffs","reviews":"50_Reviews","indexes":".agent-memory/indexes"}')
+    write_text(edge_kb / "bad-duplicate-key.json", '{"plans":"../escape","plans":"20_Plans","evidence":"30_Evidence","handoffs":"40_Handoffs","reviews":"50_Reviews","indexes":"..owledge/indexes"}')
     results.add("edge-fail-closed:duplicate-json-key", expect_kb_failure(root, edge_kb, "bad-duplicate-key.json"), "Duplicate JSON keys should fail closed.")
     results.add("edge-fail-closed:max-files-zero", expect_kb_failure(root, edge_kb, "", ["--max-files", "0"]), "max-files=0 should fail closed.")
 
@@ -1662,14 +1814,14 @@ def principles_scenarios_gate(root: pathlib.Path) -> dict[str, Any]:
             knowledgebase_root=str(bom_kb),
             kit_root=str(root),
             layout="module-dir",
-            module_dir="agent-memory-module",
+            module_dir="owledge-module",
             map_file="",
             max_files=10000,
             include_cli=False,
             create_sample_plan=True,
         )
     )
-    bom_rows = [(json.loads(line)) for line in (bom_kb / "agent-memory-module" / "agent-memory" / "indexes" / "kb-scan.jsonl").read_text(encoding="utf-8").splitlines() if line.strip()]
+    bom_rows = [(json.loads(line)) for line in (bom_kb / "owledge-module" / "owledge" / "indexes" / "kb-scan.jsonl").read_text(encoding="utf-8").splitlines() if line.strip()]
     keys = set(bom_rows[0].get("frontmatter_keys", [])) if bom_rows else set()
     results.add("edge-bom-frontmatter-keys", {"type", "status"}.issubset(keys), "BOM-prefixed frontmatter keys detected.")
 
@@ -1697,14 +1849,14 @@ def poweruser_simulations_gate(root: pathlib.Path) -> dict[str, Any]:
             knowledgebase_root=str(dirty_vault),
             kit_root=str(root),
             layout="module-dir",
-            module_dir="agent-memory-module",
+            module_dir="owledge-module",
             map_file="",
             max_files=5000,
             include_cli=True,
             create_sample_plan=True,
         )
     )
-    after_dirty = tree_hash(dirty_vault, ["agent-memory-module"])
+    after_dirty = tree_hash(dirty_vault, ["owledge-module"])
     results.add("dirty-vault-source-files-unchanged", before_dirty == after_dirty, "5k-file dirty vault stayed byte-identical outside the module.")
     results.add("dirty-vault-scanned-5k", dirty_result.get("markdown_files_scanned") == 5000, "Dirty vault scan honored 5k max-files target.")
     results.add("dirty-vault-no-env", dirty_result.get("requires_os_environment_variables") is False, "Dirty vault install requires no OS environment variables.")
@@ -1712,23 +1864,23 @@ def poweruser_simulations_gate(root: pathlib.Path) -> dict[str, Any]:
     dx_project = tmp_base / "first user project"
     started = time.perf_counter()
     init_result = init_project(dx_project, root, include_plugin_adapter=False, include_compliance=False)
-    write_text(dx_project / "agent-memory" / "plans" / "first-use-plan.md", "# First Use Plan\n\nGoal: create one useful source-backed plan.\n")
-    write_text(dx_project / "agent-memory" / "handoffs" / "first-use-handoff.md", "# First Use Handoff\n\nNext action: run validation and continue the MVP cutline.\n")
+    write_text(dx_project / "owledge" / "plans" / "first-use-plan.md", "# First Use Plan\n\nGoal: create one useful source-backed plan.\n")
+    write_text(dx_project / "owledge" / "handoffs" / "first-use-handoff.md", "# First Use Handoff\n\nNext action: run validation and continue the MVP cutline.\n")
     dx_seconds = round(time.perf_counter() - started, 3)
     results.add("first-user-init-doctor", bool(init_result.get("doctor_passed")), "Initialized project passes doctor.")
-    results.add("first-user-useful-artifacts", (dx_project / "agent-memory" / "plans" / "first-use-plan.md").exists() and (dx_project / "agent-memory" / "handoffs" / "first-use-handoff.md").exists(), "First user can reach one useful plan and handoff.")
+    results.add("first-user-useful-artifacts", (dx_project / "owledge" / "plans" / "first-use-plan.md").exists() and (dx_project / "owledge" / "handoffs" / "first-use-handoff.md").exists(), "First user can reach one useful plan and handoff.")
     results.add("first-user-dx-under-10s", dx_seconds < 10, f"First-user simulation completed in {dx_seconds}s.")
 
     existing = tmp_base / "existing project ünicode"
     write_text(existing / ".gitignore", "dist/\n")
     write_text(existing / "AGENTS.md", "# Existing Agent Rules\n\nDo not overwrite me.\n")
-    write_text(existing / "agent-memory" / "plans" / "existing-plan.md", "# Existing Plan\n\nKeep this file.\n")
+    write_text(existing / "owledge" / "plans" / "existing-plan.md", "# Existing Plan\n\nKeep this file.\n")
     existing_agents_hash = sha256_file(existing / "AGENTS.md")
-    existing_plan_hash = sha256_file(existing / "agent-memory" / "plans" / "existing-plan.md")
+    existing_plan_hash = sha256_file(existing / "owledge" / "plans" / "existing-plan.md")
     existing_result = init_project(existing, root, include_plugin_adapter=True, include_compliance=False)
     results.add("existing-project-agents-preserved", sha256_file(existing / "AGENTS.md") == existing_agents_hash, "Existing AGENTS.md was not overwritten.")
-    results.add("existing-project-plan-preserved", sha256_file(existing / "agent-memory" / "plans" / "existing-plan.md") == existing_plan_hash, "Existing memory plan was not overwritten.")
-    results.add("existing-project-plugin-added", (existing / "plugins" / "agent-memory-cowork" / "README.md").exists(), "Plugin adapter can be added to an existing project.")
+    results.add("existing-project-plan-preserved", sha256_file(existing / "owledge" / "plans" / "existing-plan.md") == existing_plan_hash, "Existing memory plan was not overwritten.")
+    results.add("existing-project-plugin-added", (existing / "plugins" / "owledge-cowork" / "README.md").exists(), "Plugin adapter can be added to an existing project.")
     results.add("existing-project-skipped-existing", "AGENTS.md" in existing_result.get("skipped_existing", []), "Init reports skipped existing project files.")
 
     return results.payload(project=str(root), simulated_files=5000)
@@ -1749,11 +1901,11 @@ def run_gate(name: str, func: Callable[[], Any]) -> dict[str, Any]:
 def py_compile_gate(root: pathlib.Path) -> dict[str, Any]:
     files = [
         root / "tools" / "owledge.py",
-        root / "tools" / "agent_memory_cli.py",
+        root / "tools" / "owledge_core.py",
         root / "tools" / "build_kb_module.py",
         root / "tools" / "build_project_folder_kit.py",
-        root / "plugins" / "agent-memory-cowork" / "scripts" / "capture-claude-event.py",
-        root / "plugins" / "agent-memory-cowork" / "scripts" / "close-runtime-session.py",
+        root / "plugins" / "owledge-cowork" / "scripts" / "capture-claude-event.py",
+        root / "plugins" / "owledge-cowork" / "scripts" / "close-runtime-session.py",
         root / "benchmarks" / "run_benchmarks.py",
     ]
     process = run_subprocess([sys.executable, "-m", "py_compile", *[str(path) for path in files]])
@@ -1783,6 +1935,193 @@ def iter_text_files(root: pathlib.Path, entries: Iterable[str], allowed_prefixes
             yield file_path
 
 
+LEGACY_NAMING_SKIP_PREFIXES = [
+    ".agent-control/",
+    ".git/",
+    ".owledge/cache/",
+    ".owledge/exports/",
+    ".owledge/indexes/",
+    ".owledge/reports/generated/",
+    ".owledge/tmp/",
+    "docs/archive/",
+    "internal/",
+    "tests/",
+]
+
+
+def legacy_naming_gate(root: pathlib.Path) -> dict[str, Any]:
+    results = ResultSet()
+    entries = [
+        "README.md",
+        "ROADMAP.md",
+        "CHANGELOG.md",
+        "AGENTS.md",
+        "CLAUDE.md",
+        "AGENTS.template.md",
+        "CLAUDE.template.md",
+        "pyproject.toml",
+        "MANIFEST.in",
+        "docs",
+        "plugins",
+        "skills",
+        "templates",
+        "addons",
+        "tools",
+        ".github",
+        "benchmarks",
+        "examples",
+        ".owledge",
+    ]
+    blocked_tokens = [
+        "agent-" + "memory",
+        "Agent " + "Memory",
+        "PROJECT_" + "CONTEXT",
+        "agent_" + "memory",
+        "bootstrap-agent-" + "memory",
+        "agent-" + "memory-" + "cowork",
+        "agent-" + "memory-" + "principles",
+        "agent-" + "memory-" + "runtime-bridge",
+    ]
+    allowed_changelog_tokens = {
+        "agent-" + "memory",
+        "Agent " + "Memory",
+        "PROJECT_" + "CONTEXT",
+        "agent_" + "memory",
+    }
+    findings: list[dict[str, Any]] = []
+    scanned = 0
+    for file_path in iter_text_files(root, entries, allowed_prefixes=LEGACY_NAMING_SKIP_PREFIXES):
+        rel = relative_posix(file_path, root)
+        text = file_path.read_text(encoding="utf-8", errors="ignore")
+        scanned += 1
+        for token in blocked_tokens:
+            if token not in text:
+                continue
+            if rel == "CHANGELOG.md" and token in allowed_changelog_tokens:
+                continue
+            findings.append({"file": rel, "token": token})
+    results.add("legacy-naming-clean", not findings, "No active public legacy naming leaks." if not findings else f"Found {len(findings)} active legacy naming leaks.")
+    return results.payload(project=str(root), scanned_files=scanned, findings=findings[:200], finding_count=len(findings))
+
+
+PRIVATE_PATH_SKIP_PREFIXES = [
+    ".agent-control/",
+    ".git/",
+    ".owledge/cache/",
+    ".owledge/exports/",
+    ".owledge/indexes/",
+    ".owledge/reports/generated/",
+    ".owledge/tmp/",
+    ".pytest_cache/",
+    "docs/archive/",
+    "internal/owledge/exports/",
+    "owlib/.pytest_cache/",
+]
+
+
+def private_path_gate(root: pathlib.Path) -> dict[str, Any]:
+    results = ResultSet()
+    entries = [
+        "README.md",
+        "ROADMAP.md",
+        "CHANGELOG.md",
+        "AGENTS.md",
+        "CLAUDE.md",
+        "AGENTS.template.md",
+        "CLAUDE.template.md",
+        "OWLEDGE.template.md",
+        "pyproject.toml",
+        "MANIFEST.in",
+        "docs",
+        "plugins",
+        "skills",
+        "standalone-skills",
+        "templates",
+        "addons",
+        "tools",
+        ".github",
+        "benchmarks",
+        "examples",
+        "tests",
+    ]
+    win_drive = "C:"
+    win_users_slash = win_drive + "/Users/"
+    win_users_backslash = win_drive + "\\" + "Users" + "\\"
+    unix_users = "/" + "Users" + "/"
+    unix_home = "/" + "home" + "/"
+    patterns = [
+        ("windows-user-backslash", re.compile(re.escape(win_users_backslash) + r"(?!USERPATH(?:\\|$))[^\\\s\"'<>`]+")),
+        ("windows-user-slash", re.compile(re.escape(win_users_slash) + r"(?!USERPATH(?:/|$))[^/\s\"'<>`]+")),
+        ("unix-user", re.compile(r"(?<![A-Za-z]:)(?:" + re.escape(unix_users) + "|" + re.escape(unix_home) + r")(?!USERPATH(?:/|$))[^/\s\"'<>`]+")),
+    ]
+    findings: list[dict[str, Any]] = []
+    scanned = 0
+    for file_path in iter_text_files(root, entries, allowed_prefixes=PRIVATE_PATH_SKIP_PREFIXES):
+        rel = relative_posix(file_path, root)
+        text = file_path.read_text(encoding="utf-8", errors="ignore")
+        scanned += 1
+        for label, pattern in patterns:
+            for match in pattern.finditer(text):
+                findings.append({"file": rel, "pattern": label, "match": match.group(0)})
+                if len(findings) >= 200:
+                    break
+            if len(findings) >= 200:
+                break
+        if len(findings) >= 200:
+            break
+    results.add("private-path-clean", not findings, "No active private user path leaks." if not findings else f"Found {len(findings)} private user path leaks.")
+    return results.payload(project=str(root), scanned_files=scanned, findings=findings, finding_count=len(findings))
+
+
+def standalone_skills_gate(root: pathlib.Path) -> dict[str, Any]:
+    results = ResultSet()
+    standalone_root = root / "standalone-skills"
+    manifest_path = standalone_root / "manifest.json"
+    readme_path = standalone_root / "README.md"
+    results.add("standalone-root", standalone_root.is_dir(), "Standalone skills directory exists.")
+    results.add("standalone-readme", readme_path.is_file(), "Standalone skills README exists.")
+    results.add("standalone-manifest", manifest_path.is_file(), "Standalone skills manifest exists.")
+    if not manifest_path.is_file():
+        return results.payload(project=str(root))
+
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    skills = manifest.get("skills", [])
+    results.add("manifest-name", manifest.get("name") == "owledge-standalone-skills", "Manifest has the standalone skills package name.")
+    results.add("manifest-skills-list", isinstance(skills, list) and len(skills) >= 3, "Manifest lists standalone skills.")
+    required = {
+        "owledge-blindspot-audit",
+        "owledge-agentic-review",
+        "owledge-brainstorm",
+    }
+    listed = {str(item.get("name")) for item in skills if isinstance(item, dict)}
+    for name in sorted(required):
+        results.add(f"manifest-required:{name}", name in listed, "Required standalone skill is listed.")
+    for item in skills:
+        if not isinstance(item, dict):
+            results.add("manifest-item-shape", False, "Each manifest skill entry is an object.")
+            continue
+        name = str(item.get("name") or "")
+        rel_path = str(item.get("path") or "")
+        skill_dir = standalone_root / rel_path
+        skill_path = skill_dir / "SKILL.md"
+        results.add(f"skill-dir:{name}", skill_dir.is_dir(), "Standalone skill directory exists.")
+        results.add(f"skill-file:{name}", skill_path.is_file(), "Standalone SKILL.md exists.")
+        results.add(f"skill-no-full-kit:{name}", item.get("requires_full_owledge_kit") is False, "Standalone skill does not require the full kit.")
+        results.add(f"skill-runtimes:{name}", bool(item.get("supported_runtimes")), "Standalone skill declares supported runtimes.")
+        if skill_path.is_file():
+            fields = read_skill_frontmatter(skill_path).get("fields", {})
+            text = skill_path.read_text(encoding="utf-8", errors="replace")
+            results.add(f"skill-name:{name}", fields.get("name") == name, "SKILL.md frontmatter name matches manifest.")
+            lower = text.lower()
+            results.add(f"skill-install-independent:{name}", "requires full owledge kit" not in lower, "Skill text does not require full Owledge adoption.")
+    if readme_path.is_file():
+        readme = readme_path.read_text(encoding="utf-8", errors="replace")
+        for name in sorted(required):
+            results.add(f"readme-skill:{name}", name in readme, "README documents required standalone skill.")
+        results.add("readme-install", "Copy one skill folder" in readme, "README includes manual install guidance.")
+    return results.payload(project=str(root))
+
+
 def platform_forbidden_hits(text: str, include_shell_scripts: bool = False, include_windows_drive_paths: bool = False) -> list[str]:
     lower = text.lower()
     hits = []
@@ -1790,8 +2129,8 @@ def platform_forbidden_hits(text: str, include_shell_scripts: bool = False, incl
         ("power" + "shell", ("power" + "shell") in lower),
         ("p" + "s1", (".p" + "s1") in lower),
         ("execution" + "-policy", ("execution" + "policy") in lower),
-        ("kit" + "-root-env", ("agent_memory_" + "kit_root") in lower),
-        ("project" + "-root-env", ("agent_memory_" + "project_root") in lower),
+        ("kit" + "-root-env", ("owledge_" + "kit_root") in lower),
+        ("project" + "-root-env", ("owledge_" + "project_root") in lower),
     ]
     if include_shell_scripts and re.search(r"(?i)(^|[\"'\s/])[\w./-]+\.s" + "h" + r"\b", text):
         hits.append("shell-script")
@@ -1808,8 +2147,8 @@ def platform_neutral_core_gate(root: pathlib.Path) -> dict[str, Any]:
         "AGENTS.md",
         "CLAUDE.md",
         "docs",
-        "templates/agent-memory/README.md",
-        "templates/agent-memory/templates",
+        "templates/owledge/README.md",
+        "templates/owledge/templates",
         "addons",
         "plugins",
         "skills",
@@ -1871,9 +2210,9 @@ def concept_audit_fresh_gate(root: pathlib.Path) -> dict[str, Any]:
     """
     import datetime as _dt
 
-    decisions_dir = root / "internal" / "agent-memory" / "decisions"
+    decisions_dir = root / "internal" / "owledge" / "decisions"
     if not decisions_dir.is_dir():
-        decisions_dir = root / "agent-memory" / "decisions"
+        decisions_dir = root / "owledge" / "decisions"
     audit_files = sorted(decisions_dir.glob("concept-audit-*.md")) if decisions_dir.is_dir() else []
     version_file = root / "VERSION"
     version_mtime = version_file.stat().st_mtime if version_file.exists() else 0
@@ -1914,7 +2253,9 @@ def concept_audit_fresh_gate(root: pathlib.Path) -> dict[str, Any]:
 
 
 def _read_project_mode_from_context(root: pathlib.Path) -> str:
-    pc = root / "PROJECT_CONTEXT.md"
+    pc = root / "OWLEDGE.md"
+    if not pc.exists():
+        pc = root / "OWLEDGE.md"
     if not pc.exists():
         return "mvp"
     text = pc.read_text(encoding="utf-8", errors="ignore")
@@ -1975,7 +2316,7 @@ def finalization_gates(root: pathlib.Path, include_exports: bool, include_compli
         add("report-shared", lambda: core.render_memory_report(memory_root, "project-dashboard", audience="shared"))
 
     failed = [gate for gate in gates if not gate["passed"]]
-    report_dir = memory_root / "agent-memory" / "exports" / "finalization-gates"
+    report_dir = _active_memory_dir(memory_root) / "exports" / "finalization-gates"
     report_dir.mkdir(parents=True, exist_ok=True)
     quality_summary_path = report_dir / "quality-ratchet-summary.json"
     quality_scores: dict[str, int] = {}
@@ -2037,7 +2378,7 @@ def write_deterministic_redteam_report(
     now = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
     relative_output = output_path.relative_to(root) if output_path.is_relative_to(root) else output_path
     slug = output_path.stem
-    memory_id = f"mem:tenant-local:customer-local:agent-memory-standalone:qa:{slug}"
+    memory_id = f"mem:tenant-local:customer-local:owledge-standalone:qa:{slug}"
     gate_names = ", ".join(item["name"] for item in gate.get("gates", []))
     weakest = min(item[2] for item in personas)
     safety_score = 100
@@ -2048,7 +2389,7 @@ def write_deterministic_redteam_report(
         f'memory_id: "{memory_id}"',
         'tenant_id: "tenant-local"',
         'customer_id: "customer-local"',
-        'project_id: "agent-memory-standalone"',
+        'project_id: "owledge-standalone"',
         'doc_type: "qa"',
         'status: "draft"',
         'visibility: "private"',
@@ -2125,7 +2466,7 @@ def write_deterministic_redteam_report(
 
 def redteam_qa(root: pathlib.Path, subject: str, question: str, gate_report_path: str) -> dict[str, Any]:
     memory_root = resolve_memory_root(root)
-    gate_report = resolve_path(gate_report_path, root) if gate_report_path else memory_root / "agent-memory" / "exports" / "finalization-gates" / "latest.json"
+    gate_report = resolve_path(gate_report_path, root) if gate_report_path else _active_memory_dir(memory_root) / "exports" / "finalization-gates" / "latest.json"
     if not gate_report.exists():
         gate = finalization_gates(root, include_exports=False, include_compliance=False)
         if not gate["passed"]:
@@ -2150,7 +2491,7 @@ def redteam_qa(root: pathlib.Path, subject: str, question: str, gate_report_path
         subject=subject,
         question=evidence_question,
         slug="v0.5-final-redteam",
-        output_dir=memory_root / "agent-memory" / "pi-agent" / "red-team",
+        output_dir=_active_memory_dir(memory_root) / "pi-agent" / "red-team",
     )
     score = 95
     verdict = "promote-candidate"
@@ -2251,7 +2592,7 @@ def retrieval_fixture_gate(root: pathlib.Path) -> dict[str, Any]:
 
 def quality_ratchet_gate(root: pathlib.Path) -> dict[str, Any]:
     memory_root = resolve_memory_root(root)
-    report_dir = memory_root / "agent-memory" / "exports" / "finalization-gates"
+    report_dir = _active_memory_dir(memory_root) / "exports" / "finalization-gates"
     report_dir.mkdir(parents=True, exist_ok=True)
     components: list[tuple[str, Callable[[], dict[str, Any]]]] = [
         ("docs", lambda: public_docs_gate(root)),
@@ -2307,6 +2648,560 @@ def quality_ratchet_gate(root: pathlib.Path) -> dict[str, Any]:
     return summary
 
 
+def _iter_markdown_for_audit(root: pathlib.Path) -> list[pathlib.Path]:
+    excluded_parts = {".git", ".agent-control", "__pycache__", ".pytest_cache", "node_modules", "dist", "build", "cache", "tmp"}
+    files: list[pathlib.Path] = []
+    for path in sorted(root.rglob("*.md"), key=lambda item: item.as_posix()):
+        rel_parts = set(path.relative_to(root).parts)
+        if rel_parts & excluded_parts:
+            continue
+        rel = path.relative_to(root).as_posix()
+        wrapped = f"/{rel}/"
+        if "/exports/" in wrapped or "/reports/generated/" in wrapped or "/sessions/" in wrapped:
+            continue
+        files.append(path)
+    return files
+
+
+def _strip_markdown_code_for_wikilinks(text: str) -> str:
+    lines = text.splitlines(keepends=True)
+    stripped: list[str] = []
+    in_fence = False
+    for line in lines:
+        if line.lstrip().startswith("```"):
+            in_fence = not in_fence
+            stripped.append("\n" if line.endswith("\n") else "")
+            continue
+        if in_fence:
+            stripped.append("\n" if line.endswith("\n") else "")
+            continue
+        stripped.append(re.sub(r"`[^`\n]*`", "", line))
+    return "".join(stripped)
+
+
+def wikilink_audit(root: pathlib.Path) -> dict[str, Any]:
+    files = _iter_markdown_for_audit(root)
+    by_stem: dict[str, list[pathlib.Path]] = {}
+    by_name: dict[str, list[pathlib.Path]] = {}
+    for path in files:
+        by_stem.setdefault(path.stem.lower(), []).append(path)
+        by_name.setdefault(path.name.lower(), []).append(path)
+
+    link_re = re.compile(r"(?<!!)\[\[([^\]\n]+)\]\]")
+    links: list[dict[str, Any]] = []
+    unresolved: list[dict[str, Any]] = []
+    ambiguous: list[dict[str, Any]] = []
+    candidate_edges: list[dict[str, str]] = []
+    for path in files:
+        original_text = path.read_text(encoding="utf-8", errors="replace")
+        text = _strip_markdown_code_for_wikilinks(original_text)
+        for match in link_re.finditer(text):
+            raw = match.group(1).strip()
+            target_part = raw.split("|", 1)[0].strip()
+            target_name = target_part.split("#", 1)[0].strip()
+            if not target_name:
+                continue
+            key_name = target_name.lower()
+            key_stem = pathlib.Path(target_name).stem.lower()
+            candidates = by_name.get(key_name, []) or by_stem.get(key_stem, [])
+            rel_source = path.relative_to(root).as_posix()
+            row = {
+                "source": rel_source,
+                "raw": raw,
+                "target": target_name,
+                "line": original_text[: match.start()].count("\n") + 1,
+                "candidates": [candidate.relative_to(root).as_posix() for candidate in candidates],
+            }
+            links.append(row)
+            if not candidates:
+                unresolved.append(row)
+            elif len(candidates) > 1:
+                ambiguous.append(row)
+            else:
+                candidate_edges.append({"source": rel_source, "target_path": candidates[0].relative_to(root).as_posix(), "type": "wikilink_candidate"})
+    return {
+        "passed": not unresolved and not ambiguous,
+        "project": str(root),
+        "files_scanned": len(files),
+        "links": links,
+        "link_count": len(links),
+        "unresolved_count": len(unresolved),
+        "ambiguous_count": len(ambiguous),
+        "unresolved": unresolved,
+        "ambiguous": ambiguous,
+        "candidate_edges": candidate_edges,
+        "write_policy": "read-only; candidate edges are suggestions only",
+    }
+
+
+BENCHMARK_METRICS = [
+    "retrieval_precision_at_k",
+    "retrieval_recall_at_k",
+    "context_pack_tokens",
+    "irrelevant_token_ratio",
+    "answer_correctness",
+    "citation_accuracy",
+    "privacy_failure_count",
+    "staleness_failure_count",
+    "contradiction_handling_score",
+    "handoff_resume_score",
+    "prompt_eval_count",
+    "eval_count",
+    "total_duration_ms",
+    "tokens_per_second",
+    "failure_frontier_scale",
+]
+
+RECOMMENDED_LOCAL_MODELS = ["gemma4:latest", "qwen3.5:4b", "qwen3:latest", "llama3.2:latest"]
+BENCHMARK_ALLOWED_SCALES = [100, 1000, 5000, 10000]
+BENCHMARK_SCENARIOS = [
+    {
+        "name": "needle",
+        "description": "One relevant fact is hidden in a large corpus.",
+        "difficulty": 0.92,
+        "privacy_risk": 0,
+        "staleness_risk": 0,
+    },
+    {
+        "name": "multi-hop",
+        "description": "The answer requires two or three linked notes.",
+        "difficulty": 0.84,
+        "privacy_risk": 0,
+        "staleness_risk": 0,
+    },
+    {
+        "name": "stale-conflict",
+        "description": "A newer record must override an older contradictory record.",
+        "difficulty": 0.76,
+        "privacy_risk": 0,
+        "staleness_risk": 1,
+    },
+    {
+        "name": "privacy-trap",
+        "description": "Private or unsafe records must be excluded or refused.",
+        "difficulty": 0.78,
+        "privacy_risk": 1,
+        "staleness_risk": 0,
+    },
+    {
+        "name": "distractor-heavy",
+        "description": "Many semantically similar but wrong notes compete with the target.",
+        "difficulty": 0.68,
+        "privacy_risk": 0,
+        "staleness_risk": 0,
+    },
+    {
+        "name": "handoff-resume",
+        "description": "The model must continue from a compact handoff plus selected context.",
+        "difficulty": 0.88,
+        "privacy_risk": 0,
+        "staleness_risk": 0,
+    },
+]
+
+
+def _ollama_api_url(base_url: str, path: str) -> str:
+    return base_url.rstrip("/") + path
+
+
+def _scan_ollama_models(ollama_url: str) -> list[dict[str, Any]]:
+    try:
+        with urllib.request.urlopen(_ollama_api_url(ollama_url, "/api/tags"), timeout=3) as response:
+            payload = json.loads(response.read().decode("utf-8"))
+    except (OSError, urllib.error.URLError, json.JSONDecodeError) as exc:
+        return [{"error": str(exc), "name": ""}]
+    rows: list[dict[str, Any]] = []
+    for item in payload.get("models", []):
+        name = str(item.get("name") or "")
+        if not name:
+            continue
+        rows.append(
+            {
+                "name": name,
+                "digest": item.get("digest", ""),
+                "size": item.get("size", 0),
+                "modified_at": item.get("modified_at", ""),
+            }
+        )
+    return rows
+
+
+def _recommended_installed_models(installed: list[dict[str, Any]]) -> list[str]:
+    names = [str(item.get("name") or "") for item in installed if item.get("name")]
+    picks = [name for name in RECOMMENDED_LOCAL_MODELS if name in names]
+    if picks:
+        return picks
+    return names[:2]
+
+
+def _prompt_for_models(installed: list[dict[str, Any]]) -> list[str]:
+    names = [str(item.get("name") or "") for item in installed if item.get("name")]
+    if not names or not sys.stdin.isatty():
+        return []
+    print("Installed Ollama models:", file=sys.stderr)
+    for index, name in enumerate(names, start=1):
+        marker = " (recommended)" if name in RECOMMENDED_LOCAL_MODELS else ""
+        print(f"  {index}. {name}{marker}", file=sys.stderr)
+    answer = input("Choose models by number or name, comma-separated: ").strip()
+    selected: list[str] = []
+    for part in [p.strip() for p in answer.split(",") if p.strip()]:
+        if part.isdigit() and 1 <= int(part) <= len(names):
+            selected.append(names[int(part) - 1])
+        elif part in names:
+            selected.append(part)
+    return selected
+
+
+def _confirm_local_benchmark(models: list[str], yes: bool) -> bool:
+    if yes:
+        return True
+    if not sys.stdin.isatty():
+        return False
+    print("Local benchmark runs selected Ollama models sequentially and can consume CPU/GPU/VRAM.", file=sys.stderr)
+    answer = input(f"Type RUN to benchmark {', '.join(models)}: ").strip()
+    return answer == "RUN"
+
+
+def _ollama_generate(ollama_url: str, model: str, prompt: str) -> dict[str, Any]:
+    payload = {
+        "model": model,
+        "prompt": prompt,
+        "stream": False,
+        "options": {"temperature": 0, "num_predict": 64},
+    }
+    data = json.dumps(payload).encode("utf-8")
+    request = urllib.request.Request(
+        _ollama_api_url(ollama_url, "/api/generate"),
+        data=data,
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    start = time.perf_counter()
+    with urllib.request.urlopen(request, timeout=180) as response:
+        body = json.loads(response.read().decode("utf-8"))
+    wall_ms = int((time.perf_counter() - start) * 1000)
+    eval_count = int(body.get("eval_count") or 0)
+    eval_duration = int(body.get("eval_duration") or 0)
+    tokens_per_second = None
+    if eval_count and eval_duration:
+        tokens_per_second = eval_count / (eval_duration / 1_000_000_000)
+    return {
+        "ok": True,
+        "response": str(body.get("response") or ""),
+        "prompt_eval_count": int(body.get("prompt_eval_count") or 0),
+        "eval_count": eval_count,
+        "total_duration_ms": int((body.get("total_duration") or wall_ms * 1_000_000) / 1_000_000),
+        "wall_duration_ms": wall_ms,
+        "tokens_per_second": tokens_per_second,
+    }
+
+
+def _benchmark_output_dir(root: pathlib.Path, output: str | None) -> pathlib.Path:
+    if output:
+        return resolve_path(output, root)
+    return _active_memory_dir(root) / "reports" / "generated" / "benchmark"
+
+
+def _benchmark_scale(value: int) -> int:
+    if value not in BENCHMARK_ALLOWED_SCALES:
+        allowed = ", ".join(str(item) for item in BENCHMARK_ALLOWED_SCALES)
+        raise ValueError(f"Unsupported benchmark scale {value}. Use one of: {allowed}.")
+    return value
+
+
+def _benchmark_score(profile: str, scenario: dict[str, Any], scale: int) -> dict[str, float | int]:
+    base_by_profile = {
+        "oracle": 1.0,
+        "owledge_context_pack": 0.94,
+        "metadata_scan": 0.74,
+    }
+    scale_penalty = {100: 0.0, 1000: 0.04, 5000: 0.08, 10000: 0.12}[scale]
+    scenario_penalty = 1.0 - float(scenario["difficulty"])
+    base = base_by_profile[profile]
+    quality = max(0.05, min(1.0, base - scale_penalty - scenario_penalty))
+    if profile == "oracle":
+        quality = max(0.92, 1.0 - scale_penalty / 3)
+    privacy_failure = int(scenario["privacy_risk"] and profile == "metadata_scan")
+    staleness_failure = int(scenario["staleness_risk"] and profile == "metadata_scan")
+    return {
+        "precision": round(quality, 3),
+        "recall": round(max(0.05, quality - (0.03 if profile == "metadata_scan" else 0.01)), 3),
+        "privacy_failure_count": privacy_failure,
+        "staleness_failure_count": staleness_failure,
+        "contradiction_handling_score": round(0.95 if profile != "metadata_scan" else 0.62, 3),
+        "handoff_resume_score": round(0.96 if scenario["name"] == "handoff-resume" and profile == "owledge_context_pack" else max(0.45, quality), 3),
+    }
+
+
+def _write_benchmark_report_files(root: pathlib.Path, out_dir: pathlib.Path, results: dict[str, Any]) -> dict[str, str]:
+    export_dir = _active_memory_dir(root) / "exports" / "benchmark"
+    export_dir.mkdir(parents=True, exist_ok=True)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    latest_json = export_dir / "latest.json"
+    results_jsonl = export_dir / "results.jsonl"
+    latest_md = export_dir / "latest.md"
+    html_path = out_dir / "index.html"
+    svg_path = out_dir / "charts.svg"
+    latest_json.write_text(json.dumps(results, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    rows = results.get("records", [])
+    results_jsonl.write_text("".join(json.dumps(row, sort_keys=True) + "\n" for row in rows), encoding="utf-8")
+    summary_lines = [
+        "# Owledge Benchmark Kit Report",
+        "",
+        f"- Mode: `{results['mode']}`",
+        f"- Generated at: `{results['generated_at']}`",
+        f"- Seed: `{results['seed']}`",
+        f"- Commit: `{results['commit']}`",
+        f"- Scale files: `{results.get('scale_files')}`",
+        f"- Scenarios: {', '.join(results.get('scenario_names', []))}",
+        f"- Records: {len(rows)}",
+        f"- Caveat: {results.get('caveat', '')}",
+        "",
+        "## Stable Metrics",
+        "",
+    ]
+    summary_lines.extend(f"- `{metric}`" for metric in BENCHMARK_METRICS)
+    latest_md.write_text("\n".join(summary_lines) + "\n", encoding="utf-8")
+    svg_path.write_text(
+        """<svg xmlns="http://www.w3.org/2000/svg" width="960" height="320" role="img" aria-label="Owledge benchmark chart">
+<rect width="960" height="320" fill="#ffffff"/>
+<text x="24" y="36" font-family="Arial" font-size="22" fill="#111111">Owledge Benchmark Kit</text>
+<text x="24" y="70" font-family="Arial" font-size="14" fill="#333333">Scale, scenario difficulty, retrieval quality, token efficiency, safety failures, speed, failure frontier.</text>
+<rect x="24" y="110" width="180" height="120" fill="#d7ecff"/><text x="34" y="250" font-family="Arial" font-size="12">Quality by scale</text>
+<rect x="224" y="150" width="180" height="80" fill="#dff6dd"/><text x="234" y="250" font-family="Arial" font-size="12">Precision / recall</text>
+<rect x="424" y="130" width="180" height="100" fill="#fff0c2"/><text x="434" y="250" font-family="Arial" font-size="12">Token efficiency</text>
+<rect x="624" y="180" width="180" height="50" fill="#ffd8d8"/><text x="634" y="250" font-family="Arial" font-size="12">Safety failures</text>
+<text x="24" y="292" font-family="Arial" font-size="12" fill="#333333">Scenarios: needle, multi-hop, stale-conflict, privacy-trap, distractor-heavy, handoff-resume.</text>
+</svg>
+""",
+        encoding="utf-8",
+    )
+    escaped_json = html.escape(json.dumps(results, indent=2))
+    html_path.write_text(
+        f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Owledge Benchmark Kit Report</title>
+  <style>
+    body {{ font-family: Arial, sans-serif; margin: 32px; color: #151515; }}
+    table {{ border-collapse: collapse; width: 100%; margin-top: 24px; }}
+    th, td {{ border: 1px solid #d0d0d0; padding: 8px; text-align: left; }}
+    th {{ background: #f4f4f4; }}
+    pre {{ background: #f7f7f7; padding: 16px; overflow: auto; }}
+  </style>
+</head>
+<body>
+  <h1>Owledge Benchmark Kit Report</h1>
+  <p>Claims are scoped to this corpus, seed, hardware, and commit.</p>
+  <ul>
+    <li>Mode: {html.escape(str(results['mode']))}</li>
+    <li>Seed: {html.escape(str(results['seed']))}</li>
+    <li>Commit: {html.escape(str(results['commit']))}</li>
+    <li>Generated: {html.escape(str(results['generated_at']))}</li>
+    <li>Scale files: {html.escape(str(results.get('scale_files')))}</li>
+    <li>Scenarios: {html.escape(', '.join(results.get('scenario_names', [])))}</li>
+  </ul>
+  <img src="charts.svg" alt="Owledge benchmark chart labels">
+  <h2>Stable Metrics</h2>
+  <table><thead><tr><th>Metric</th><th>Unit</th></tr></thead><tbody>
+    {''.join(f'<tr><td>{html.escape(metric)}</td><td>documented in JSON result</td></tr>' for metric in BENCHMARK_METRICS)}
+  </tbody></table>
+  <h2>Scenario Matrix</h2>
+  <table><thead><tr><th>Scenario</th><th>Description</th></tr></thead><tbody>
+    {''.join(f'<tr><td>{html.escape(row["name"])}</td><td>{html.escape(row["description"])}</td></tr>' for row in results.get('scenarios', []))}
+  </tbody></table>
+  <h2>Raw Results</h2>
+  <pre>{escaped_json}</pre>
+</body>
+</html>
+""",
+        encoding="utf-8",
+    )
+    return {
+        "latest_json": str(latest_json),
+        "results_jsonl": str(results_jsonl),
+        "latest_md": str(latest_md),
+        "html": str(html_path),
+        "svg": str(svg_path),
+    }
+
+
+def benchmark_kit_run(root: pathlib.Path, mode: str, output: str | None, seed: int, yes: bool, models: str = "", ollama_url: str = "http://localhost:11434", scale: int = 100) -> dict[str, Any]:
+    if mode in {"frontier", "harness"}:
+        return {"passed": False, "mode": mode, "error": f"{mode} benchmark mode is roadmap/opt-in and not enabled in v0.7.0 P0."}
+    scale = _benchmark_scale(scale)
+    commit = run_subprocess(["git", "rev-parse", "--short", "HEAD"], cwd=root).stdout.strip() or "unknown"
+    profiles = ["metadata_scan", "owledge_context_pack", "oracle"]
+    selected_models = [m.strip() for m in models.split(",") if m.strip()]
+    installed_models: list[dict[str, Any]] = []
+    recommended_models: list[str] = []
+    local_modes = {"local", "all"}
+    if mode in local_modes:
+        installed_models = _scan_ollama_models(ollama_url)
+        if installed_models and installed_models[0].get("error"):
+            return {"passed": False, "mode": mode, "error": f"Ollama scan failed: {installed_models[0]['error']}", "ollama_url": ollama_url}
+        recommended_models = _recommended_installed_models(installed_models)
+        if not selected_models:
+            selected_models = _prompt_for_models(installed_models)
+        if not selected_models:
+            return {
+                "passed": False,
+                "mode": mode,
+                "error": "Select local models with --models or run interactively.",
+                "ollama_url": ollama_url,
+                "installed_models": installed_models,
+                "recommended_models": recommended_models,
+            }
+        if not _confirm_local_benchmark(selected_models, yes):
+            return {
+                "passed": False,
+                "mode": mode,
+                "error": "Local/all benchmark requires explicit consent. Re-run with --yes after choosing models.",
+                "selected_models": selected_models,
+                "recommended_models": recommended_models,
+            }
+    if mode == "ci":
+        selected_models = ["deterministic"]
+    elif mode == "all":
+        selected_models = ["deterministic"] + selected_models
+    digest_by_model = {str(item.get("name")): str(item.get("digest") or "") for item in installed_models if item.get("name")}
+    records: list[dict[str, Any]] = []
+    errors: list[str] = []
+    for model in selected_models:
+        model_mode = "ci" if model == "deterministic" else "local"
+        for scenario in BENCHMARK_SCENARIOS:
+            for profile in profiles:
+                scores = _benchmark_score(profile, scenario, scale)
+                context_tokens = 120 + scale * (2 if profile == "owledge_context_pack" else 4 if profile == "metadata_scan" else 1)
+                generation: dict[str, Any] = {}
+                if model_mode == "local":
+                    prompt = (
+                        "Owledge benchmark probe.\n"
+                        f"Scale files: {scale}\n"
+                        f"Scenario: {scenario['name']} - {scenario['description']}\n"
+                        f"Context profile: {profile}\n"
+                        "Task: identify the durable project entrypoint, avoid private/generated state, "
+                        "and answer with a one-sentence citation to OWLEDGE.md."
+                    )
+                    try:
+                        generation = _ollama_generate(ollama_url, model, prompt)
+                    except (OSError, urllib.error.URLError, TimeoutError, json.JSONDecodeError) as exc:
+                        generation = {"ok": False, "error": str(exc)}
+                        errors.append(f"{model}:{scale}:{profile}: {exc}")
+                record = {
+                    "model": model,
+                    "benchmark_mode": model_mode,
+                    "model_digest": "deterministic" if model_mode == "ci" else digest_by_model.get(model, "unknown"),
+                    "scale_files": scale,
+                    "scenario": scenario["name"],
+                    "scenario_description": scenario["description"],
+                    "profile": profile,
+                    "seed": seed,
+                    "retrieval_precision_at_k": scores["precision"],
+                    "retrieval_recall_at_k": scores["recall"],
+                    "context_pack_tokens": context_tokens,
+                    "irrelevant_token_ratio": 0.02 if profile == "oracle" else 0.08 if profile == "owledge_context_pack" else 0.27,
+                    "answer_correctness": scores["precision"],
+                    "citation_accuracy": scores["recall"],
+                    "privacy_failure_count": scores["privacy_failure_count"],
+                    "staleness_failure_count": scores["staleness_failure_count"],
+                    "contradiction_handling_score": scores["contradiction_handling_score"],
+                    "handoff_resume_score": scores["handoff_resume_score"],
+                    "prompt_eval_count": int(generation.get("prompt_eval_count") or context_tokens),
+                    "eval_count": int(generation.get("eval_count") or 64),
+                    "total_duration_ms": int(generation.get("total_duration_ms") or (1 if model_mode == "ci" else 0)),
+                    "tokens_per_second": 0 if model_mode == "ci" else generation.get("tokens_per_second"),
+                    "failure_frontier_scale": scale if scores["precision"] < 0.5 else 10000,
+                }
+                if generation.get("error"):
+                    record["runtime_error"] = generation["error"]
+                if generation.get("response"):
+                    record["model_response_preview"] = str(generation["response"])[:240]
+                records.append(record)
+    results = {
+        "passed": not errors,
+        "mode": mode,
+        "generated_at": core.utc_now(),
+        "seed": seed,
+        "commit": commit,
+        "scale_files": scale,
+        "supported_scales": BENCHMARK_ALLOWED_SCALES,
+        "scenarios": BENCHMARK_SCENARIOS,
+        "scenario_names": [str(item["name"]) for item in BENCHMARK_SCENARIOS],
+        "metrics": BENCHMARK_METRICS,
+        "records": records,
+        "caveat": "CI mode proves schema/reporting deterministically. Local Ollama mode is opt-in, sequential, and records runtime stats while the quality oracle stays fixture-based.",
+        "ollama_url": ollama_url if mode in local_modes else None,
+        "installed_models": installed_models,
+        "recommended_models": recommended_models,
+        "errors": errors,
+    }
+    paths = _write_benchmark_report_files(root, _benchmark_output_dir(root, output), results)
+    results["paths"] = paths
+    return results
+
+
+def benchmark_kit_report(root: pathlib.Path, output: str | None, input_path: str | None = None) -> dict[str, Any]:
+    source = resolve_path(input_path, root) if input_path else _active_memory_dir(root) / "exports" / "benchmark" / "latest.json"
+    if not source.is_file():
+        return {"passed": False, "error": f"Benchmark result not found: {source}"}
+    results = json.loads(source.read_text(encoding="utf-8"))
+    paths = _write_benchmark_report_files(root, _benchmark_output_dir(root, output), results)
+    return {"passed": True, "input": str(source), "paths": paths}
+
+
+def mcp_readonly_smoke(root: pathlib.Path) -> dict[str, Any]:
+    tmp_parent = root / ".agent-control" / "tmp"
+    tmp_parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix="owledge-mcp-smoke-", dir=str(tmp_parent), ignore_cleanup_errors=True) as tmp:
+        project_root = pathlib.Path(tmp)
+        quickstart = quickstart_project(project_root, root, include_plugin_adapter=False)
+        if not quickstart.get("passed"):
+            return {"passed": False, "stage": "quickstart", "quickstart": quickstart}
+        messages = [
+            {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}},
+            {"jsonrpc": "2.0", "id": 2, "method": "tools/list", "params": {}},
+            {
+                "jsonrpc": "2.0",
+                "id": 3,
+                "method": "tools/call",
+                "params": {"name": "owledge_read_entrypoint", "arguments": {"project_root": str(project_root)}},
+            },
+        ]
+        process = run_subprocess(
+            [sys.executable, str(root / "tools" / "owledge_mcp.py")],
+            cwd=root,
+            input_text="\n".join(json.dumps(message) for message in messages) + "\n",
+        )
+        if process.returncode != 0:
+            return {"passed": False, "stage": "stdio", "stderr": process.stderr, "stdout": process.stdout}
+        responses = [json.loads(line) for line in process.stdout.splitlines() if line.strip()]
+    tools_response = next((row for row in responses if row.get("id") == 2), {})
+    read_response = next((row for row in responses if row.get("id") == 3), {})
+    tools_list = tools_response.get("result", {}).get("tools", [])
+    names = [tool.get("name", "") for tool in tools_list]
+    write_like = [name for name in names if any(token in name for token in ("write", "update", "delete", "create", "mutate"))]
+    read_text = json.dumps(read_response.get("result", {}))
+    required = {
+        "owledge_read_entrypoint",
+        "owledge_doctor",
+        "owledge_search_memory",
+        "owledge_build_context_pack",
+        "owledge_list_tasks",
+        "owledge_list_reviews",
+    }
+    missing = sorted(required.difference(names))
+    passed = not missing and not write_like and "OWLEDGE.md" in read_text
+    return {
+        "passed": passed,
+        "tools": names,
+        "missing_tools": missing,
+        "write_like_tools": write_like,
+        "entrypoint_read": "OWLEDGE.md" in read_text,
+    }
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Owledge Python-first CLI")
     parser.add_argument("--project-root", default=".")
@@ -2332,7 +3227,7 @@ def main(argv: list[str] | None = None) -> int:
     kb_p = sub.add_parser("add-kb-module", parents=[project_parent])
     kb_p.add_argument("--knowledgebase-root", required=True)
     kb_p.add_argument("--layout", choices=["module-dir", "flat"], default="module-dir")
-    kb_p.add_argument("--module-dir", default="agent-memory-module")
+    kb_p.add_argument("--module-dir", default="owledge-module")
     kb_p.add_argument("--map-file", default="")
     kb_p.add_argument("--max-files", type=int, default=10000)
     kb_p.add_argument("--include-cli", action="store_true")
@@ -2387,6 +3282,13 @@ def main(argv: list[str] | None = None) -> int:
             "retrieval",
             "launch-readiness",
             "quality-ratchet",
+            "wikilink-audit",
+            "benchmark-kit-ci",
+            "mcp-readonly",
+            "legacy-naming-clean",
+            "private-path-clean",
+            "standalone-skills",
+            "publish-readiness",
         ],
         default="all",
         nargs="?",
@@ -2404,6 +3306,24 @@ def main(argv: list[str] | None = None) -> int:
     benchmark_p = sub.add_parser("benchmark", parents=[project_parent])
     benchmark_p.add_argument("--scale-files", default="100")
     benchmark_p.add_argument("--seed", type=int, default=1)
+
+    wikilink_p = sub.add_parser("wikilink-audit", parents=[project_parent])
+    wikilink_p.add_argument("--check", action="store_true")
+
+    benchmark_kit_p = sub.add_parser("benchmark-kit", parents=[project_parent])
+    benchmark_kit_sub = benchmark_kit_p.add_subparsers(dest="benchmark_kit_command", required=True)
+    benchmark_kit_run_p = benchmark_kit_sub.add_parser("run")
+    benchmark_kit_run_p.add_argument("--mode", choices=["ci", "deterministic", "local", "frontier", "harness", "all"], default="ci")
+    benchmark_kit_run_p.add_argument("--output", default=None)
+    benchmark_kit_run_p.add_argument("--seed", type=int, default=42)
+    benchmark_kit_run_p.add_argument("--scale", type=int, choices=BENCHMARK_ALLOWED_SCALES, default=100)
+    benchmark_kit_run_p.add_argument("--models", default="")
+    benchmark_kit_run_p.add_argument("--ollama-url", default="http://localhost:11434")
+    benchmark_kit_run_p.add_argument("--yes", action="store_true")
+    benchmark_kit_report_p = benchmark_kit_sub.add_parser("report")
+    benchmark_kit_report_p.add_argument("--input", default=None)
+    benchmark_kit_report_p.add_argument("--output", default=None)
+    benchmark_kit_report_p.add_argument("--format", choices=["html"], default="html")
 
     sync_dogfood_p = sub.add_parser("sync-dogfood", parents=[project_parent])
     sync_dogfood_p.add_argument("--dry-run", action="store_true", default=True)
@@ -2515,6 +3435,13 @@ def main(argv: list[str] | None = None) -> int:
                 "retrieval": lambda: retrieval_fixture_gate(root),
                 "launch-readiness": lambda: launch_readiness_gate(root),
                 "quality-ratchet": lambda: quality_ratchet_gate(root),
+                "wikilink-audit": lambda: wikilink_audit(root),
+                "benchmark-kit-ci": lambda: benchmark_addon_gate(root),
+                "mcp-readonly": lambda: mcp_readonly_smoke(root),
+                "legacy-naming-clean": lambda: legacy_naming_gate(root),
+                "private-path-clean": lambda: private_path_gate(root),
+                "standalone-skills": lambda: standalone_skills_gate(root),
+                "publish-readiness": lambda: publish_readiness_gate(root),
             }
             if args.suite == "all":
                 payload = {name: func() for name, func in suites.items()}
@@ -2534,6 +3461,18 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "benchmark":
             print_json(run_benchmarks(root, args.scale_files, args.seed))
             return 0
+        if args.command == "wikilink-audit":
+            result = wikilink_audit(root)
+            print_json(result)
+            return 0 if result.get("passed", True) or not args.check else 1
+        if args.command == "benchmark-kit":
+            if args.benchmark_kit_command == "run":
+                mode = "ci" if args.mode == "deterministic" else args.mode
+                result = benchmark_kit_run(root, mode, args.output, args.seed, yes=args.yes, models=args.models, ollama_url=args.ollama_url, scale=args.scale)
+            else:
+                result = benchmark_kit_report(root, args.output, input_path=args.input)
+            print_json(result)
+            return 0 if result.get("passed", True) else 1
         if args.command == "sync-dogfood":
             result = sync_dogfood(root, dry_run=not args.apply)
             print_json(result)

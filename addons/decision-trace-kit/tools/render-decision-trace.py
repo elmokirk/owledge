@@ -111,8 +111,8 @@ def source_hash(path: pathlib.Path) -> str:
 
 
 def candidate_paths(root: pathlib.Path) -> list[pathlib.Path]:
-    paths = [root / "PROJECT_CONTEXT.md"]
-    memory_root = root / "agent-memory"
+    paths = [root / "OWLEDGE.md"]
+    memory_root = root / ".owledge"
     if memory_root.exists():
         paths.extend(memory_root.rglob("*.md"))
     return [path for path in paths if path.exists() and not (EXCLUDED_PARTS & set(path.parts))]
@@ -324,14 +324,14 @@ def main() -> int:
     parser.add_argument("--shared", action="store_true")
     args = parser.parse_args()
     root = pathlib.Path(args.project_root).resolve()
-    trace_dir = root / "agent-memory" / "decision-trace"
-    report_dir = root / "agent-memory" / "reports" / "decision-trace"
+    trace_dir = root / ".owledge" / "decision-trace"
+    report_dir = root / ".owledge" / "reports" / "decision-trace"
     trace_dir.mkdir(parents=True, exist_ok=True)
     report_dir.mkdir(parents=True, exist_ok=True)
     trace = build_trace(root, args.shared)
     (trace_dir / "trace.json").write_text(json.dumps(trace, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
     (report_dir / "index.html").write_text(render_html(trace), encoding="utf-8", newline="\n")
-    print(json.dumps({"trace": "agent-memory/decision-trace/trace.json", "html": "agent-memory/reports/decision-trace/index.html", "nodes": trace["metrics"]["node_count"], "edges": trace["metrics"]["edge_count"]}, indent=2, sort_keys=True))
+    print(json.dumps({"trace": ".owledge/decision-trace/trace.json", "html": ".owledge/reports/decision-trace/index.html", "nodes": trace["metrics"]["node_count"], "edges": trace["metrics"]["edge_count"]}, indent=2, sort_keys=True))
     return 0
 
 

@@ -1,14 +1,16 @@
 # Distribution And Release Path
 
 Owledge should be easy to try without making the core larger. Distribution is a
-wrapper around the existing local Python CLI and Markdown-first contract.
+wrapper around the local Python CLI and Markdown-first contract.
 
 ## Supported Install Shapes
 
 | Shape | Status | Purpose |
 | --- | --- | --- |
+| `uvx owledge` | Preferred | One-command agent/harness execution without a persistent install. |
+| `uv tool install owledge` | Preferred | Repeated local CLI use after publishing to PyPI. |
 | Source checkout | Supported | Development and local kit publishing. |
-| `pipx install owledge` | Packaging-ready | Preferred public CLI path after publishing to PyPI. |
+| `pipx install owledge` | Supported | Alternative persistent CLI path. |
 | GitHub release ZIP | Recommended | Offline-friendly release artifact with checksums. |
 | Runtime plugin folders | Supported locally | Claude/Cowork/Codex-compatible adapter files. |
 
@@ -28,8 +30,11 @@ engine, database, daemon, or hosted service.
 - Publish from a clean tag matching `VERSION`.
 - Run `python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports`.
 - Run `python tools/owledge.py test launch-readiness --project-root .`.
+- Run `python tools/owledge.py wikilink-audit --project-root . --check`.
+- Install the optional `benchmark-kit` add-on and run `python tools/benchmark-kit/run-benchmark-kit.py --mode ci --scale-mode small --yes`.
 - Build source and wheel distributions.
-- Attach release ZIP and checksum files.
+- Smoke the wheel with `uvx --from dist/<wheel> owledge quickstart --target <tmp>`.
+- Attach release ZIP and checksum files when publishing GitHub artifacts.
 - Link CI workflow runs from the release notes.
 - Keep raw sessions, generated local reports, temp outputs, and private memory out of release artifacts.
 
@@ -38,13 +43,13 @@ engine, database, daemon, or hosted service.
 The first screen should lead with:
 
 1. What problem Owledge solves.
-2. Install or try path.
+2. `uvx` or `uv tool install` path.
 3. The 5-minute demo.
 4. Trust boundaries.
-5. Extension model.
+5. Extension model and roadmap boundaries.
 
-The source-checkout path remains valid, but it should not be the only public
-onboarding route once packages are published.
+The source-checkout path remains valid, but public onboarding should be
+uv-first.
 
 ## Release Artifact Policy
 
@@ -69,9 +74,13 @@ Release artifacts must not include:
 This repository contains two distinct memory trees:
 
 | Directory | Purpose | Shipped to users? |
-|-----------|---------|-------------------|
-| `templates/agent-memory/` | Pristine product source: schemas, templates, structural `.gitkeep` | Yes — via `init-project`, `build-project-kit`, and sdist |
-| `internal/agent-memory/` | Maintainers' live dogfood: decision traces, compiled snapshots, generated indexes, red-team reports, benchmarks | No — excluded from sdist and release ZIPs |
+| --- | --- | --- |
+| `templates/owledge/` | Pristine product source: schemas, templates, structural `.gitkeep` files | Yes, via `quickstart`, `init-project`, `build-project-kit`, wheel, and sdist |
+| `internal/owledge/` | Maintainers' live dogfood workspace: plans, sessions, generated indexes, reports, and release evidence | No, excluded from sdist and release ZIPs |
 
-A CI `kit-integrity` gate verifies that built kits contain zero files from the dogfood tree. A `sdist-clean` gate verifies the PyPI source distribution contains no `internal/` paths, no non-addon `agent-memory/decision-trace/` dogfood, and includes the required root release docs (CHANGELOG, CONTRIBUTING, README, LICENSE, SECURITY, PRIVACY, VERSION) plus the core product trees (`templates/`, `skills/`, `tools/`, `addons/`). A `source-vs-target-audit` gate verifies `templates/agent-memory/` has all core directories and no leaked dogfood.
-
+A CI `kit-integrity` gate verifies that built kits contain zero files from the
+dogfood tree. A `sdist-clean` gate verifies that the PyPI source distribution
+contains no `internal/` paths, no non-addon dogfood decision traces, and all
+required root release docs plus the core product trees. A
+`source-vs-target-audit` gate verifies `templates/owledge/` has all core
+directories and no leaked dogfood.

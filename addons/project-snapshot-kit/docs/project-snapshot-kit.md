@@ -5,10 +5,10 @@ local project cockpit without making dashboard output canonical memory.
 
 ## What It Adds
 
-- reusable Markdown snapshots under `agent-memory/compiled/`
-- a project snapshot profile under `agent-memory/project-snapshot/`
-- a durable planning folder under `agent-memory/plans/`
-- static HTML reports under `agent-memory/reports/project-site/`
+- reusable Markdown snapshots under `.owledge/compiled/`
+- a project snapshot profile under `.owledge/project-snapshot/`
+- a durable planning folder under `.owledge/plans/`
+- static HTML reports under `.owledge/reports/project-site/`
 - source-hash and token-estimate metadata in a generated manifest
 
 ## Rules

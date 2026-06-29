@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "description": "Optional pilot benchmark metrics and static chart views for Owledge quality evidence.",
   "install_directories": [
-    "agent-memory/pilot-benchmark",
-    "agent-memory/reports/pilot-benchmark",
+    ".owledge/pilot-benchmark",
+    ".owledge/reports/pilot-benchmark",
     "tools/pilot-benchmark"
   ],
   "install_files": [
@@ -14,15 +14,15 @@
     },
     {
       "source": "fixtures/benchmark-latest.json",
-      "target": "agent-memory/pilot-benchmark/fixtures/benchmark-latest.json"
+      "target": ".owledge/pilot-benchmark/fixtures/benchmark-latest.json"
     },
     {
       "source": "fixtures/retrieval-eval.json",
-      "target": "agent-memory/pilot-benchmark/fixtures/retrieval-eval.json"
+      "target": ".owledge/pilot-benchmark/fixtures/retrieval-eval.json"
     },
     {
       "source": "fixtures/finalization-summary.json",
-      "target": "agent-memory/pilot-benchmark/fixtures/finalization-summary.json"
+      "target": ".owledge/pilot-benchmark/fixtures/finalization-summary.json"
     },
     {
       "source": "tools/render-pilot-benchmark.py",
@@ -30,6 +30,6 @@
     }
   ],
   "gitignore": [
-    "agent-memory/reports/pilot-benchmark/"
+    ".owledge/reports/pilot-benchmark/"
   ]
 }

@@ -13,10 +13,10 @@ from typing import Any
 
 
 DEFAULT_BENCHMARK = "benchmarks/results/latest.json"
-DEFAULT_RETRIEVAL = "agent-memory/exports/retrieval-eval/retrieval-eval.json"
-DEFAULT_FINALIZATION = "agent-memory/exports/finalization-gates/quality-ratchet-summary.json"
-DEFAULT_FINALIZATION_ALT = "agent-memory/exports/finalization-gates/latest.json"
-DEFAULT_OUT_DIR = "agent-memory/reports/pilot-benchmark"
+DEFAULT_RETRIEVAL = ".owledge/exports/retrieval-eval/retrieval-eval.json"
+DEFAULT_FINALIZATION = ".owledge/exports/finalization-gates/quality-ratchet-summary.json"
+DEFAULT_FINALIZATION_ALT = ".owledge/exports/finalization-gates/latest.json"
+DEFAULT_OUT_DIR = ".owledge/reports/pilot-benchmark"
 
 
 @dataclass(frozen=True)

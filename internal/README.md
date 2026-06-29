@@ -16,15 +16,15 @@ to users.
 
 ```bash
 # Dogfood health check
-python tools/agent_memory_cli.py --project-root internal doctor --mode host
+python tools/owledge_core.py --project-root internal doctor --mode host
 
-# Full finalization gates (auto-detects internal/agent-memory/ for memory ops)
+# Full finalization gates (auto-detects internal/owledge/ for memory ops)
 python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports
 
-# Red-team QA (auto-detects internal/agent-memory/)
+# Red-team QA (auto-detects internal/owledge/)
 python tools/owledge.py redteam-qa --project-root .
 
-# Benchmarks (auto-detects internal/agent-memory/)
+# Benchmarks (auto-detects internal/owledge/)
 python tools/owledge.py benchmark --project-root . --scale-files 100 --seed 1
 ```
 
@@ -36,14 +36,14 @@ directory is the only place generated dogfood content should accumulate.
 
 ## Keeping dogfood in sync
 
-The `internal/agent-memory/templates/` tree must mirror `templates/agent-memory/templates/`
+The `internal/owledge/templates/` tree must mirror `templates/owledge/templates/`
 (one-way: product source -> dogfood). Dogfood-only artifacts (decisions, sessions, evidence,
 handoffs, decision-trace) are NOT synced and live only in `internal/`.
 
 Check for drift:
 
 ```bash
-python tools/agent_memory_cli.py --project-root . dogfood-sync-check
+python tools/owledge_core.py --project-root . dogfood-sync-check
 ```
 
 Reconcile drift:

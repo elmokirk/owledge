@@ -8,10 +8,10 @@ Use when the user asks what agents did, how delegation progressed, how many sess
 
 Prefer:
 
-- `agent-memory/sessions/`
-- `agent-memory/compiled/`
-- `agent-memory/evidence/`
-- `agent-memory/handoffs/`
+- `.owledge/sessions/`
+- `.owledge/compiled/`
+- `.owledge/evidence/`
+- `.owledge/handoffs/`
 - simulation or eval reports when present
 
 ## Sections

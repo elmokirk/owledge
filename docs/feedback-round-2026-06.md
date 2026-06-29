@@ -17,7 +17,7 @@ refactor (`3440e30`).
 
 - **Source:** Q1, Q3, vibe-coder persona, influencer persona
 - **Problem:** The refactor made the sdist clean (zero `internal/` paths, zero
-  root `agent-memory/`), but `pip install owledge` does not work yet. Users must
+  root `.owledge/`), but `pip install owledge` does not work yet. Users must
   `git clone` and run from source. This is the single biggest adoption blocker.
 - **Action:** Publish `owledge` to PyPI. The `pyproject.toml` already declares
   the `owledge` console script. `MANIFEST.in` includes `templates/` and excludes
@@ -31,7 +31,7 @@ refactor (`3440e30`).
 - **Source:** Q3
 - **Problem:** When integrating Owledge into an existing project, there is no
   single SOTA copy-paste block a user can paste into their `AGENTS.md` or
-  `CLAUDE.md`. The `agent-memory-principles` skill exists, but users who do not
+  `CLAUDE.md`. The `owledge-principles` skill exists, but users who do not
   use the skills path need a self-contained block.
 - **Action:** Create `docs/agents-md-integration-block.md` with a tested,
   self-contained paste block that covers: read order, memory layers, MVP plan
@@ -75,11 +75,11 @@ refactor (`3440e30`).
 ### FB-005: Project abstract + project mode (PoC/MVP/Side/SaaS)
 
 - **Source:** Q10b
-- **Problem:** `PROJECT_CONTEXT.md` has goals and a decision log, but no forced
+- **Problem:** `OWLEDGE.md` has goals and a decision log, but no forced
   one-paragraph project abstract combining goals + roadmap. There is no project
   mode selector (PoC, MVP, side project, SaaS) to set planning discipline depth.
 - **Action:** Add a `project_abstract` field and `project_mode` field to
-  `PROJECT_CONTEXT.md`. The mode determines planning rigor: PoC = minimal
+  `OWLEDGE.md`. The mode determines planning rigor: PoC = minimal
   plan, MVP = full MVP cutline, side project = lightweight, SaaS = full abstract
   + metrics + compliance notes. The `mvp-plan-example.md` template gets a
   `## Project Abstract` section and a `## Success Metrics` section.
@@ -127,7 +127,7 @@ refactor (`3440e30`).
 - **Problem:** Owledge does not have a harness-specific plan detection
   mechanism. It uses a Markdown contract: a plan is "done" when its task(s)
   reach `status: done` and the required `qa_gate_ids` have passing
-  `gate_reports` (`agent_memory_cli.py:1271-1279`). This is harness-agnostic but
+  `gate_reports` (`owledge_core.py:1271-1279`). This is harness-agnostic but
   not documented as a contract.
 - **Action:** Document the completion contract in the planning-layer skill and
   `docs/mvp-plan-example.md`: `status: done` + `acceptance_criteria` met + QA
@@ -139,11 +139,11 @@ refactor (`3440e30`).
 ### FB-009: Idea-duplicate handling + permission modes
 
 - **Source:** Q8
-- **Problem:** When an idea already exists (`agent-memory/ideas/`), the
+- **Problem:** When an idea already exists (`.owledge/ideas/`), the
   `ideation-workflow.md` says agents should "check ideas before drafting new
   plans" and "add `similar_to` edges" but does not define whether the agent asks
   the user or just links it. There is no permission toggle.
-- **Action:** Add a `planning_mode` field to `PROJECT_CONTEXT.md` with three
+- **Action:** Add a `planning_mode` field to `OWLEDGE.md` with three
   values: `supervised` (agent asks before linking/integrating existing ideas),
   `approve-automatically` (agent links and logs without asking), `full-access`
   (agent can promote ideas into tasks without asking). Default is `supervised`.
@@ -170,12 +170,12 @@ refactor (`3440e30`).
 ### FB-011: Idea-to-project pipeline
 
 - **Source:** Q10c
-- **Problem:** Ideas are captured in `agent-memory/ideas/` and
+- **Problem:** Ideas are captured in `.owledge/ideas/` and
   `global-memory/ideas/`, but there is no pipeline to filter, prioritize, and
   scaffold a new project from a promoted idea.
 - **Action:** Add an `owlib ideas` subcommand that lists ideas across project
   and global scope, sorted by signal strength. Add an `owlib ideas promote`
-  command that scaffolds a new `PROJECT_CONTEXT.md` from a promoted idea with
+  command that scaffolds a new `OWLEDGE.md` from a promoted idea with
   the idea's `concept_tags`, `problem_patterns`, and source links pre-filled.
 - **Priority:** P3
 - **Acceptance:** A user can run `owlib ideas --scope global` and see a
@@ -210,7 +210,7 @@ refactor (`3440e30`).
 - **Action:**
   1. Add a `ticket-board` command to `owledge.py` that renders a read-only
      Markdown board grouped by `status` column with priority sorting within each
-     column. Source: all `task-card` frontmatter in `agent-memory/`.
+     column. Source: all `task-card` frontmatter in `.owledge/`.
   2. Add a timeline view (tasks sorted by `updated_at` or due date).
   3. Add a frontmatter sync hook/script that reliably updates `status` → `done`
      when acceptance criteria + QA gates pass. Wire it as an Owledge hook for
@@ -226,7 +226,7 @@ refactor (`3440e30`).
 
 - **Source:** Feature idea 2
 - **Connects to:** Already partially implemented —
-  `plugins/agent-memory-cowork/.claude-plugin/plugin.json` and
+  `plugins/owledge-cowork/.claude-plugin/plugin.json` and
   `.codex-plugin/plugin.json` both exist with `hooks`, `commands`, `agents`,
   `skills`. `hooks.json` wires 8 lifecycle hooks (SessionStart, UserPromptSubmit,
   PostToolUse, PostToolUseFailure, PreCompact, PostCompact, Stop, SessionEnd).
@@ -316,7 +316,7 @@ refactor (`3440e30`).
     required (at least 3 with decision rules), compliance notes, and trust
     readiness check. Target: "ship and charge for it."
 - **Priority:** P1
-- **Acceptance:** `PROJECT_CONTEXT.template.md` has a `project_mode` field with
+- **Acceptance:** `OWLEDGE.template.md` has a `project_mode` field with
   the 4 modes documented inline. A new user reading the template understands
   which mode to pick without external docs.
 
@@ -338,7 +338,7 @@ refactor (`3440e30`).
      uncheck and redo the phase.
   3. Subagents check their own boxes before returning to the orchestrator.
   4. The checkbox is a navigation aid, not an audit record; the phase's QA
-     gate output (committed to `internal/agent-memory/exports/`) is the
+     gate output (committed to `internal/owledge/exports/`) is the
      durable evidence.
   5. A new gate `test_planning_conventions.py::test_plan_has_continuity_checklists`
      enforces the convention on multi-phase plans.
@@ -351,7 +351,7 @@ refactor (`3440e30`).
 
 ### FB-019: Deferred P2 polish batch from v0.6.1 red-team
 
-- **Source:** v0.6.1 red-team `internal/agent-memory/decisions/red-team-v0.6.1-pr.md`
+- **Source:** v0.6.1 red-team `internal/owledge/decisions/red-team-v0.6.1-pr.md`
   (P2-16..P2-21)
 - **Connects to:** IDEA-2026-006-18
 - **Problem:** Six P2 polish items were identified but deferred to keep the

@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "GraphRagNode",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "label", "type", "metadata", "source_path"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^mem:" },
+    "label": { "type": "string" },
+    "type": { "type": "string" },
+    "metadata": { "type": "object" },
+    "source_path": { "type": "string" }
+  }
+}

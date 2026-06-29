@@ -2,7 +2,70 @@
 
 ## Current Release Goal
 
-Publish v0.5 as a project-ready Markdown-first Agent Memory Kit with lifecycle checks, retrieval calibration, runtime smoke tests, red-team QA, and a minimal project-folder-only setup path.
+Publish v0.7.0 as an international, package-first Owledge release for power users, AI creators, agent builders, and teams.
+
+Public contract:
+
+- `.owledge/` is the canonical project memory folder.
+- `OWLEDGE.md` is the visible project and agent entrypoint.
+- Public docs are uv-first.
+- Read-only MCP, Wikilink Audit, Native Planning Layers, and Benchmark Kit V2 are P0.
+- Harness benchmarks, write-enabled MCP, Hermes, RAG engine integrations, cloud/frontier benchmark matrices, and marketplace certification are roadmap items until implemented and benchmarked.
+
+## Release Board
+
+| Status | Ticket | Feature | DoD | Target |
+| --- | --- | --- | --- | --- |
+| Done | REL-001 | `.owledge/` foundation | New quickstarts and generated kits create `.owledge/` plus `OWLEDGE.md`; contracts validate the v0.7 surface. | v0.7.0 |
+| Done | REL-002 | Package-first install | Wheel/sdist package data includes templates, tools, plugins, add-ons, and standalone skills; `uvx`/wheel smoke paths are documented. | v0.7.0 |
+| Done | REL-003 | Owledge naming cut | Active public docs, plugin paths, skills, package metadata, and workflows use Owledge naming; legacy names are only migration/archive context. | v0.7.0 |
+| Done | REL-004 | Read-only MCP | `tools/owledge_mcp.py` exposes entrypoint, doctor, search, context-pack, tasks, and reviews without write tools; MCP smoke gate passes. | v0.7.0 |
+| Done | REL-005 | Wikilink Audit | `owledge wikilink-audit --check` reports valid, broken, and ambiguous wiki links without rewriting Markdown. | v0.7.0 |
+| Done | REL-006 | Native planning layers | Reviews, audiences, research, and brainstorm candidate layers exist under `.owledge/` and ship with templates/skills. | v0.7.0 |
+| Done | REL-007 | Benchmark Kit Add-on | Optional `benchmark-kit` add-on supports `small`, `mid`, and `large` real Markdown fixture simulations, retrieval challenge scenarios, sequential Ollama local runs, and JSON/MD/HTML/SVG outputs. | v0.7.0 |
+| Done | REL-008 | Standalone skills | `standalone-skills/` ships independently usable blindspot audit, agentic review, brainstorm, and planning-layer skills with manifest and install notes. | v0.7.0 |
+| Done | REL-009 | Release gates and CI | CI and local gates check naming, public docs, release trust, launch readiness, MCP read-only, Wikilinks, Benchmark Kit CI, standalone skills, contracts, and publish readiness. | v0.7.0 |
+| In progress | REL-010 | Final publishing docs | README, docs index, quickstart, command reference, roadmap, changelog, troubleshooting, Mermaid workflows, plugin docs, and benchmark docs match the implemented v0.7 surface. | v0.7.0 |
+| Planned | POST-001 | Final release artifact cut | Run build, wheel/sdist checks, uvx smoke, final release notes, tag discipline, and artifact inspection before publishing. | v0.7.0 final |
+| Planned | POST-002 | CLI UX simplification | Add short commands such as `owledge init`, `owledge add benchmark-kit`, and `owledge benchmark local` while preserving explicit script paths. | v0.7.1 |
+| Planned | POST-003 | Agent-native runtime contract | Define a compact runtime contract for session start, context-pack loading, task/handoff discovery, hook events, and token-aware read order across harnesses. | v0.8.0 |
+| Planned | POST-004 | PI Agent runtime adapter | Evaluate and implement PI Agent as a lightweight Owledge runtime lane only if it can preserve `.owledge/` as source of truth and pass conformance gates. | v0.8.0 |
+| Planned | POST-005 | Harness benchmarks | Benchmark Claude Code, Codex, OpenCode, Cursor, and Zed with local/cloud model setups and clear caveats. | v0.8.x |
+| Planned | POST-006 | Own-vault benchmark mode | Extend the optional Benchmark Kit to run privacy-safe measurements against a user's existing Owledge vault. | v0.8.x |
+| Planned | POST-007 | Write-enabled MCP | Add scoped write tools with locks, privacy checks, review requirements, and audit artifacts. | v0.9.0 |
+| Planned | POST-008 | Cloud/frontier benchmark matrix | Extend Benchmark Kit to Ollama Cloud/frontier/local-hosted models with cost and resource warnings. | v0.9.x |
+| Planned | POST-009 | RAG integrations | Export Owledge's canonical Markdown layer to Mem0, Graphiti, LlamaIndex, vector DBs, or enterprise RAG systems. | v0.9.x |
+| Planned | POST-010 | Hermes adapter | Ship only when SOUL.md, project context, memory rules, runtime hooks, docs, and tests can land together. | Post-v0.9 |
+| Planned | POST-011 | Marketplace certification | Claim marketplace readiness only after standards, manifests, screenshots, install flows, and review gates are complete. | Post-v0.9 |
+
+## Shipped In v0.7.0 Pre-Release
+
+| Priority | Area | Outcome |
+| --- | --- | --- |
+| P0 | `.owledge` foundation | New quickstarts and generated kits create `.owledge/` plus `OWLEDGE.md`; contracts validate the v0.7 surface. |
+| P0 | Package-first install | Docs and release workflows validate `uvx`/wheel smoke paths. |
+| P0 | Read-only MCP | `tools/owledge_mcp.py` exposes entrypoint, doctor, search, context-pack, tasks, and reviews without write tools. |
+| P0 | Wikilink Audit | `owledge wikilink-audit --check` validates valid, broken, and ambiguous wiki links without rewriting Markdown. |
+| P0 | Native planning layers | Reviews, audiences, research, and brainstorm candidate templates are first-class `.owledge` layers. |
+| P0 | Benchmark Kit Add-on | Optional deterministic CI mode and opt-in sequential Ollama local mode emit JSON/MD/HTML/SVG reports with stable metrics from real synthetic Markdown fixtures. |
+| P0 | CI release gates | CI now checks v0.7 contracts, Wikilink Audit, Benchmark Kit CI, read-only MCP, and fresh `.owledge` installs. |
+
+## Deferred After v0.7.0
+
+| Priority | Area | Outcome |
+| --- | --- | --- |
+| P0 | Final release artifact cut | Run build, wheel/sdist checks, uvx smoke, final release notes, tag discipline, and artifact inspection before publishing. |
+| P1 | CLI UX simplification | Add short commands such as `owledge init`, `owledge add benchmark-kit`, and `owledge benchmark local`. |
+| P1 | Agent-native runtime contract | Define token-aware read order, hook events, context-pack loading, handoff discovery, and conformance checks across harnesses. |
+| P1 | PI Agent runtime adapter | Evaluate PI Agent as a lightweight runtime adapter for Owledge when it preserves `.owledge/` as canonical memory. |
+| P1 | Harness benchmarks | Benchmark Claude Code, Codex, OpenCode, Cursor, and Zed with local/cloud model setups. |
+| P1 | Own-vault benchmark mode | Let users benchmark their own local Owledge vaults without leaking private data. |
+| P2 | Write-enabled MCP | Add reviewed write tools with explicit scopes, locks, privacy checks, and audit artifacts. |
+| P2 | Cloud/frontier benchmark matrix | Extend Benchmark Kit to Ollama cloud/frontier models with clear cost warnings. |
+| P2 | RAG integrations | Export Owledge's canonical Markdown layer to Mem0, Graphiti, LlamaIndex, or vector/RAG engines. |
+| P3 | Hermes adapter | Full adapter only when SOUL.md, project context, memory rules, runtime hooks, and docs can ship together. |
+| P3 | Marketplace certification | Claude/Codex marketplace claims only after standards, manifests, screenshots, install flows, and review gates are complete. |
+| P2 | Public case studies | Add 3-5 real repo/vault case studies after the release surface is stable. |
 
 ## Near-Term Roadmap
 
@@ -28,11 +91,11 @@ Publish v0.5 as a project-ready Markdown-first Agent Memory Kit with lifecycle c
 | P0 | Upgrade command | `owledge upgrade --dry-run/--apply` with safe/force-templates/manual modes; never-touch list; idempotent. **Shipped v0.6.1 (with fix-up: skills enrolled in manifest; manual mode always dry-run; git-apply-able patch).** |
 | P1 | Drift detection | `doctor` reports `version-drift` + `outdated_files` + `user_edited_files`. **Shipped v0.6.1.** |
 | P1 | Global-layer registry | `init-project --link-global` writes `global-link.json`; `doctor` checks the link. **Shipped v0.6.1.** |
-| P1 | Dogfood-sync gate | `dogfood-sync` finalization gate + `sync-dogfood` CLI; one-way mirror templates → internal. **Shipped v0.6.1.** |
+| P1 | Dogfood-sync gate | `dogfood-sync` finalization gate + `sync-dogfood` CLI; one-way mirror templates -> internal. **Shipped v0.6.1.** |
 | P1 | Concept blindspot skill | `concept-blindspot-audit` skill that stress-tests distribution, lifecycle, coherence (v0.6.1 Phase 5). **Shipped v0.6.1 (with fix-up: skill now installable + in manifest + upgradable).** |
 | P1 | Session-continuity checklists | Per-phase checkboxes (implementation/QA/review done) in multi-phase plans; resume rule; gate. **Shipped v0.6.1 fix-up (FB-018).** |
 
-## Feedback-Derived Roadmap (v0.5.x — 2026-06-23)
+## Feedback-Derived Roadmap (v0.5.x - 2026-06-23)
 
 Collected from a structured feedback round covering integration, privacy,
 planning discipline, cross-project intelligence, and publish readiness. See
@@ -51,7 +114,7 @@ for idea log entries.
 | P2 | Plan completion detection contract | Standardize `status: done` + `acceptance_criteria` + `qa_gate_ids` as the harness-agnostic completion signal; document in planning-layer skill | Q7 |
 | P2 | Idea-duplicate handling + permission modes | Add `planning_mode: supervised/approve-automatically/full-access` toggle; when an idea already exists, agent behavior depends on mode | Q8 |
 | P2 | MVP goal/metric definition template | Add a `success_metrics` section to the MVP plan template with user-specific, measurable acceptance criteria | Q9 |
-| P3 | Idea-to-project pipeline | Filter upcoming ideas (project-scoped and global-scoped), collect in priority order, and scaffold a new `PROJECT_CONTEXT.md` from a promoted idea | Q10c |
+| P3 | Idea-to-project pipeline | Filter upcoming ideas (project-scoped and global-scoped), collect in priority order, and scaffold a new `OWLEDGE.md` from a promoted idea | Q10c |
 | P3 | Feedback round integration | Add a recurring feedback-round workflow to collect, triage, and promote user feedback into roadmap items | Q (meta) |
 
 ### Round 2: Feature Ideas
@@ -65,7 +128,7 @@ harness hooks, supervised-mode UX, and schema extensions. See
 | --- | --- | --- | --- |
 | P1 | Minimal ticket board with timeline + frontmatter sync | `owledge ticket-board` renders a Markdown board grouped by `status` with priority sorting; frontmatter sync hook updates `status: done` when QA gates pass | Feature idea 1 (FB-013) |
 | P1 | Quick-read section on all tickets | Add a `quick_read` field (under 300 chars) to `TaskCard` schema as a maintained view; validation gate detects stale quick-reads; board uses `quick_read`, not full bodies | Feature idea 4 (FB-016) |
-| P1 | Cleanly defined project abstract + modes | Define 4 project modes (`poc`, `mvp`, `side`, `saas`) with intuitive definitions and per-mode planning discipline in `PROJECT_CONTEXT.template.md` | Feature idea 5 (FB-017) |
+| P1 | Cleanly defined project abstract + modes | Define 4 project modes (`poc`, `mvp`, `side`, `saas`) with intuitive definitions and per-mode planning discipline in `OWLEDGE.template.md` | Feature idea 5 (FB-017) |
 | P2 | Harness hook extensions for Codex/Claude | Extend existing hook layer with `PostToolUse` frontmatter validation and `Stop`/`SessionEnd` `validate-memory --strict`; document extension points | Feature idea 2 (FB-014) |
 | P2 | Ticket summary in supervised approval | In `supervised` mode, render a compact 5-line ticket summary (title, priority, status, description, source link) inline before asking for approval | Feature idea 3 (FB-015) |
 

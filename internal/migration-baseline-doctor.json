@@ -1,4 +1,4 @@
-﻿{
+{
   "checks": [
     {
       "details": "Doctor mode: kit (detected: host).",
@@ -8,7 +8,7 @@
       "severity": "info"
     },
     {
-      "details": "PROJECT_CONTEXT.template.md is present.",
+      "details": "OWLEDGE.template.md is present.",
       "fix": "Restore the kit templates.",
       "name": "kit-template-project-context",
       "passed": true,
@@ -30,15 +30,15 @@
     },
     {
       "details": "Kit CLI exists.",
-      "fix": "Restore tools/agent_memory_cli.py.",
+      "fix": "Restore tools/owledge_core.py.",
       "name": "kit-tools",
       "passed": true,
       "severity": "error"
     },
     {
-      "details": "agent-memory directory is present.",
-      "fix": "Run init-agent-memory for this repo.",
-      "name": "agent-memory-dir",
+      "details": "owledge directory is present.",
+      "fix": "Run init-owledge for this repo.",
+      "name": "owledge-dir",
       "passed": true,
       "severity": "error"
     },
@@ -51,21 +51,21 @@
     },
     {
       "details": "Local CLI exists.",
-      "fix": "Copy tools/agent_memory_cli.py into the project or run from an Owledge repo checkout when local tooling is missing.",
+      "fix": "Copy tools/owledge_core.py into the project or run from an Owledge repo checkout when local tooling is missing.",
       "name": "cli-local",
       "passed": true,
       "severity": "warning"
     },
     {
       "details": "Raw runtime event logs are ignored by git.",
-      "fix": "Add agent-memory/sessions/**/events.jsonl to .gitignore for privacy.",
+      "fix": "Add .owledge/sessions/**/events.jsonl to .gitignore for privacy.",
       "name": "raw-events-ignored",
       "passed": true,
       "severity": "warning"
     },
     {
       "details": "Memory validation: 0 failed of 100.",
-      "fix": "Run python tools/agent_memory_cli.py --project-root . validate-memory --strict and fix reported frontmatter/edge issues.",
+      "fix": "Run python tools/owledge_core.py --project-root . validate-memory --strict and fix reported frontmatter/edge issues.",
       "name": "memory-validation",
       "passed": true,
       "severity": "error"
@@ -107,7 +107,7 @@
     }
   ],
   "passed": true,
-  "project": "C:\\Users\\Kirk\\Documents\\Playground\\agent-memory-standalone",
+  "project": "C:\\Users\\Kirk\\Documents\\Playground\\owledge-standalone",
   "score": 100,
   "unsafe_shared_records": []
 }

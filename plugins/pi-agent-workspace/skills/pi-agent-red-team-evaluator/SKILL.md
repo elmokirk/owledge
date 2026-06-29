@@ -9,12 +9,12 @@ This plugin skill mirrors the root `skills/pi-agent-red-team-evaluator` skill.
 
 ## Core Rule
 
-Evaluate and challenge PI outputs before promotion. Write scorecards and red-team reports under `agent-memory/pi-agent/`; never write canonical memory directly.
+Evaluate and challenge PI outputs before promotion. Write scorecards and red-team reports under `.owledge/pi-agent/`; never write canonical memory directly.
 
 ## Runtime Command
 
 ```bash
-python tools/agent_memory_cli.py --project-root . run-review-workflow --review-type multi-perspective-red-team --subject agent-memory/pi-agent/reports --question "Evaluate PI intelligence quality and release risk."
+python tools/owledge_core.py --project-root . run-review-workflow --review-type multi-perspective-red-team --subject .owledge/pi-agent/reports --question "Evaluate PI intelligence quality and release risk."
 ```
 
 ## Recommendation Bands

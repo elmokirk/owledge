@@ -34,8 +34,8 @@ Public issue tracker is not an acceptable place for undisclosed security finding
 ## Current Safe-Use Rules
 
 - Do not commit `.agent-control/secrets/`, runtime databases, raw scratch files, or customer secrets.
-- Treat `agent-memory/sessions/` as private working memory.
+- Treat `.owledge/sessions/` as private working memory.
 - Export shared RAG only from reviewed and sanitized artifacts.
 - Keep customer-specific memory scoped by `tenant_id`, `customer_id`, and `project_id`.
 - Run validation before export or promotion.
-- Run `python tools/agent_memory_cli.py --project-root . scan-memory-sensitive-data` before shared export or release review.
+- Run `python tools/owledge_core.py --project-root . scan-memory-sensitive-data` before shared export or release review.

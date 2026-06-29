@@ -6,7 +6,7 @@ memory engine.
 
 ## What It Does
 
-- scans Markdown files under `agent-memory/`
+- scans Markdown files under `.owledge/`
 - validates required frontmatter fields
 - checks shared records for approved review and sanitization states
 - can run against the retrieval fixture corpus

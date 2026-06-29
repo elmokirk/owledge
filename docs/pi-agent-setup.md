@@ -56,7 +56,7 @@ This creates the library structure and `owlib.yaml` config.
 python -m owlib register-project --library-root /path/to/owl-library --path /path/to/project
 ```
 
-A project must have `PROJECT_CONTEXT.md` and `agent-memory/` to be registered.
+A project must have `OWLEDGE.md` and `.owledge/` to be registered.
 
 ### 3. Sync Reviewed Records
 
@@ -142,7 +142,7 @@ The following skills provide PI Agent behavior guidance for agents:
 
 | Problem | Cause | Fix |
 | --- | --- | --- |
-| `Missing PROJECT_CONTEXT.md` | Project not initialized with Owledge | Run `python tools/owledge.py init-project --target /path/to/project` |
+| `Missing OWLEDGE.md` | Project not initialized with Owledge | Run `python tools/owledge.py init-project --target /path/to/project` |
 | `No projects registered` | No projects synced to library | Run `register-project` for each project |
 | `No parallels found` | Projects share no tags | Add `concept_tags` / `problem_patterns` to frontmatter |
 | `PI report score < 95` | Report missing sections | Ensure report has Parallel Candidates, Growth Signals, Recommended Actions |

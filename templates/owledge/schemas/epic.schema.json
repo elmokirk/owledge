@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EpicOverview",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["id", "type", "status", "tenant_id", "customer_id", "project_id", "max_parallelism"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^epic-" },
+    "type": { "const": "EpicOverview" },
+    "status": { "type": "string", "enum": ["draft", "active", "blocked", "done", "archived"] },
+    "tenant_id": { "type": "string", "minLength": 1 },
+    "customer_id": { "type": "string", "minLength": 1 },
+    "project_id": { "type": "string", "minLength": 1 },
+    "max_parallelism": { "type": "integer", "minimum": 1, "maximum": 50 }
+  }
+}
