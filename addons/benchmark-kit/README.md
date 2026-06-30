@@ -2,10 +2,10 @@
 
 Optional real-file benchmark add-on for Owledge.
 
-The kit creates deterministic synthetic Markdown fixture vaults, runs
-retrieval/context-pack scenarios against those files, and writes JSON,
-Markdown, HTML, and SVG reports focused on token usage, local performance, and
-context pollution.
+The kit ships deterministic synthetic Markdown fixture vaults, can generate
+fresh deterministic fixtures, runs retrieval/context-pack scenarios against
+those files, and writes JSON, Markdown, HTML, and SVG reports focused on token
+usage, local performance, and context pollution.
 
 The kit has two report layers:
 
@@ -27,7 +27,7 @@ python tools/owledge.py install-addon --project-root /path/to/project --addon be
 Deterministic CI-safe benchmark:
 
 ```bash
-python tools/benchmark-kit/run-benchmark-kit.py --mode ci --scale-mode small --yes
+python tools/benchmark-kit/run-benchmark-kit.py --mode ci --scale-mode small --fixture-source bundled --yes
 python tools/benchmark-kit/render-benchmark-report.py --format html
 ```
 
@@ -50,7 +50,7 @@ completed `latest.json` reports.
 Local Ollama benchmark:
 
 ```bash
-python tools/benchmark-kit/run-benchmark-kit.py --mode local --scale-mode small --models gemma4:latest --yes
+python tools/benchmark-kit/run-benchmark-kit.py --mode local --scale-mode small --fixture-source bundled --models gemma4:latest --yes
 python tools/benchmark-kit/render-benchmark-report.py --format html
 ```
 
@@ -59,8 +59,8 @@ python tools/benchmark-kit/render-benchmark-report.py --format html
 | Mode | Files | Purpose |
 | --- | ---: | --- |
 | `small` | 100 | CI, smoke tests, quick local demo |
-| `mid` | 500 | Solo or power-user project vault |
-| `large` | 1000 | Team-sized local benchmark |
+| `mid` | 500 | Larger local reproduction run |
+| `large` | 1000 | Team-sized synthetic benchmark |
 
 ## Outputs
 
@@ -79,11 +79,16 @@ Generated files are written under:
 .owledge/reports/generated/benchmark-kit-comparison/charts.svg
 ```
 
+Bundled fixtures are installed under `tools/benchmark-kit/fixtures/` and are
+unpacked into `.owledge/tmp/benchmark-kit/fixtures/` during a run. Use
+`--fixture-source generate` to create a fresh deterministic fixture from the
+same scenario generator.
+
 Read `.owledge/benchmark-kit/BENCHMARK_EXPLAINED.md` before interpreting
 results. It explains the injected distractor, stale, private, multi-hop,
 handoff, and needle problems.
 
 The comparison report includes an Executive Verdict, Creator Pull Quote, Model
-Matrix, Before vs Owledge charts, Scenario Heatmap, audience interpretation,
-and caveats. `oracle` is the ground-truth reference ceiling from the fixture
-generator, not a model or product claim.
+Matrix, Before vs Owledge charts, Scenario Heatmap, and caveats. `oracle` is
+the ground-truth reference ceiling from the fixture generator, not a model or
+product claim.

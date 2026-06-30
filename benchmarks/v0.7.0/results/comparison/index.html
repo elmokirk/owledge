@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Owledge Benchmark Comparison Report</title>
+  <style>
+    body { font-family: Inter, Segoe UI, Arial, sans-serif; margin: 32px; color: #172033; background: #f8fafc; }
+    h1, h2 { color: #0f172a; }
+    .card { background: white; border: 1px solid #d8dee9; border-radius: 8px; padding: 16px; margin: 12px 0; }
+    .verdict { border-left: 6px solid #16a34a; }
+    .quote { font-size: 24px; font-weight: 800; line-height: 1.25; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+    .value { font-size: 24px; font-weight: 800; }
+    .label { color: #64748b; font-size: 13px; }
+    .pill { display: inline-block; border-radius: 999px; padding: 2px 8px; font-size: 12px; font-weight: 700; }
+    .pill.pass { color: #166534; background: #dcfce7; }
+    .pill.warn { color: #92400e; background: #fef3c7; }
+    .pill.fail { color: #991b1b; background: #fee2e2; }
+    .pill.missing, .pill.unknown { color: #475569; background: #e2e8f0; }
+    table { width: 100%; border-collapse: collapse; background: white; margin-top: 12px; }
+    th, td { border-bottom: 1px solid #e2e8f0; padding: 8px; text-align: left; font-size: 14px; }
+    th { color: #475569; background: #f1f5f9; }
+    code { background: #e2e8f0; padding: 2px 4px; border-radius: 4px; }
+    .charts { background: white; border: 1px solid #d8dee9; border-radius: 8px; padding: 16px; overflow-x: auto; }
+  </style>
+</head>
+<body>
+  <h1>Owledge Benchmark Comparison Report</h1>
+  <section class="card verdict">
+    <div class="label">Executive Verdict</div>
+    <div class="value">Pass</div>
+    <p>Owledge compared 3 completed benchmark runs: 3/3 Owledge profiles passed, privacy failures prevented=3, stale failures prevented=3, average pollution reduction=88.36%, average tokens/correct reduction=83.54%.</p>
+  </section>
+  <section class="card">
+    <div class="label">Creator Pull Quote</div>
+    <div class="quote">Owledge makes the context safer and cheaper before the model sees it.</div>
+  </section>
+  <div class="grid">
+    <div class="card"><div class="label">Models compared</div><div class="value">3</div></div>
+    <div class="card"><div class="label">Privacy failures prevented</div><div class="value">3</div></div>
+    <div class="card"><div class="label">Stale failures prevented</div><div class="value">3</div></div>
+    <div class="card"><div class="label">Avg pollution reduction</div><div class="value">88.36%</div></div>
+    <div class="card"><div class="label">Avg tokens/correct reduction</div><div class="value">83.54%</div></div>
+  </div>
+  <h2>Model Matrix</h2>
+  <table>
+    <thead><tr><th>Model</th><th>Baseline</th><th>Owledge</th><th>Pollution reduction</th><th>Privacy prevented</th><th>Stale prevented</th><th>Token reduction</th><th>Pass rate</th><th>tokens/sec</th></tr></thead>
+    <tbody><tr><td>gemma4:latest</td><td><span class="pill fail">Fail</span></td><td><span class="pill pass">Pass</span></td><td>88.36%</td><td>1</td><td>1</td><td>87.15%</td><td>0.8333</td><td>74.5858</td></tr><tr><td>qwen3.5:4b</td><td><span class="pill fail">Fail</span></td><td><span class="pill pass">Pass</span></td><td>88.36%</td><td>1</td><td>1</td><td>77.66%</td><td>0.8333</td><td>37.6034</td></tr><tr><td>glm-5.1:cloud</td><td><span class="pill fail">Fail</span></td><td><span class="pill pass">Pass</span></td><td>88.36%</td><td>1</td><td>1</td><td>85.8%</td><td>0.8333</td><td>89.4848</td></tr></tbody>
+  </table>
+  <h2>Before vs Owledge Charts</h2>
+  <p>Lower privacy failures, stale failures, <strong>Context pollution</strong>, and <strong>Tokens per correct answer</strong> are better. Higher reduction/prevention is better in these charts.</p>
+  <div class="charts"><svg xmlns="http://www.w3.org/2000/svg" width="1120" height="602" viewBox="0 0 1120 602">
+<style>text{font-family:Inter,Segoe UI,Arial,sans-serif}.title{font-size:22px;font-weight:700}.label{font-size:12px;fill:#475569}.value{font-size:12px;fill:#0f172a}.track{fill:#e2e8f0}.bar{fill:#2563eb}</style>
+<rect width="100%" height="100%" fill="#f8fafc"/>
+<text x="24" y="38" class="title">Before vs Owledge Comparison</text>
+<text x="24" y="62" class="label">Higher reduction/prevention is better. tokens/sec is shown in the model matrix.</text>
+<text x="24" y="100" class="label">gemma4:latest - Pollution reduction %</text>
+<rect x="320" y="86" width="560" height="18" rx="4" class="track"/>
+<rect x="320" y="86" width="552" height="18" rx="4" class="bar"/>
+<text x="896" y="100" class="value">88.36</text>
+<text x="24" y="134" class="label">gemma4:latest - Token reduction %</text>
+<rect x="320" y="120" width="560" height="18" rx="4" class="track"/>
+<rect x="320" y="120" width="545" height="18" rx="4" class="bar"/>
+<text x="896" y="134" class="value">87.15</text>
+<text x="24" y="168" class="label">gemma4:latest - Owledge tokens/sec</text>
+<rect x="320" y="154" width="560" height="18" rx="4" class="track"/>
+<rect x="320" y="154" width="466" height="18" rx="4" class="bar"/>
+<text x="896" y="168" class="value">74.5858</text>
+<text x="24" y="202" class="label">gemma4:latest - Privacy prevented</text>
+<rect x="320" y="188" width="560" height="18" rx="4" class="track"/>
+<rect x="320" y="188" width="6" height="18" rx="4" class="bar"/>
+<text x="896" y="202" class="value">1.0</text>
+<text x="24" y="236" class="label">gemma4:latest - Stale prevented</text>
+<rect x="320" y="222" width="560" height="18" rx="4" class="track"/>
+<rect x="320" y="222" width="6" height="18" rx="4" class="bar"/>
+<text x="896" y="236" class="value">1.0</text>
+<text x="24" y="270" class="label">qwen3.5:4b - Pollution reduction %</text>
+<rect x="320" y="256" width="560" height="18" rx="4" class="track"/>
+<rect x="320" y="256" width="552" height="18" rx="4" class="bar"/>
+<text x="896" y="270" class="value">88.36</text>
+<text x="24" y="304" class="label">qwen3.5:4b - Token reduction %</text>
+<rect x="320" y="290" width="560" height="18" rx="4" class="track"/>
+<rect x="320" y="290" width="485" height="18" rx="4" class="bar"/>
+<text x="896" y="304" class="value">77.66</text>
+<text x="24" y="338" class="label">qwen3.5:4b - Owledge tokens/sec</text>
+<rect x="320" y="324" width="560" height="18" rx="4" class="track"/>
+<rect x="320" y="324" width="235" height="18" rx="4" class="bar"/>
+<text x="896" y="338" class="value">37.6034</text>
+<text x="24" y="372" class="label">qwen3.5:4b - Privacy prevented</text>
+<rect x="320" y="358" width="560" height="18" rx="4" class="track"/>
+<rect x="320" y="358" width="6" height="18" rx="4" class="bar"/>
+<text x="896" y="372" class="value">1.0</text>
+<text x="24" y="406" class="label">qwen3.5:4b - Stale prevented</text>
+<rect x="320" y="392" width="560" height="18" rx="4" class="track"/>
+<rect x="320" y="392" width="6" height="18" rx="4" class="bar"/>
+<text x="896" y="406" class="value">1.0</text>
+<text x="24" y="440" class="label">glm-5.1:cloud - Pollution reduction %</text>
+<rect x="320" y="426" width="560" height="18" rx="4" class="track"/>
+<rect x="320" y="426" width="552" height="18" rx="4" class="bar"/>
+<text x="896" y="440" class="value">88.36</text>
+<text x="24" y="474" class="label">glm-5.1:cloud - Token reduction %</text>
+<rect x="320" y="460" width="560" height="18" rx="4" class="track"/>
+<rect x="320" y="460" width="536" height="18" rx="4" class="bar"/>
+<text x="896" y="474" class="value">85.8</text>
+<text x="24" y="508" class="label">glm-5.1:cloud - Owledge tokens/sec</text>
+<rect x="320" y="494" width="560" height="18" rx="4" class="track"/>
+<rect x="320" y="494" width="560" height="18" rx="4" class="bar"/>
+<text x="896" y="508" class="value">89.4848</text>
+<text x="24" y="542" class="label">glm-5.1:cloud - Privacy prevented</text>
+<rect x="320" y="528" width="560" height="18" rx="4" class="track"/>
+<rect x="320" y="528" width="6" height="18" rx="4" class="bar"/>
+<text x="896" y="542" class="value">1.0</text>
+<text x="24" y="576" class="label">glm-5.1:cloud - Stale prevented</text>
+<rect x="320" y="562" width="560" height="18" rx="4" class="track"/>
+<rect x="320" y="562" width="6" height="18" rx="4" class="bar"/>
+<text x="896" y="576" class="value">1.0</text>
+</svg></div>
+  <h2>Estimated API Cost Impact</h2>
+  <p>Illustrative API prices per 1M tokens. Verify current provider pricing before using these numbers for budgets. Sources checked: Anthropic Claude pricing (docs.anthropic.com/en/docs/about-claude/pricing), Google Gemini API pricing (ai.google.dev/gemini-api/docs/pricing), and OpenAI API pricing (platform.openai.com/docs/pricing).</p>
+  <p>This table applies provider API prices to the measured baseline and Owledge token counts. It estimates cost pressure avoided by cleaner context; it is not a full project ROI calculation.</p>
+  <table>
+    <thead><tr><th>Provider</th><th>Model</th><th>Input $/1M</th><th>Output $/1M</th><th>Baseline cost</th><th>Owledge cost</th><th>Estimated savings</th><th>Savings</th></tr></thead>
+    <tbody><tr><td>Anthropic</td><td>Claude Opus 4.8</td><td>$5.0</td><td>$25.0</td><td>$0.489345</td><td>$0.396005</td><td>$0.09334</td><td>19.07%</td></tr><tr><td>Anthropic</td><td>Claude Sonnet 4.6</td><td>$3.0</td><td>$15.0</td><td>$0.293607</td><td>$0.237603</td><td>$0.056004</td><td>19.07%</td></tr><tr><td>Anthropic</td><td>Claude Haiku 4.5</td><td>$1.0</td><td>$5.0</td><td>$0.097869</td><td>$0.079201</td><td>$0.018668</td><td>19.07%</td></tr><tr><td>Google</td><td>Gemini 3 Pro</td><td>$2.0</td><td>$12.0</td><td>$0.218954</td><td>$0.185236</td><td>$0.033718</td><td>15.4%</td></tr><tr><td>Google</td><td>Gemini 2.5 Pro</td><td>$1.25</td><td>$10.0</td><td>$0.165866</td><td>$0.149315</td><td>$0.016551</td><td>9.98%</td></tr><tr><td>Google</td><td>Gemini 2.5 Flash</td><td>$0.3</td><td>$2.5</td><td>$0.040969</td><td>$0.037177</td><td>$0.003792</td><td>9.26%</td></tr><tr><td>OpenAI</td><td>gpt-5.5</td><td>$5.0</td><td>$30.0</td><td>$0.547385</td><td>$0.46309</td><td>$0.084295</td><td>15.4%</td></tr><tr><td>OpenAI</td><td>gpt-5.5-pro</td><td>$30.0</td><td>$180.0</td><td>$3.28431</td><td>$2.77854</td><td>$0.50577</td><td>15.4%</td></tr><tr><td>OpenAI</td><td>gpt-5.4</td><td>$2.5</td><td>$15.0</td><td>$0.273693</td><td>$0.231545</td><td>$0.042148</td><td>15.4%</td></tr></tbody>
+  </table>
+  <h2>Scenario Heatmap</h2>
+  <table>
+    <thead><tr><th>Model</th><th>Scenario</th><th>Baseline</th><th>Owledge</th></tr></thead>
+    <tbody><tr><td>gemma4:latest</td><td>needle</td><td><span class="pill warn">Warn</span></td><td><span class="pill pass">Pass</span></td></tr><tr><td>gemma4:latest</td><td>multi-hop</td><td><span class="pill warn">Warn</span></td><td><span class="pill pass">Pass</span></td></tr><tr><td>gemma4:latest</td><td>stale-conflict</td><td><span class="pill warn">Warn</span></td><td><span class="pill pass">Pass</span></td></tr><tr><td>gemma4:latest</td><td>privacy-trap</td><td><span class="pill fail">Fail</span></td><td><span class="pill pass">Pass</span></td></tr><tr><td>gemma4:latest</td><td>distractor-heavy</td><td><span class="pill warn">Warn</span></td><td><span class="pill warn">Warn</span></td></tr><tr><td>gemma4:latest</td><td>handoff-resume</td><td><span class="pill warn">Warn</span></td><td><span class="pill pass">Pass</span></td></tr><tr><td>qwen3.5:4b</td><td>needle</td><td><span class="pill warn">Warn</span></td><td><span class="pill pass">Pass</span></td></tr><tr><td>qwen3.5:4b</td><td>multi-hop</td><td><span class="pill warn">Warn</span></td><td><span class="pill pass">Pass</span></td></tr><tr><td>qwen3.5:4b</td><td>stale-conflict</td><td><span class="pill warn">Warn</span></td><td><span class="pill pass">Pass</span></td></tr><tr><td>qwen3.5:4b</td><td>privacy-trap</td><td><span class="pill fail">Fail</span></td><td><span class="pill pass">Pass</span></td></tr><tr><td>qwen3.5:4b</td><td>distractor-heavy</td><td><span class="pill warn">Warn</span></td><td><span class="pill warn">Warn</span></td></tr><tr><td>qwen3.5:4b</td><td>handoff-resume</td><td><span class="pill warn">Warn</span></td><td><span class="pill pass">Pass</span></td></tr><tr><td>glm-5.1:cloud</td><td>needle</td><td><span class="pill warn">Warn</span></td><td><span class="pill pass">Pass</span></td></tr><tr><td>glm-5.1:cloud</td><td>multi-hop</td><td><span class="pill warn">Warn</span></td><td><span class="pill pass">Pass</span></td></tr><tr><td>glm-5.1:cloud</td><td>stale-conflict</td><td><span class="pill warn">Warn</span></td><td><span class="pill pass">Pass</span></td></tr><tr><td>glm-5.1:cloud</td><td>privacy-trap</td><td><span class="pill fail">Fail</span></td><td><span class="pill pass">Pass</span></td></tr><tr><td>glm-5.1:cloud</td><td>distractor-heavy</td><td><span class="pill warn">Warn</span></td><td><span class="pill warn">Warn</span></td></tr><tr><td>glm-5.1:cloud</td><td>handoff-resume</td><td><span class="pill warn">Warn</span></td><td><span class="pill pass">Pass</span></td></tr></tbody>
+  </table>
+  <h2>How To Read This Report</h2>
+  <table>
+    <tbody>
+      <tr><th>Baseline</th><td>Shows what happens when retrieval over-selects noisy, stale, or private context.</td></tr>
+      <tr><th>Owledge</th><td>Shows the product behavior under test: cleaner selected context before model inference.</td></tr>
+      <tr><th>Token reduction</th><td>Estimates cost pressure avoided by cleaner context, not total project ROI.</td></tr>
+      <tr><th>tokens/sec</th><td>Runtime throughput for the tested model and environment, not an Owledge quality score.</td></tr>
+      <tr><th>Oracle</th><td>Ground-truth reference ceiling from the fixture generator.</td></tr>
+    </tbody>
+  </table>
+  <h2>Caveats</h2>
+  <p>Inputs are completed Benchmark Kit reports; this command does not run models. Oracle is ground-truth reference, not a model or product claim. API prices are illustrative snapshots and must be verified against provider pricing before budgeting. Small scale is release proof for v0.7.0.</p>
+  <h2>Skipped Inputs</h2><ul><li><code>.owledge\exports\benchmark-kit-nemotron-nano-cloud\latest.json</code></li></ul>
+</body>
+</html>

@@ -1276,6 +1276,26 @@ def benchmark_addon_gate(root: pathlib.Path) -> dict[str, Any]:
     results.add("benchmark-addon:renderer", renderer.exists(), "Benchmark Kit report renderer exists.")
     results.add("benchmark-addon:comparer", comparer.exists(), "Benchmark Kit comparison renderer exists.")
     results.add("benchmark-addon:explanation", explanation.exists(), "Benchmark explanation Markdown exists.")
+    for scale in ["small", "mid", "large"]:
+        archive = root / "addons" / "benchmark-kit" / "fixtures" / f"{scale}.zip"
+        public_fixture = root / "benchmarks" / "v0.7.0" / "fixtures" / scale
+        results.add(f"benchmark-addon:fixture-archive:{scale}", archive.exists(), "Bundled Benchmark Kit fixture archive exists.")
+        results.add(f"benchmark-addon:public-fixture:{scale}", public_fixture.exists(), "Public v0.7.0 benchmark fixture exists.")
+        results.add(f"benchmark-addon:public-fixture-manifest:{scale}", (public_fixture / "fixture-manifest.json").exists(), "Public fixture manifest exists.")
+    public_benchmark = root / "benchmarks" / "v0.7.0"
+    for rel in [
+        "README.md",
+        "methodology.md",
+        "benchmark-explained.md",
+        "results/comparison/index.html",
+        "results/comparison/latest.json",
+        "results/comparison/latest.md",
+        "results/comparison/charts.svg",
+        "results/gemma4-latest/index.html",
+        "results/qwen3-5-4b/index.html",
+        "results/glm-5-1-cloud/index.html",
+    ]:
+        results.add(f"benchmark-addon:public-artifact:{rel}", (public_benchmark / rel).exists(), "Public v0.7.0 benchmark artifact exists.")
     if explanation.exists():
         text = explanation.read_text(encoding="utf-8", errors="replace").lower()
         for required in ["distractor", "stale", "private", "multi-hop", "handoff", "context pollution"]:
@@ -1294,8 +1314,11 @@ def benchmark_addon_gate(root: pathlib.Path) -> dict[str, Any]:
         results.add("benchmark-addon:install-renderer", installed_renderer.exists(), "Installed Benchmark Kit renderer exists.")
         results.add("benchmark-addon:install-comparer", installed_comparer.exists(), "Installed Benchmark Kit comparison renderer exists.")
         results.add("benchmark-addon:install-explanation", installed_explanation.exists(), "Installed Benchmark Kit explanation exists.")
+        for scale in ["small", "mid", "large"]:
+            installed_archive = temp_dir / "tools" / "benchmark-kit" / "fixtures" / f"{scale}.zip"
+            results.add(f"benchmark-addon:install-fixture-archive:{scale}", installed_archive.exists(), "Installed bundled fixture archive exists.")
         if installed_runner.exists() and installed_renderer.exists() and installed_comparer.exists():
-            run = run_subprocess([sys.executable, str(installed_runner), "--mode", "ci", "--scale-mode", "small", "--yes"], cwd=temp_dir)
+            run = run_subprocess([sys.executable, str(installed_runner), "--mode", "ci", "--scale-mode", "small", "--fixture-source", "bundled", "--yes"], cwd=temp_dir)
             results.add("benchmark-addon:ci-run", run.returncode == 0, "Benchmark Kit CI run exits successfully." if run.returncode == 0 else f"Benchmark Kit CI run failed: {run.stderr[-800:]}")
             render = run_subprocess([sys.executable, str(installed_renderer), "--format", "html"], cwd=temp_dir)
             results.add("benchmark-addon:html-render", render.returncode == 0, "Benchmark Kit report render exits successfully." if render.returncode == 0 else f"Benchmark Kit report render failed: {render.stderr[-800:]}")
@@ -1316,6 +1339,7 @@ def benchmark_addon_gate(root: pathlib.Path) -> dict[str, Any]:
                 results.add("benchmark-addon:json-verdicts-owledge", str(report_payload.get("verdicts", {}).get("owledge", {}).get("verdict") or "") in {"pass", "warn", "fail"}, "Benchmark JSON includes an Owledge product verdict.")
                 results.add("benchmark-addon:json-final-verdict", str(report_payload.get("final_verdict") or "") in {"pass", "warn", "fail"}, "Benchmark JSON includes a final product verdict.")
                 results.add("benchmark-addon:json-profile-totals", all(profile in report_payload.get("profile_totals", {}) for profile in ["metadata_scan", "owledge_context_pack", "oracle"]), "Benchmark JSON includes profile-level totals.")
+                results.add("benchmark-addon:json-fixture-source", report_payload.get("fixture_source") == "bundled", "Benchmark JSON records bundled fixture source.")
                 baseline_verdict = str(report_payload.get("verdicts", {}).get("baseline", {}).get("verdict") or "")
                 owledge_verdict = str(report_payload.get("verdicts", {}).get("owledge", {}).get("verdict") or "")
                 results.add("benchmark-addon:baseline-does-not-force-product-fail", not (baseline_verdict == "fail" and owledge_verdict == "pass" and report_payload.get("final_verdict") == "fail"), "Baseline failures do not force a product-level fail when Owledge passes.")
