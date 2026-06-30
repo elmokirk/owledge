@@ -5657,7 +5657,9 @@ def sdist_clean_check(root: pathlib.Path, sdist_glob: str = "dist/owledge-*.tar.
     ]
     leaked_legacy_templates = [
         n for n in names
-        if "/templates/owledge/" in n or n.endswith("/OWLEDGE.template.md")
+        if "/templates/agent-memory/" in n
+        or n.endswith("/PROJECT_CONTEXT.template.md")
+        or n.endswith("/PROJECT_CONTEXT.md")
     ]
 
     required_root_files = [
