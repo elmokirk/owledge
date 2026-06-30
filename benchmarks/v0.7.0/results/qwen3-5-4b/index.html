@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Owledge Benchmark Kit Report</title>
+  <style>
+    body { font-family: Inter, Segoe UI, Arial, sans-serif; margin: 32px; color: #172033; background: #f8fafc; }
+    h1, h2 { color: #0f172a; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+    .card { background: white; border: 1px solid #d8dee9; border-radius: 8px; padding: 14px; }
+    .verdict { border-left: 6px solid #2563eb; }
+    .verdict.pass { border-color: #16a34a; }
+    .verdict.warn { border-color: #d97706; }
+    .verdict.fail { border-color: #dc2626; }
+    .summary { border-left: 6px solid #2563eb; }
+    .product { background: #f0fdf4; }
+    .baseline { background: #fff7ed; }
+    .oracle { background: #f8fafc; }
+    .label { color: #64748b; font-size: 13px; }
+    .value { font-size: 24px; font-weight: 700; margin-top: 6px; }
+    .hint { color: #64748b; font-size: 13px; margin-top: 6px; line-height: 1.45; }
+    .pill { display: inline-block; border-radius: 999px; padding: 2px 8px; font-size: 12px; font-weight: 700; }
+    .pill.pass { color: #166534; background: #dcfce7; }
+    .pill.warn { color: #92400e; background: #fef3c7; }
+    .pill.fail { color: #991b1b; background: #fee2e2; }
+    .charts { background: white; border: 1px solid #d8dee9; border-radius: 8px; padding: 16px; margin-top: 12px; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; background: white; margin-top: 12px; }
+    th, td { border-bottom: 1px solid #e2e8f0; padding: 8px; text-align: left; font-size: 14px; }
+    th { color: #475569; background: #f1f5f9; }
+    code { background: #e2e8f0; padding: 2px 4px; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <h1>Owledge Benchmark Kit Report</h1>
+  <p>This report uses real synthetic Markdown fixtures. Read <code>.owledge/benchmark-kit/BENCHMARK_EXPLAINED.md</code> before interpreting the scores.</p>
+  <section class="card summary">
+    <div class="label">Run Summary</div>
+    <div class="value">Local / small</div>
+    <p>Profiles tested: <code>metadata_scan, owledge_context_pack, oracle</code>. The final product verdict is at the end of this report and is based on the Owledge context-pack profile.</p>
+  </section>
+  <div class="grid">
+    <div class="card"><div class="label">Scale mode</div><div class="value">small</div></div>
+    <div class="card"><div class="label">File count</div><div class="value">100</div></div>
+    <div class="card"><div class="label">Total tokens</div><div class="value">40768</div><div class="hint">Total prompt plus completion budget consumed by the benchmark.</div></div>
+    <div class="card"><div class="label">Context pollution</div><div class="value">0.2737</div><div class="hint">Lower is better. Pass <= 0.20, warn <= 0.40, fail above 0.40.</div></div>
+    <div class="card"><div class="label">tokens/sec</div><div class="value">37.3757</div><div class="hint">Higher is better. Local hardware, model size, and quantization strongly affect this.</div></div>
+    <div class="card"><div class="label">Duration ms</div><div class="value">565653</div><div class="hint">Lower is better for the same model, scale, and scenario set.</div></div>
+    <div class="card"><div class="label">Privacy failures</div><div class="value">1</div><div class="hint">Must be zero for team-safe or shareable context.</div></div>
+    <div class="card"><div class="label">Stale failures</div><div class="value">1</div><div class="hint">Lower is better. Stale context means outdated notes entered the selected pack.</div></div>
+  </div>
+  <h2>Before vs Owledge</h2>
+  <p>Baseline <code>metadata_scan</code> is the naive before-state. <code>owledge_context_pack</code> is the product behavior under test. <code>oracle</code> is the ideal reference ceiling.</p>
+  <table>
+    <thead><tr><th>Metric</th><th>Baseline metadata_scan</th><th>Owledge context pack</th><th>Oracle reference</th></tr></thead>
+    <tbody>
+      <tr><th>Context pollution</th><td>0.7356</td><td>0.0856</td><td>0.0</td></tr>
+      <tr><th>Privacy failures</th><td>1</td><td>0</td><td>0</td></tr>
+      <tr><th>Stale failures</th><td>1</td><td>0</td><td>0</td></tr>
+      <tr><th>Tokens per correct answer</th><td>8964.0</td><td>2002.17</td><td>1804.5</td></tr>
+      <tr><th>Verdict</th><td><span class="pill fail">Fail</span></td><td><span class="pill pass">Pass</span></td><td><span class="pill pass">Pass</span></td></tr>
+    </tbody>
+  </table>
+  <h2>Privacy Trap Explained</h2>
+  <p>The benchmark injects private Markdown notes that look relevant to the question. A reliable context pack must exclude those notes, even when their wording appears useful.</p>
+  <h2>Benchmark Charts</h2>
+  <p class="hint">Chart direction: lower pollution, duration, and token cost are better; higher tokens/sec is better. The standalone SVG is also written to <code>.owledge/reports/generated/benchmark-kit/charts.svg</code>.</p>
+  <div class="charts"><svg xmlns="http://www.w3.org/2000/svg" width="960" height="300" viewBox="0 0 960 300">
+<style>text{font-family:Inter,Segoe UI,Arial,sans-serif}.title{font-size:22px;font-weight:700}.label{font-size:13px;fill:#475569}.value{font-size:13px;fill:#0f172a}.track{fill:#e2e8f0}.bar{fill:#2563eb}</style>
+<rect width="100%" height="100%" fill="#f8fafc"/>
+<text x="24" y="38" class="title">Owledge Benchmark Kit Metrics</text>
+<text x="24" y="87" class="label">Total tokens</text>
+<rect x="210" y="72" width="560" height="18" rx="3" class="track"/>
+<rect x="210" y="72" width="560" height="18" rx="3" class="bar"/>
+<text x="790" y="87" class="value">40768.00</text>
+<text x="24" y="129" class="label">Context tokens</text>
+<rect x="210" y="114" width="560" height="18" rx="3" class="track"/>
+<rect x="210" y="114" width="214" height="18" rx="3" class="bar"/>
+<text x="790" y="129" class="value">15594.00</text>
+<text x="24" y="171" class="label">Completion tokens</text>
+<rect x="210" y="156" width="560" height="18" rx="3" class="track"/>
+<rect x="210" y="156" width="276" height="18" rx="3" class="bar"/>
+<text x="790" y="171" class="value">20122.00</text>
+<text x="24" y="213" class="label">Pollution x1000</text>
+<rect x="210" y="198" width="560" height="18" rx="3" class="track"/>
+<rect x="210" y="198" width="3" height="18" rx="3" class="bar"/>
+<text x="790" y="213" class="value">273.70</text>
+<text x="24" y="255" class="label">Duration seconds</text>
+<rect x="210" y="240" width="560" height="18" rx="3" class="track"/>
+<rect x="210" y="240" width="7" height="18" rx="3" class="bar"/>
+<text x="790" y="255" class="value">565.65</text>
+</svg></div>
+  <h2>Context Composition</h2>
+  <div class="grid">
+    <div class="card"><div class="label">Benchmark prompt tokens</div><div class="value">20646</div></div>
+    <div class="card"><div class="label">Selected context tokens</div><div class="value">15594</div></div>
+    <div class="card"><div class="label">Completion tokens</div><div class="value">20122</div></div>
+    <div class="card"><div class="label">Tokens per correct answer</div><div class="value">2912.0</div><div class="hint">Lower is better when answer quality stays high.</div></div>
+  </div>
+  <h2>What This Means</h2>
+  <table>
+    <tbody>
+      <tr><th>Total tokens</th><td>How much prompt and completion budget the run consumed.</td></tr>
+      <tr><th>Tokens per correct answer</th><td>The practical token cost of useful retrieval.</td></tr>
+      <tr><th>Context pollution</th><td>How much irrelevant, stale, private, or background context entered selected packs.</td></tr>
+      <tr><th>Privacy failures</th><td>Whether private trap notes entered selected context. This must stay at zero.</td></tr>
+      <tr><th>Stale failures</th><td>Whether superseded records entered selected context.</td></tr>
+      <tr><th>tokens/sec</th><td>Approximate local generation throughput when a local model is used.</td></tr>
+      <tr><th>Duration</th><td>End-to-end benchmark runtime for this run.</td></tr>
+    </tbody>
+  </table>
+  <h2>Scenario Results</h2>
+  <table>
+    <thead><tr><th>Status</th><th>Scenario</th><th>Profile</th><th>Model</th><th>Precision</th><th>Recall</th><th>Pollution</th><th>Total tokens</th><th>tokens/sec</th><th>Duration ms</th></tr></thead>
+    <tbody><tr class="baseline"><td><span class="pill warn">Warn</span></td><td>needle</td><td>metadata_scan</td><td>qwen3.5:4b</td><td>0.2</td><td>1.0</td><td>0.805</td><td>3211</td><td>37.0104</td><td>44990</td></tr><tr class="product"><td><span class="pill pass">Pass</span></td><td>needle</td><td>owledge_context_pack</td><td>qwen3.5:4b</td><td>1.0</td><td>1.0</td><td>0.0</td><td>1166</td><td>38.2158</td><td>19660</td></tr><tr class="oracle"><td><span class="pill pass">Pass</span></td><td>needle</td><td>oracle</td><td>qwen3.5:4b</td><td>1.0</td><td>1.0</td><td>0.0</td><td>1166</td><td>38.2104</td><td>19474</td></tr><tr class="baseline"><td><span class="pill warn">Warn</span></td><td>multi-hop</td><td>metadata_scan</td><td>qwen3.5:4b</td><td>0.5</td><td>1.0</td><td>0.5056</td><td>1835</td><td>0.0</td><td>1</td></tr><tr class="product"><td><span class="pill pass">Pass</span></td><td>multi-hop</td><td>owledge_context_pack</td><td>qwen3.5:4b</td><td>1.0</td><td>1.0</td><td>0.0</td><td>4911</td><td>36.3751</td><td>103366</td></tr><tr class="oracle"><td><span class="pill pass">Pass</span></td><td>multi-hop</td><td>oracle</td><td>qwen3.5:4b</td><td>1.0</td><td>1.0</td><td>0.0</td><td>4911</td><td>36.3634</td><td>103032</td></tr><tr class="baseline"><td><span class="pill warn">Warn</span></td><td>stale-conflict</td><td>metadata_scan</td><td>qwen3.5:4b</td><td>0.2</td><td>1.0</td><td>0.8036</td><td>3424</td><td>36.9179</td><td>39488</td></tr><tr class="product"><td><span class="pill pass">Pass</span></td><td>stale-conflict</td><td>owledge_context_pack</td><td>qwen3.5:4b</td><td>1.0</td><td>1.0</td><td>0.0</td><td>1349</td><td>38.019</td><td>24420</td></tr><tr class="oracle"><td><span class="pill pass">Pass</span></td><td>stale-conflict</td><td>oracle</td><td>qwen3.5:4b</td><td>1.0</td><td>1.0</td><td>0.0</td><td>1349</td><td>38.0725</td><td>24168</td></tr><tr class="baseline"><td><span class="pill fail">Fail</span></td><td>privacy-trap</td><td>metadata_scan</td><td>qwen3.5:4b</td><td>0.2</td><td>1.0</td><td>0.8065</td><td>2907</td><td>37.0645</td><td>26225</td></tr><tr class="product"><td><span class="pill pass">Pass</span></td><td>privacy-trap</td><td>owledge_context_pack</td><td>qwen3.5:4b</td><td>1.0</td><td>1.0</td><td>0.0</td><td>1297</td><td>37.9965</td><td>23281</td></tr><tr class="oracle"><td><span class="pill pass">Pass</span></td><td>privacy-trap</td><td>oracle</td><td>qwen3.5:4b</td><td>1.0</td><td>1.0</td><td>0.0</td><td>1297</td><td>38.0381</td><td>23078</td></tr><tr class="baseline"><td><span class="pill warn">Warn</span></td><td>distractor-heavy</td><td>metadata_scan</td><td>qwen3.5:4b</td><td>0.1111</td><td>1.0</td><td>0.8937</td><td>4972</td><td>35.5405</td><td>39491</td></tr><tr class="product"><td><span class="pill warn">Warn</span></td><td>distractor-heavy</td><td>owledge_context_pack</td><td>qwen3.5:4b</td><td>0.5</td><td>1.0</td><td>0.5137</td><td>2617</td><td>37.4108</td><td>48263</td></tr><tr class="oracle"><td><span class="pill pass">Pass</span></td><td>distractor-heavy</td><td>oracle</td><td>qwen3.5:4b</td><td>1.0</td><td>1.0</td><td>0.0</td><td>1431</td><td>38.0245</td><td>26713</td></tr><tr class="baseline"><td><span class="pill warn">Warn</span></td><td>handoff-resume</td><td>metadata_scan</td><td>qwen3.5:4b</td><td>0.4</td><td>1.0</td><td>0.5989</td><td>1579</td><td>0.0</td><td>1</td></tr><tr class="product"><td><span class="pill pass">Pass</span></td><td>handoff-resume</td><td>owledge_context_pack</td><td>qwen3.5:4b</td><td>1.0</td><td>1.0</td><td>0.0</td><td>673</td><td>0.0</td><td>1</td></tr><tr class="oracle"><td><span class="pill pass">Pass</span></td><td>handoff-resume</td><td>oracle</td><td>qwen3.5:4b</td><td>1.0</td><td>1.0</td><td>0.0</td><td>673</td><td>0.0</td><td>1</td></tr></tbody>
+  </table>
+  <h2>Caveats</h2>
+  <p>Fixture content is deterministic and synthetic. Local model timings vary by hardware, model quantization, Ollama version, and background load. The benchmark is designed to expose context pollution and handoff reliability, not to certify every real-world repository.</p>
+  <p>Fixture directory: <code>.owledge/tmp/benchmark-kit/fixtures/20260629094411-seed42-small/small</code></p>
+  <h2>Final Verdict</h2>
+  <section class="card verdict pass">
+    <div class="label">Product Verdict</div>
+    <div class="value">Pass</div>
+    <p><strong>Baseline:</strong> Baseline failed as expected: naive metadata scanning over-selected unsafe, stale, or noisy context.</p>
+    <p><strong>Owledge:</strong> Owledge passed: the context-pack profile kept private and stale records out while staying inside the target pollution band.</p>
+    <p><strong>Oracle:</strong> Oracle is the reference ceiling and should be treated as an ideal comparison point, not a product claim.</p>
+    <p><strong>Conclusion:</strong> Owledge passed: the baseline profile over-selected unsafe or stale context, while the Owledge context-pack profile kept private and stale records out.</p>
+  </section>
+</body>
+</html>

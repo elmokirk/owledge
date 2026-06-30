@@ -105,20 +105,21 @@ owledge doctor --project-root .agent-control/tmp/owledge-five-minute-demo
 Expected result: the demo project contains evidence, a next-agent handoff, and
 a static proof report. Full walk-through: [Try Owledge in 5 minutes](docs/try-owledge-in-5-minutes.md).
 
-Benchmark proof path:
+Benchmark proof:
 
-```bash
-python tools/benchmark-kit/compare-benchmark-runs.py --inputs \
-  .owledge/exports/benchmark-kit-gemma4-latest/latest.json \
-  .owledge/exports/benchmark-kit-qwen3-5-4b/latest.json \
-  .owledge/exports/benchmark-kit-glm-5-1-cloud/latest.json \
-  --output .owledge/reports/generated/benchmark-kit-comparison
-```
+On the v0.7.0 synthetic Markdown fixture, Owledge reduced context pollution by
+88.36% on average and reduced tokens per correct answer by 83.54% on average
+against the naive baseline. Real-world savings vary by vault shape, model,
+runtime, and retrieval configuration.
 
-Expected result: a comparison report shows baseline retrieval versus Owledge
-context packs across model tiers. It highlights privacy failures prevented,
-stale context avoided, context pollution reduction, and tokens per correct
-answer. The report is proof-oriented, not a universal model benchmark.
+- [v0.7.0 benchmark summary](benchmarks/v0.7.0/README.md)
+- [HTML comparison report](benchmarks/v0.7.0/results/comparison/index.html)
+- [Methodology](benchmarks/v0.7.0/methodology.md)
+- [Injected benchmark traps](benchmarks/v0.7.0/benchmark-explained.md)
+
+The published runs use deterministic test vaults, not a personal vault. The
+privacy-trap baseline is expected to fail; the product proof is whether the
+Owledge context-pack profile keeps private and stale notes out.
 
 ## Quickstart Paths
 

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="300" viewBox="0 0 960 300">
+<style>text{font-family:Inter,Segoe UI,Arial,sans-serif}.title{font-size:22px;font-weight:700}.label{font-size:13px;fill:#475569}.value{font-size:13px;fill:#0f172a}.track{fill:#e2e8f0}.bar{fill:#2563eb}</style>
+<rect width="100%" height="100%" fill="#f8fafc"/>
+<text x="24" y="38" class="title">Owledge Benchmark Kit Metrics</text>
+<text x="24" y="87" class="label">Total tokens</text>
+<rect x="210" y="72" width="560" height="18" rx="3" class="track"/>
+<rect x="210" y="72" width="560" height="18" rx="3" class="bar"/>
+<text x="790" y="87" class="value">32362.00</text>
+<text x="24" y="129" class="label">Context tokens</text>
+<rect x="210" y="114" width="560" height="18" rx="3" class="track"/>
+<rect x="210" y="114" width="269" height="18" rx="3" class="bar"/>
+<text x="790" y="129" class="value">15594.00</text>
+<text x="24" y="171" class="label">Completion tokens</text>
+<rect x="210" y="156" width="560" height="18" rx="3" class="track"/>
+<rect x="210" y="156" width="155" height="18" rx="3" class="bar"/>
+<text x="790" y="171" class="value">9004.00</text>
+<text x="24" y="213" class="label">Pollution x1000</text>
+<rect x="210" y="198" width="560" height="18" rx="3" class="track"/>
+<rect x="210" y="198" width="4" height="18" rx="3" class="bar"/>
+<text x="790" y="213" class="value">273.70</text>
+<text x="24" y="255" class="label">Duration seconds</text>
+<rect x="210" y="240" width="560" height="18" rx="3" class="track"/>
+<rect x="210" y="240" width="2" height="18" rx="3" class="bar"/>
+<text x="790" y="255" class="value">131.46</text>
+</svg>

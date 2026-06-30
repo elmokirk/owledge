@@ -2,6 +2,22 @@
 
 Owledge keeps benchmark claims local and reproducible.
 
+## Public v0.7.0 Benchmark
+
+The public v0.7.0 Benchmark Kit proof lives in [`v0.7.0/`](v0.7.0/).
+
+Start here:
+
+- [v0.7.0 benchmark summary](v0.7.0/README.md)
+- [HTML comparison report](v0.7.0/results/comparison/index.html)
+- [Methodology](v0.7.0/methodology.md)
+- [Injected benchmark traps](v0.7.0/benchmark-explained.md)
+
+On the v0.7.0 synthetic Markdown fixture, Owledge reduced context pollution by
+88.36% on average and reduced tokens per correct answer by 83.54% on average
+against the naive baseline. This is a fixture-bounded result; real-world
+savings vary by vault shape, model, runtime, and retrieval configuration.
+
 ## Included Scenarios
 
 - KB scan on a synthetic Markdown vault

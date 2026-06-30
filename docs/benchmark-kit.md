@@ -3,9 +3,10 @@
 Benchmark Kit is an optional Owledge add-on for real-file local benchmarking.
 It is not part of the lean core install surface.
 
-The add-on creates deterministic English Markdown fixture vaults, injects
-known retrieval problems, runs deterministic or local Ollama benchmark modes,
-and writes JSON, Markdown, HTML, and SVG reports.
+The add-on ships deterministic English Markdown fixture vaults, can also
+generate fresh deterministic fixtures, injects known retrieval problems, runs
+deterministic or local Ollama benchmark modes, and writes JSON, Markdown, HTML,
+and SVG reports.
 
 Benchmark Kit has two report layers:
 
@@ -25,14 +26,14 @@ python tools/owledge.py install-addon --project-root . --addon benchmark-kit
 Deterministic CI-safe run:
 
 ```bash
-python tools/benchmark-kit/run-benchmark-kit.py --mode ci --scale-mode small --yes
+python tools/benchmark-kit/run-benchmark-kit.py --mode ci --scale-mode small --fixture-source bundled --yes
 python tools/benchmark-kit/render-benchmark-report.py --format html
 ```
 
 Local Ollama run:
 
 ```bash
-python tools/benchmark-kit/run-benchmark-kit.py --mode local --scale-mode small --models gemma4:latest --yes
+python tools/benchmark-kit/run-benchmark-kit.py --mode local --scale-mode small --fixture-source bundled --models gemma4:latest --yes
 python tools/benchmark-kit/render-benchmark-report.py --format html
 ```
 
@@ -53,13 +54,27 @@ python tools/benchmark-kit/compare-benchmark-runs.py --inputs \
 The comparison command never calls Ollama and never runs models. It only reads
 completed `latest.json` reports.
 
+## Published v0.7.0 Proof
+
+The v0.7.0 release includes curated benchmark artifacts:
+
+- [Benchmark summary](../benchmarks/v0.7.0/README.md)
+- [HTML comparison report](../benchmarks/v0.7.0/results/comparison/index.html)
+- [Methodology](../benchmarks/v0.7.0/methodology.md)
+- [Injected benchmark traps](../benchmarks/v0.7.0/benchmark-explained.md)
+
+On the v0.7.0 small fixture, Owledge reduced context pollution by 88.36% on
+average and reduced tokens per correct answer by 83.54% on average compared
+with the naive baseline. This is a fixture-bounded result; real-world savings
+vary by vault shape, model, runtime, and retrieval configuration.
+
 ## Scale Modes
 
 | Mode | Files | Use |
 | --- | ---: | --- |
-| `small` | 100 | CI, smoke tests, quick local demo |
-| `mid` | 500 | Solo or power-user project vault |
-| `large` | 1000 | Team-sized local benchmark |
+| `small` | 100 | CI, smoke tests, quick local demo, v0.7.0 release proof |
+| `mid` | 500 | Larger local reproduction run |
+| `large` | 1000 | Team-sized synthetic benchmark |
 
 `xl`, 10k-file stress tests, external datasets, own-vault benchmarking, and
 cloud/frontier matrices are roadmap items.
@@ -93,13 +108,16 @@ Generated outputs are ignored by default:
 .owledge/reports/generated/benchmark-kit-comparison/charts.svg
 ```
 
+Bundled fixtures are installed under `tools/benchmark-kit/fixtures/` as ZIP
+archives and unpacked into `.owledge/tmp/benchmark-kit/fixtures/` at run time.
+The public fixture folders are available under `benchmarks/v0.7.0/fixtures/`.
+
 The HTML report leads with token usage, context pollution, local model
 throughput, duration, privacy failures, and stale-context failures before
 showing research-style precision and recall metrics.
 
 The comparison HTML report leads with an Executive Verdict, Creator Pull Quote,
-Model Matrix, Before vs Owledge charts, Scenario Heatmap, audience
-interpretation, and caveats. It compares `metadata_scan` against
+Model Matrix, Before vs Owledge charts, Scenario Heatmap, and caveats. It compares `metadata_scan` against
 `owledge_context_pack` for privacy failures, stale failures, context pollution,
 tokens per correct answer, total tokens, scenario pass rate, handoff resume
 score, and tokens/sec.

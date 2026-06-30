@@ -1,0 +1,307 @@
+{
+  "passed": true,
+  "report_type": "benchmark-kit-comparison",
+  "inputs": [
+    ".owledge/exports/benchmark-kit-gemma4-latest/latest.json",
+    ".owledge/exports/benchmark-kit-qwen3-5-4b/latest.json",
+    ".owledge/exports/benchmark-kit-glm-5-1-cloud/latest.json"
+  ],
+  "executive": {
+    "release_proof_status": "pass",
+    "models_compared": 3,
+    "models_passed": 3,
+    "avg_pollution_reduction_percent": 88.36,
+    "avg_token_reduction_percent": 83.54,
+    "privacy_failures_prevented": 3,
+    "stale_failures_prevented": 3,
+    "skipped_inputs": [
+      ".owledge\\exports\\benchmark-kit-nemotron-nano-cloud\\latest.json"
+    ],
+    "summary": "Owledge compared 3 completed benchmark runs: 3/3 Owledge profiles passed, privacy failures prevented=3, stale failures prevented=3, average pollution reduction=88.36%, average tokens/correct reduction=83.54%."
+  },
+  "models": [
+    {
+      "model": "gemma4:latest",
+      "mode": "local",
+      "scale_mode": "small",
+      "file_count": 100,
+      "baseline_verdict": "fail",
+      "owledge_verdict": "pass",
+      "oracle_verdict": "pass",
+      "release_proof_status": "pass",
+      "baseline_pollution": 0.7356,
+      "owledge_pollution": 0.0856,
+      "oracle_pollution": 0.0,
+      "pollution_reduction_percent": 88.36,
+      "baseline_tokens_per_correct_answer": 9269.5,
+      "owledge_tokens_per_correct_answer": 1190.67,
+      "oracle_tokens_per_correct_answer": 1113.17,
+      "token_reduction_percent": 87.15,
+      "baseline_total_tokens": 18539,
+      "owledge_total_tokens": 7144,
+      "baseline_prompt_tokens": 14792,
+      "owledge_prompt_tokens": 4496,
+      "baseline_completion_tokens": 3747,
+      "owledge_completion_tokens": 2648,
+      "total_token_reduction_percent": 61.47,
+      "privacy_failures_prevented": 1,
+      "stale_failures_prevented": 1,
+      "owledge_scenario_pass_rate": 0.8333,
+      "baseline_scenario_pass_rate": 0.0,
+      "owledge_handoff_resume_score": 1.0,
+      "owledge_tokens_per_second": 74.5858,
+      "heatmap": [
+        {
+          "scenario": "needle",
+          "baseline_status": "warn",
+          "owledge_status": "pass"
+        },
+        {
+          "scenario": "multi-hop",
+          "baseline_status": "warn",
+          "owledge_status": "pass"
+        },
+        {
+          "scenario": "stale-conflict",
+          "baseline_status": "warn",
+          "owledge_status": "pass"
+        },
+        {
+          "scenario": "privacy-trap",
+          "baseline_status": "fail",
+          "owledge_status": "pass"
+        },
+        {
+          "scenario": "distractor-heavy",
+          "baseline_status": "warn",
+          "owledge_status": "warn"
+        },
+        {
+          "scenario": "handoff-resume",
+          "baseline_status": "warn",
+          "owledge_status": "pass"
+        }
+      ]
+    },
+    {
+      "model": "qwen3.5:4b",
+      "mode": "local",
+      "scale_mode": "small",
+      "file_count": 100,
+      "baseline_verdict": "fail",
+      "owledge_verdict": "pass",
+      "oracle_verdict": "pass",
+      "release_proof_status": "pass",
+      "baseline_pollution": 0.7356,
+      "owledge_pollution": 0.0856,
+      "oracle_pollution": 0.0,
+      "pollution_reduction_percent": 88.36,
+      "baseline_tokens_per_correct_answer": 8964.0,
+      "owledge_tokens_per_correct_answer": 2002.17,
+      "oracle_tokens_per_correct_answer": 1804.5,
+      "token_reduction_percent": 77.66,
+      "baseline_total_tokens": 17928,
+      "owledge_total_tokens": 12013,
+      "baseline_prompt_tokens": 13018,
+      "owledge_prompt_tokens": 4017,
+      "baseline_completion_tokens": 4910,
+      "owledge_completion_tokens": 7996,
+      "total_token_reduction_percent": 32.99,
+      "privacy_failures_prevented": 1,
+      "stale_failures_prevented": 1,
+      "owledge_scenario_pass_rate": 0.8333,
+      "baseline_scenario_pass_rate": 0.0,
+      "owledge_handoff_resume_score": 1.0,
+      "owledge_tokens_per_second": 37.6034,
+      "heatmap": [
+        {
+          "scenario": "needle",
+          "baseline_status": "warn",
+          "owledge_status": "pass"
+        },
+        {
+          "scenario": "multi-hop",
+          "baseline_status": "warn",
+          "owledge_status": "pass"
+        },
+        {
+          "scenario": "stale-conflict",
+          "baseline_status": "warn",
+          "owledge_status": "pass"
+        },
+        {
+          "scenario": "privacy-trap",
+          "baseline_status": "fail",
+          "owledge_status": "pass"
+        },
+        {
+          "scenario": "distractor-heavy",
+          "baseline_status": "warn",
+          "owledge_status": "warn"
+        },
+        {
+          "scenario": "handoff-resume",
+          "baseline_status": "warn",
+          "owledge_status": "pass"
+        }
+      ]
+    },
+    {
+      "model": "glm-5.1:cloud",
+      "mode": "local",
+      "scale_mode": "small",
+      "file_count": 100,
+      "baseline_verdict": "fail",
+      "owledge_verdict": "pass",
+      "oracle_verdict": "pass",
+      "release_proof_status": "pass",
+      "baseline_pollution": 0.7356,
+      "owledge_pollution": 0.0856,
+      "oracle_pollution": 0.0,
+      "pollution_reduction_percent": 88.36,
+      "baseline_tokens_per_correct_answer": 7485.0,
+      "owledge_tokens_per_correct_answer": 1062.67,
+      "oracle_tokens_per_correct_answer": 898.83,
+      "token_reduction_percent": 85.8,
+      "baseline_total_tokens": 14970,
+      "owledge_total_tokens": 6376,
+      "baseline_prompt_tokens": 12019,
+      "owledge_prompt_tokens": 3603,
+      "baseline_completion_tokens": 2951,
+      "owledge_completion_tokens": 2773,
+      "total_token_reduction_percent": 57.41,
+      "privacy_failures_prevented": 1,
+      "stale_failures_prevented": 1,
+      "owledge_scenario_pass_rate": 0.8333,
+      "baseline_scenario_pass_rate": 0.0,
+      "owledge_handoff_resume_score": 1.0,
+      "owledge_tokens_per_second": 89.4848,
+      "heatmap": [
+        {
+          "scenario": "needle",
+          "baseline_status": "warn",
+          "owledge_status": "pass"
+        },
+        {
+          "scenario": "multi-hop",
+          "baseline_status": "warn",
+          "owledge_status": "pass"
+        },
+        {
+          "scenario": "stale-conflict",
+          "baseline_status": "warn",
+          "owledge_status": "pass"
+        },
+        {
+          "scenario": "privacy-trap",
+          "baseline_status": "fail",
+          "owledge_status": "pass"
+        },
+        {
+          "scenario": "distractor-heavy",
+          "baseline_status": "warn",
+          "owledge_status": "warn"
+        },
+        {
+          "scenario": "handoff-resume",
+          "baseline_status": "warn",
+          "owledge_status": "pass"
+        }
+      ]
+    }
+  ],
+  "api_price_source_note": "Illustrative API prices per 1M tokens. Verify current provider pricing before using these numbers for budgets. Sources checked: Anthropic Claude pricing (docs.anthropic.com/en/docs/about-claude/pricing), Google Gemini API pricing (ai.google.dev/gemini-api/docs/pricing), and OpenAI API pricing (platform.openai.com/docs/pricing).",
+  "api_cost_estimates": [
+    {
+      "provider": "Anthropic",
+      "model": "Claude Opus 4.8",
+      "input_per_mtok": 5.0,
+      "output_per_mtok": 25.0,
+      "baseline_cost_usd": 0.489345,
+      "owledge_cost_usd": 0.396005,
+      "estimated_savings_usd": 0.09334,
+      "estimated_savings_percent": 19.07
+    },
+    {
+      "provider": "Anthropic",
+      "model": "Claude Sonnet 4.6",
+      "input_per_mtok": 3.0,
+      "output_per_mtok": 15.0,
+      "baseline_cost_usd": 0.293607,
+      "owledge_cost_usd": 0.237603,
+      "estimated_savings_usd": 0.056004,
+      "estimated_savings_percent": 19.07
+    },
+    {
+      "provider": "Anthropic",
+      "model": "Claude Haiku 4.5",
+      "input_per_mtok": 1.0,
+      "output_per_mtok": 5.0,
+      "baseline_cost_usd": 0.097869,
+      "owledge_cost_usd": 0.079201,
+      "estimated_savings_usd": 0.018668,
+      "estimated_savings_percent": 19.07
+    },
+    {
+      "provider": "Google",
+      "model": "Gemini 3 Pro",
+      "input_per_mtok": 2.0,
+      "output_per_mtok": 12.0,
+      "baseline_cost_usd": 0.218954,
+      "owledge_cost_usd": 0.185236,
+      "estimated_savings_usd": 0.033718,
+      "estimated_savings_percent": 15.4
+    },
+    {
+      "provider": "Google",
+      "model": "Gemini 2.5 Pro",
+      "input_per_mtok": 1.25,
+      "output_per_mtok": 10.0,
+      "baseline_cost_usd": 0.165866,
+      "owledge_cost_usd": 0.149315,
+      "estimated_savings_usd": 0.016551,
+      "estimated_savings_percent": 9.98
+    },
+    {
+      "provider": "Google",
+      "model": "Gemini 2.5 Flash",
+      "input_per_mtok": 0.3,
+      "output_per_mtok": 2.5,
+      "baseline_cost_usd": 0.040969,
+      "owledge_cost_usd": 0.037177,
+      "estimated_savings_usd": 0.003792,
+      "estimated_savings_percent": 9.26
+    },
+    {
+      "provider": "OpenAI",
+      "model": "gpt-5.5",
+      "input_per_mtok": 5.0,
+      "output_per_mtok": 30.0,
+      "baseline_cost_usd": 0.547385,
+      "owledge_cost_usd": 0.46309,
+      "estimated_savings_usd": 0.084295,
+      "estimated_savings_percent": 15.4
+    },
+    {
+      "provider": "OpenAI",
+      "model": "gpt-5.5-pro",
+      "input_per_mtok": 30.0,
+      "output_per_mtok": 180.0,
+      "baseline_cost_usd": 3.28431,
+      "owledge_cost_usd": 2.77854,
+      "estimated_savings_usd": 0.50577,
+      "estimated_savings_percent": 15.4
+    },
+    {
+      "provider": "OpenAI",
+      "model": "gpt-5.4",
+      "input_per_mtok": 2.5,
+      "output_per_mtok": 15.0,
+      "baseline_cost_usd": 0.273693,
+      "owledge_cost_usd": 0.231545,
+      "estimated_savings_usd": 0.042148,
+      "estimated_savings_percent": 15.4
+    }
+  ],
+  "publication_note": "Curated Owledge v0.7.0 benchmark artifact. Paths are sanitized for public release."
+}

@@ -16,6 +16,7 @@ import sys
 import time
 import urllib.error
 import urllib.request
+import zipfile
 from datetime import datetime, timezone
 from typing import Any
 
@@ -267,9 +268,16 @@ def write_fixtures(root: pathlib.Path, scale_mode: str, seed: int, run_id: str) 
     for index, record in enumerate(records):
         file_name = f"{index:04d}-{slug(record['scenario'])}-{slug(record['role'])}.md"
         path = notes_dir / file_name
-        path.write_text(markdown_record(record), encoding="utf-8")
         record["path"] = path.relative_to(fixture_dir).as_posix()
         path_by_record[record["id"]] = record["path"]
+    title_to_stem = {
+        record["title"]: pathlib.PurePosixPath(record["path"]).stem
+        for record in records
+    }
+    for record in records:
+        record["wikilinks"] = [title_to_stem.get(item, item) for item in record.get("wikilinks", [])]
+        path = fixture_dir / record["path"]
+        path.write_text(markdown_record(record), encoding="utf-8")
 
     queries = []
     oracle = {"scenarios": {}, "scale_mode": scale_mode, "file_count": file_count, "seed": seed}
@@ -304,6 +312,45 @@ def write_fixtures(root: pathlib.Path, scale_mode: str, seed: int, run_id: str) 
         encoding="utf-8",
     )
     return {"fixture_dir": fixture_dir, "records": records, "queries": queries, "oracle": oracle}
+
+
+def bundled_fixture_archive(scale_mode: str) -> pathlib.Path:
+    return pathlib.Path(__file__).resolve().parent / "fixtures" / f"{scale_mode}.zip"
+
+
+def unpack_bundled_fixtures(root: pathlib.Path, scale_mode: str, run_id: str) -> dict[str, Any]:
+    archive = bundled_fixture_archive(scale_mode)
+    if not archive.exists():
+        raise FileNotFoundError(
+            f"Bundled benchmark fixture is missing: {archive}. "
+            "Use --fixture-source generate or reinstall the benchmark-kit add-on."
+        )
+    fixture_dir = root / ".owledge" / "tmp" / "benchmark-kit" / "fixtures" / run_id / scale_mode
+    if fixture_dir.exists():
+        shutil.rmtree(fixture_dir)
+    fixture_dir.mkdir(parents=True, exist_ok=True)
+    with zipfile.ZipFile(archive) as zf:
+        zf.extractall(fixture_dir)
+    manifest_path = fixture_dir / "fixture-manifest.json"
+    if not manifest_path.exists():
+        raise FileNotFoundError(f"Bundled fixture manifest is missing: {manifest_path}")
+    queries_path = fixture_dir / "queries.json"
+    oracle_path = fixture_dir / "oracle.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    queries = json.loads(queries_path.read_text(encoding="utf-8"))
+    oracle = json.loads(oracle_path.read_text(encoding="utf-8"))
+    records = manifest.get("records")
+    if not isinstance(records, list):
+        raise ValueError(f"Bundled fixture manifest has no records list: {manifest_path}")
+    return {"fixture_dir": fixture_dir, "records": records, "queries": queries, "oracle": oracle}
+
+
+def prepare_fixtures(root: pathlib.Path, scale_mode: str, seed: int, run_id: str, fixture_source: str) -> dict[str, Any]:
+    if fixture_source == "bundled":
+        return unpack_bundled_fixtures(root, scale_mode, run_id)
+    if fixture_source == "generate":
+        return write_fixtures(root, scale_mode, seed, run_id)
+    raise ValueError(f"Unsupported fixture source: {fixture_source}")
 
 
 def read_text(fixture_dir: pathlib.Path, rel_path: str) -> str:
@@ -614,6 +661,7 @@ def render_markdown(results: dict[str, Any]) -> str:
         f"- Passed: `{str(results['passed']).lower()}`",
         f"- Mode: `{results['mode']}`",
         f"- Scale mode: `{results['scale_mode']}`",
+        f"- Fixture source: `{results.get('fixture_source', 'generated')}`",
         f"- File count: `{results['file_count']}`",
         f"- Model(s): `{', '.join(results['models'])}`",
         f"- Profiles tested: `{', '.join(PROFILES)}`",
@@ -760,6 +808,7 @@ def render_html(results: dict[str, Any], svg_text: str | None = None) -> str:
   </section>
   <div class="grid">
     <div class="card"><div class="label">Scale mode</div><div class="value">{html.escape(results['scale_mode'])}</div></div>
+    <div class="card"><div class="label">Fixture source</div><div class="value">{html.escape(str(results.get('fixture_source', 'generated')))}</div><div class="hint">Bundled fixtures make runs reproducible; generated fixtures create a fresh deterministic vault from the same seed.</div></div>
     <div class="card"><div class="label">File count</div><div class="value">{results['file_count']}</div></div>
     <div class="card"><div class="label">Total tokens</div><div class="value">{totals['total_tokens']}</div><div class="hint">Total prompt plus completion budget consumed by the benchmark.</div></div>
     <div class="card"><div class="label">Context pollution</div><div class="value">{totals['avg_irrelevant_token_ratio']}</div><div class="hint">Lower is better. Pass <= 0.20, warn <= 0.40, fail above 0.40.</div></div>
@@ -869,7 +918,7 @@ def render_svg(results: dict[str, Any]) -> str:
     return "\n".join(parts)
 
 
-def run(root: pathlib.Path, mode: str, scale_mode: str, seed: int, models: str, ollama_url: str, yes: bool, primary_profile: str = "owledge_context_pack") -> dict[str, Any]:
+def run(root: pathlib.Path, mode: str, scale_mode: str, seed: int, models: str, ollama_url: str, yes: bool, primary_profile: str = "owledge_context_pack", fixture_source: str = "bundled") -> dict[str, Any]:
     if mode not in {"ci", "local"}:
         return {"passed": False, "error": f"Unsupported mode for v0.7.0 benchmark-kit: {mode}"}
     if scale_mode not in SCALE_MODES:
@@ -884,7 +933,7 @@ def run(root: pathlib.Path, mode: str, scale_mode: str, seed: int, models: str, 
             return {"passed": False, "error": "Local mode requires --yes because it can consume CPU/GPU/VRAM."}
 
     run_id = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S") + f"-seed{seed}-{scale_mode}"
-    fixture = write_fixtures(root, scale_mode, seed, run_id)
+    fixture = prepare_fixtures(root, scale_mode, seed, run_id, fixture_source)
     fixture_dir = fixture["fixture_dir"]
     records: list[dict[str, Any]] = []
     errors: list[str] = []
@@ -943,6 +992,7 @@ def run(root: pathlib.Path, mode: str, scale_mode: str, seed: int, models: str, 
         "commit": git_commit(root),
         "mode": mode,
         "scale_mode": scale_mode,
+        "fixture_source": fixture_source,
         "file_count": SCALE_MODES[scale_mode],
         "seed": seed,
         "run_id": run_id,
@@ -974,12 +1024,13 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--mode", choices=["ci", "local"], default="ci")
     parser.add_argument("--scale-mode", choices=sorted(SCALE_MODES), default="small")
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--fixture-source", choices=["bundled", "generate"], default="bundled")
     parser.add_argument("--models", default="")
     parser.add_argument("--primary-profile", choices=PROFILES, default="owledge_context_pack")
     parser.add_argument("--ollama-url", default="http://localhost:11434")
     parser.add_argument("--yes", action="store_true")
     args = parser.parse_args(argv)
-    result = run(pathlib.Path(args.project_root).resolve(), args.mode, args.scale_mode, args.seed, args.models, args.ollama_url, args.yes, args.primary_profile)
+    result = run(pathlib.Path(args.project_root).resolve(), args.mode, args.scale_mode, args.seed, args.models, args.ollama_url, args.yes, args.primary_profile, args.fixture_source)
     print(json.dumps(result, indent=2))
     return 0 if result.get("passed") else 1
 

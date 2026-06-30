@@ -1,0 +1,1444 @@
+{
+  "passed": true,
+  "generated_at": "2026-06-29T10:05:02Z",
+  "project_root": ".",
+  "commit": "112f536",
+  "mode": "local",
+  "scale_mode": "small",
+  "file_count": 100,
+  "seed": 42,
+  "run_id": "20260629100314-seed42-small",
+  "fixture_dir": ".owledge/tmp/benchmark-kit/fixtures/20260629100314-seed42-small/small",
+  "queries": ".owledge/tmp/benchmark-kit/fixtures/20260629100314-seed42-small/small/queries.json",
+  "oracle": ".owledge/tmp/benchmark-kit/fixtures/20260629100314-seed42-small/small/oracle.json",
+  "models": [
+    "glm-5.1:cloud"
+  ],
+  "primary_profile": "owledge_context_pack",
+  "installed_models": [
+    {
+      "name": "gemma4:latest",
+      "model": "gemma4:latest",
+      "modified_at": "2026-05-08T12:10:43.0701446+02:00",
+      "size": 9608350718,
+      "digest": "c6eb396dbd5992bbe3f5cdb947e8bbc0ee413d7c17e2beaae69f5d569cf982eb",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "gemma4",
+        "families": [
+          "gemma4"
+        ],
+        "parameter_size": "8.0B",
+        "quantization_level": "Q4_K_M"
+      },
+      "capabilities": [
+        "completion",
+        "tools",
+        "thinking"
+      ]
+    },
+    {
+      "name": "llava:7b",
+      "model": "llava:7b",
+      "modified_at": "2026-05-06T22:41:37.4161659+02:00",
+      "size": 4733363377,
+      "digest": "8dd30f6b0cb19f555f2c7a7ebda861449ea2cc76bf1f44e262931f45fc81d081",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "llama",
+        "families": [
+          "llama",
+          "clip"
+        ],
+        "parameter_size": "7B",
+        "quantization_level": "Q4_0",
+        "context_length": 32768,
+        "embedding_length": 4096
+      },
+      "capabilities": [
+        "completion",
+        "vision"
+      ]
+    },
+    {
+      "name": "qwen3.5:4b",
+      "model": "qwen3.5:4b",
+      "modified_at": "2026-04-24T17:50:19.1381543+02:00",
+      "size": 3389983735,
+      "digest": "2a654d98e6fba55d452b7043684e9b57a947e393bbffa62485a7aac05ee4eefd",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "qwen35",
+        "families": [
+          "qwen35"
+        ],
+        "parameter_size": "4.7B",
+        "quantization_level": "Q4_K_M",
+        "context_length": 262144,
+        "embedding_length": 2560
+      },
+      "capabilities": [
+        "vision",
+        "completion",
+        "tools",
+        "thinking"
+      ]
+    },
+    {
+      "name": "bge-m3:latest",
+      "model": "bge-m3:latest",
+      "modified_at": "2026-04-24T15:43:56.5755092+02:00",
+      "size": 1157672605,
+      "digest": "7907646426070047a77226ac3e684fbbe8410524f7b4a74d02837e43f2146bab",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "bert",
+        "families": [
+          "bert"
+        ],
+        "parameter_size": "566.70M",
+        "quantization_level": "F16",
+        "context_length": 8192,
+        "embedding_length": 1024
+      },
+      "capabilities": [
+        "embedding"
+      ]
+    },
+    {
+      "name": "llama3.2:latest",
+      "model": "llama3.2:latest",
+      "modified_at": "2026-04-20T17:07:50.0370945+02:00",
+      "size": 2019393189,
+      "digest": "a80c4f17acd55265feec403c7aef86be0c25983ab279d83f3bcd3abbcb5b8b72",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "llama",
+        "families": [
+          "llama"
+        ],
+        "parameter_size": "3.2B",
+        "quantization_level": "Q4_K_M",
+        "context_length": 131072,
+        "embedding_length": 3072
+      },
+      "capabilities": [
+        "completion",
+        "tools"
+      ]
+    },
+    {
+      "name": "nomic-embed-text:v1.5",
+      "model": "nomic-embed-text:v1.5",
+      "modified_at": "2026-04-19T20:23:50.8623629+02:00",
+      "size": 274302450,
+      "digest": "0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "nomic-bert",
+        "families": [
+          "nomic-bert"
+        ],
+        "parameter_size": "137M",
+        "quantization_level": "F16",
+        "context_length": 2048,
+        "embedding_length": 768
+      },
+      "capabilities": [
+        "embedding"
+      ]
+    },
+    {
+      "name": "hermes3:latest",
+      "model": "hermes3:latest",
+      "modified_at": "2026-04-19T20:00:48.8768526+02:00",
+      "size": 4661227243,
+      "digest": "4f6b83f30b62bc3d0cf9be09266db222805ee815c8fd7d8b38f863f655be78b7",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "llama",
+        "families": [
+          "llama"
+        ],
+        "parameter_size": "8.0B",
+        "quantization_level": "Q4_0",
+        "context_length": 131072,
+        "embedding_length": 4096
+      },
+      "capabilities": [
+        "completion",
+        "tools"
+      ]
+    },
+    {
+      "name": "glm-5.1:cloud",
+      "model": "glm-5.1:cloud",
+      "remote_model": "glm-5.1",
+      "remote_host": "https://ollama.com:443",
+      "modified_at": "2026-04-17T16:53:14.0016289+02:00",
+      "size": 327,
+      "digest": "59472abf9d0aab2eb1b0106ba1c1f59266a00ed41f63d2a2b1db082e7346b982",
+      "details": {
+        "parent_model": "",
+        "format": "",
+        "family": "",
+        "families": null,
+        "parameter_size": "",
+        "quantization_level": "",
+        "context_length": 202752
+      },
+      "capabilities": [
+        "completion",
+        "tools",
+        "thinking"
+      ]
+    },
+    {
+      "name": "minimax-m2.7:cloud",
+      "model": "minimax-m2.7:cloud",
+      "remote_model": "minimax-m2.7",
+      "remote_host": "https://ollama.com:443",
+      "modified_at": "2026-04-17T16:52:33.4708752+02:00",
+      "size": 375,
+      "digest": "06daa293c105f0bd71fd19420e4d15cae66cc5f71cb8f55b4f998e96ec8ab67a",
+      "details": {
+        "parent_model": "",
+        "format": "",
+        "family": "minimax",
+        "families": [
+          "minimax"
+        ],
+        "parameter_size": "",
+        "quantization_level": "",
+        "context_length": 204800,
+        "embedding_length": 3072
+      },
+      "capabilities": [
+        "completion",
+        "tools",
+        "thinking"
+      ]
+    },
+    {
+      "name": "kimi-k2.5:cloud",
+      "model": "kimi-k2.5:cloud",
+      "remote_model": "kimi-k2.5",
+      "remote_host": "https://ollama.com:443",
+      "modified_at": "2026-04-06T20:34:26.3338786+02:00",
+      "size": 340,
+      "digest": "6d1c3246c6080b61c87b543323760b8f36cb68cf4473080b9429d09e2a73ddb7",
+      "details": {
+        "parent_model": "",
+        "format": "",
+        "family": "",
+        "families": null,
+        "parameter_size": "",
+        "quantization_level": "",
+        "context_length": 262144
+      },
+      "capabilities": [
+        "completion",
+        "tools",
+        "thinking",
+        "vision"
+      ]
+    },
+    {
+      "name": "glm-5:cloud",
+      "model": "glm-5:cloud",
+      "remote_model": "glm-5",
+      "remote_host": "https://ollama.com:443",
+      "modified_at": "2026-03-31T11:29:56.9452982+02:00",
+      "size": 323,
+      "digest": "c313cd06593533865448bd609a95c40c6e13d87ddf2daeb3b8f342e1a6c34794",
+      "details": {
+        "parent_model": "",
+        "format": "",
+        "family": "",
+        "families": null,
+        "parameter_size": "",
+        "quantization_level": "",
+        "context_length": 202752
+      },
+      "capabilities": [
+        "completion",
+        "tools",
+        "thinking"
+      ]
+    },
+    {
+      "name": "command-r7b:latest",
+      "model": "command-r7b:latest",
+      "modified_at": "2026-03-25T21:02:43.7708919+01:00",
+      "size": 5057031198,
+      "digest": "ff4e9696ef9f19b62e3f7d7261c95dcc9bb15a7c0398493366d851119fe2e1ef",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "cohere2",
+        "families": [
+          "cohere2"
+        ],
+        "parameter_size": "8.0B",
+        "quantization_level": "Q4_K_M",
+        "context_length": 8192,
+        "embedding_length": 4096
+      },
+      "capabilities": [
+        "completion",
+        "tools"
+      ]
+    },
+    {
+      "name": "qwen2.5:7b-instruct",
+      "model": "qwen2.5:7b-instruct",
+      "modified_at": "2026-03-25T21:02:00.9957994+01:00",
+      "size": 4683087332,
+      "digest": "845dbda0ea48ed749caafd9e6037047aa19acfcfd82e704d7ca97d631a0b697e",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "qwen2",
+        "families": [
+          "qwen2"
+        ],
+        "parameter_size": "7.6B",
+        "quantization_level": "Q4_K_M",
+        "context_length": 32768,
+        "embedding_length": 3584
+      },
+      "capabilities": [
+        "completion",
+        "tools"
+      ]
+    },
+    {
+      "name": "rjmalagon/gte-qwen2-1.5b-instruct-embed-f16:latest",
+      "model": "rjmalagon/gte-qwen2-1.5b-instruct-embed-f16:latest",
+      "modified_at": "2026-03-25T19:33:46.5024905+01:00",
+      "size": 3558625829,
+      "digest": "90ba362f82076c02e232e4835f0e5a70d3ccf55527f1dd694cb46cddaf705939",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "qwen2",
+        "families": [
+          "qwen2"
+        ],
+        "parameter_size": "1.8B",
+        "quantization_level": "F16",
+        "context_length": 131072,
+        "embedding_length": 1536
+      },
+      "capabilities": [
+        "completion"
+      ]
+    },
+    {
+      "name": "deepseek-r1:latest",
+      "model": "deepseek-r1:latest",
+      "modified_at": "2026-03-19T19:07:19.1832648+01:00",
+      "size": 5225376047,
+      "digest": "6995872bfe4c521a67b32da386cd21d5c6e819b6e0d62f79f64ec83be99f5763",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "qwen3",
+        "families": [
+          "qwen3"
+        ],
+        "parameter_size": "8.2B",
+        "quantization_level": "Q4_K_M",
+        "context_length": 131072,
+        "embedding_length": 4096
+      },
+      "capabilities": [
+        "completion",
+        "thinking"
+      ]
+    },
+    {
+      "name": "llama3-groq-tool-use:8b",
+      "model": "llama3-groq-tool-use:8b",
+      "modified_at": "2026-03-18T11:52:15.9214864+01:00",
+      "size": 4661257688,
+      "digest": "36211dad2b153f09fe2b0c5f3e4e82ee83d27db68e3a00006cd934dfdc5057a4",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "llama",
+        "families": [
+          "llama"
+        ],
+        "parameter_size": "8.0B",
+        "quantization_level": "Q4_0",
+        "context_length": 8192,
+        "embedding_length": 4096
+      },
+      "capabilities": [
+        "completion",
+        "tools"
+      ]
+    },
+    {
+      "name": "llama3.1:8b",
+      "model": "llama3.1:8b",
+      "modified_at": "2026-03-18T11:12:14.2221331+01:00",
+      "size": 4920753328,
+      "digest": "46e0c10c039e019119339687c3c1757cc81b9da49709a3b3924863ba87ca666e",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "llama",
+        "families": [
+          "llama"
+        ],
+        "parameter_size": "8.0B",
+        "quantization_level": "Q4_K_M",
+        "context_length": 131072,
+        "embedding_length": 4096
+      },
+      "capabilities": [
+        "completion",
+        "tools"
+      ]
+    },
+    {
+      "name": "qwen3.5:9b",
+      "model": "qwen3.5:9b",
+      "modified_at": "2026-03-18T11:07:11.3834197+01:00",
+      "size": 6594474711,
+      "digest": "6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "qwen35",
+        "families": [
+          "qwen35"
+        ],
+        "parameter_size": "9.7B",
+        "quantization_level": "Q4_K_M",
+        "context_length": 262144,
+        "embedding_length": 4096
+      },
+      "capabilities": [
+        "vision",
+        "completion",
+        "tools",
+        "thinking"
+      ]
+    },
+    {
+      "name": "qwen3:0.6b",
+      "model": "qwen3:0.6b",
+      "modified_at": "2026-03-18T10:53:03.8033371+01:00",
+      "size": 522653767,
+      "digest": "7df6b6e09427a769808717c0a93cadc4ae99ed4eb8bf5ca557c90846becea435",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "qwen3",
+        "families": [
+          "qwen3"
+        ],
+        "parameter_size": "751.63M",
+        "quantization_level": "Q4_K_M",
+        "context_length": 40960,
+        "embedding_length": 1024
+      },
+      "capabilities": [
+        "completion",
+        "tools",
+        "thinking"
+      ]
+    },
+    {
+      "name": "qwen2.5vl:7b",
+      "model": "qwen2.5vl:7b",
+      "modified_at": "2026-03-01T18:03:02.5807952+01:00",
+      "size": 5969245856,
+      "digest": "5ced39dfa4bac325dc183dd1e4febaa1c46b3ea28bce48896c8e69c1e79611cc",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "qwen25vl",
+        "families": [
+          "qwen25vl"
+        ],
+        "parameter_size": "8.3B",
+        "quantization_level": "Q4_K_M",
+        "context_length": 128000,
+        "embedding_length": 3584
+      },
+      "capabilities": [
+        "vision",
+        "completion"
+      ]
+    },
+    {
+      "name": "llama3.2-vision:latest",
+      "model": "llama3.2-vision:latest",
+      "modified_at": "2026-02-21T19:59:21.3144153+01:00",
+      "size": 7816589186,
+      "digest": "6f2f9757ae97e8a3f8ea33d6adb2b11d93d9a35bef277cd2c0b1b5af8e8d0b1e",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "mllama",
+        "families": [
+          "mllama"
+        ],
+        "parameter_size": "10.7B",
+        "quantization_level": "Q4_K_M",
+        "context_length": 131072,
+        "embedding_length": 4096
+      },
+      "capabilities": [
+        "vision",
+        "completion"
+      ]
+    },
+    {
+      "name": "qwen3:latest",
+      "model": "qwen3:latest",
+      "modified_at": "2025-12-17T12:29:39.8141562+01:00",
+      "size": 5225388164,
+      "digest": "500a1f067a9f782620b40bee6f7b0c89e17ae61f686b92c24933e4ca4b2b8b41",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "qwen3",
+        "families": [
+          "qwen3"
+        ],
+        "parameter_size": "8.2B",
+        "quantization_level": "Q4_K_M",
+        "context_length": 40960,
+        "embedding_length": 4096
+      },
+      "capabilities": [
+        "completion",
+        "tools",
+        "thinking"
+      ]
+    },
+    {
+      "name": "codegemma:latest",
+      "model": "codegemma:latest",
+      "modified_at": "2025-12-06T13:38:11.7472759+01:00",
+      "size": 5011852809,
+      "digest": "0c96700aaada572ce9bb6999d1fda9b53e9e6cef5d74fda1e066a1ba811b93f3",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "gemma",
+        "families": [
+          "gemma"
+        ],
+        "parameter_size": "9B",
+        "quantization_level": "Q4_0",
+        "context_length": 8192,
+        "embedding_length": 3072
+      },
+      "capabilities": [
+        "completion"
+      ]
+    }
+  ],
+  "platform": {
+    "system": "Windows",
+    "release": "11",
+    "machine": "AMD64",
+    "python": "3.14.0"
+  },
+  "scenarios": [
+    {
+      "name": "needle",
+      "question": "Which launch decision should the next agent use?",
+      "expected": [
+        "target"
+      ],
+      "description": "One decisive fact is hidden in a larger project vault."
+    },
+    {
+      "name": "multi-hop",
+      "question": "Which evidence chain explains the billing migration plan?",
+      "expected": [
+        "target",
+        "support-a",
+        "support-b"
+      ],
+      "description": "The answer requires two or three linked Markdown files."
+    },
+    {
+      "name": "stale-conflict",
+      "question": "Which authentication plan is current?",
+      "expected": [
+        "target"
+      ],
+      "description": "A newer reviewed record contradicts an older stale record."
+    },
+    {
+      "name": "privacy-trap",
+      "question": "Which safe customer insight can be shared?",
+      "expected": [
+        "target"
+      ],
+      "description": "Private notes contain tempting but unsafe context."
+    },
+    {
+      "name": "distractor-heavy",
+      "question": "Which analytics rollout note is correct?",
+      "expected": [
+        "target"
+      ],
+      "description": "Many plausible but wrong notes compete with the target."
+    },
+    {
+      "name": "handoff-resume",
+      "question": "What should the next agent do after the handoff?",
+      "expected": [
+        "target",
+        "support-a"
+      ],
+      "description": "A compact handoff needs the plan and next action context."
+    }
+  ],
+  "records": [
+    {
+      "model": "glm-5.1:cloud",
+      "model_digest": "59472abf9d0aab2eb1b0106ba1c1f59266a00ed41f63d2a2b1db082e7346b982",
+      "mode": "local",
+      "scale_mode": "small",
+      "file_count": 100,
+      "scenario": "needle",
+      "profile": "metadata_scan",
+      "selected_files": [
+        "notes/0070-needle-target.md",
+        "notes/0006-needle-distractor-a.md",
+        "notes/0052-needle-distractor-b.md",
+        "notes/0000-background-filler.md",
+        "notes/0001-background-filler.md"
+      ],
+      "context_pack_tokens": 1436,
+      "benchmark_prompt_tokens": 1546,
+      "relevant_context_tokens": 280,
+      "distractor_tokens": 571,
+      "stale_tokens": 0,
+      "private_tokens": 0,
+      "background_tokens": 585,
+      "prompt_eval_count": 1701,
+      "eval_count": 476,
+      "total_tokens": 2177,
+      "total_duration_ms": 2821,
+      "time_to_first_token_ms": 0,
+      "tokens_per_second": 153.8959,
+      "precision_at_k": 0.2,
+      "recall_at_k": 1.0,
+      "answer_correctness": 0.64,
+      "citation_accuracy": 1.0,
+      "multi_hop_success": 1.0,
+      "handoff_resume_score": 1.0,
+      "privacy_failure_count": 0,
+      "staleness_failure_count": 0,
+      "distractor_hit_count": 2,
+      "irrelevant_token_ratio": 0.805
+    },
+    {
+      "model": "glm-5.1:cloud",
+      "model_digest": "59472abf9d0aab2eb1b0106ba1c1f59266a00ed41f63d2a2b1db082e7346b982",
+      "mode": "local",
+      "scale_mode": "small",
+      "file_count": 100,
+      "scenario": "needle",
+      "profile": "owledge_context_pack",
+      "selected_files": [
+        "notes/0070-needle-target.md"
+      ],
+      "context_pack_tokens": 280,
+      "benchmark_prompt_tokens": 351,
+      "relevant_context_tokens": 280,
+      "distractor_tokens": 0,
+      "stale_tokens": 0,
+      "private_tokens": 0,
+      "background_tokens": 0,
+      "prompt_eval_count": 375,
+      "eval_count": 393,
+      "total_tokens": 768,
+      "total_duration_ms": 2670,
+      "time_to_first_token_ms": 0,
+      "tokens_per_second": 134.7275,
+      "precision_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "answer_correctness": 1.0,
+      "citation_accuracy": 1.0,
+      "multi_hop_success": 1.0,
+      "handoff_resume_score": 1.0,
+      "privacy_failure_count": 0,
+      "staleness_failure_count": 0,
+      "distractor_hit_count": 0,
+      "irrelevant_token_ratio": 0.0
+    },
+    {
+      "model": "glm-5.1:cloud",
+      "model_digest": "59472abf9d0aab2eb1b0106ba1c1f59266a00ed41f63d2a2b1db082e7346b982",
+      "mode": "local",
+      "scale_mode": "small",
+      "file_count": 100,
+      "scenario": "needle",
+      "profile": "oracle",
+      "selected_files": [
+        "notes/0070-needle-target.md"
+      ],
+      "context_pack_tokens": 280,
+      "benchmark_prompt_tokens": 351,
+      "relevant_context_tokens": 280,
+      "distractor_tokens": 0,
+      "stale_tokens": 0,
+      "private_tokens": 0,
+      "background_tokens": 0,
+      "prompt_eval_count": 375,
+      "eval_count": 383,
+      "total_tokens": 758,
+      "total_duration_ms": 2555,
+      "time_to_first_token_ms": 0,
+      "tokens_per_second": 141.7993,
+      "precision_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "answer_correctness": 1.0,
+      "citation_accuracy": 1.0,
+      "multi_hop_success": 1.0,
+      "handoff_resume_score": 1.0,
+      "privacy_failure_count": 0,
+      "staleness_failure_count": 0,
+      "distractor_hit_count": 0,
+      "irrelevant_token_ratio": 0.0
+    },
+    {
+      "model": "glm-5.1:cloud",
+      "model_digest": "59472abf9d0aab2eb1b0106ba1c1f59266a00ed41f63d2a2b1db082e7346b982",
+      "mode": "local",
+      "scale_mode": "small",
+      "file_count": 100,
+      "scenario": "multi-hop",
+      "profile": "metadata_scan",
+      "selected_files": [
+        "notes/0061-multi-hop-support-b.md",
+        "notes/0085-multi-hop-support-a.md",
+        "notes/0097-multi-hop-target.md",
+        "notes/0062-multi-hop-distractor-a.md",
+        "notes/0000-background-filler.md",
+        "notes/0001-background-filler.md"
+      ],
+      "context_pack_tokens": 1711,
+      "benchmark_prompt_tokens": 1835,
+      "relevant_context_tokens": 846,
+      "distractor_tokens": 280,
+      "stale_tokens": 0,
+      "private_tokens": 0,
+      "background_tokens": 585,
+      "prompt_eval_count": 1997,
+      "eval_count": 372,
+      "total_tokens": 2369,
+      "total_duration_ms": 6878,
+      "time_to_first_token_ms": 0,
+      "tokens_per_second": 52.751,
+      "precision_at_k": 0.5,
+      "recall_at_k": 1.0,
+      "answer_correctness": 0.775,
+      "citation_accuracy": 1.0,
+      "multi_hop_success": 1.0,
+      "handoff_resume_score": 1.0,
+      "privacy_failure_count": 0,
+      "staleness_failure_count": 0,
+      "distractor_hit_count": 1,
+      "irrelevant_token_ratio": 0.5056
+    },
+    {
+      "model": "glm-5.1:cloud",
+      "model_digest": "59472abf9d0aab2eb1b0106ba1c1f59266a00ed41f63d2a2b1db082e7346b982",
+      "mode": "local",
+      "scale_mode": "small",
+      "file_count": 100,
+      "scenario": "multi-hop",
+      "profile": "owledge_context_pack",
+      "selected_files": [
+        "notes/0061-multi-hop-support-b.md",
+        "notes/0085-multi-hop-support-a.md",
+        "notes/0097-multi-hop-target.md"
+      ],
+      "context_pack_tokens": 846,
+      "benchmark_prompt_tokens": 940,
+      "relevant_context_tokens": 846,
+      "distractor_tokens": 0,
+      "stale_tokens": 0,
+      "private_tokens": 0,
+      "background_tokens": 0,
+      "prompt_eval_count": 1014,
+      "eval_count": 669,
+      "total_tokens": 1683,
+      "total_duration_ms": 8688,
+      "time_to_first_token_ms": 0,
+      "tokens_per_second": 75.5505,
+      "precision_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "answer_correctness": 1.0,
+      "citation_accuracy": 1.0,
+      "multi_hop_success": 1.0,
+      "handoff_resume_score": 1.0,
+      "privacy_failure_count": 0,
+      "staleness_failure_count": 0,
+      "distractor_hit_count": 0,
+      "irrelevant_token_ratio": 0.0
+    },
+    {
+      "model": "glm-5.1:cloud",
+      "model_digest": "59472abf9d0aab2eb1b0106ba1c1f59266a00ed41f63d2a2b1db082e7346b982",
+      "mode": "local",
+      "scale_mode": "small",
+      "file_count": 100,
+      "scenario": "multi-hop",
+      "profile": "oracle",
+      "selected_files": [
+        "notes/0061-multi-hop-support-b.md",
+        "notes/0085-multi-hop-support-a.md",
+        "notes/0097-multi-hop-target.md"
+      ],
+      "context_pack_tokens": 846,
+      "benchmark_prompt_tokens": 940,
+      "relevant_context_tokens": 846,
+      "distractor_tokens": 0,
+      "stale_tokens": 0,
+      "private_tokens": 0,
+      "background_tokens": 0,
+      "prompt_eval_count": 1014,
+      "eval_count": 315,
+      "total_tokens": 1329,
+      "total_duration_ms": 3404,
+      "time_to_first_token_ms": 0,
+      "tokens_per_second": 88.0626,
+      "precision_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "answer_correctness": 1.0,
+      "citation_accuracy": 1.0,
+      "multi_hop_success": 1.0,
+      "handoff_resume_score": 1.0,
+      "privacy_failure_count": 0,
+      "staleness_failure_count": 0,
+      "distractor_hit_count": 0,
+      "irrelevant_token_ratio": 0.0
+    },
+    {
+      "model": "glm-5.1:cloud",
+      "model_digest": "59472abf9d0aab2eb1b0106ba1c1f59266a00ed41f63d2a2b1db082e7346b982",
+      "mode": "local",
+      "scale_mode": "small",
+      "file_count": 100,
+      "scenario": "stale-conflict",
+      "profile": "metadata_scan",
+      "selected_files": [
+        "notes/0048-stale-conflict-target.md",
+        "notes/0003-stale-conflict-distractor-a.md",
+        "notes/0030-stale-conflict-stale-old-plan.md",
+        "notes/0000-background-filler.md",
+        "notes/0001-background-filler.md"
+      ],
+      "context_pack_tokens": 1461,
+      "benchmark_prompt_tokens": 1578,
+      "relevant_context_tokens": 287,
+      "distractor_tokens": 290,
+      "stale_tokens": 299,
+      "private_tokens": 0,
+      "background_tokens": 585,
+      "prompt_eval_count": 1730,
+      "eval_count": 319,
+      "total_tokens": 2049,
+      "total_duration_ms": 5468,
+      "time_to_first_token_ms": 0,
+      "tokens_per_second": 56.3107,
+      "precision_at_k": 0.2,
+      "recall_at_k": 1.0,
+      "answer_correctness": 0.56,
+      "citation_accuracy": 1.0,
+      "multi_hop_success": 1.0,
+      "handoff_resume_score": 1.0,
+      "privacy_failure_count": 0,
+      "staleness_failure_count": 1,
+      "distractor_hit_count": 2,
+      "irrelevant_token_ratio": 0.8036
+    },
+    {
+      "model": "glm-5.1:cloud",
+      "model_digest": "59472abf9d0aab2eb1b0106ba1c1f59266a00ed41f63d2a2b1db082e7346b982",
+      "mode": "local",
+      "scale_mode": "small",
+      "file_count": 100,
+      "scenario": "stale-conflict",
+      "profile": "owledge_context_pack",
+      "selected_files": [
+        "notes/0048-stale-conflict-target.md"
+      ],
+      "context_pack_tokens": 287,
+      "benchmark_prompt_tokens": 360,
+      "relevant_context_tokens": 287,
+      "distractor_tokens": 0,
+      "stale_tokens": 0,
+      "private_tokens": 0,
+      "background_tokens": 0,
+      "prompt_eval_count": 380,
+      "eval_count": 436,
+      "total_tokens": 816,
+      "total_duration_ms": 6134,
+      "time_to_first_token_ms": 0,
+      "tokens_per_second": 69.1734,
+      "precision_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "answer_correctness": 1.0,
+      "citation_accuracy": 1.0,
+      "multi_hop_success": 1.0,
+      "handoff_resume_score": 1.0,
+      "privacy_failure_count": 0,
+      "staleness_failure_count": 0,
+      "distractor_hit_count": 0,
+      "irrelevant_token_ratio": 0.0
+    },
+    {
+      "model": "glm-5.1:cloud",
+      "model_digest": "59472abf9d0aab2eb1b0106ba1c1f59266a00ed41f63d2a2b1db082e7346b982",
+      "mode": "local",
+      "scale_mode": "small",
+      "file_count": 100,
+      "scenario": "stale-conflict",
+      "profile": "oracle",
+      "selected_files": [
+        "notes/0048-stale-conflict-target.md"
+      ],
+      "context_pack_tokens": 287,
+      "benchmark_prompt_tokens": 360,
+      "relevant_context_tokens": 287,
+      "distractor_tokens": 0,
+      "stale_tokens": 0,
+      "private_tokens": 0,
+      "background_tokens": 0,
+      "prompt_eval_count": 380,
+      "eval_count": 410,
+      "total_tokens": 790,
+      "total_duration_ms": 5111,
+      "time_to_first_token_ms": 0,
+      "tokens_per_second": 76.3643,
+      "precision_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "answer_correctness": 1.0,
+      "citation_accuracy": 1.0,
+      "multi_hop_success": 1.0,
+      "handoff_resume_score": 1.0,
+      "privacy_failure_count": 0,
+      "staleness_failure_count": 0,
+      "distractor_hit_count": 0,
+      "irrelevant_token_ratio": 0.0
+    },
+    {
+      "model": "glm-5.1:cloud",
+      "model_digest": "59472abf9d0aab2eb1b0106ba1c1f59266a00ed41f63d2a2b1db082e7346b982",
+      "mode": "local",
+      "scale_mode": "small",
+      "file_count": 100,
+      "scenario": "privacy-trap",
+      "profile": "metadata_scan",
+      "selected_files": [
+        "notes/0011-privacy-trap-target.md",
+        "notes/0039-privacy-trap-distractor-a.md",
+        "notes/0088-privacy-trap-private-trap.md",
+        "notes/0000-background-filler.md",
+        "notes/0001-background-filler.md"
+      ],
+      "context_pack_tokens": 1442,
+      "benchmark_prompt_tokens": 1555,
+      "relevant_context_tokens": 279,
+      "distractor_tokens": 285,
+      "stale_tokens": 0,
+      "private_tokens": 293,
+      "background_tokens": 585,
+      "prompt_eval_count": 1698,
+      "eval_count": 574,
+      "total_tokens": 2272,
+      "total_duration_ms": 6896,
+      "time_to_first_token_ms": 0,
+      "tokens_per_second": 80.0893,
+      "precision_at_k": 0.2,
+      "recall_at_k": 1.0,
+      "answer_correctness": 0.54,
+      "citation_accuracy": 1.0,
+      "multi_hop_success": 1.0,
+      "handoff_resume_score": 1.0,
+      "privacy_failure_count": 1,
+      "staleness_failure_count": 0,
+      "distractor_hit_count": 2,
+      "irrelevant_token_ratio": 0.8065
+    },
+    {
+      "model": "glm-5.1:cloud",
+      "model_digest": "59472abf9d0aab2eb1b0106ba1c1f59266a00ed41f63d2a2b1db082e7346b982",
+      "mode": "local",
+      "scale_mode": "small",
+      "file_count": 100,
+      "scenario": "privacy-trap",
+      "profile": "owledge_context_pack",
+      "selected_files": [
+        "notes/0011-privacy-trap-target.md"
+      ],
+      "context_pack_tokens": 279,
+      "benchmark_prompt_tokens": 350,
+      "relevant_context_tokens": 279,
+      "distractor_tokens": 0,
+      "stale_tokens": 0,
+      "private_tokens": 0,
+      "background_tokens": 0,
+      "prompt_eval_count": 372,
+      "eval_count": 383,
+      "total_tokens": 755,
+      "total_duration_ms": 3657,
+      "time_to_first_token_ms": 0,
+      "tokens_per_second": 99.7656,
+      "precision_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "answer_correctness": 1.0,
+      "citation_accuracy": 1.0,
+      "multi_hop_success": 1.0,
+      "handoff_resume_score": 1.0,
+      "privacy_failure_count": 0,
+      "staleness_failure_count": 0,
+      "distractor_hit_count": 0,
+      "irrelevant_token_ratio": 0.0
+    },
+    {
+      "model": "glm-5.1:cloud",
+      "model_digest": "59472abf9d0aab2eb1b0106ba1c1f59266a00ed41f63d2a2b1db082e7346b982",
+      "mode": "local",
+      "scale_mode": "small",
+      "file_count": 100,
+      "scenario": "privacy-trap",
+      "profile": "oracle",
+      "selected_files": [
+        "notes/0011-privacy-trap-target.md"
+      ],
+      "context_pack_tokens": 279,
+      "benchmark_prompt_tokens": 350,
+      "relevant_context_tokens": 279,
+      "distractor_tokens": 0,
+      "stale_tokens": 0,
+      "private_tokens": 0,
+      "background_tokens": 0,
+      "prompt_eval_count": 372,
+      "eval_count": 329,
+      "total_tokens": 701,
+      "total_duration_ms": 9383,
+      "time_to_first_token_ms": 0,
+      "tokens_per_second": 34.3603,
+      "precision_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "answer_correctness": 1.0,
+      "citation_accuracy": 1.0,
+      "multi_hop_success": 1.0,
+      "handoff_resume_score": 1.0,
+      "privacy_failure_count": 0,
+      "staleness_failure_count": 0,
+      "distractor_hit_count": 0,
+      "irrelevant_token_ratio": 0.0
+    },
+    {
+      "model": "glm-5.1:cloud",
+      "model_digest": "59472abf9d0aab2eb1b0106ba1c1f59266a00ed41f63d2a2b1db082e7346b982",
+      "mode": "local",
+      "scale_mode": "small",
+      "file_count": 100,
+      "scenario": "distractor-heavy",
+      "profile": "metadata_scan",
+      "selected_files": [
+        "notes/0091-distractor-heavy-target.md",
+        "notes/0008-distractor-heavy-distractor-1.md",
+        "notes/0044-distractor-heavy-distractor-4.md",
+        "notes/0054-distractor-heavy-distractor-2.md",
+        "notes/0065-distractor-heavy-distractor-5.md",
+        "notes/0092-distractor-heavy-distractor-3.md",
+        "notes/0098-distractor-heavy-distractor-0.md",
+        "notes/0000-background-filler.md",
+        "notes/0001-background-filler.md"
+      ],
+      "context_pack_tokens": 2662,
+      "benchmark_prompt_tokens": 2830,
+      "relevant_context_tokens": 283,
+      "distractor_tokens": 1794,
+      "stale_tokens": 0,
+      "private_tokens": 0,
+      "background_tokens": 585,
+      "prompt_eval_count": 3159,
+      "eval_count": 658,
+      "total_tokens": 3817,
+      "total_duration_ms": 5856,
+      "time_to_first_token_ms": 0,
+      "tokens_per_second": 109.1573,
+      "precision_at_k": 0.1111,
+      "recall_at_k": 1.0,
+      "answer_correctness": 0.6,
+      "citation_accuracy": 1.0,
+      "multi_hop_success": 1.0,
+      "handoff_resume_score": 1.0,
+      "privacy_failure_count": 0,
+      "staleness_failure_count": 0,
+      "distractor_hit_count": 6,
+      "irrelevant_token_ratio": 0.8937
+    },
+    {
+      "model": "glm-5.1:cloud",
+      "model_digest": "59472abf9d0aab2eb1b0106ba1c1f59266a00ed41f63d2a2b1db082e7346b982",
+      "mode": "local",
+      "scale_mode": "small",
+      "file_count": 100,
+      "scenario": "distractor-heavy",
+      "profile": "owledge_context_pack",
+      "selected_files": [
+        "notes/0091-distractor-heavy-target.md",
+        "notes/0008-distractor-heavy-distractor-1.md"
+      ],
+      "context_pack_tokens": 582,
+      "benchmark_prompt_tokens": 668,
+      "relevant_context_tokens": 283,
+      "distractor_tokens": 299,
+      "stale_tokens": 0,
+      "private_tokens": 0,
+      "background_tokens": 0,
+      "prompt_eval_count": 729,
+      "eval_count": 357,
+      "total_tokens": 1086,
+      "total_duration_ms": 14929,
+      "time_to_first_token_ms": 0,
+      "tokens_per_second": 23.5395,
+      "precision_at_k": 0.5,
+      "recall_at_k": 1.0,
+      "answer_correctness": 0.775,
+      "citation_accuracy": 1.0,
+      "multi_hop_success": 1.0,
+      "handoff_resume_score": 1.0,
+      "privacy_failure_count": 0,
+      "staleness_failure_count": 0,
+      "distractor_hit_count": 1,
+      "irrelevant_token_ratio": 0.5137
+    },
+    {
+      "model": "glm-5.1:cloud",
+      "model_digest": "59472abf9d0aab2eb1b0106ba1c1f59266a00ed41f63d2a2b1db082e7346b982",
+      "mode": "local",
+      "scale_mode": "small",
+      "file_count": 100,
+      "scenario": "distractor-heavy",
+      "profile": "oracle",
+      "selected_files": [
+        "notes/0091-distractor-heavy-target.md"
+      ],
+      "context_pack_tokens": 283,
+      "benchmark_prompt_tokens": 357,
+      "relevant_context_tokens": 283,
+      "distractor_tokens": 0,
+      "stale_tokens": 0,
+      "private_tokens": 0,
+      "background_tokens": 0,
+      "prompt_eval_count": 375,
+      "eval_count": 166,
+      "total_tokens": 541,
+      "total_duration_ms": 1736,
+      "time_to_first_token_ms": 0,
+      "tokens_per_second": 86.5034,
+      "precision_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "answer_correctness": 1.0,
+      "citation_accuracy": 1.0,
+      "multi_hop_success": 1.0,
+      "handoff_resume_score": 1.0,
+      "privacy_failure_count": 0,
+      "staleness_failure_count": 0,
+      "distractor_hit_count": 0,
+      "irrelevant_token_ratio": 0.0
+    },
+    {
+      "model": "glm-5.1:cloud",
+      "model_digest": "59472abf9d0aab2eb1b0106ba1c1f59266a00ed41f63d2a2b1db082e7346b982",
+      "mode": "local",
+      "scale_mode": "small",
+      "file_count": 100,
+      "scenario": "handoff-resume",
+      "profile": "metadata_scan",
+      "selected_files": [
+        "notes/0021-handoff-resume-support-a.md",
+        "notes/0069-handoff-resume-target.md",
+        "notes/0058-handoff-resume-distractor-a.md",
+        "notes/0000-background-filler.md",
+        "notes/0001-background-filler.md"
+      ],
+      "context_pack_tokens": 1461,
+      "benchmark_prompt_tokens": 1579,
+      "relevant_context_tokens": 586,
+      "distractor_tokens": 290,
+      "stale_tokens": 0,
+      "private_tokens": 0,
+      "background_tokens": 585,
+      "prompt_eval_count": 1734,
+      "eval_count": 552,
+      "total_tokens": 2286,
+      "total_duration_ms": 9683,
+      "time_to_first_token_ms": 0,
+      "tokens_per_second": 56.0179,
+      "precision_at_k": 0.4,
+      "recall_at_k": 1.0,
+      "answer_correctness": 0.73,
+      "citation_accuracy": 1.0,
+      "multi_hop_success": 1.0,
+      "handoff_resume_score": 1.0,
+      "privacy_failure_count": 0,
+      "staleness_failure_count": 0,
+      "distractor_hit_count": 1,
+      "irrelevant_token_ratio": 0.5989
+    },
+    {
+      "model": "glm-5.1:cloud",
+      "model_digest": "59472abf9d0aab2eb1b0106ba1c1f59266a00ed41f63d2a2b1db082e7346b982",
+      "mode": "local",
+      "scale_mode": "small",
+      "file_count": 100,
+      "scenario": "handoff-resume",
+      "profile": "owledge_context_pack",
+      "selected_files": [
+        "notes/0021-handoff-resume-support-a.md",
+        "notes/0069-handoff-resume-target.md"
+      ],
+      "context_pack_tokens": 586,
+      "benchmark_prompt_tokens": 673,
+      "relevant_context_tokens": 586,
+      "distractor_tokens": 0,
+      "stale_tokens": 0,
+      "private_tokens": 0,
+      "background_tokens": 0,
+      "prompt_eval_count": 733,
+      "eval_count": 535,
+      "total_tokens": 1268,
+      "total_duration_ms": 3821,
+      "time_to_first_token_ms": 0,
+      "tokens_per_second": 134.1525,
+      "precision_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "answer_correctness": 1.0,
+      "citation_accuracy": 1.0,
+      "multi_hop_success": 1.0,
+      "handoff_resume_score": 1.0,
+      "privacy_failure_count": 0,
+      "staleness_failure_count": 0,
+      "distractor_hit_count": 0,
+      "irrelevant_token_ratio": 0.0
+    },
+    {
+      "model": "glm-5.1:cloud",
+      "model_digest": "59472abf9d0aab2eb1b0106ba1c1f59266a00ed41f63d2a2b1db082e7346b982",
+      "mode": "local",
+      "scale_mode": "small",
+      "file_count": 100,
+      "scenario": "handoff-resume",
+      "profile": "oracle",
+      "selected_files": [
+        "notes/0021-handoff-resume-support-a.md",
+        "notes/0069-handoff-resume-target.md"
+      ],
+      "context_pack_tokens": 586,
+      "benchmark_prompt_tokens": 673,
+      "relevant_context_tokens": 586,
+      "distractor_tokens": 0,
+      "stale_tokens": 0,
+      "private_tokens": 0,
+      "background_tokens": 0,
+      "prompt_eval_count": 733,
+      "eval_count": 541,
+      "total_tokens": 1274,
+      "total_duration_ms": 4173,
+      "time_to_first_token_ms": 0,
+      "tokens_per_second": 125.1156,
+      "precision_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "answer_correctness": 1.0,
+      "citation_accuracy": 1.0,
+      "multi_hop_success": 1.0,
+      "handoff_resume_score": 1.0,
+      "privacy_failure_count": 0,
+      "staleness_failure_count": 0,
+      "distractor_hit_count": 0,
+      "irrelevant_token_ratio": 0.0
+    }
+  ],
+  "totals": {
+    "prompt_tokens": 18871,
+    "completion_tokens": 7868,
+    "context_pack_tokens": 15594,
+    "total_duration_ms": 103863,
+    "privacy_failures": 1,
+    "staleness_failures": 1,
+    "distractor_hits": 15,
+    "failed_scenarios": 0,
+    "total_tokens": 26739,
+    "tokens_per_correct_answer": 1909.93,
+    "avg_irrelevant_token_ratio": 0.2737,
+    "avg_tokens_per_second": 88.7409
+  },
+  "errors": [],
+  "explanation": ".owledge/benchmark-kit/BENCHMARK_EXPLAINED.md",
+  "profile_totals": {
+    "metadata_scan": {
+      "prompt_tokens": 12019,
+      "completion_tokens": 2951,
+      "context_pack_tokens": 10173,
+      "total_duration_ms": 37602,
+      "privacy_failures": 1,
+      "staleness_failures": 1,
+      "distractor_hits": 14,
+      "failed_scenarios": 0,
+      "total_tokens": 14970,
+      "tokens_per_correct_answer": 7485.0,
+      "avg_irrelevant_token_ratio": 0.7356,
+      "avg_tokens_per_second": 84.7037,
+      "record_count": 6
+    },
+    "owledge_context_pack": {
+      "prompt_tokens": 3603,
+      "completion_tokens": 2773,
+      "context_pack_tokens": 2860,
+      "total_duration_ms": 39899,
+      "privacy_failures": 0,
+      "staleness_failures": 0,
+      "distractor_hits": 1,
+      "failed_scenarios": 0,
+      "total_tokens": 6376,
+      "tokens_per_correct_answer": 1062.67,
+      "avg_irrelevant_token_ratio": 0.0856,
+      "avg_tokens_per_second": 89.4848,
+      "record_count": 6
+    },
+    "oracle": {
+      "prompt_tokens": 3249,
+      "completion_tokens": 2144,
+      "context_pack_tokens": 2561,
+      "total_duration_ms": 26362,
+      "privacy_failures": 0,
+      "staleness_failures": 0,
+      "distractor_hits": 0,
+      "failed_scenarios": 0,
+      "total_tokens": 5393,
+      "tokens_per_correct_answer": 898.83,
+      "avg_irrelevant_token_ratio": 0.0,
+      "avg_tokens_per_second": 92.0343,
+      "record_count": 6
+    }
+  },
+  "verdicts": {
+    "baseline": {
+      "profile": "metadata_scan",
+      "verdict": "fail",
+      "conclusion": "Baseline failed as expected: naive metadata scanning over-selected unsafe, stale, or noisy context.",
+      "states": {
+        "context_pollution": "fail",
+        "privacy": "fail",
+        "staleness": "warn",
+        "failed_scenarios": "pass",
+        "tokens_per_correct_answer": "warn"
+      },
+      "totals": {
+        "prompt_tokens": 12019,
+        "completion_tokens": 2951,
+        "context_pack_tokens": 10173,
+        "total_duration_ms": 37602,
+        "privacy_failures": 1,
+        "staleness_failures": 1,
+        "distractor_hits": 14,
+        "failed_scenarios": 0,
+        "total_tokens": 14970,
+        "tokens_per_correct_answer": 7485.0,
+        "avg_irrelevant_token_ratio": 0.7356,
+        "avg_tokens_per_second": 84.7037,
+        "record_count": 6
+      }
+    },
+    "owledge": {
+      "profile": "owledge_context_pack",
+      "verdict": "pass",
+      "conclusion": "Owledge passed: the context-pack profile kept private and stale records out while staying inside the target pollution band.",
+      "states": {
+        "context_pollution": "pass",
+        "privacy": "pass",
+        "staleness": "pass",
+        "failed_scenarios": "pass",
+        "tokens_per_correct_answer": "pass"
+      },
+      "totals": {
+        "prompt_tokens": 3603,
+        "completion_tokens": 2773,
+        "context_pack_tokens": 2860,
+        "total_duration_ms": 39899,
+        "privacy_failures": 0,
+        "staleness_failures": 0,
+        "distractor_hits": 1,
+        "failed_scenarios": 0,
+        "total_tokens": 6376,
+        "tokens_per_correct_answer": 1062.67,
+        "avg_irrelevant_token_ratio": 0.0856,
+        "avg_tokens_per_second": 89.4848,
+        "record_count": 6
+      }
+    },
+    "oracle": {
+      "profile": "oracle",
+      "verdict": "pass",
+      "conclusion": "Oracle is the reference ceiling and should be treated as an ideal comparison point, not a product claim.",
+      "states": {
+        "context_pollution": "pass",
+        "privacy": "pass",
+        "staleness": "pass",
+        "failed_scenarios": "pass",
+        "tokens_per_correct_answer": "pass"
+      },
+      "totals": {
+        "prompt_tokens": 3249,
+        "completion_tokens": 2144,
+        "context_pack_tokens": 2561,
+        "total_duration_ms": 26362,
+        "privacy_failures": 0,
+        "staleness_failures": 0,
+        "distractor_hits": 0,
+        "failed_scenarios": 0,
+        "total_tokens": 5393,
+        "tokens_per_correct_answer": 898.83,
+        "avg_irrelevant_token_ratio": 0.0,
+        "avg_tokens_per_second": 92.0343,
+        "record_count": 6
+      }
+    },
+    "final_verdict": "pass",
+    "final_conclusion": "Owledge passed: the baseline profile over-selected unsafe or stale context, while the Owledge context-pack profile kept private and stale records out."
+  },
+  "final_verdict": "pass",
+  "final_conclusion": "Owledge passed: the baseline profile over-selected unsafe or stale context, while the Owledge context-pack profile kept private and stale records out.",
+  "verdict": {
+    "verdict": "pass",
+    "conclusion": "Owledge passed: the baseline profile over-selected unsafe or stale context, while the Owledge context-pack profile kept private and stale records out.",
+    "states": {
+      "context_pollution": "pass",
+      "privacy": "pass",
+      "staleness": "pass",
+      "failed_scenarios": "pass",
+      "tokens_per_correct_answer": "pass"
+    }
+  },
+  "publication_note": "Curated Owledge v0.7.0 benchmark artifact. Paths are sanitized for public release."
+}
