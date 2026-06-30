@@ -1499,7 +1499,7 @@ def kb_module_gate(root: pathlib.Path) -> dict[str, Any]:
     ]:
         if not (module_root / pathlib.Path(relative)).exists():
             raise RuntimeError(f"Missing expected module file: {relative}")
-    status = json.loads((module_root / "owledge" / "indexes" / "kb-module-status.json").read_text(encoding="utf-8"))
+    status = json.loads((module_root / ".owledge" / "indexes" / "kb-module-status.json").read_text(encoding="utf-8"))
     if status["markdown_files_scanned"] < 2 or status["existing_kb_files_modified"] or status["requires_os_environment_variables"]:
         raise RuntimeError("KB module status did not report safe additive behavior.")
 
@@ -1509,7 +1509,7 @@ def kb_module_gate(root: pathlib.Path) -> dict[str, Any]:
     mapped_kb.mkdir(parents=True)
     write_text(mapped_kb / "Idea.md", "# Idea\n\nTurn [[Research]] into an MVP.\n")
     write_text(mapped_kb / "Research.md", "# Research\n\nSource note.\n")
-    for relative in ["01_Ideas", "20_Plans", "30_Evidence", "40_Handoffs", "50_Reviews", "..owledge/indexes"]:
+    for relative in ["01_Ideas", "20_Plans", "30_Evidence", "40_Handoffs", "50_Reviews", ".owledge/indexes"]:
         (mapped_kb / pathlib.Path(relative)).mkdir(parents=True, exist_ok=True)
     write_text(
         mapped_kb / "owledge-map.json",
@@ -1520,7 +1520,7 @@ def kb_module_gate(root: pathlib.Path) -> dict[str, Any]:
                 "evidence": "30_Evidence",
                 "handoffs": "40_Handoffs",
                 "reviews": "50_Reviews",
-                "indexes": "..owledge/indexes",
+                "indexes": ".owledge/indexes",
             },
             indent=2,
         ),
@@ -1547,7 +1547,7 @@ def kb_module_gate(root: pathlib.Path) -> dict[str, Any]:
         "evidence": "30_Evidence",
         "handoffs": "40_Handoffs",
         "reviews": "50_Reviews",
-        "indexes": "..owledge/indexes",
+        "indexes": ".owledge/indexes",
     }
     write_text(mapped_kb / "bad-owledge-map.json", json.dumps(bad_map))
     process = run_subprocess(

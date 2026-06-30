@@ -418,8 +418,8 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
     if not mapping:
         ensure_dirs(module_root)
 
-    plan_dir = mapping["plans"] if mapping else module_root / "owledge" / "plans"
-    index_dir = mapping["indexes"] if mapping else module_root / "owledge" / "indexes"
+    plan_dir = mapping["plans"] if mapping else module_root / ".owledge" / "plans"
+    index_dir = mapping["indexes"] if mapping else module_root / ".owledge" / "indexes"
     excluded_roots = (
         [path for key, path in mapping.items() if key != "ideas"]
         if mapping
