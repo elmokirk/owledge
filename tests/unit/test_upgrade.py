@@ -98,7 +98,7 @@ def test_manual_patch_is_git_applyable(tmp_path):
     patch_text = out.get("patch", "")
     assert "diff --git" in patch_text, f"patch missing diff --git header: {patch_text[:200]}"
     assert "a/" in patch_text and "b/" in patch_text, "patch missing a/ b/ prefixes"
-    patch_path = project / "owledge" / "exports" / "upgrade-pending.patch"
+    patch_path = project / ".owledge" / "exports" / "upgrade-pending.patch"
     assert patch_path.is_file(), "patch file not written"
     git_check = subprocess.run(
         ["git", "-C", str(project), "apply", "--check", str(patch_path)],
@@ -165,7 +165,7 @@ def test_manifest_deleted_graceful(fresh_project):
 def test_concurrent_run_blocked(fresh_project_with_old_manifest):
     """Plan: hold .upgrade.lock with a live PID, second --apply -> refused."""
     project = fresh_project_with_old_manifest
-    lock_path = project / "owledge" / ".upgrade.lock"
+    lock_path = project / ".owledge" / ".upgrade.lock"
     lock_path.parent.mkdir(parents=True, exist_ok=True)
     live_pid = os.getpid()
     lock_path.write_text(json.dumps({"pid": live_pid, "started_at": "2026-01-01T00:00:00Z"}), encoding="utf-8")
