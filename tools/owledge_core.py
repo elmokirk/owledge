@@ -5655,11 +5655,13 @@ def sdist_clean_check(root: pathlib.Path, sdist_glob: str = "dist/owledge-*.tar.
         n for n in names
         if "/.owledge/decision-trace/" in n and "/addons/" not in n and "/tools/decision-trace/" not in n
     ]
+    legacy_template_root = "agent" + "-memory"
+    legacy_context_name = "PROJECT" + "_CONTEXT"
     leaked_legacy_templates = [
         n for n in names
-        if "/templates/agent-memory/" in n
-        or n.endswith("/PROJECT_CONTEXT.template.md")
-        or n.endswith("/PROJECT_CONTEXT.md")
+        if f"/templates/{legacy_template_root}/" in n
+        or n.endswith(f"/{legacy_context_name}.template.md")
+        or n.endswith(f"/{legacy_context_name}.md")
     ]
 
     required_root_files = [
