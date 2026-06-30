@@ -62,16 +62,16 @@ skipped optional inputs and does not fabricate missing model results.
 
 Install the optional Benchmark Kit into a project and run:
 
-```powershell
-python tools\benchmark-kit\run-benchmark-kit.py --mode ci --scale-mode small --fixture-source bundled --yes
-python tools\benchmark-kit\render-benchmark-report.py --format html
+```bash
+python tools/benchmark-kit/run-benchmark-kit.py --mode ci --scale-mode small --fixture-source bundled --yes
+python tools/benchmark-kit/render-benchmark-report.py --format html
 ```
 
 For local Ollama models, run one model at a time:
 
-```powershell
-python tools\benchmark-kit\run-benchmark-kit.py --mode local --scale-mode small --fixture-source bundled --models gemma4:latest --yes
-python tools\benchmark-kit\render-benchmark-report.py --format html
+```bash
+python tools/benchmark-kit/run-benchmark-kit.py --mode local --scale-mode small --fixture-source bundled --models gemma4:latest --yes
+python tools/benchmark-kit/render-benchmark-report.py --format html
 ```
 
 Sequential local runs are intentional. Running models in parallel can distort
@@ -83,4 +83,3 @@ These results come from a synthetic Markdown vault. They prove the benchmarked
 behavior on a controlled fixture, not a guaranteed savings percentage for every
 project. Real-world savings vary by vault shape, writing quality, model
 behavior, context window, and selected retrieval strategy.
-
