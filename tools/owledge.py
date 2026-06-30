@@ -1704,7 +1704,7 @@ def expect_kb_failure(root: pathlib.Path, kb_root: pathlib.Path, map_file: str, 
 
 def new_mapped_kb(path: pathlib.Path) -> None:
     path.mkdir(parents=True, exist_ok=True)
-    for relative in ["00_Inbox", "20_Plans", "30_Evidence", "40_Handoffs", "50_Reviews", "..owledge/indexes"]:
+    for relative in ["00_Inbox", "20_Plans", "30_Evidence", "40_Handoffs", "50_Reviews", ".owledge/indexes"]:
         (path / pathlib.Path(relative)).mkdir(parents=True, exist_ok=True)
     write_text(path / "00_Inbox" / "Idea.md", "# Idea\n\nBuild MVP from [[Research Note]].\n")
     write_text(path / "Research Note.md", "---\ntype: research\n---\n\n# Research Note\n\nKeep this source unchanged.\n")
@@ -1717,7 +1717,7 @@ def new_mapped_kb(path: pathlib.Path) -> None:
                 "evidence": "30_Evidence",
                 "handoffs": "40_Handoffs",
                 "reviews": "50_Reviews",
-                "indexes": "..owledge/indexes",
+                "indexes": ".owledge/indexes",
             },
             indent=2,
         ),
@@ -1751,7 +1751,7 @@ def principles_scenarios_gate(root: pathlib.Path) -> dict[str, Any]:
         )
     )
     large_after = tree_hash(large_root, ["owledge-module"])
-    large_status = json.loads((large_root / "owledge-module" / "owledge" / "indexes" / "kb-module-status.json").read_text(encoding="utf-8"))
+    large_status = json.loads((large_root / "owledge-module" / ".owledge" / "indexes" / "kb-module-status.json").read_text(encoding="utf-8"))
     results.add("large-codebase-existing-files-unchanged", large_before == large_after, "Existing files stayed byte-identical outside the module.")
     results.add("large-codebase-max-files-honored", large_status["markdown_files_scanned"] == 25, "MaxFiles=25 honored.")
     results.add("large-codebase-zero-env", large_status["requires_os_environment_variables"] is False, "No OS environment variable dependency.")
@@ -1771,7 +1771,7 @@ def principles_scenarios_gate(root: pathlib.Path) -> dict[str, Any]:
             create_sample_plan=True,
         )
     )
-    user_after = tree_hash(user_kb, ["20_Plans", "30_Evidence", "40_Handoffs", "50_Reviews", "..owledge/indexes"])
+    user_after = tree_hash(user_kb, ["20_Plans", "30_Evidence", "40_Handoffs", "50_Reviews", ".owledge/indexes"])
     user_status = json.loads((user_kb / ".owledge" / "indexes" / "kb-module-status.json").read_text(encoding="utf-8"))
     results.add("user-kb-mapped-mode", user_status["mode"] == "mapped" and user_status["mapping_enabled"], "Mapped mode selected.")
     results.add("user-kb-original-notes-unchanged", user_before == user_after, "Original notes and map stayed byte-identical.")
@@ -1780,7 +1780,7 @@ def principles_scenarios_gate(root: pathlib.Path) -> dict[str, Any]:
     write_text(user_kb / "30_Evidence" / "worker-evidence.md", "# Worker Evidence\n\nSource: `Research Note.md`.\n")
     write_text(user_kb / "40_Handoffs" / "worker-handoff.md", "# Worker Handoff\n\nStatus: done.\n")
     write_text(user_kb / "50_Reviews" / "reviewer-findings.md", "# Reviewer Findings\n\nVerdict: needs curator approval before promotion.\n")
-    forbidden = [user_kb / "owledge" / "canonical", user_kb / "owledge" / "lessons", user_kb / "global-memory"]
+    forbidden = [user_kb / ".owledge" / "canonical", user_kb / ".owledge" / "lessons", user_kb / "global-memory"]
     results.add("multi-agent-role-boundaries", not any(path.exists() for path in forbidden), "Workers/reviewers wrote only mapped artifacts.")
 
     skill_bloat = tmp_base / "skill-bloat"
@@ -1819,8 +1819,8 @@ def principles_scenarios_gate(root: pathlib.Path) -> dict[str, Any]:
         )
     )
     superpowers_hash_after = sha256_file(superpowers_plan)
-    index_text = (superpowers_kb / "owledge-module" / "owledge" / "indexes" / "kb-scan.jsonl").read_text(encoding="utf-8")
-    handoff_path = superpowers_kb / "owledge-module" / "owledge" / "handoffs" / "superpowers-plan-handoff.md"
+    index_text = (superpowers_kb / "owledge-module" / ".owledge" / "indexes" / "kb-scan.jsonl").read_text(encoding="utf-8")
+    handoff_path = superpowers_kb / "owledge-module" / ".owledge" / "handoffs" / "superpowers-plan-handoff.md"
     write_text(handoff_path, "# Superpowers Plan Handoff\n\nEvidence: `docs/superpowers/plans/example-plan.md`.\n")
     results.add("superpowers-plan-unchanged", superpowers_hash_before == superpowers_hash_after, "Superpowers plan unchanged.")
     results.add("superpowers-plan-indexed", "docs/superpowers/plans/example-plan.md" in index_text, "Index references Superpowers plan.")
@@ -1829,20 +1829,20 @@ def principles_scenarios_gate(root: pathlib.Path) -> dict[str, Any]:
     edge_kb = tmp_base / "edge-kb"
     new_mapped_kb(edge_kb)
     edge_cases: list[tuple[str, Any]] = [
-        ("absolute-path", {"plans": "C" + ":/escape", "evidence": "30_Evidence", "handoffs": "40_Handoffs", "reviews": "50_Reviews", "indexes": "..owledge/indexes"}),
-        ("unknown-key", {"plans": "20_Plans", "evidence": "30_Evidence", "handoffs": "40_Handoffs", "reviews": "50_Reviews", "indexes": "..owledge/indexes", "canonical": "50_Reviews"}),
-        ("missing-required-key", {"plans": "20_Plans", "evidence": "30_Evidence", "reviews": "50_Reviews", "indexes": "..owledge/indexes"}),
+        ("absolute-path", {"plans": "C" + ":/escape", "evidence": "30_Evidence", "handoffs": "40_Handoffs", "reviews": "50_Reviews", "indexes": ".owledge/indexes"}),
+        ("unknown-key", {"plans": "20_Plans", "evidence": "30_Evidence", "handoffs": "40_Handoffs", "reviews": "50_Reviews", "indexes": ".owledge/indexes", "canonical": "50_Reviews"}),
+        ("missing-required-key", {"plans": "20_Plans", "evidence": "30_Evidence", "reviews": "50_Reviews", "indexes": ".owledge/indexes"}),
         ("missing-target", {"plans": "20_Plans", "evidence": "30_Evidence", "handoffs": "40_Handoffs", "reviews": "50_Reviews", "indexes": "missing-indexes"}),
-        ("file-target", {"plans": "Research Note.md", "evidence": "30_Evidence", "handoffs": "40_Handoffs", "reviews": "50_Reviews", "indexes": "..owledge/indexes"}),
-        ("blank-value", {"plans": "", "evidence": "30_Evidence", "handoffs": "40_Handoffs", "reviews": "50_Reviews", "indexes": "..owledge/indexes"}),
-        ("null-value", {"plans": None, "evidence": "30_Evidence", "handoffs": "40_Handoffs", "reviews": "50_Reviews", "indexes": "..owledge/indexes"}),
-        ("array-value", {"plans": ["20_Plans"], "evidence": "30_Evidence", "handoffs": "40_Handoffs", "reviews": "50_Reviews", "indexes": "..owledge/indexes"}),
+        ("file-target", {"plans": "Research Note.md", "evidence": "30_Evidence", "handoffs": "40_Handoffs", "reviews": "50_Reviews", "indexes": ".owledge/indexes"}),
+        ("blank-value", {"plans": "", "evidence": "30_Evidence", "handoffs": "40_Handoffs", "reviews": "50_Reviews", "indexes": ".owledge/indexes"}),
+        ("null-value", {"plans": None, "evidence": "30_Evidence", "handoffs": "40_Handoffs", "reviews": "50_Reviews", "indexes": ".owledge/indexes"}),
+        ("array-value", {"plans": ["20_Plans"], "evidence": "30_Evidence", "handoffs": "40_Handoffs", "reviews": "50_Reviews", "indexes": ".owledge/indexes"}),
     ]
     for name, payload in edge_cases:
         write_text(edge_kb / f"bad-{name}.json", json.dumps(payload))
         results.add(f"edge-fail-closed:{name}", expect_kb_failure(root, edge_kb, f"bad-{name}.json"), "Invalid map should fail closed.")
     results.add("edge-fail-closed:missing-explicit-map", expect_kb_failure(root, edge_kb, "does-not-exist.json"), "Explicit missing map should fail closed.")
-    write_text(edge_kb / "bad-duplicate-key.json", '{"plans":"../escape","plans":"20_Plans","evidence":"30_Evidence","handoffs":"40_Handoffs","reviews":"50_Reviews","indexes":"..owledge/indexes"}')
+    write_text(edge_kb / "bad-duplicate-key.json", '{"plans":"../escape","plans":"20_Plans","evidence":"30_Evidence","handoffs":"40_Handoffs","reviews":"50_Reviews","indexes":".owledge/indexes"}')
     results.add("edge-fail-closed:duplicate-json-key", expect_kb_failure(root, edge_kb, "bad-duplicate-key.json"), "Duplicate JSON keys should fail closed.")
     results.add("edge-fail-closed:max-files-zero", expect_kb_failure(root, edge_kb, "", ["--max-files", "0"]), "max-files=0 should fail closed.")
 
@@ -1861,7 +1861,7 @@ def principles_scenarios_gate(root: pathlib.Path) -> dict[str, Any]:
             create_sample_plan=True,
         )
     )
-    bom_rows = [(json.loads(line)) for line in (bom_kb / "owledge-module" / "owledge" / "indexes" / "kb-scan.jsonl").read_text(encoding="utf-8").splitlines() if line.strip()]
+    bom_rows = [(json.loads(line)) for line in (bom_kb / "owledge-module" / ".owledge" / "indexes" / "kb-scan.jsonl").read_text(encoding="utf-8").splitlines() if line.strip()]
     keys = set(bom_rows[0].get("frontmatter_keys", [])) if bom_rows else set()
     results.add("edge-bom-frontmatter-keys", {"type", "status"}.issubset(keys), "BOM-prefixed frontmatter keys detected.")
 
@@ -1904,22 +1904,22 @@ def poweruser_simulations_gate(root: pathlib.Path) -> dict[str, Any]:
     dx_project = tmp_base / "first user project"
     started = time.perf_counter()
     init_result = init_project(dx_project, root, include_plugin_adapter=False, include_compliance=False)
-    write_text(dx_project / "owledge" / "plans" / "first-use-plan.md", "# First Use Plan\n\nGoal: create one useful source-backed plan.\n")
-    write_text(dx_project / "owledge" / "handoffs" / "first-use-handoff.md", "# First Use Handoff\n\nNext action: run validation and continue the MVP cutline.\n")
+    write_text(dx_project / ".owledge" / "plans" / "first-use-plan.md", "# First Use Plan\n\nGoal: create one useful source-backed plan.\n")
+    write_text(dx_project / ".owledge" / "handoffs" / "first-use-handoff.md", "# First Use Handoff\n\nNext action: run validation and continue the MVP cutline.\n")
     dx_seconds = round(time.perf_counter() - started, 3)
     results.add("first-user-init-doctor", bool(init_result.get("doctor_passed")), "Initialized project passes doctor.")
-    results.add("first-user-useful-artifacts", (dx_project / "owledge" / "plans" / "first-use-plan.md").exists() and (dx_project / "owledge" / "handoffs" / "first-use-handoff.md").exists(), "First user can reach one useful plan and handoff.")
+    results.add("first-user-useful-artifacts", (dx_project / ".owledge" / "plans" / "first-use-plan.md").exists() and (dx_project / ".owledge" / "handoffs" / "first-use-handoff.md").exists(), "First user can reach one useful plan and handoff.")
     results.add("first-user-dx-under-10s", dx_seconds < 10, f"First-user simulation completed in {dx_seconds}s.")
 
     existing = tmp_base / "existing project ünicode"
     write_text(existing / ".gitignore", "dist/\n")
     write_text(existing / "AGENTS.md", "# Existing Agent Rules\n\nDo not overwrite me.\n")
-    write_text(existing / "owledge" / "plans" / "existing-plan.md", "# Existing Plan\n\nKeep this file.\n")
+    write_text(existing / ".owledge" / "plans" / "existing-plan.md", "# Existing Plan\n\nKeep this file.\n")
     existing_agents_hash = sha256_file(existing / "AGENTS.md")
-    existing_plan_hash = sha256_file(existing / "owledge" / "plans" / "existing-plan.md")
+    existing_plan_hash = sha256_file(existing / ".owledge" / "plans" / "existing-plan.md")
     existing_result = init_project(existing, root, include_plugin_adapter=True, include_compliance=False)
     results.add("existing-project-agents-preserved", sha256_file(existing / "AGENTS.md") == existing_agents_hash, "Existing AGENTS.md was not overwritten.")
-    results.add("existing-project-plan-preserved", sha256_file(existing / "owledge" / "plans" / "existing-plan.md") == existing_plan_hash, "Existing memory plan was not overwritten.")
+    results.add("existing-project-plan-preserved", sha256_file(existing / ".owledge" / "plans" / "existing-plan.md") == existing_plan_hash, "Existing memory plan was not overwritten.")
     results.add("existing-project-plugin-added", (existing / "plugins" / "owledge-cowork" / "README.md").exists(), "Plugin adapter can be added to an existing project.")
     results.add("existing-project-skipped-existing", "AGENTS.md" in existing_result.get("skipped_existing", []), "Init reports skipped existing project files.")
 

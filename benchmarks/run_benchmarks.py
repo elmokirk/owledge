@@ -94,7 +94,7 @@ def run(project_root: pathlib.Path, scale_files: list[int], seed: int) -> dict:
                     ).items()
                     if key in {"markdown_files_scanned", "existing_kb_files_modified", "index_path", "module_root", "markdown_scan_truncated"}
                 }
-                index_path = vault / "owledge-module" / "owledge" / "indexes" / "kb-scan.jsonl"
+                index_path = vault / "owledge-module" / ".owledge" / "indexes" / "kb-scan.jsonl"
                 result["output_bytes"] = index_path.stat().st_size if index_path.exists() else 0
                 return result
 
