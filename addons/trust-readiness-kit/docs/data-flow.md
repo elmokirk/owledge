@@ -14,9 +14,9 @@ flowchart LR
 
 | Class | Examples | Sharing rule |
 | --- | --- | --- |
-| Canonical project memory | `PROJECT_CONTEXT.md`, `agent-memory/canonical/` | Share only by repo policy. |
-| Private runtime memory | `agent-memory/sessions/` | Never shared by default. |
-| Evidence and handoffs | `agent-memory/evidence/`, `agent-memory/handoffs/` | Review before reuse. |
+| Canonical project memory | `OWLEDGE.md`, `.owledge/canonical/` | Share only by repo policy. |
+| Private runtime memory | `.owledge/sessions/` | Never shared by default. |
+| Evidence and handoffs | `.owledge/evidence/`, `.owledge/handoffs/` | Review before reuse. |
 | Generated views | indexes, reports, exports | Rebuildable; not canonical. |
 | Shared export | reviewed RAG documents | Requires approved review and sanitization. |
 

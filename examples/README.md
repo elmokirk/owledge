@@ -13,6 +13,6 @@ python tools/owledge.py add-kb-module --knowledgebase-root examples/demo-vault -
 
 After the command, existing files in `examples/demo-vault/` should remain
 unchanged and generated Owledge files should live under
-`examples/demo-vault/agent-memory-module/`.
+`examples/demo-vault/owledge-module/`.
 
 Generated module files are local demo output and should not be committed.

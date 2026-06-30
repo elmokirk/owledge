@@ -10,7 +10,7 @@ HTML reports are generated views for humans. They must not become canonical memo
 | Handoff report | PM, dev, QA, or agent handoff is requested | `handoffs/`, `sessions/`, `compiled/` |
 | RAG readiness report | User asks whether the project is ready for RAG/LightRAG/GraphRAG | `indexes/`, `exports/`, schemas |
 | Agent activity report | User asks what agents did or what changed | `sessions/`, `compiled/`, `evidence/` |
-| Project dashboard | User asks for stakeholder status overview | `PROJECT_CONTEXT.md`, `canonical/`, `compiled/` |
+| Project dashboard | User asks for stakeholder status overview | `OWLEDGE.md`, `canonical/`, `compiled/` |
 | Website/UI report | User asks for visual UI, design, branding, or frontend decisions | website docs, decisions, evidence |
 
 ## Report Design System

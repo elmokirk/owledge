@@ -4,7 +4,7 @@ Optional standalone adapter for Owledge.
 
 ## Purpose
 
-The PI Agent checks workspace quality, asks targeted questions, inspects ideas before new plans, and routes quality review through project-local Agent Memory. It also provides a global intelligence mode for parallels, trends, recurring agent errors, and central project candidates. A QA Red Team PI Agent can challenge those reports with a 1-100 scorecard.
+The PI Agent checks workspace quality, asks targeted questions, inspects ideas before new plans, and routes quality review through project-local Owledge. It also provides a global intelligence mode for parallels, trends, recurring agent errors, and central project candidates. A QA Red Team PI Agent can challenge those reports with a 1-100 scorecard.
 
 ## Components
 
@@ -38,17 +38,17 @@ This default check is read-only. Pass `-BuildIndex` only when index regeneration
 Generate a PI intelligence report:
 
 ```bash
-python tools/agent_memory_cli.py --project-root . run-review-workflow --review-type expert-lens --subject agent-memory/pi-agent/reports --question "What intelligence should be curated?"
+python tools/owledge_core.py --project-root . run-review-workflow --review-type expert-lens --subject .owledge/pi-agent/reports --question "What intelligence should be curated?"
 ```
 
-Reports are written to `agent-memory/pi-agent/reports/` and remain candidate knowledge until reviewed.
+Reports are written to `.owledge/pi-agent/reports/` and remain candidate knowledge until reviewed.
 
 Personal PI findings can read `USER_CONTEXT.md` and `global-memory/` when present. Private coach reports are written under `global-memory/coach/` and must not become shared RAG input without explicit review and sanitization.
 
 Evaluate the latest PI report with the Red Team scorecard:
 
 ```bash
-python tools/agent_memory_cli.py --project-root . run-review-workflow --review-type multi-perspective-red-team --subject agent-memory/pi-agent/reports --question "Evaluate PI intelligence quality."
+python tools/owledge_core.py --project-root . run-review-workflow --review-type multi-perspective-red-team --subject .owledge/pi-agent/reports --question "Evaluate PI intelligence quality."
 ```
 
 ## Rules

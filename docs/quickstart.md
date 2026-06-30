@@ -5,7 +5,20 @@ the source of truth.
 
 ## Path A: Add Owledge To An Existing Project
 
-From your local Owledge clone:
+Recommended package path:
+
+```bash
+uvx owledge quickstart --target /path/to/your-project
+```
+
+For repeated use:
+
+```bash
+uv tool install owledge
+owledge doctor --project-root /path/to/your-project
+```
+
+Contributor source-checkout path:
 
 ```bash
 python tools/owledge.py init-project --target /path/to/your-project
@@ -17,8 +30,8 @@ build system, source tree, or existing agent workflow.
 Then verify inside the host project:
 
 ```bash
-python tools/owledge.py doctor --project-root .
-python tools/agent_memory_cli.py --project-root . validate-memory --strict
+owledge doctor --project-root .
+python tools/owledge_core.py --project-root . validate-memory --strict
 ```
 
 ## Optional: Add Runtime Hooks
@@ -62,19 +75,19 @@ this mode.
 ## First Useful Commands
 
 ```bash
-python tools/agent_memory_cli.py --project-root . build-memory-index
-python tools/agent_memory_cli.py --project-root . render-memory-report --report-type project-dashboard --audience private
+python tools/owledge_core.py --project-root . build-memory-index
+python tools/owledge_core.py --project-root . render-memory-report --report-type project-dashboard --audience private
 ```
 
 ## What Gets Added
 
 | Path | Purpose |
 | --- | --- |
-| `PROJECT_CONTEXT.md` | Project-level durable context |
+| `OWLEDGE.md` | Project-level durable context and agent entrypoint |
 | `AGENTS.md` and `CLAUDE.md` | Runtime instructions |
-| `agent-memory/` | Plans, evidence, reviews, handoffs, indexes, sessions |
+| `.owledge/` | Plans, tasks, workpackages, evidence, reviews, handoffs, research, indexes, sessions |
 | `tools/` | Local Python CLI |
-| `plugins/agent-memory-cowork/` | Optional Python-hook runtime adapter |
+| `plugins/owledge-cowork/` | Optional Python-hook runtime adapter |
 
 ## Rules
 
@@ -86,6 +99,21 @@ python tools/agent_memory_cli.py --project-root . render-memory-report --report-
 For plugin setup, read [install-plugin.md](install-plugin.md). For a drop-in
 knowledgebase install instead of a coding project, read
 [agent-integration-guide.md](agent-integration-guide.md).
+
+## P0 Checks
+
+```bash
+owledge wikilink-audit --project-root . --check
+python tools/owledge.py install-addon --project-root . --addon benchmark-kit
+python tools/benchmark-kit/run-benchmark-kit.py --mode ci --scale-mode small --yes
+python tools/benchmark-kit/render-benchmark-report.py --format html
+```
+
+Local Ollama benchmark mode is opt-in and sequential:
+
+```bash
+python tools/benchmark-kit/run-benchmark-kit.py --mode local --scale-mode small --models gemma4:latest --yes
+```
 
 ## Optional Project Cockpit
 

@@ -1,14 +1,14 @@
 {
   "name": "pi-agent-workspace",
   "version": "0.1.0",
-  "description": "Optional PI Agent adapter for Agent Memory workspace quality, planning questions, and ideation checks.",
+  "description": "Optional PI Agent adapter for Owledge workspace quality, planning questions, and ideation checks.",
   "author": {
-    "name": "Agent Memory Kit"
+    "name": "Owledge"
   },
   "license": "MIT",
   "keywords": [
     "pi-agent",
-    "agent-memory",
+    "owledge",
     "workspace-quality",
     "global-intelligence",
     "parallels",
@@ -27,7 +27,7 @@
   ],
   "interface": {
     "display_name": "PI Agent Workspace",
-    "short_description": "Workspace quality and ideation adapter for Agent Memory.",
+    "short_description": "Workspace quality and ideation adapter for Owledge.",
     "default_prompt": "Check this workspace and ask the next useful project-quality question."
   }
 }

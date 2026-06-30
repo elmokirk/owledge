@@ -29,8 +29,8 @@ python tools/decision-trace/render-decision-trace.py --project-root .
 Outputs:
 
 ```text
-agent-memory/decision-trace/trace.json
-agent-memory/reports/decision-trace/index.html
+.owledge/decision-trace/trace.json
+.owledge/reports/decision-trace/index.html
 ```
 
 ## Guardrails

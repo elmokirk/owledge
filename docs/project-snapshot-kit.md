@@ -35,10 +35,10 @@ missing. Use `--yes` for a single scripted run that updates snapshots and HTML.
 
 | Path | Purpose |
 | --- | --- |
-| `agent-memory/compiled/project-story-snapshot.md` | Pitch, problem, painpoints, workflows, features, and status |
-| `agent-memory/compiled/project-execution-snapshot.md` | MVP, out-of-MVP scope, local tasks, blockers, QA, and activity |
-| `agent-memory/reports/project-site/` | Static generated HTML pages |
-| `agent-memory/project-snapshot/project-snapshot-manifest.json` | Generated source hashes, skipped files, and token estimates |
+| `.owledge/compiled/project-story-snapshot.md` | Pitch, problem, painpoints, workflows, features, and status |
+| `.owledge/compiled/project-execution-snapshot.md` | MVP, out-of-MVP scope, local tasks, blockers, QA, and activity |
+| `.owledge/reports/project-site/` | Static generated HTML pages |
+| `.owledge/project-snapshot/project-snapshot-manifest.json` | Generated source hashes, skipped files, and token estimates |
 
 ## Token Behavior
 

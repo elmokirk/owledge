@@ -6,7 +6,7 @@ Scope: connect the Markdown-first Owledge memory contract to an existing local L
 
 ## Positioning
 
-LightRAG, Neo4j and Qdrant are retrieval infrastructure. They must consume reviewed Agent Memory exports, but they must not become the source of truth.
+LightRAG, Neo4j and Qdrant are retrieval infrastructure. They must consume reviewed Owledge exports, but they must not become the source of truth.
 
 ```text
 Markdown memory -> validated index -> reviewed RAG export -> LightRAG ingest -> Neo4j/Qdrant retrieval
@@ -18,10 +18,10 @@ This integration is one adapter profile, not a hard dependency. The same export 
 
 | Layer | Recommended Role |
 | --- | --- |
-| `agent-memory/` | Canonical project memory, summaries, lessons, decisions, patterns |
-| `agent-memory/indexes/memory-index.jsonl` | Fast local metadata index |
-| `agent-memory/exports/rag/` | Neutral reviewed JSONL corpus |
-| `agent-memory/exports/lightrag/` | LightRAG-ready `texts`, `ids`, `file_paths`, `manifest` |
+| `.owledge/` | Canonical project memory, summaries, lessons, decisions, patterns |
+| `.owledge/indexes/memory-index.jsonl` | Fast local metadata index |
+| `.owledge/exports/rag/` | Neutral reviewed JSONL corpus |
+| `.owledge/exports/lightrag/` | LightRAG-ready `texts`, `ids`, `file_paths`, `manifest` |
 | LightRAG workspace | Project/customer/tenant scoped retrieval runtime |
 | Qdrant | Vector storage for semantic retrieval |
 | Neo4j | Graph storage for entity/relationship retrieval |
@@ -30,7 +30,7 @@ This integration is one adapter profile, not a hard dependency. The same export 
 
 Use LightRAG workspaces to isolate tenants/projects.
 
-| Agent Memory Scope | LightRAG Workspace |
+| Owledge Scope | LightRAG Workspace |
 | --- | --- |
 | One local project | `project_id` |
 | Customer hub | `tenant_id__customer_id` |
@@ -56,28 +56,28 @@ WORKSPACE=tenant-local__customer-local__project-local
 
 Keep provider keys and database passwords outside Markdown, Git, reports, exports and session logs.
 
-## Agent Memory Export Flow
+## Owledge Export Flow
 
 From a bootstrapped project:
 
 ```bash
-python tools/agent_memory_cli.py --project-root . validate-memory --strict
-python tools/agent_memory_cli.py --project-root . build-memory-index
-python tools/agent_memory_cli.py --project-root . export-rag-documents --corpus-type private
-python tools/agent_memory_cli.py --project-root . export-lightrag --corpus-type private
-python tools/agent_memory_cli.py --project-root . export-graphrag --corpus-type private
+python tools/owledge_core.py --project-root . validate-memory --strict
+python tools/owledge_core.py --project-root . build-memory-index
+python tools/owledge_core.py --project-root . export-rag-documents --corpus-type private
+python tools/owledge_core.py --project-root . export-lightrag --corpus-type private
+python tools/owledge_core.py --project-root . export-graphrag --corpus-type private
 ```
 
 For an enterprise hub or multi-project vault, always scope the export:
 
 ```bash
-python tools/agent_memory_cli.py --project-root . export-lightrag --corpus-type private --tenant-id tenant-a --customer-id customer-a --project-id project-a
+python tools/owledge_core.py --project-root . export-lightrag --corpus-type private --tenant-id tenant-a --customer-id customer-a --project-id project-a
 ```
 
 For shared/cross-project retrieval:
 
 ```bash
-python tools/agent_memory_cli.py --project-root . export-lightrag --corpus-type shared
+python tools/owledge_core.py --project-root . export-lightrag --corpus-type shared
 ```
 
 Shared export includes only records that satisfy the shared gates:
@@ -94,16 +94,16 @@ The exporter writes:
 
 | File | Use |
 | --- | --- |
-| `agent-memory/exports/lightrag/texts.json` | Array of retrieval texts |
-| `agent-memory/exports/lightrag/ids.json` | Stable IDs from `memory_id` |
-| `agent-memory/exports/lightrag/file_paths.json` | Source paths for citation |
-| `agent-memory/exports/lightrag/manifest.json` | Export metadata, hashes, generation ID |
-| `agent-memory/exports/lightrag/latest.json` | Pointer to immutable generation folder |
+| `.owledge/exports/lightrag/texts.json` | Array of retrieval texts |
+| `.owledge/exports/lightrag/ids.json` | Stable IDs from `memory_id` |
+| `.owledge/exports/lightrag/file_paths.json` | Source paths for citation |
+| `.owledge/exports/lightrag/manifest.json` | Export metadata, hashes, generation ID |
+| `.owledge/exports/lightrag/latest.json` | Pointer to immutable generation folder |
 
 Use the immutable generation folder for reproducible ingestion when possible:
 
 ```text
-agent-memory/exports/lightrag/generations/<generation_id>/
+.owledge/exports/lightrag/generations/<generation_id>/
 ```
 
 ## Minimal Ingestion Adapter
@@ -118,7 +118,7 @@ from pathlib import Path
 from lightrag import LightRAG
 
 
-EXPORT_DIR = Path("/path/to/project/agent-memory/exports/lightrag")
+EXPORT_DIR = Path("/path/to/project/.owledge/exports/lightrag")
 WORKING_DIR = "/path/to/lightrag/storage"
 WORKSPACE = "tenant-local__customer-local__project-local"
 
@@ -177,17 +177,17 @@ if __name__ == "__main__":
 
 ## Neo4j / GraphRAG Alignment
 
-Agent Memory already exports typed edges:
+Owledge already exports typed edges:
 
 ```text
-agent-memory/exports/graphrag/nodes.jsonl
-agent-memory/exports/graphrag/edges.jsonl
+.owledge/exports/graphrag/nodes.jsonl
+.owledge/exports/graphrag/edges.jsonl
 ```
 
 Use these as a deterministic graph layer next to LightRAG's extracted graph. The recommended long-term approach is:
 
 1. Let LightRAG build its graph from reviewed text.
-2. Keep Agent Memory typed edges as explicit human/agent-curated truth.
+2. Keep Owledge typed edges as explicit human/agent-curated truth.
 3. Compare extracted graph edges against frontmatter edges.
 4. Promote only confirmed new relationships back into Markdown.
 
@@ -214,15 +214,15 @@ Run these before ingestion:
 
 ```bash
 python tools/owledge.py doctor --project-root .
-python tools/agent_memory_cli.py --project-root . validate-memory --strict
-python tools/agent_memory_cli.py --project-root . export-lightrag --corpus-type private
+python tools/owledge_core.py --project-root . validate-memory --strict
+python tools/owledge_core.py --project-root . export-lightrag --corpus-type private
 ```
 
 Then inspect:
 
 ```bash
-python -m json.tool agent-memory/exports/lightrag/manifest.json
-python -m json.tool agent-memory/exports/lightrag/latest.json
+python -m json.tool .owledge/exports/lightrag/manifest.json
+python -m json.tool .owledge/exports/lightrag/latest.json
 ```
 
 ## Do Not Do This
@@ -243,7 +243,7 @@ Add a small local adapter in a later milestone:
 | Task | Output |
 | --- | --- |
 | `adapters/lightrag/run_ingest.py` | Optional local Python runner that calls the user's LightRAG adapter |
-| `adapters/lightrag/ingest_agent_memory.py` | Optional sample adapter |
+| `adapters/lightrag/ingest_owledge.py` | Optional sample adapter |
 | `docs/lightrag-roundtrip-eval.md` | Test plan for insert, query, source citation, and stale export handling |
 | Retrieval eval fixture | Known question set with expected memory IDs |
 

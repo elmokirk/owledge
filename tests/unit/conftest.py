@@ -70,8 +70,8 @@ def run_owledge(args: list[str], project_root: pathlib.Path | None = None) -> su
 
 
 def run_cli(args: list[str], project_root: pathlib.Path) -> subprocess.CompletedProcess:
-    """Run the agent_memory_cli.py with the given args."""
-    cmd = [sys.executable, str(REPO_ROOT / "tools" / "agent_memory_cli.py"), "--project-root", str(project_root)] + args
+    """Run the owledge_core.py with the given args."""
+    cmd = [sys.executable, str(REPO_ROOT / "tools" / "owledge_core.py"), "--project-root", str(project_root)] + args
     return subprocess.run(cmd, capture_output=True, text=True, cwd=str(REPO_ROOT))
 
 

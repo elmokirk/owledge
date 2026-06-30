@@ -35,12 +35,12 @@
       "target": "tools/ts-adapter/fixtures/retrieval-fixture.json"
     },
     {
-      "source": "fixtures/minimal-project/agent-memory/canonical/markdown-contract.md",
-      "target": "tools/ts-adapter/fixtures/minimal-project/agent-memory/canonical/markdown-contract.md"
+      "source": "fixtures/minimal-project/.owledge/canonical/markdown-contract.md",
+      "target": "tools/ts-adapter/fixtures/minimal-project/.owledge/canonical/markdown-contract.md"
     },
     {
-      "source": "fixtures/minimal-project/agent-memory/compiled/retrieval-adapter.md",
-      "target": "tools/ts-adapter/fixtures/minimal-project/agent-memory/compiled/retrieval-adapter.md"
+      "source": "fixtures/minimal-project/.owledge/compiled/retrieval-adapter.md",
+      "target": "tools/ts-adapter/fixtures/minimal-project/.owledge/compiled/retrieval-adapter.md"
     }
   ]
 }

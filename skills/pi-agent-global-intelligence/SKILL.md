@@ -1,6 +1,6 @@
 ---
 name: pi-agent-global-intelligence
-description: Use when a PI Agent should act as a global knowledge assistant that finds parallels, trends, repeated agent errors, and central project candidates from Agent Memory.
+description: Use when a PI Agent should act as a global knowledge assistant that finds parallels, trends, repeated agent errors, and central project candidates from Owledge.
 ---
 
 # PI Agent Global Intelligence
@@ -10,7 +10,7 @@ description: Use when a PI Agent should act as a global knowledge assistant that
 Use this skill when the user asks the PI Agent to:
 
 - find parallels across projects, ideas, decisions, sessions, patterns, or lessons
-- detect trends in Agent Memory
+- detect trends in Owledge
 - identify repeated agent mistakes and propose fixes
 - derive central project candidates from existing goals and ideas
 - inspect global user goals, preferences, ideas, research and personal patterns
@@ -18,7 +18,7 @@ Use this skill when the user asks the PI Agent to:
 
 ## Core Rule
 
-PI intelligence is candidate knowledge. Do not edit `canonical/`, `compiled/`, `patterns/`, or `lessons/` directly from this skill. Write findings to `agent-memory/pi-agent/` and ask for curator or owner review before promotion.
+PI intelligence is candidate knowledge. Do not edit `canonical/`, `compiled/`, `patterns/`, or `lessons/` directly from this skill. Write findings to `.owledge/pi-agent/` and ask for curator or owner review before promotion.
 
 ## Workspace
 
@@ -26,24 +26,24 @@ Use these artifact folders:
 
 | Path | Purpose |
 | --- | --- |
-| `agent-memory/pi-agent/reports/` | Periodic intelligence reports |
-| `agent-memory/pi-agent/parallels/` | Parallel candidates across workstreams or projects |
-| `agent-memory/pi-agent/trends/` | Trend summaries and signal logs |
-| `agent-memory/pi-agent/recurring-errors/` | Repeated agent failure modes and fix proposals |
-| `agent-memory/pi-agent/concepts/` | Central project candidates and concept derivatives |
-| `agent-memory/pi-agent/indexes/` | Generated helper indexes |
+| `.owledge/pi-agent/reports/` | Periodic intelligence reports |
+| `.owledge/pi-agent/parallels/` | Parallel candidates across workstreams or projects |
+| `.owledge/pi-agent/trends/` | Trend summaries and signal logs |
+| `.owledge/pi-agent/recurring-errors/` | Repeated agent failure modes and fix proposals |
+| `.owledge/pi-agent/concepts/` | Central project candidates and concept derivatives |
+| `.owledge/pi-agent/indexes/` | Generated helper indexes |
 | `global-memory/coach/` | Private user-level coach reports and sourced recommendations |
 
 ## Workflow
 
-1. Read `USER_CONTEXT.md` when present, then `PROJECT_CONTEXT.md`.
-2. Build or inspect `agent-memory/indexes/memory-index.jsonl` if present.
+1. Read `USER_CONTEXT.md` when present, then `OWLEDGE.md`.
+2. Build or inspect `.owledge/indexes/memory-index.jsonl` if present.
 3. Inspect relevant global memory groups: `global-memory/preferences/`, `global-memory/goals/`, `global-memory/ideas/`, `global-memory/research/`, and `global-memory/patterns/`.
 4. Inspect only relevant project memory groups: `ideas/`, `canonical/`, `compiled/`, `patterns/`, `lessons/`, `decisions/`, `handoffs/`, `evidence/`, and reviewed session summaries.
 5. Run the runtime command when available:
 
 ```bash
-python tools/agent_memory_cli.py --project-root . run-review-workflow --review-type expert-lens --subject agent-memory/pi-agent/reports --question "What cross-project intelligence should be curated?"
+python tools/owledge_core.py --project-root . run-review-workflow --review-type expert-lens --subject .owledge/pi-agent/reports --question "What cross-project intelligence should be curated?"
 ```
 
 6. Review the generated report and classify findings:

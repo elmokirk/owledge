@@ -1,0 +1,4 @@
+interface:
+  display_name: "Agentic Review"
+  short_description: "Evidence-linked red team and review workflows"
+  default_prompt: "Use $agentic-review to run an evidence-linked multi-perspective review with clear scores, findings, and QA gates."

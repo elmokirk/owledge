@@ -20,7 +20,7 @@ TOOLS = ROOT / "tools"
 if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
 
-import agent_memory_cli as core  # noqa: E402
+import owledge_core as core  # noqa: E402
 import build_kb_module  # noqa: E402
 import owledge  # noqa: E402
 
@@ -85,7 +85,7 @@ def run(project_root: pathlib.Path, scale_files: list[int], seed: int) -> dict:
                             knowledgebase_root=str(vault),
                             kit_root=str(project_root),
                             layout="module-dir",
-                            module_dir="agent-memory-module",
+                            module_dir="owledge-module",
                             map_file="",
                             max_files=count,
                             include_cli=True,
@@ -94,7 +94,7 @@ def run(project_root: pathlib.Path, scale_files: list[int], seed: int) -> dict:
                     ).items()
                     if key in {"markdown_files_scanned", "existing_kb_files_modified", "index_path", "module_root", "markdown_scan_truncated"}
                 }
-                index_path = vault / "agent-memory-module" / "agent-memory" / "indexes" / "kb-scan.jsonl"
+                index_path = vault / "owledge-module" / ".owledge" / "indexes" / "kb-scan.jsonl"
                 result["output_bytes"] = index_path.stat().st_size if index_path.exists() else 0
                 return result
 

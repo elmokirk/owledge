@@ -8,10 +8,10 @@ Use for ADRs, architecture decisions, strategic tradeoffs, implementation choice
 
 Prefer:
 
-- `agent-memory/decisions/`
-- `agent-memory/canonical/`
-- `agent-memory/evidence/`
-- `agent-memory/compiled/`
+- `.owledge/decisions/`
+- `.owledge/canonical/`
+- `.owledge/evidence/`
+- `.owledge/compiled/`
 
 ## Sections
 

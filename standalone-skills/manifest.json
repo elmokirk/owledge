@@ -1,0 +1,35 @@
+{
+  "name": "owledge-standalone-skills",
+  "version": "0.7.0",
+  "description": "Standalone Owledge skills that can be installed without adopting the full Owledge project kit.",
+  "skills": [
+    {
+      "name": "owledge-blindspot-audit",
+      "path": "owledge-blindspot-audit",
+      "requires_full_owledge_kit": false,
+      "optional_owledge_cli": true,
+      "supported_runtimes": ["codex-style", "claude-style", "generic-agent"]
+    },
+    {
+      "name": "owledge-agentic-review",
+      "path": "owledge-agentic-review",
+      "requires_full_owledge_kit": false,
+      "optional_owledge_cli": true,
+      "supported_runtimes": ["codex-style", "claude-style", "generic-agent"]
+    },
+    {
+      "name": "owledge-brainstorm",
+      "path": "owledge-brainstorm",
+      "requires_full_owledge_kit": false,
+      "optional_owledge_cli": false,
+      "supported_runtimes": ["codex-style", "claude-style", "generic-agent"]
+    },
+    {
+      "name": "owledge-planning-layer",
+      "path": "owledge-planning-layer",
+      "requires_full_owledge_kit": false,
+      "optional_owledge_cli": true,
+      "supported_runtimes": ["codex-style", "claude-style", "generic-agent"]
+    }
+  ]
+}

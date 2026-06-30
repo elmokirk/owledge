@@ -1,13 +1,13 @@
 Metadata-Version: 2.4
 Name: owledge
-Version: 0.6.0
+Version: 0.7.0
 Summary: Markdown-first durable memory for AI agents, existing repos, and knowledgebases.
 Author: Owledge maintainers
 License: MIT
 Project-URL: Documentation, https://github.com/elmokirk/owledge/tree/main/docs
 Project-URL: Issues, https://github.com/elmokirk/owledge/issues
 Project-URL: Source, https://github.com/elmokirk/owledge
-Keywords: agent-memory,ai-agents,markdown,codex,claude-code,knowledge-base
+Keywords: owledge,ai-agents,markdown,codex,claude-code,knowledge-base
 Classifier: Development Status :: 4 - Beta
 Classifier: Environment :: Console
 Classifier: Intended Audience :: Developers
@@ -27,7 +27,7 @@ Dynamic: license-file
 
 **Drop-in durable project memory for existing Markdown repos and Obsidian-style vaults: no migration, no vector DB, no wiki-link rewrite.**
 
-[![Version](https://img.shields.io/badge/version-0.6.0-blue)](VERSION)
+[![Version](https://img.shields.io/badge/version-0.7.0-blue)](VERSION)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Storage: Markdown](https://img.shields.io/badge/storage-Markdown-black)](docs/quickstart.md)
 [![Runtime support](https://img.shields.io/badge/runtimes-Codex%20%7C%20Claude%20Code%20%7C%20Cowork%20%7C%20OpenCode-orange)](docs/harness-plugin-matrix.md)
@@ -48,8 +48,8 @@ artifacts, runtime capture, proof assets, or release evidence.
 
 ## Repo Layout
 
-This repository ships product source from `templates/agent-memory/`. The
-`internal/agent-memory/` directory is the maintainers' dogfood workspace
+This repository ships product source from `templates/owledge/`. The
+`internal/owledge/` directory is the maintainers' dogfood workspace
 (generated artifacts, not shipped). The `tools/` directory holds the Python
 CLI. See [docs/distribution.md](docs/distribution.md) for the full
 Dogfooding vs. Product breakdown.
@@ -57,6 +57,7 @@ Dogfooding vs. Product breakdown.
 ## Table Of Contents
 
 - [Why It Exists](#why-it-exists)
+- [Problem To Solution](#problem-to-solution)
 - [Install Or Try](#install-or-try)
 - [Quickstart Paths](#quickstart-paths)
 - [Decision Guide](#decision-guide)
@@ -64,6 +65,9 @@ Dogfooding vs. Product breakdown.
 - [Harness Support](#harness-support)
 - [Integration Model](#integration-model)
 - [Performance And Token Model](#performance-and-token-model)
+- [Core Workflows](#core-workflows)
+- [Standalone Skills](#standalone-skills)
+- [Troubleshooting](#troubleshooting)
 - [Not This](#not-this)
 - [Launch Extensions](#launch-extensions)
 - [Quality Gates](#quality-gates)
@@ -79,10 +83,37 @@ Owledge is for teams and power users who already work in Markdown, Obsidian, LLM
 - Let multiple agents coordinate through explicit artifacts instead of raw logs.
 - Stay local, inspectable, and repo-friendly.
 
+## Problem To Solution
+
+| Problem | Owledge solution |
+| --- | --- |
+| Agents forget context between sessions | `OWLEDGE.md` plus `.owledge/` creates a durable project entrypoint and memory layer. |
+| Plans live only in chat | `.owledge/plans/`, `.owledge/tasks/`, and `.owledge/workpackages/` keep scoped work visible and reviewable. |
+| Handoffs are vague | `.owledge/handoffs/` and context packs give the next agent explicit source files, decisions, and next actions. |
+| Docs and implementation drift | `doctor`, `test-contracts`, `public-docs`, `release-trust`, and finalization gates catch stale public claims. |
+| Obsidian links are fragile | `owledge wikilink-audit` checks valid, broken, and ambiguous wiki links without rewriting notes. |
+| Users doubt token efficiency | Optional `benchmark-kit` add-on emits real Markdown fixture reports with token usage, performance, context pollution, retrieval, safety, and speed metrics. |
+| Users want one skill without the full kit | `standalone-skills/` provides independently installable Owledge skills for blindspot audit, agentic review, brainstorm, and planning layer use. |
+| Teams need review and research traceability | `.owledge/reviews/`, `.owledge/audiences/`, and `.owledge/research/` make red-team, audience, and research artifacts first-class. |
+
 ## Install Or Try
 
-Packaging metadata is included for the public `owledge` console script. Until a
-package is published, use a source checkout:
+Owledge is uv-first for agents and harnesses:
+
+```bash
+uvx owledge --help
+uvx owledge quickstart --target .agent-control/tmp/owledge-five-minute-demo
+```
+
+For repeated use:
+
+```bash
+uv tool install owledge
+owledge doctor --project-root .
+owledge doctor --project-root /path/to/your-project
+```
+
+Source checkout remains useful for contributors:
 
 ```bash
 python tools/owledge.py --help
@@ -91,20 +122,35 @@ python tools/owledge.py --help
 Fastest proof path:
 
 ```bash
-python tools/owledge.py quickstart --target .agent-control/tmp/owledge-five-minute-demo
-python tools/owledge.py install-addon --project-root .agent-control/tmp/owledge-five-minute-demo --addon launch-demo-kit
-python tools/agent_memory_cli.py --project-root .agent-control/tmp/owledge-five-minute-demo build-memory-index
+uvx owledge quickstart --target .agent-control/tmp/owledge-five-minute-demo
+owledge install-addon --project-root .agent-control/tmp/owledge-five-minute-demo --addon launch-demo-kit
+owledge doctor --project-root .agent-control/tmp/owledge-five-minute-demo
 ```
 
 Expected result: the demo project contains evidence, a next-agent handoff, and
 a static proof report. Full walk-through: [Try Owledge in 5 minutes](docs/try-owledge-in-5-minutes.md).
+
+Benchmark proof path:
+
+```bash
+python tools/benchmark-kit/compare-benchmark-runs.py --inputs \
+  .owledge/exports/benchmark-kit-gemma4-latest/latest.json \
+  .owledge/exports/benchmark-kit-qwen3-5-4b/latest.json \
+  .owledge/exports/benchmark-kit-glm-5-1-cloud/latest.json \
+  --output .owledge/reports/generated/benchmark-kit-comparison
+```
+
+Expected result: a comparison report shows baseline retrieval versus Owledge
+context packs across model tiers. It highlights privacy failures prevented,
+stale context avoided, context pollution reduction, and tokens per correct
+answer. The report is proof-oriented, not a universal model benchmark.
 
 ## Quickstart Paths
 
 ### 0. Use Only The Principles Or Skills
 
 For the smallest setup, do not install anything. Tell an agent to follow the
-Owledge principles or use `skills/agent-memory-principles`:
+Owledge principles or use `skills/owledge-principles`:
 
 ```text
 Follow Owledge principles: keep Markdown canonical, preserve existing files,
@@ -116,7 +162,13 @@ This path is the default for existing systems, solo users, and quick adoption.
 
 ### 1. Add Owledge To A Project
 
-From your local Owledge clone:
+Package path:
+
+```bash
+uvx owledge quickstart --target /path/to/your-project
+```
+
+Source checkout path:
 
 ```bash
 python tools/owledge.py init-project --target /path/to/your-project
@@ -151,7 +203,7 @@ python tools/owledge.py doctor --project-root /path/to/your-project
 Use the ready-to-install Cowork / Claude-compatible plugin bundle:
 
 ```text
-plugins/agent-memory-cowork/
+plugins/owledge-cowork/
 ```
 
 Best next read: [Plugin install guide](docs/install-plugin.md)
@@ -187,8 +239,7 @@ multi-agent handoffs, or poweruser positioning:
 
 ```bash
 python tools/owledge.py install-addon --project-root . --addon ts-adapter-kit
-python tools/owledge.py install-addon --project-root . --addon pilot-benchmark-kit
-python tools/owledge.py install-addon --project-root . --addon enterprise-context-benchmark-kit
+python tools/owledge.py install-addon --project-root . --addon benchmark-kit
 python tools/owledge.py install-addon --project-root . --addon decision-trace-kit
 python tools/owledge.py install-addon --project-root . --addon cross-project-hub-kit
 python tools/owledge.py install-addon --project-root . --addon swarm-coordination-kit
@@ -232,12 +283,12 @@ Owledge is a memory layer around agent runtimes. It does not replace the runtime
 
 | Harness | Current shape | Install path |
 | --- | --- | --- |
-| Principles-only coding agents | First-class support | Instructions or `agent-memory-principles` skill |
+| Principles-only coding agents | First-class support | Instructions or `owledge-principles` skill |
 | Codex | Local adapter support | Local CLI, skills, optional plugin adapter |
 | Claude Code | Local adapter support | Skill/plugin copy path plus project-local memory rules |
-| Cowork / Claude-compatible | Local adapter support | `plugins/agent-memory-cowork/` |
+| Cowork / Claude-compatible | Local adapter support | `plugins/owledge-cowork/` |
 | OpenCode-style agents | Instruction-based support | Repo-link integration via `AGENTS.md` and local scripts |
-| Existing Markdown / Obsidian KBs | Primary supported path | `tools/build_kb_module.py` or `agent-memory-map.json` |
+| Existing Markdown / Obsidian KBs | Primary supported path | `tools/build_kb_module.py`, `owledge-map.json`, and `wikilink-audit` |
 | PI agents | Advanced optional path | Candidate-only QA, workspace checks, and intelligence artifacts |
 
 Full matrix: [Harness and plugin matrix](docs/harness-plugin-matrix.md)
@@ -247,7 +298,7 @@ Full matrix: [Harness and plugin matrix](docs/harness-plugin-matrix.md)
 | Mode | What changes | Best fit |
 | --- | --- | --- |
 | Principles-only | Agent instructions adopt the Owledge memory contract without adding a plugin; no plugin, generator, wrapper, or OS-specific setup is required | Existing coding agents and mature repos |
-| Project-local kit | Adds `PROJECT_CONTEXT.md`, `agent-memory/`, local Python tools, and optional runtime adapter files | Coding projects that want durable memory in-repo |
+| Project-local kit | Adds `OWLEDGE.md`, `.owledge/`, local Python tools, and optional runtime adapter files | Coding projects that want durable memory in-repo |
 | Knowledgebase module | Adds an Owledge-owned module or mapped folders beside an existing Markdown KB | Obsidian-style vaults and LLM wikis |
 | Runtime adapter | Adds optional plugin hooks and commands around the same Markdown source of truth | Claude/Cowork/Codex-compatible local workflows |
 
@@ -270,9 +321,114 @@ flowchart LR
 | Token strategy | Paths and refs first, full bodies only on demand |
 | Write policy | Additive module or mapped writes; existing notes unchanged by default |
 | Scale guard | `--max-files`, excluded generated dirs, truncation reporting |
-| Benchmarks | Reproducible local harness included under `benchmarks/` |
+| Benchmarks | Optional `benchmark-kit` add-on with real Markdown fixtures, deterministic CI mode, opt-in sequential Ollama local mode, and multi-model comparison reports |
 
 Benchmarks and scale notes: [Performance and scale notes](docs/performance-scale-notes.md)
+
+## Core Workflows
+
+### Project Setup
+
+```mermaid
+flowchart LR
+    A["uvx owledge quickstart"] --> B["OWLEDGE.md"]
+    A --> C[".owledge/"]
+    C --> D["plans, tasks, reviews, handoffs"]
+    C --> E["indexes and generated reports"]
+    B --> F["Agent reads scoped project truth"]
+```
+
+### Read-Only MCP
+
+Owledge ships a read-only MCP surface in v0.7.0.
+
+```mermaid
+flowchart LR
+    A["Agent harness"] --> B["Owledge read-only MCP"]
+    B --> C["Read OWLEDGE.md"]
+    B --> D["Search memory"]
+    B --> E["Build context pack"]
+    B --> F["List tasks and reviews"]
+    C --> G["No write tools in P0"]
+```
+
+### Planning, Review, Research
+
+```mermaid
+flowchart TD
+    A["Goal or release question"] --> B["Audience profile"]
+    B --> C["Research brief or findings"]
+    C --> D["Plan and workpackages"]
+    D --> E["Agentic review"]
+    E --> F["Accepted deltas"]
+    F --> G["OWLEDGE.md or canonical memory after review"]
+```
+
+### Wikilink Audit
+
+```mermaid
+flowchart LR
+    A["Markdown files"] --> B["Extract wiki links"]
+    B --> C{"Target found?"}
+    C -->|Yes| D["Candidate edge"]
+    C -->|No| E["Broken link finding"]
+    C -->|Multiple| F["Ambiguous link finding"]
+    D --> G["Read-only report"]
+    E --> G
+    F --> G
+```
+
+### Benchmark Kit
+
+```mermaid
+flowchart LR
+    A["install benchmark-kit add-on"] --> B["run-benchmark-kit.py"]
+    B --> C{"Mode and scale mode"}
+    C -->|ci| D["Generate real Markdown fixtures"]
+    C -->|local| E["Scan/use selected Ollama models"]
+    C --> I["Scale modes: small, mid, large"]
+    E --> F["Sequential model calls"]
+    D --> G["Stable metrics"]
+    F --> G
+    G --> H["JSON, MD, HTML, SVG report"]
+```
+
+## Standalone Skills
+
+Owledge also ships selected skills as separate, download-friendly folders under
+`standalone-skills/`. Use this when a user wants a single workflow without
+installing the full project memory kit.
+
+| Skill | Use |
+| --- | --- |
+| `owledge-blindspot-audit` | Stress-test a concept, repo, plan, or launch surface for hidden gaps. |
+| `owledge-agentic-review` | Run evidence-linked red-team and expert review workflows. |
+| `owledge-brainstorm` | Generate candidate options without mutating canonical memory. |
+| `owledge-planning-layer` | Apply Owledge planning, handoff, and QA rules in an existing agent setup. |
+
+See [standalone-skills/README.md](standalone-skills/README.md).
+
+### Handoff And Resume
+
+```mermaid
+flowchart LR
+    A["Agent finishes phase"] --> B["Write handoff and review evidence"]
+    B --> C["Orchestrator summarizes delta"]
+    C --> D["Plan/tasklist updated"]
+    D --> E["Next agent reads OWLEDGE.md and handoff"]
+    E --> F["Resume first unchecked phase"]
+```
+
+## Troubleshooting
+
+| Symptom | Check |
+| --- | --- |
+| `owledge` command not found | Run `uvx owledge --help` or `uv tool install owledge`. |
+| Fresh project has old `OWLEDGE.md`/`.owledge/` | Re-run `owledge quickstart --target <path>` with v0.7.0 and check for `OWLEDGE.md` plus `.owledge/`. |
+| Wikilink audit fails | Run `owledge wikilink-audit --project-root .` and fix unresolved or ambiguous targets. Code blocks and inline code are ignored. |
+| Local benchmark refuses to run | Install `benchmark-kit`, then pass explicit scale mode, model, and consent: `python tools/benchmark-kit/run-benchmark-kit.py --mode local --scale-mode small --models gemma4:latest --yes`. |
+| MCP integration should not write | Use `tools/owledge_mcp.py`; v0.7.0 P0 exposes read-only tools only. |
+| Docs look stale after code changes | Run `owledge test public-docs`, `owledge test release-trust`, and `owledge wikilink-audit --check`. |
 
 ## Not This
 
@@ -297,8 +453,7 @@ The core stays small. Broad-launch proof is handled by optional add-ons:
 | `runtime-conformance-kit` | Read-only runtime contracts for Codex, Claude Code, and Cowork-compatible adapters. |
 | `pi-proof-kit` | Synthetic PI loop proving observe, detect, red-team, promote, and measure. |
 | `ts-adapter-kit` | Optional Node/TypeScript CI validation for the Markdown contract. |
-| `pilot-benchmark-kit` | Optional pilot benchmark summaries and static chart views. |
-| `enterprise-context-benchmark-kit` | Research-grade synthetic context/token benchmark with JSON data, charts, and HTML report. |
+| `benchmark-kit` | Optional real Markdown fixture benchmark with token, performance, context pollution, single-run reports, and multi-model comparison proof reports. |
 | `decision-trace-kit` | Read-only JSON and HTML trace from memory records to decision tree. |
 | `cross-project-hub-kit` | Reviewed export map from project-local lessons, patterns, decisions, and summaries into a central reusable hub. |
 | `swarm-coordination-kit` | Role-lane templates for Codex, Claude Code, Hermes, and generic agent swarms without hard distributed locking. |
@@ -338,12 +493,14 @@ Start here: [Documentation index](docs/README.md)
 - [MVP plan example](docs/mvp-plan-example.md)
 - [Demo vault](examples/README.md)
 - [Performance and scale notes](docs/performance-scale-notes.md)
+- [Benchmark Kit](docs/benchmark-kit.md)
 - [Team and long-running project guide](docs/team-long-running-project-guide.md)
 - [Command reference](docs/command-reference.md)
 - [Project Snapshot Kit](docs/project-snapshot-kit.md)
 - [Decision Trace Kit](docs/decision-trace-kit.md)
-- [Enterprise Context Benchmark Kit](docs/enterprise-context-benchmark-kit.md)
+- [Benchmark Kit](docs/benchmark-kit.md)
 - [Cross-Project Hub Kit](docs/cross-project-hub-kit.md)
 - [Swarm Coordination Kit](docs/swarm-coordination-kit.md)
 - [Poweruser Positioning Kit](docs/poweruser-positioning-kit.md)
+- [Standalone Skills](standalone-skills/README.md)
 - [Owledge vs agent methods](docs/owledge-vs-agent-methods.md)

@@ -110,7 +110,7 @@ accepted | rejected | promoted`.
 - status: captured
 - source: feedback round Q8
 - summary: Add `planning_mode: supervised/approve-automatically/full-access` to
-  `PROJECT_CONTEXT.md`. When idea exists, behavior depends on mode.
+  `OWLEDGE.md`. When idea exists, behavior depends on mode.
 
 ### IDEA-2026-006-10: Success metrics in MVP plan
 
@@ -132,7 +132,7 @@ accepted | rejected | promoted`.
 - status: captured
 - source: feedback round Q10c
 - summary: `owlib ideas --scope global` lists ideas sorted by signal. `owlib ideas
-  promote` scaffolds a new `PROJECT_CONTEXT.md` from a promoted idea.
+  promote` scaffolds a new `OWLEDGE.md` from a promoted idea.
 
 ## Promotion Paths
 
@@ -142,11 +142,11 @@ accepted | rejected | promoted`.
 | IDEA-006-02 | P1 roadmap item + new doc file |
 | IDEA-006-03 | P1 roadmap item + benchmark extension |
 | IDEA-006-04 | P1 roadmap item + owlib.yaml extension |
-| IDEA-006-05 | P1 roadmap item + PROJECT_CONTEXT.md template update |
+| IDEA-006-05 | P1 roadmap item + OWLEDGE.md template update |
 | IDEA-006-06 | P2 roadmap item + owlib notification artifact |
 | IDEA-006-07 | P2 roadmap item + new doc file |
 | IDEA-006-08 | P2 roadmap item + planning skill update |
-| IDEA-006-09 | P2 roadmap item + PROJECT_CONTEXT.md template update |
+| IDEA-006-09 | P2 roadmap item + OWLEDGE.md template update |
 | IDEA-006-10 | P2 roadmap item + MVP plan template update |
 | IDEA-006-11 | P3 roadmap item + owlib subcommand |
 
@@ -176,7 +176,7 @@ and either `elaborate` (accept into near-term roadmap) or `reject` with reason.
 - problem_patterns: hooks-only-capture, no-validation-on-stop
 - architecture_patterns: hook-extension-points
 - feedback_ticket: FB-014
-- similar_to: existing `plugins/agent-memory-cowork/` (already has 8 hooks)
+- similar_to: existing `plugins/owledge-cowork/` (already has 8 hooks)
 - status: captured
 - source: feature idea 2
 - summary: Extend the existing hook layer to validate ticket frontmatter on

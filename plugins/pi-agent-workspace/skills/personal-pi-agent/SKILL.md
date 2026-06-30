@@ -21,7 +21,7 @@ Personal PI findings are candidate knowledge. Do not overwrite `USER_CONTEXT.md`
 4. `global-memory/ideas/`
 5. `global-memory/research/`
 6. `global-memory/patterns/`
-7. Active project `PROJECT_CONTEXT.md` and project memory when relevant
+7. Active project `OWLEDGE.md` and project memory when relevant
 
 Use `global-memory/daily/`, `global-memory/tasks/`, and onboarding profiles only for explicit deep dives.
 

@@ -1,48 +1,48 @@
 {
   "name": "compliance-light",
   "version": "0.1.0",
-  "description": "Optional Markdown-first compliance-support add-on for Agent Memory Kit projects.",
+  "description": "Optional Markdown-first compliance-support add-on for Owledge projects.",
   "install_directories": [
-    "agent-memory/compliance/registers",
-    "agent-memory/compliance/dpia",
-    "agent-memory/compliance/ai-systems",
-    "agent-memory/compliance/incidents",
-    "agent-memory/compliance/requests",
-    "agent-memory/compliance/policies",
-    "agent-memory/exports/compliance"
+    ".owledge/compliance/registers",
+    ".owledge/compliance/dpia",
+    ".owledge/compliance/ai-systems",
+    ".owledge/compliance/incidents",
+    ".owledge/compliance/requests",
+    ".owledge/compliance/policies",
+    ".owledge/exports/compliance"
   ],
   "install_files": [
     {
-      "source": "starter/agent-memory/compliance/profile.md",
-      "target": "agent-memory/compliance/profile.md"
+      "source": "starter/.owledge/compliance/profile.md",
+      "target": ".owledge/compliance/profile.md"
     },
     {
       "source": "templates/processing-activity-template.md",
-      "target": "agent-memory/templates/processing-activity-template.md"
+      "target": ".owledge/templates/processing-activity-template.md"
     },
     {
       "source": "templates/ai-system-template.md",
-      "target": "agent-memory/templates/ai-system-template.md"
+      "target": ".owledge/templates/ai-system-template.md"
     },
     {
       "source": "templates/provider-registry-template.md",
-      "target": "agent-memory/templates/provider-registry-template.md"
+      "target": ".owledge/templates/provider-registry-template.md"
     },
     {
       "source": "templates/dpia-trigger-template.md",
-      "target": "agent-memory/templates/dpia-trigger-template.md"
+      "target": ".owledge/templates/dpia-trigger-template.md"
     },
     {
       "source": "templates/data-subject-request-template.md",
-      "target": "agent-memory/templates/data-subject-request-template.md"
+      "target": ".owledge/templates/data-subject-request-template.md"
     },
     {
       "source": "templates/security-incident-template.md",
-      "target": "agent-memory/templates/security-incident-template.md"
+      "target": ".owledge/templates/security-incident-template.md"
     },
     {
       "source": "schemas/compliance-record.schema.json",
-      "target": "agent-memory/schemas/compliance-record.schema.json"
+      "target": ".owledge/schemas/compliance-record.schema.json"
     },
     {
       "source": "docs/compliance-light.md",

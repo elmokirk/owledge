@@ -3,56 +3,56 @@
   "version": "0.1.0",
   "description": "Optional PI Agent proof corpus that demonstrates observe, detect, red-team, promote, and measure loops.",
   "install_directories": [
-    "agent-memory/pi-agent/proof-corpus",
-    "agent-memory/pi-agent/red-team",
-    "agent-memory/pi-agent/reports",
-    "agent-memory/patterns",
-    "agent-memory/lessons"
+    ".owledge/pi-agent/proof-corpus",
+    ".owledge/pi-agent/red-team",
+    ".owledge/pi-agent/reports",
+    ".owledge/patterns",
+    ".owledge/lessons"
   ],
   "install_files": [
     {
-      "source": "starter/agent-memory/pi-agent/proof-corpus/01-observe-chat-context-loss.md",
-      "target": "agent-memory/pi-agent/proof-corpus/01-observe-chat-context-loss.md"
+      "source": "starter/.owledge/pi-agent/proof-corpus/01-observe-chat-context-loss.md",
+      "target": ".owledge/pi-agent/proof-corpus/01-observe-chat-context-loss.md"
     },
     {
-      "source": "starter/agent-memory/pi-agent/proof-corpus/02-observe-handoff-gap.md",
-      "target": "agent-memory/pi-agent/proof-corpus/02-observe-handoff-gap.md"
+      "source": "starter/.owledge/pi-agent/proof-corpus/02-observe-handoff-gap.md",
+      "target": ".owledge/pi-agent/proof-corpus/02-observe-handoff-gap.md"
     },
     {
-      "source": "starter/agent-memory/pi-agent/proof-corpus/03-observe-runtime-fixture-gap.md",
-      "target": "agent-memory/pi-agent/proof-corpus/03-observe-runtime-fixture-gap.md"
+      "source": "starter/.owledge/pi-agent/proof-corpus/03-observe-runtime-fixture-gap.md",
+      "target": ".owledge/pi-agent/proof-corpus/03-observe-runtime-fixture-gap.md"
     },
     {
-      "source": "starter/agent-memory/pi-agent/proof-corpus/04-detect-recurring-error.md",
-      "target": "agent-memory/pi-agent/proof-corpus/04-detect-recurring-error.md"
+      "source": "starter/.owledge/pi-agent/proof-corpus/04-detect-recurring-error.md",
+      "target": ".owledge/pi-agent/proof-corpus/04-detect-recurring-error.md"
     },
     {
-      "source": "starter/agent-memory/pi-agent/proof-corpus/05-detect-parallel.md",
-      "target": "agent-memory/pi-agent/proof-corpus/05-detect-parallel.md"
+      "source": "starter/.owledge/pi-agent/proof-corpus/05-detect-parallel.md",
+      "target": ".owledge/pi-agent/proof-corpus/05-detect-parallel.md"
     },
     {
-      "source": "starter/agent-memory/pi-agent/proof-corpus/06-redteam-finding.md",
-      "target": "agent-memory/pi-agent/proof-corpus/06-redteam-finding.md"
+      "source": "starter/.owledge/pi-agent/proof-corpus/06-redteam-finding.md",
+      "target": ".owledge/pi-agent/proof-corpus/06-redteam-finding.md"
     },
     {
-      "source": "starter/agent-memory/pi-agent/proof-corpus/07-promoted-pattern.md",
-      "target": "agent-memory/pi-agent/proof-corpus/07-promoted-pattern.md"
+      "source": "starter/.owledge/pi-agent/proof-corpus/07-promoted-pattern.md",
+      "target": ".owledge/pi-agent/proof-corpus/07-promoted-pattern.md"
     },
     {
-      "source": "starter/agent-memory/pi-agent/proof-corpus/08-promoted-lesson.md",
-      "target": "agent-memory/pi-agent/proof-corpus/08-promoted-lesson.md"
+      "source": "starter/.owledge/pi-agent/proof-corpus/08-promoted-lesson.md",
+      "target": ".owledge/pi-agent/proof-corpus/08-promoted-lesson.md"
     },
     {
-      "source": "starter/agent-memory/pi-agent/proof-corpus/09-measure-recurrence-reduction.md",
-      "target": "agent-memory/pi-agent/proof-corpus/09-measure-recurrence-reduction.md"
+      "source": "starter/.owledge/pi-agent/proof-corpus/09-measure-recurrence-reduction.md",
+      "target": ".owledge/pi-agent/proof-corpus/09-measure-recurrence-reduction.md"
     },
     {
-      "source": "starter/agent-memory/pi-agent/proof-corpus/10-measure-launch-score.md",
-      "target": "agent-memory/pi-agent/proof-corpus/10-measure-launch-score.md"
+      "source": "starter/.owledge/pi-agent/proof-corpus/10-measure-launch-score.md",
+      "target": ".owledge/pi-agent/proof-corpus/10-measure-launch-score.md"
     },
     {
-      "source": "starter/agent-memory/pi-agent/red-team/pi-proof-redteam-scorecard.md",
-      "target": "agent-memory/pi-agent/red-team/pi-proof-redteam-scorecard.md"
+      "source": "starter/.owledge/pi-agent/red-team/pi-proof-redteam-scorecard.md",
+      "target": ".owledge/pi-agent/red-team/pi-proof-redteam-scorecard.md"
     },
     {
       "source": "docs/pi-proof-loop.md",

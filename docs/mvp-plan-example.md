@@ -36,7 +36,7 @@ Out of scope:
 
 - `docs/superpowers/plans/example-plan.md`
 - `Research.md`
-- `agent-memory/indexes/memory-index.jsonl`
+- `.owledge/indexes/memory-index.jsonl`
 
 ## Acceptance Criteria
 

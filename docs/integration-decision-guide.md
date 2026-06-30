@@ -21,7 +21,7 @@ The first working option is usually the right option.
 | Path | Use When | What It Adds | Avoid When |
 | --- | --- | --- | --- |
 | Principles-only / Skills | One user or one agent needs the Owledge memory rules inside an existing workflow | Instructions and skills only | You need local validation, indexes, or durable project artifacts |
-| Project-local kit | A project needs durable plans, evidence, handoffs, indexes, and validation in-repo | `PROJECT_CONTEXT.md`, `agent-memory/`, local Python tools, optional skills | The team only wants a portable operating rule |
+| Project-local kit | A project needs durable plans, evidence, handoffs, indexes, and validation in-repo | `OWLEDGE.md`, `.owledge/`, local Python tools, optional skills | The team only wants a portable operating rule |
 | Knowledgebase module | An existing Markdown or Obsidian-style vault should be scanned without migration | An additive Owledge-owned module or mapped indexes | You want Owledge to own or rewrite the vault taxonomy |
 | Runtime adapter | A runtime should capture private session events, handoffs, or command wrappers | Optional hooks, plugin files, and runtime contracts | Skills and manual handoffs are enough |
 | Add-ons | A team needs proof, demo, trust review, conformance, TypeScript eval, or benchmark charts | Optional docs, fixtures, generated-view tools, and scorecards | The add-on would become a default dependency |
@@ -30,7 +30,7 @@ The first working option is usually the right option.
 
 For the smallest possible setup, use only:
 
-- `skills/agent-memory-principles`
+- `skills/owledge-principles`
 - `AGENTS.md` or the equivalent runtime instruction file
 - the rule that Markdown artifacts are canonical and generated views are
   disposable
@@ -58,7 +58,7 @@ runtime contracts, or distribution assets, but they must not:
 | `runtime-conformance-kit` | Read-only runtime contract fixtures |
 | `pi-proof-kit` | Synthetic observe, detect, red-team, promote, and measure loop |
 | `ts-adapter-kit` | Optional Node/TypeScript CI validation of the Markdown contract |
-| `pilot-benchmark-kit` | Optional pilot metrics, benchmark summaries, and static chart views |
+| `benchmark-kit` | Optional real Markdown fixture benchmark with token, performance, context pollution, and report outputs |
 
 ## Decision Checklist
 

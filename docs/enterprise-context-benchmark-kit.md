@@ -1,5 +1,8 @@
 # Enterprise Context Benchmark Kit
 
+Status: deprecated active surface for v0.7. Use
+[Benchmark Kit](benchmark-kit.md) for current public benchmark guidance.
+
 Optional research-grade add-on for proving Owledge context hygiene before making
 token or cost claims.
 
@@ -30,10 +33,11 @@ Metrics include prompt tokens, estimated input cost, useful-source precision and
 recall, irrelevant-token ratio, oracle distance, dropped-source reasons, runtime,
 peak memory, and privacy leakage count.
 
-## Install
+## Current v0.7 Path
 
 ```bash
-python tools/owledge.py install-addon --project-root . --addon enterprise-context-benchmark-kit
+python tools/owledge.py install-addon --project-root . --addon benchmark-kit
+python tools/benchmark-kit/run-benchmark-kit.py --mode ci --scale-mode small --yes
 ```
 
 ## Run
@@ -51,8 +55,8 @@ Outputs:
 benchmarks/results/context-growth.json
 benchmarks/results/context-growth-charts.json
 benchmarks/results/token-efficiency.md
-agent-memory/reports/enterprise-context-benchmark/index.html
-agent-memory/reports/enterprise-context-benchmark/*.svg
+.owledge/reports/enterprise-context-benchmark/index.html
+.owledge/reports/enterprise-context-benchmark/*.svg
 ```
 
 ## Guardrails

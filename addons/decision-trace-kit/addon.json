@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "description": "Optional read-only decision trace JSON and HTML add-on for Owledge projects.",
   "install_directories": [
-    "agent-memory/decision-trace",
-    "agent-memory/reports/decision-trace",
+    ".owledge/decision-trace",
+    ".owledge/reports/decision-trace",
     "tools/decision-trace"
   ],
   "install_files": [
@@ -17,12 +17,12 @@
       "target": "tools/decision-trace/render-decision-trace.py"
     },
     {
-      "source": "starter/agent-memory/decision-trace/trace-profile.md",
-      "target": "agent-memory/decision-trace/trace-profile.md"
+      "source": "starter/.owledge/decision-trace/trace-profile.md",
+      "target": ".owledge/decision-trace/trace-profile.md"
     }
   ],
   "gitignore": [
-    "agent-memory/reports/decision-trace/"
+    ".owledge/reports/decision-trace/"
   ]
 }
 

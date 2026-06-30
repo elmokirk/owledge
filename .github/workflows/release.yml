@@ -27,7 +27,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install build tooling
-        run: python -m pip install --quiet --upgrade build twine
+        run: python -m pip install --quiet --upgrade build twine uv
 
       - name: Build sdist and wheel
         run: python -m build
@@ -35,16 +35,29 @@ jobs:
       - name: Check distributions
         run: python -m twine check dist/*
 
+      - name: Wheel uvx smoke
+        run: |
+          VERSION=$(cat VERSION)
+          WHEEL="dist/owledge-${VERSION}-py3-none-any.whl"
+          uvx --from "$WHEEL" owledge --help
+          tmp=$(mktemp -d /tmp/owledge-wheel-XXXXXX)
+          uvx --from "$WHEEL" owledge quickstart --target "$tmp"
+          test -f "$tmp/OWLEDGE.md"
+          test -d "$tmp/.owledge"
+
+      - name: Publish readiness
+        run: python tools/owledge.py test publish-readiness --project-root .
+
       - name: Verify sdist is clean
         run: |
           python -m pip install --quiet .
-          python tools/agent_memory_cli.py --project-root . sdist-clean
+          python tools/owledge_core.py --project-root . sdist-clean
 
       - name: Verify upgrade notes on schema/template changes
         run: |
-          # Check if templates/ or schemas/ changed between the prior tag and HEAD
+          # Check if product templates or schemas changed between the prior tag and HEAD
           BASE=$(git describe --tags --abbrev=0 HEAD 2>/dev/null || echo HEAD~1)
-          if git diff --name-only $BASE HEAD -- templates/ schemas/ | grep -q .; then
+          if git diff --name-only $BASE HEAD -- templates/ schemas/ OWLEDGE.template.md AGENTS.template.md CLAUDE.template.md | grep -q .; then
             if ! grep -q "## Upgrade notes" CHANGELOG.md; then
               echo "ERROR: templates/ or schemas/ changed but CHANGELOG.md has no '## Upgrade notes' section"
               exit 1

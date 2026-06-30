@@ -9,7 +9,7 @@ The templates consolidate patterns already used across the kit:
 
 | Source Pattern | Existing Location | Reusable Shape |
 | --- | --- | --- |
-| PI Red Team scoring | `agent-memory/pi-agent/red-team/`, `skills/pi-agent-red-team-evaluator/` | 1-100 score, recommendation, blocking issues, evidence |
+| PI Red Team scoring | `.owledge/pi-agent/red-team/`, `skills/pi-agent-red-team-evaluator/` | 1-100 score, recommendation, blocking issues, evidence |
 | Senior expert critique | planning and finalization reviews | dynamic expert lens, findings, tradeoffs, next actions |
 | 10-scenario simulation | plugin and system validation tasks | scenario matrix, success metrics, residual risk |
 | Enterprise / UX / DX review | publish and dashboard reviews | persona-based critique with adoption metrics |
@@ -46,7 +46,7 @@ Use these metrics unless the review needs a specialized rubric.
 Use the `review-evaluation-workflow` skill when a Codex, Claude, Cowork, or generic runtime agent needs a red team review, expert evaluation, scenario simulation, scorecard, promotion-readiness check, or task conversion from findings.
 
 1. Choose the artifact: plan, report, code change, memory candidate, export, workflow, or system behavior.
-2. Choose the template from `agent-memory/templates/`.
+2. Choose the template from `.owledge/templates/`.
 3. Inject personas from `evaluation-persona-pack-template.md` or define explicit roles inline.
 4. Collect evidence: source paths, hashes, command results, screenshots, logs, memory IDs, or clearly marked assumptions.
 5. Score dimensions from 1-100.

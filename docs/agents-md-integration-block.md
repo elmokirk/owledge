@@ -10,7 +10,7 @@ instruction file.
 - Your project already has an `AGENTS.md` or `CLAUDE.md` and you do not want to
   overwrite it.
 - You want Owledge rules but do not need local Python tools or the full
-  `agent-memory/` folder structure.
+  `.owledge/` folder structure.
 - You want the smallest possible integration (principles-only path).
 
 ## Copy-Paste Block
@@ -29,11 +29,11 @@ exports, and dashboards are disposable views.
 ### Read Order
 
 1. `USER_CONTEXT.md` when present (private user profile).
-2. `PROJECT_CONTEXT.md` (project router, goals, decisions, next actions).
-3. `agent-memory/indexes/memory-index.jsonl` when present (metadata-first scan).
-4. Relevant `agent-memory/compiled/`, `agent-memory/canonical/`,
-   `agent-memory/decisions/`, `agent-memory/lessons/`, `agent-memory/patterns/`.
-5. `agent-memory/ideas/` before drafting any new plan or proposing new work.
+2. `OWLEDGE.md` (project router, goals, decisions, next actions).
+3. `.owledge/indexes/memory-index.jsonl` when present (metadata-first scan).
+4. Relevant `.owledge/compiled/`, `.owledge/canonical/`,
+   `.owledge/decisions/`, `.owledge/lessons/`, `.owledge/patterns/`.
+5. `.owledge/ideas/` before drafting any new plan or proposing new work.
 
 ### MVP-First Planning
 
@@ -52,15 +52,15 @@ Before implementation, draft a plan with:
 
 When work produces an idea that does not belong in the current scope:
 
-- Capture it in `agent-memory/ideas/` with `concept_tags`,
+- Capture it in `.owledge/ideas/` with `concept_tags`,
   `problem_patterns`, `architecture_patterns`, `failure_modes`, and
   `similar_to` edges.
 - Store source links and hashes, not long transcripts.
-- Check `agent-memory/ideas/` before drafting new plans to avoid duplicates.
+- Check `.owledge/ideas/` before drafting new plans to avoid duplicates.
 
 ### Permission Mode
 
-The `PROJECT_CONTEXT.md` may set `planning_mode`:
+The `OWLEDGE.md` may set `planning_mode`:
 
 - `supervised` (default): ask before linking existing ideas or expanding scope.
 - `approve-automatically`: link and log without asking.
@@ -82,9 +82,9 @@ The `PROJECT_CONTEXT.md` may set `planning_mode`:
 
 ## After Pasting
 
-- Create a `PROJECT_CONTEXT.md` with at minimum: project name, goal, and
+- Create a `OWLEDGE.md` with at minimum: project name, goal, and
   `project_mode` (PoC, MVP, side, SaaS).
-- Create `agent-memory/ideas/` and `agent-memory/plans/` directories.
+- Create `.owledge/ideas/` and `.owledge/plans/` directories.
 - When you want local validation, run
   `python tools/owledge.py init-project --target .` to add the Python tools
   additively (existing files are preserved).
@@ -99,7 +99,7 @@ What is the read order? What is the MVP plan structure? What is the completion
 signal?
 ```
 
-The agent should answer: read order (USER_CONTEXT → PROJECT_CONTEXT → index →
+The agent should answer: read order (USER_CONTEXT → OWLEDGE → index →
 compiled/canonical/decisions → ideas), MVP plan structure (goal, non-goals,
 cutline, evidence, success metrics, acceptance criteria, completion signal),
 and completion signal (`status: done` + QA gates passing).

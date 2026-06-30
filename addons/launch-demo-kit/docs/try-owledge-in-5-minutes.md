@@ -5,6 +5,6 @@ The installed evidence, handoff, and static report prove the core before/after
 story without requiring a runtime plugin.
 
 Expected result: the next agent can resume from
-`agent-memory/handoffs/launch-demo-resume-handoff.md` instead of asking the user
+`.owledge/handoffs/launch-demo-resume-handoff.md` instead of asking the user
 to reconstruct the previous chat.
 

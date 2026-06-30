@@ -24,7 +24,7 @@ def test_doctor_distinguishes_edits(fresh_project):
     """E2: edit a template hash -> classified user_edited, not outdated."""
     project = fresh_project
     set_manifest_kit_version(project, "0.6.0")
-    editable_rel = "agent-memory/templates/task-card-template.md"
+    editable_rel = ".owledge/templates/task-card-template.md"
     write_file(project, editable_rel, "# user-edited\n")
     result = run_owledge(["doctor"], project)
     doctor = json.loads(result.stdout)
@@ -59,7 +59,7 @@ def test_global_link_resolves_env(fresh_project, tmp_path, monkeypatch):
     monkeypatch.setenv("OWLEDGE_GLOBAL_HOME", str(env_global))
     result = run_owledge(["init-project", "--target", str(project), "--link-global"])
     assert result.returncode == 0
-    link_path = project / "agent-memory" / "global-link.json"
+    link_path = project / "owledge" / "global-link.json"
     if link_path.is_file():
         link = json.loads(link_path.read_text(encoding="utf-8"))
         assert pathlib.Path(link["path"]) == env_global, f"global-link path {link['path']} != env {env_global}"

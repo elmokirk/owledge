@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build a drop-in Agent Memory module inside an existing Markdown KB.
+"""Build a drop-in Owledge module inside an existing Markdown KB.
 
 This generator is intentionally additive. It does not require global
 environment variables, does not rewrite existing Markdown files, and does not
@@ -21,12 +21,12 @@ from typing import Any, Iterable
 
 
 MODULE_DIRS = [
-    "agent-memory/plans",
-    "agent-memory/handoffs",
-    "agent-memory/evidence",
-    "agent-memory/reviews",
-    "agent-memory/indexes",
-    "agent-memory/tmp",
+    ".owledge/plans",
+    ".owledge/handoffs",
+    ".owledge/evidence",
+    ".owledge/reviews",
+    ".owledge/indexes",
+    ".owledge/tmp",
 ]
 
 REQUIRED_MAP_KEYS = {"plans", "evidence", "handoffs", "reviews", "indexes"}
@@ -123,7 +123,7 @@ def reject_duplicate_json_keys(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
     payload: dict[str, Any] = {}
     for key, value in pairs:
         if key in seen:
-            raise ValueError(f"Duplicate key in agent-memory-map.json: {key}")
+            raise ValueError(f"Duplicate key in owledge-map.json: {key}")
         seen.add(key)
         payload[key] = value
     return payload
@@ -152,7 +152,7 @@ def resolve_map_path(kb_root: pathlib.Path, raw: str) -> pathlib.Path:
 
 def load_mapping(kb_root: pathlib.Path, map_file: str) -> dict[str, pathlib.Path] | None:
     explicit_map = bool(map_file)
-    candidate = pathlib.Path(map_file) if map_file else kb_root / "agent-memory-map.json"
+    candidate = pathlib.Path(map_file) if map_file else kb_root / "owledge-map.json"
     if not candidate.is_absolute():
         candidate = kb_root / candidate
     candidate = candidate.resolve()
@@ -169,14 +169,14 @@ def load_mapping(kb_root: pathlib.Path, map_file: str) -> dict[str, pathlib.Path
     except ValueError as exc:
         raise SystemExit(str(exc)) from exc
     if not isinstance(payload, dict):
-        raise SystemExit("agent-memory-map.json must contain a JSON object.")
+        raise SystemExit("owledge-map.json must contain a JSON object.")
     missing = sorted(REQUIRED_MAP_KEYS - set(payload))
     if missing:
-        raise SystemExit(f"agent-memory-map.json is missing required keys: {', '.join(missing)}")
+        raise SystemExit(f"owledge-map.json is missing required keys: {', '.join(missing)}")
     allowed = REQUIRED_MAP_KEYS | OPTIONAL_MAP_KEYS
     unknown = sorted(set(payload) - allowed)
     if unknown:
-        raise SystemExit(f"agent-memory-map.json contains unknown keys: {', '.join(unknown)}")
+        raise SystemExit(f"owledge-map.json contains unknown keys: {', '.join(unknown)}")
     mapping: dict[str, pathlib.Path] = {}
     for key, value in payload.items():
         if not isinstance(value, str) or not value.strip():
@@ -290,21 +290,21 @@ def module_readme(module_root: pathlib.Path, kb_root: pathlib.Path, layout: str,
     write_rule = (
         "Write new planning and memory artifacts only inside the mapped vault paths listed below."
         if mapping
-        else f"Write new planning and memory artifacts only inside `{relative_module}/agent-memory/`."
+        else f"Write new planning and memory artifacts only inside `{relative_module}/.owledge/`."
     )
     index_rule = (
         f"Use `{normalize_relative(mapping['indexes'].relative_to(kb_root))}/kb-scan.jsonl` as a generated source index, not canonical truth."
         if mapping
-        else "Use `agent-memory/indexes/kb-scan.jsonl` as a generated source index, not canonical truth."
+        else "Use `.owledge/indexes/kb-scan.jsonl` as a generated source index, not canonical truth."
     )
     mapped_lines = ""
     local_paths = """| Path | Purpose |
 | --- | --- |
-| `agent-memory/plans/` | Project plans and planning deltas |
-| `agent-memory/handoffs/` | Agent handoff notes |
-| `agent-memory/evidence/` | Source-backed evidence notes |
-| `agent-memory/reviews/` | QA, red-team, and decision reviews |
-| `agent-memory/indexes/` | Generated read-only indexes over the host KB |"""
+| `.owledge/plans/` | Project plans and planning deltas |
+| `.owledge/handoffs/` | Agent handoff notes |
+| `.owledge/evidence/` | Source-backed evidence notes |
+| `.owledge/reviews/` | QA, red-team, and decision reviews |
+| `.owledge/indexes/` | Generated read-only indexes over the host KB |"""
     if mapping:
         local_paths = """| Map key | Path | Purpose |
 | --- | --- | --- |
@@ -322,7 +322,7 @@ def module_readme(module_root: pathlib.Path, kb_root: pathlib.Path, layout: str,
         mapped_lines = "\n## Mapped Vault Paths\n\n" + "\n".join(
             f"- `{key}` -> `{normalize_relative(path.relative_to(kb_root))}`" for key, path in sorted(mapping.items())
         ) + "\n"
-    return f"""# Agent Memory Module
+    return f"""# Owledge Module
 
 This is a drop-in planning and memory module for this Markdown knowledgebase.
 
@@ -392,17 +392,17 @@ Create a source-backed project plan from the existing Markdown knowledgebase wit
 ## Next Actions
 
 1. Ask the user which project or goal should be planned.
-2. Select the relevant source notes from `agent-memory/indexes/kb-scan.jsonl`.
-3. Create a concrete project plan in `agent-memory/plans/`.
+2. Select the relevant source notes from `.owledge/indexes/kb-scan.jsonl`.
+3. Create a concrete project plan in `.owledge/plans/`.
 4. Add evidence or handoff notes only when they cite source paths.
 """
 
 
 def copy_cli(source_root: pathlib.Path, target_root: pathlib.Path) -> pathlib.Path | None:
-    source = source_root / "tools" / "agent_memory_cli.py"
+    source = source_root / "tools" / "owledge_core.py"
     if not source.exists():
         return None
-    target = target_root / "tools" / "agent_memory_cli.py"
+    target = target_root / "tools" / "owledge_core.py"
     target.parent.mkdir(parents=True, exist_ok=True)
     if not target.exists():
         shutil.copy2(source, target)
@@ -418,8 +418,8 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
     if not mapping:
         ensure_dirs(module_root)
 
-    plan_dir = mapping["plans"] if mapping else module_root / "agent-memory" / "plans"
-    index_dir = mapping["indexes"] if mapping else module_root / "agent-memory" / "indexes"
+    plan_dir = mapping["plans"] if mapping else module_root / ".owledge" / "plans"
+    index_dir = mapping["indexes"] if mapping else module_root / ".owledge" / "indexes"
     excluded_roots = (
         [path for key, path in mapping.items() if key != "ideas"]
         if mapping
@@ -431,7 +431,7 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
     created_files: list[str] = []
     skipped_files: list[str] = []
 
-    module_doc = (index_dir / "AGENT_MEMORY_MODULE.md") if mapping else (module_root / "AGENT_MEMORY_MODULE.md")
+    module_doc = (index_dir / "OWLEDGE_MODULE.md") if mapping else (module_root / "OWLEDGE_MODULE.md")
     if write_text_if_missing(module_doc, module_readme(module_root, kb_root, args.layout, args.module_dir, mapping)):
         created_files.append(normalize_relative(module_doc.relative_to(kb_root)))
     else:
@@ -480,14 +480,14 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Build a drop-in Agent Memory module for an existing Markdown knowledgebase.")
+    parser = argparse.ArgumentParser(description="Build a drop-in Owledge module for an existing Markdown knowledgebase.")
     parser.add_argument("--knowledgebase-root", required=True, help="Existing Markdown KB or Obsidian vault root.")
-    parser.add_argument("--kit-root", default="", help="Optional Agent Memory Kit root. Defaults to this script's repo.")
+    parser.add_argument("--kit-root", default="", help="Optional Owledge root. Defaults to this script's repo.")
     parser.add_argument("--layout", choices=["module-dir", "flat"], default="module-dir")
-    parser.add_argument("--module-dir", default="agent-memory-module")
-    parser.add_argument("--map-file", default="", help="Optional agent-memory-map.json path inside the KB.")
+    parser.add_argument("--module-dir", default="owledge-module")
+    parser.add_argument("--map-file", default="", help="Optional owledge-map.json path inside the KB.")
     parser.add_argument("--max-files", type=int, default=10000)
-    parser.add_argument("--include-cli", action="store_true", help="Copy tools/agent_memory_cli.py into the module.")
+    parser.add_argument("--include-cli", action="store_true", help="Copy tools/owledge_core.py into the module.")
     parser.add_argument("--create-sample-plan", action=argparse.BooleanOptionalAction, default=True)
     args = parser.parse_args(argv)
     result = build(args)

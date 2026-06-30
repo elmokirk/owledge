@@ -3,32 +3,32 @@
   "version": "0.1.0",
   "description": "Optional five-minute demo assets that show Owledge durable memory, evidence, handoff, and a static proof report.",
   "install_directories": [
-    "agent-memory/launch-demo",
-    "agent-memory/evidence",
-    "agent-memory/handoffs",
-    "agent-memory/reports/launch-demo",
-    "agent-memory/templates"
+    ".owledge/launch-demo",
+    ".owledge/evidence",
+    ".owledge/handoffs",
+    ".owledge/reports/launch-demo",
+    ".owledge/templates"
   ],
   "install_files": [
     {
-      "source": "starter/agent-memory/launch-demo/profile.md",
-      "target": "agent-memory/launch-demo/profile.md"
+      "source": "starter/.owledge/launch-demo/profile.md",
+      "target": ".owledge/launch-demo/profile.md"
     },
     {
-      "source": "starter/agent-memory/evidence/launch-demo-before.md",
-      "target": "agent-memory/evidence/launch-demo-before.md"
+      "source": "starter/.owledge/evidence/launch-demo-before.md",
+      "target": ".owledge/evidence/launch-demo-before.md"
     },
     {
-      "source": "starter/agent-memory/handoffs/launch-demo-resume-handoff.md",
-      "target": "agent-memory/handoffs/launch-demo-resume-handoff.md"
+      "source": "starter/.owledge/handoffs/launch-demo-resume-handoff.md",
+      "target": ".owledge/handoffs/launch-demo-resume-handoff.md"
     },
     {
-      "source": "starter/agent-memory/reports/launch-demo/project-memory-cockpit.html",
-      "target": "agent-memory/reports/launch-demo/project-memory-cockpit.html"
+      "source": "starter/.owledge/reports/launch-demo/project-memory-cockpit.html",
+      "target": ".owledge/reports/launch-demo/project-memory-cockpit.html"
     },
     {
       "source": "templates/launch-demo-next-agent-prompt.md",
-      "target": "agent-memory/templates/launch-demo-next-agent-prompt.md"
+      "target": ".owledge/templates/launch-demo-next-agent-prompt.md"
     },
     {
       "source": "docs/try-owledge-in-5-minutes.md",
@@ -36,6 +36,6 @@
     }
   ],
   "gitignore": [
-    "agent-memory/reports/launch-demo/*.local.html"
+    ".owledge/reports/launch-demo/*.local.html"
   ]
 }

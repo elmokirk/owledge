@@ -1,0 +1,40 @@
+---
+memory_id: "mem:TENANT_ID:CUSTOMER_ID:PROJECT_ID:evidence:slug"
+tenant_id: "TENANT_ID"
+customer_id: "CUSTOMER_ID"
+project_id: "PROJECT_ID"
+doc_type: "evidence"
+status: "active"
+visibility: "private"
+data_class: "internal"
+semantic_title: "Evidence title"
+summary: "Evidence summary with hashes and links."
+concept_tags: []
+stack_tags: []
+problem_patterns: []
+architecture_patterns: []
+failure_modes: []
+reusable_lessons: []
+confidence: 0.8
+review_status: "reviewed"
+sanitization_status: "not_required"
+created_at: "YYYY-MM-DDTHH:MM:SSZ"
+updated_at: "YYYY-MM-DDTHH:MM:SSZ"
+retention_class: "standard"
+stale_after: ""
+expires_at: ""
+last_reviewed_at: "YYYY-MM-DDTHH:MM:SSZ"
+review_cycle: "monthly"
+source_hash: ""
+edges: []
+---
+
+# Evidence Title
+
+## Evidence Summary
+
+## Source Links
+
+## Hashes
+
+## Validation Notes

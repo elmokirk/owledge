@@ -3,29 +3,29 @@
   "version": "0.1.0",
   "description": "Optional read-only runtime conformance fixtures for Codex, Claude Code, and Cowork-compatible adapters.",
   "install_directories": [
-    "agent-memory/runtime-conformance",
+    ".owledge/runtime-conformance",
     "tools/runtime-conformance"
   ],
   "install_files": [
     {
       "source": "contracts/codex.json",
-      "target": "agent-memory/runtime-conformance/codex.json"
+      "target": ".owledge/runtime-conformance/codex.json"
     },
     {
       "source": "contracts/claude-code.json",
-      "target": "agent-memory/runtime-conformance/claude-code.json"
+      "target": ".owledge/runtime-conformance/claude-code.json"
     },
     {
       "source": "contracts/cowork-compatible.json",
-      "target": "agent-memory/runtime-conformance/cowork-compatible.json"
+      "target": ".owledge/runtime-conformance/cowork-compatible.json"
     },
     {
       "source": "fixtures/session-start.json",
-      "target": "agent-memory/runtime-conformance/fixtures/session-start.json"
+      "target": ".owledge/runtime-conformance/fixtures/session-start.json"
     },
     {
       "source": "fixtures/user-prompt.json",
-      "target": "agent-memory/runtime-conformance/fixtures/user-prompt.json"
+      "target": ".owledge/runtime-conformance/fixtures/user-prompt.json"
     },
     {
       "source": "tools/run-runtime-conformance.py",

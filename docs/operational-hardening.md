@@ -8,10 +8,10 @@ explicitly promotes or edits memory.
 
 Use separate files for separate agents whenever possible:
 
-- session events under each agent's own `agent-memory/sessions/<id>/`
-- handoffs under `agent-memory/handoffs/`
-- evidence under `agent-memory/evidence/`
-- reviews or QA reports under `agent-memory/reviews/` or `agent-memory/qa/`
+- session events under each agent's own `.owledge/sessions/<id>/`
+- handoffs under `.owledge/handoffs/`
+- evidence under `.owledge/evidence/`
+- reviews or QA reports under `.owledge/reviews/` or `.owledge/qa/`
 
 The Python tools use locked atomic writes for generated indexes, exports,
 reports, promotion manifests, and runtime session artifacts. That protects
@@ -22,7 +22,7 @@ single-file updates, but it is not a substitute for task ownership.
 When two records disagree, do not overwrite one with the other.
 
 1. Keep both Markdown records.
-2. Run `python tools/agent_memory_cli.py --project-root . review-memory-conflicts`.
+2. Run `python tools/owledge_core.py --project-root . review-memory-conflicts`.
 3. Add a review artifact describing the conflict.
 4. Promote a supersession or canonical record only after review approval.
 

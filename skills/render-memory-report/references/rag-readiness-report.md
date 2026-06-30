@@ -8,10 +8,10 @@ Use when the user asks whether memory is ready for RAG, LightRAG, GraphRAG, vect
 
 Prefer:
 
-- `agent-memory/indexes/*.jsonl`
-- `agent-memory/exports/rag/`
-- `agent-memory/exports/lightrag/`
-- `agent-memory/exports/graphrag/`
+- `.owledge/indexes/*.jsonl`
+- `.owledge/exports/rag/`
+- `.owledge/exports/lightrag/`
+- `.owledge/exports/graphrag/`
 - schemas and validation outputs
 
 ## Sections

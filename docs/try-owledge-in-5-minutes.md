@@ -20,7 +20,7 @@ Run these commands from a local Owledge checkout.
 ```bash
 python tools/owledge.py quickstart --target .agent-control/tmp/owledge-five-minute-demo
 python tools/owledge.py install-addon --project-root .agent-control/tmp/owledge-five-minute-demo --addon launch-demo-kit
-python tools/agent_memory_cli.py --project-root .agent-control/tmp/owledge-five-minute-demo build-memory-index
+python tools/owledge_core.py --project-root .agent-control/tmp/owledge-five-minute-demo build-memory-index
 ```
 
 ## Expected Result
@@ -29,11 +29,11 @@ The demo project now contains:
 
 | Path | What it proves |
 | --- | --- |
-| `PROJECT_CONTEXT.md` | The project has a durable context router. |
-| `agent-memory/evidence/launch-demo-before.md` | Evidence no longer lives only in chat. |
-| `agent-memory/handoffs/launch-demo-resume-handoff.md` | The next agent has scoped resume instructions. |
-| `agent-memory/reports/launch-demo/project-memory-cockpit.html` | A shareable static proof asset exists. |
-| `agent-memory/indexes/memory-index.jsonl` | Memory can be rebuilt and inspected. |
+| `OWLEDGE.md` | The project has a durable context router. |
+| `.owledge/evidence/launch-demo-before.md` | Evidence no longer lives only in chat. |
+| `.owledge/handoffs/launch-demo-resume-handoff.md` | The next agent has scoped resume instructions. |
+| `.owledge/reports/launch-demo/project-memory-cockpit.html` | A shareable static proof asset exists. |
+| `.owledge/indexes/memory-index.jsonl` | Memory can be rebuilt and inspected. |
 
 Verify the install:
 
@@ -43,16 +43,33 @@ python tools/owledge.py doctor --project-root .agent-control/tmp/owledge-five-mi
 
 Expected result: `passed` is `true`.
 
+## Optional Benchmark Proof
+
+After installing `benchmark-kit` and running one or more model benchmarks
+sequentially, generate a comparison report:
+
+```bash
+python tools/benchmark-kit/compare-benchmark-runs.py --inputs \
+  .owledge/exports/benchmark-kit-gemma4-latest/latest.json \
+  .owledge/exports/benchmark-kit-qwen3-5-4b/latest.json \
+  .owledge/exports/benchmark-kit-glm-5-1-cloud/latest.json \
+  --output .owledge/reports/generated/benchmark-kit-comparison
+```
+
+Expected result: the report shows baseline retrieval versus Owledge context
+packs across model tiers, with privacy failures prevented, stale context
+avoided, pollution reduction, and token efficiency in one proof-oriented view.
+
 ## Next agent prompt
 
 Paste this into Codex, Claude Code, Cowork, or another coding agent from the
 demo project root:
 
 ```text
-Use Owledge project memory. Read PROJECT_CONTEXT.md, then
-agent-memory/handoffs/launch-demo-resume-handoff.md. Continue from the evidence
+Use Owledge project memory. Read OWLEDGE.md, then
+.owledge/handoffs/launch-demo-resume-handoff.md. Continue from the evidence
 listed there, do not rely on chat history, and write any new evidence or
-handoff as Markdown under agent-memory/.
+handoff as Markdown under .owledge/.
 ```
 
 ## What Changed On Disk

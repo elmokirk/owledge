@@ -24,13 +24,19 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Python compile
-        run: python -m py_compile tools/owledge.py tools/agent_memory_cli.py tools/build_kb_module.py tools/build_project_folder_kit.py benchmarks/run_benchmarks.py plugins/agent-memory-cowork/scripts/capture-claude-event.py plugins/agent-memory-cowork/scripts/close-runtime-session.py
+        run: python -m py_compile tools/owledge.py tools/owledge_mcp.py tools/owledge_core.py tools/build_kb_module.py tools/build_project_folder_kit.py benchmarks/run_benchmarks.py plugins/owledge-cowork/scripts/capture-claude-event.py plugins/owledge-cowork/scripts/close-runtime-session.py
 
       - name: Public docs
         run: python tools/owledge.py test public-docs --project-root .
 
       - name: Release trust
         run: python tools/owledge.py test release-trust --project-root .
+
+      - name: Legacy naming
+        run: python tools/owledge.py test legacy-naming-clean --project-root .
+
+      - name: Standalone skills
+        run: python tools/owledge.py test standalone-skills --project-root .
 
       - name: Platform-neutral core
         run: python tools/owledge.py test core-platform-neutral --project-root .
@@ -40,6 +46,21 @@ jobs:
 
       - name: Runtime adapters
         run: python tools/owledge.py test runtime-adapters --project-root .
+
+      - name: Contracts
+        run: python tools/owledge_core.py --project-root . test-contracts
+
+      - name: Wikilink audit
+        run: python tools/owledge.py wikilink-audit --project-root . --check
+
+      - name: Benchmark kit CI
+        run: python tools/owledge.py test benchmark-kit-ci --project-root .
+
+      - name: Read-only MCP smoke
+        run: python tools/owledge.py test mcp-readonly --project-root .
+
+      - name: Publish readiness
+        run: python tools/owledge.py test publish-readiness --project-root .
 
   release-gates:
     name: full-release-gates
@@ -59,6 +80,27 @@ jobs:
       - name: Stress tests (v0.6.1 fix-up suite)
         run: python -m pytest tests/unit/ -q --tb=short
 
+      - name: Contracts
+        run: python tools/owledge_core.py --project-root . test-contracts
+
+      - name: Legacy naming
+        run: python tools/owledge.py test legacy-naming-clean --project-root .
+
+      - name: Standalone skills
+        run: python tools/owledge.py test standalone-skills --project-root .
+
+      - name: Wikilink audit
+        run: python tools/owledge.py wikilink-audit --project-root . --check
+
+      - name: Benchmark kit CI
+        run: python tools/owledge.py test benchmark-kit-ci --project-root .
+
+      - name: Read-only MCP smoke
+        run: python tools/owledge.py test mcp-readonly --project-root .
+
+      - name: Publish readiness
+        run: python tools/owledge.py test publish-readiness --project-root .
+
       - name: Finalization gates (dogfood)
         run: python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports
 
@@ -66,19 +108,19 @@ jobs:
         run: python tools/owledge.py build-project-kit --output-path /tmp/clean-kit --force --verify
 
       - name: Kit integrity (zero dogfood)
-        run: python tools/agent_memory_cli.py --project-root /tmp/clean-kit kit-integrity
+        run: python tools/owledge_core.py --project-root /tmp/clean-kit kit-integrity
 
       - name: Addon boundary check
-        run: python tools/agent_memory_cli.py --project-root /tmp/clean-kit addon-boundary-check
+        run: python tools/owledge_core.py --project-root /tmp/clean-kit addon-boundary-check
 
       - name: Source vs target audit
-        run: python tools/agent_memory_cli.py --project-root . source-vs-target-audit
+        run: python tools/owledge_core.py --project-root . source-vs-target-audit
 
       - name: Sdist clean
         run: |
           python -m pip install --quiet build
           python -m build --sdist
-          python tools/agent_memory_cli.py --project-root . sdist-clean
+          python tools/owledge_core.py --project-root . sdist-clean
 
   fresh-install-cycle:
     name: fresh-install-cycle
@@ -99,6 +141,8 @@ jobs:
         run: |
           tmp=$(mktemp -d /tmp/owledge-fresh-XXXXXX)
           owledge init-project --target "$tmp"
+          test -f "$tmp/OWLEDGE.md"
+          test -d "$tmp/.owledge"
           owledge doctor --project-root "$tmp" --mode host
           owledge upgrade --project-root "$tmp" --dry-run
           echo "Fresh install cycle completed successfully"

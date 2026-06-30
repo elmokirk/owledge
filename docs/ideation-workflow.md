@@ -8,8 +8,8 @@ The ideation layer captures project and product ideas while agents work. It prev
 
 | Path | Purpose |
 | --- | --- |
-| `agent-memory/ideas/` | Project-local idea cards |
-| `agent-memory/templates/idea-card-template.md` | Copyable idea template |
+| `.owledge/ideas/` | Project-local idea cards |
+| `.owledge/templates/idea-card-template.md` | Copyable idea template |
 | `shared/patterns/` | Promoted cross-project patterns |
 | `shared/lessons/` | Promoted shared lessons |
 
@@ -23,11 +23,11 @@ captured -> triaged -> linked -> elaborated -> accepted | rejected | promoted
 
 Before creating a new plan, agents must check:
 
-1. `PROJECT_CONTEXT.md`
-2. `agent-memory/indexes/memory-index.jsonl`
-3. `agent-memory/ideas/`
-4. `agent-memory/patterns/`
-5. `agent-memory/lessons/`
+1. `OWLEDGE.md`
+2. `.owledge/indexes/memory-index.jsonl`
+3. `.owledge/ideas/`
+4. `.owledge/patterns/`
+5. `.owledge/lessons/`
 6. relevant ADRs and compiled summaries
 
 The agent should look for matching:
@@ -57,7 +57,7 @@ The agent should look for matching:
 | Architecture decision | `decisions/` ADR |
 | Reusable method | `patterns/` |
 | Sanitized learning | `lessons/` |
-| New standalone project | new `PROJECT_CONTEXT.md` in a new repo or hub entry |
+| New standalone project | new `OWLEDGE.md` in a new repo or hub entry |
 
 ## Human-Friendly Rule
 

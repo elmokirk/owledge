@@ -8,10 +8,10 @@ implementation status, or source-backed stakeholder view.
 
 Prefer:
 
-- `agent-memory/compiled/project-story-snapshot.md`
-- `agent-memory/compiled/project-execution-snapshot.md`
-- `agent-memory/project-snapshot/project-snapshot-manifest.json`
-- `agent-memory/indexes/memory-index.jsonl`
+- `.owledge/compiled/project-story-snapshot.md`
+- `.owledge/compiled/project-execution-snapshot.md`
+- `.owledge/project-snapshot/project-snapshot-manifest.json`
+- `.owledge/indexes/memory-index.jsonl`
 - Owledge-local TaskCard, WorkPackage, EpicOverview, plans, handoffs, and evidence
 
 ## Sections

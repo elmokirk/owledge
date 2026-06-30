@@ -18,7 +18,7 @@ The `version-drift` check compares the manifest's `kit_version` against the runn
 | --- | --- | --- |
 | `safe` (default) | Updates only pristine files; skips user-edited files with a warning | Yes |
 | `force-templates` | Updates every updatable file except never-touch list; requires `--yes` or interactive confirmation on a TTY | Yes |
-| `manual` | Emits a `git apply`-able patch to `agent-memory/exports/upgrade-pending.patch`; always dry-run (`--apply` is rejected) | Yes |
+| `manual` | Emits a `git apply`-able patch to `.owledge/exports/upgrade-pending.patch`; always dry-run (`--apply` is rejected) | Yes |
 
 Use `safe` for routine additive upgrades where you have lightly customized a few
 shipped files and want to preserve your edits. Use `force-templates` when you
@@ -32,8 +32,8 @@ code 2 (manual emits a patch, never writes).
 
 ## Never-touch list (hardcoded, no flag bypasses)
 
-- `PROJECT_CONTEXT.md`, `AGENTS.md`, `CLAUDE.md`, `USER_CONTEXT.md`
-- `agent-memory/{decisions,plans,sessions,evidence,handoffs}/**`
+- `OWLEDGE.md`, `AGENTS.md`, `CLAUDE.md`, `USER_CONTEXT.md`
+- `.owledge/{decisions,plans,sessions,evidence,handoffs}/**`
 - `global-memory/**`
 
 ## Commands
@@ -72,8 +72,8 @@ a patch, inspect it, and adapt your project before applying.
 
 ## Skills and the manifest
 
-`init-project` installs the kit's skills (`skills/agent-memory-principles`,
-`skills/agent-memory-runtime-bridge`, `skills/review-evaluation-workflow`,
+`init-project` installs the kit's skills (`skills/owledge-principles`,
+`skills/owledge-runtime-bridge`, `skills/review-evaluation-workflow`,
 `skills/render-memory-report`, `skills/concept-blindspot-audit`) into your
 project and records each skill file in `kit-manifest.json`. This means `doctor`
 detects skill drift and `upgrade --apply --mode=safe` updates skill files you
@@ -97,7 +97,7 @@ missing.
 ## Dogfood sync (for maintainers)
 
 Maintainers use `sync-dogfood --apply` to mirror
-`templates/agent-memory/templates/` → `internal/agent-memory/templates/` after
+`templates/owledge/templates/` → `internal/owledge/templates/` after
 editing product templates. The mirror is strictly one-way; the
 `dogfood-sync` finalization gate fails if the two trees drift. See
 `internal/README.md` for the maintainer workflow.
@@ -113,6 +113,6 @@ python tools/owledge.py sync-dogfood --apply --project-root .
 | --- | --- |
 | "No kit-manifest.json found" | Run `owledge init-project --target .` first to write the manifest |
 | "Kit installed at vX, CLI is vY" | Run `owledge upgrade --dry-run --project-root .` to see the diff, then `--apply` |
-| "Lock held by PID" | Remove `agent-memory/.upgrade.lock` if the prior run is no longer active |
+| "Lock held by PID" | Remove `.owledge/.upgrade.lock` if the prior run is no longer active |
 | "force-templates requires --yes" | Add `--yes` (or run on a TTY for interactive confirmation) |
 | "manual mode is always dry-run" | Remove `--apply` from your `--mode=manual` invocation; manual emits a patch only |

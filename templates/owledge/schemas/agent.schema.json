@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Agent",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["agent_id", "tenant_id", "role", "runtime", "status"],
+  "properties": {
+    "agent_id": { "type": "string", "minLength": 1 },
+    "tenant_id": { "type": "string", "minLength": 1 },
+    "customer_id": { "type": "string" },
+    "project_id": { "type": "string" },
+    "role": {
+      "type": "string",
+      "enum": ["orchestrator", "planner", "strategic-reviewer", "worker", "qa-agent", "memory-curator", "observer"]
+    },
+    "runtime": {
+      "type": "string",
+      "enum": ["codex", "claude-code", "openclaw", "opencode", "hermes", "pi", "other"]
+    },
+    "status": { "type": "string", "enum": ["active", "paused", "retired"] }
+  }
+}

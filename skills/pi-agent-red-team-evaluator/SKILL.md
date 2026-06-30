@@ -19,18 +19,18 @@ Challenge PI Agent outputs before promotion. The evaluator writes scorecards and
    - `revise`: score 70-84
    - `accept`: score 85-94
    - `promote-candidate`: score 95-100, still requiring curator approval
-5. Write findings under `agent-memory/pi-agent/red-team/`, `evaluations/`, or `scorecards/`.
+5. Write findings under `.owledge/pi-agent/red-team/`, `evaluations/`, or `scorecards/`.
 
 ## Runtime Command
 
 ```bash
-python tools/agent_memory_cli.py --project-root . run-review-workflow --review-type multi-perspective-red-team --subject agent-memory/pi-agent/reports --question "Evaluate PI intelligence quality and release risk."
+python tools/owledge_core.py --project-root . run-review-workflow --review-type multi-perspective-red-team --subject .owledge/pi-agent/reports --question "Evaluate PI intelligence quality and release risk."
 ```
 
 Pass a specific report when needed:
 
 ```bash
-python tools/agent_memory_cli.py --project-root . run-review-workflow --review-type multi-perspective-red-team --subject agent-memory/pi-agent/reports/pi-intelligence-YYYYMMDDHHMMSS.md --question "Evaluate this PI intelligence report."
+python tools/owledge_core.py --project-root . run-review-workflow --review-type multi-perspective-red-team --subject .owledge/pi-agent/reports/pi-intelligence-YYYYMMDDHHMMSS.md --question "Evaluate this PI intelligence report."
 ```
 
 ## Evaluation Dimensions

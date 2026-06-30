@@ -7,7 +7,7 @@ selected skills.
 ## Current Answer
 
 Yes, there is a minimal configuration: Project Folder Only. It includes the
-project files, `agent-memory/`, selected `skills/`, and local Python tools. It
+project files, `.owledge/`, selected `skills/`, and local Python tools. It
 is not skills-only, because agents need durable files plus a local CLI to
 verify, index, and build context packs.
 
@@ -29,15 +29,15 @@ From inside the generated project:
 
 ```bash
 python tools/owledge.py doctor --project-root .
-python tools/agent_memory_cli.py --project-root . validate-memory --strict
-python tools/agent_memory_cli.py --project-root . build-memory-index
+python tools/owledge_core.py --project-root . validate-memory --strict
+python tools/owledge_core.py --project-root . build-memory-index
 ```
 
 ## Agents
 
 Agents should treat the generated folder as self-contained:
 
-1. Read `PROJECT_CONTEXT.md`.
+1. Read `OWLEDGE.md`.
 2. Follow `AGENTS.md` and `CLAUDE.md`.
 3. Build a scoped context pack before non-trivial work:
 
@@ -45,7 +45,7 @@ Agents should treat the generated folder as self-contained:
 python tools/owledge.py build-context-pack --project-root . --task-id "TASK-ID" --agent-role worker --objective "Short objective"
 ```
 
-4. Write durable facts, decisions, patterns, and lessons to `agent-memory/`.
+4. Write durable facts, decisions, patterns, and lessons to `.owledge/`.
 5. Rebuild indexes after edits.
 6. Keep raw sessions private. Shared exports require reviewed and sanitized
    records.

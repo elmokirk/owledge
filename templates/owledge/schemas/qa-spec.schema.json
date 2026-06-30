@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "QASpec",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["id", "type", "status", "tenant_id", "customer_id", "project_id", "gate_ids"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^qa-" },
+    "type": { "const": "QASpec" },
+    "status": { "type": "string", "enum": ["draft", "active", "superseded", "archived"] },
+    "tenant_id": { "type": "string", "minLength": 1 },
+    "customer_id": { "type": "string", "minLength": 1 },
+    "project_id": { "type": "string", "minLength": 1 },
+    "gate_ids": { "type": "array", "items": { "type": "string" } }
+  }
+}
