@@ -35,6 +35,7 @@ Public contract:
 | Planned | POST-007 | Write-enabled MCP | Add scoped write tools with locks, privacy checks, review requirements, and audit artifacts. | v0.9.0 |
 | Planned | POST-008 | Cloud/frontier benchmark matrix | Extend Benchmark Kit to Ollama Cloud/frontier/local-hosted models with cost and resource warnings. | v0.9.x |
 | Planned | POST-009 | RAG integrations | Export Owledge's canonical Markdown layer to Mem0, Graphiti, LlamaIndex, vector DBs, or enterprise RAG systems. | v0.9.x |
+| Planned | POST-012 | OKF interchange profile | Validate, export, and import Google Open Knowledge Format bundles without weakening Owledge's stricter lifecycle, privacy, and promotion model. | v0.8.x |
 | Planned | POST-010 | Hermes adapter | Ship only when SOUL.md, project context, memory rules, runtime hooks, docs, and tests can land together. | Post-v0.9 |
 | Planned | POST-011 | Marketplace certification | Claim marketplace readiness only after standards, manifests, screenshots, install flows, and review gates are complete. | Post-v0.9 |
 
@@ -63,6 +64,7 @@ Public contract:
 | P2 | Write-enabled MCP | Add reviewed write tools with explicit scopes, locks, privacy checks, and audit artifacts. |
 | P2 | Cloud/frontier benchmark matrix | Extend Benchmark Kit to Ollama cloud/frontier models with clear cost warnings. |
 | P2 | RAG integrations | Export Owledge's canonical Markdown layer to Mem0, Graphiti, LlamaIndex, or vector/RAG engines. |
+| P2 | OKF interchange profile | Support OKF validation, safe exports, quarantined draft imports, and readiness reporting while keeping Owledge Markdown as canonical source. |
 | P3 | Hermes adapter | Full adapter only when SOUL.md, project context, memory rules, runtime hooks, and docs can ship together. |
 | P3 | Marketplace certification | Claude/Codex marketplace claims only after standards, manifests, screenshots, install flows, and review gates are complete. |
 | P2 | Public case studies | Add 3-5 real repo/vault case studies after the release surface is stable. |
@@ -72,7 +74,7 @@ Public contract:
 | Priority | Area | Outcome |
 | --- | --- | --- |
 | P0 | Publish readiness | GitHub repo with docs, license, privacy, security, examples |
-| P0 | PyPI publishing | Publish `owledge` console script so users can `pip install owledge` instead of source checkout |
+| P0 | PyPI publishing | Shipped: `owledge==0.7.0` is published and installable through `uvx owledge` |
 | P1 | HTML reports | Visual decision, handoff, RAG readiness, and activity reports |
 | P1 | Project-folder setup | Implemented: minimal local folder generator with explicit copy manifest and verification |
 | P1 | Runtime adapters | Implemented: Claude/Cowork fixtures and generic CLI runtime smoke wrapper |

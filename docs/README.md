@@ -67,6 +67,7 @@ Start with the path that matches your setup.
 
 - Read [owledge-vs-agent-methods.md](owledge-vs-agent-methods.md)
 - Read [superpowers-integration.md](superpowers-integration.md) when comparing Owledge with execution frameworks
+- Read [okf-integration-plan.md](okf-integration-plan.md) for the planned OKF-compatible interchange profile
 
 ## Advanced
 
@@ -83,6 +84,7 @@ Start with the path that matches your setup.
 
 - [feedback-round-2026-06.md](feedback-round-2026-06.md) - structured feedback triage with tickets FB-001 through FB-017 (including Round 2 feature ideas FB-013 through FB-017)
 - [roadmap-ideas-2026-06.md](roadmap-ideas-2026-06.md) - idea log from the 2026-06 feedback round with 16 idea cards (including Round 2 feature ideas)
+- [strategic-roadmap-2026-2027.md](strategic-roadmap-2026-2027.md) - decision-ready product and execution roadmap after the v0.7.0 release
 
 ## Maintainer And Historical Docs
 
