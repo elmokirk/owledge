@@ -1,30 +1,66 @@
 name: Release
 
 on:
-  push:
-    tags:
-      - "v*.*.*"
   workflow_dispatch:
+    inputs:
+      release_ref:
+        description: Release branch to publish (must be release/vX.Y.Z)
+        required: true
+        type: string
 
 permissions:
   contents: read
 
 concurrency:
-  group: release-${{ github.ref }}
+  group: release-promotion
   cancel-in-progress: false
 
 jobs:
   build:
-    name: build-dist
+    name: verify-release-candidate
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout release candidate
         uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.release_ref }}
+          fetch-depth: 0
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+
+      - name: Verify release branch and current main/PyPI reconciliation
+        env:
+          RELEASE_REF: ${{ inputs.release_ref }}
+        run: |
+          set -euo pipefail
+          VERSION="$(tr -d '\r\n' < VERSION)"
+          test "$RELEASE_REF" = "release/v$VERSION"
+          git fetch origin main --tags
+          git merge-base --is-ancestor origin/main HEAD
+          test -z "$(git ls-remote --tags origin "refs/tags/v$VERSION")"
+          python - "$VERSION" "$(git show origin/main:VERSION | tr -d '\r\n')" <<'PY'
+          import json
+          import sys
+          import urllib.error
+          import urllib.request
+
+          candidate, main_version = sys.argv[1], sys.argv[2]
+          if candidate == main_version:
+              raise SystemExit("release candidate must bump VERSION beyond origin/main")
+          with urllib.request.urlopen("https://pypi.org/pypi/owledge/json", timeout=20) as response:
+              published = json.load(response)["info"]["version"]
+          if published != main_version:
+              raise SystemExit(f"origin/main version {main_version} does not match PyPI {published}; reconcile before release")
+          try:
+              with urllib.request.urlopen(f"https://pypi.org/pypi/owledge/{candidate}/json", timeout=20):
+                  raise SystemExit(f"PyPI already contains owledge=={candidate}")
+          except urllib.error.HTTPError as error:
+              if error.code != 404:
+                  raise
+          PY
 
       - name: Install build tooling
         run: python -m pip install --quiet --upgrade build twine uv
@@ -37,60 +73,111 @@ jobs:
 
       - name: Wheel uvx smoke
         run: |
-          VERSION=$(cat VERSION)
-          WHEEL="dist/owledge-${VERSION}-py3-none-any.whl"
+          VERSION="$(tr -d '\r\n' < VERSION)"
+          WHEEL="dist/owledge-$VERSION-py3-none-any.whl"
           uvx --from "$WHEEL" owledge --help
           tmp=$(mktemp -d /tmp/owledge-wheel-XXXXXX)
           uvx --from "$WHEEL" owledge quickstart --target "$tmp"
           test -f "$tmp/OWLEDGE.md"
           test -d "$tmp/.owledge"
 
-      - name: Publish readiness
-        run: python tools/owledge.py test publish-readiness --project-root .
+      - name: Release contracts and evidence
+        run: python tools/owledge.py test release-contract --project-root . --require-dist --evidence-path dist/release-evidence.json
 
       - name: Verify sdist is clean
         run: |
           python -m pip install --quiet .
           python tools/owledge_core.py --project-root . sdist-clean
 
-      - name: Verify upgrade notes on schema/template changes
-        run: |
-          # Check if product templates or schemas changed between the prior tag and HEAD
-          BASE=$(git describe --tags --abbrev=0 HEAD 2>/dev/null || echo HEAD~1)
-          if git diff --name-only $BASE HEAD -- templates/ schemas/ OWLEDGE.template.md AGENTS.template.md CLAUDE.template.md | grep -q .; then
-            if ! grep -q "## Upgrade notes" CHANGELOG.md; then
-              echo "ERROR: templates/ or schemas/ changed but CHANGELOG.md has no '## Upgrade notes' section"
-              exit 1
-            fi
-            echo "OK: Upgrade notes present in CHANGELOG.md"
-          else
-            echo "OK: No template/schema changes since $BASE"
-          fi
-
-      - name: Upload dist artifacts
+      - name: Upload release artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: dist
+          name: release-dist
           path: dist/*
           if-no-files-found: error
-          retention-days: 7
+          retention-days: 30
 
-  publish:
-    name: publish-pypi
+  publish-and-promote:
+    name: publish-pypi-and-promote-main
     needs: build
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
+      contents: write
       id-token: write
       attestations: write
     steps:
-      - name: Download dist artifacts
+      - name: Download release artifacts
         uses: actions/download-artifact@v4
         with:
-          name: dist
+          name: release-dist
           path: dist
+
+      - name: Mark promotion in progress
+        run: |
+          echo "## promotion-in-progress" >> "$GITHUB_STEP_SUMMARY"
+          echo "PyPI publish is complete only after main fast-forward, tag creation, and reconciliation." >> "$GITHUB_STEP_SUMMARY"
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           attestations: true
+
+      - name: Checkout tested release candidate
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.release_ref }}
+          fetch-depth: 0
+
+      - name: Confirm PyPI within five minutes
+        run: |
+          set -euo pipefail
+          VERSION="$(tr -d '\r\n' < VERSION)"
+          deadline=$((SECONDS + 300))
+          until python - "$VERSION" <<'PY'
+          import json
+          import sys
+          import urllib.request
+          with urllib.request.urlopen(f"https://pypi.org/pypi/owledge/{sys.argv[1]}/json", timeout=20) as response:
+              raise SystemExit(0 if json.load(response)["info"]["version"] == sys.argv[1] else 1)
+          PY
+          do
+            test "$SECONDS" -lt "$deadline"
+            sleep 5
+          done
+
+      - name: Fast-forward main and create release tag
+        run: |
+          set -euo pipefail
+          VERSION="$(tr -d '\r\n' < VERSION)"
+          git fetch origin main --tags
+          git merge-base --is-ancestor origin/main HEAD
+          git push origin HEAD:refs/heads/main
+          git tag -a "v$VERSION" -m "Owledge v$VERSION"
+          git push origin "v$VERSION"
+          test "$(git ls-remote origin refs/heads/main | cut -f1)" = "$(git rev-parse HEAD)"
+          test "$(git ls-remote origin "refs/tags/v$VERSION^{}" | cut -f1)" = "$(git rev-parse HEAD)"
+
+      - name: Write promotion reconciliation evidence
+        run: |
+          VERSION="$(tr -d '\r\n' < VERSION)"
+          python - "$VERSION" "$(git rev-parse HEAD)" <<'PY' > dist/release-promotion.json
+          import json
+          import sys
+          print(json.dumps({
+              "schema_version": 1,
+              "status": "reconciled",
+              "version": sys.argv[1],
+              "commit": sys.argv[2],
+              "pypi_confirmation_timeout_seconds": 300,
+          }, indent=2, sort_keys=True))
+          PY
+
+      - name: Upload promotion evidence
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: release-promotion-evidence
+          path: dist/release-*.json
+          if-no-files-found: warn
+          retention-days: 30

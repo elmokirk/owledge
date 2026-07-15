@@ -11,6 +11,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -22,6 +24,15 @@ jobs:
 
       - name: Release trust gate
         run: python tools/owledge.py test release-trust --project-root .
+
+      - name: Version contract
+        run: python tools/owledge.py test version-contract --project-root .
+
+      - name: Documentation contract
+        run: python tools/owledge.py test docs-contract --project-root . --base-ref origin/\${{ github.base_ref || 'main' }}
+
+      - name: Release contract
+        run: python tools/owledge.py test release-contract --project-root .
 
       - name: Wikilink audit
         run: python tools/owledge.py wikilink-audit --project-root . --check

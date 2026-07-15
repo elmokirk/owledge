@@ -1,5 +1,9 @@
 # Feedback Round 2026-06
 
+> **Historical record:** This June 2026 feedback round preserves the release
+> context and version references that existed at the time. For current release
+> guidance, use [README.md](README.md).
+
 Date: 2026-06-23
 Status: active
 Owner: Kirk

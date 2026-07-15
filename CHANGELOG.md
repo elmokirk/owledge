@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Release QA hardening: machine-readable version, documentation, and feature
+  contracts now block incomplete public changes; future releases promote a
+  tested release branch to main only after PyPI confirms the package.
+
 ## 0.7.0 (2026-06-26)
 
 - Public contract: `.owledge/` is the canonical project memory folder and `OWLEDGE.md` is the visible agent/project entrypoint.

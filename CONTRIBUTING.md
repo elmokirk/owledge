@@ -21,6 +21,14 @@ python tools/owledge.py finalization-gates --project-root internal --include-com
 
 ## Pull Request Rules
 
+- Product-surface changes must update every documentation file mapped by
+  contracts/release-surface.json; CI blocks a PR when the docs-contract finds
+  missing updates.
+- Run the version-contract and docs-contract against origin/main before
+  requesting review for public changes.
+- Do not bump VERSION directly on main. Prepare a release/vX.Y.Z branch; the
+  release workflow promotes it only after PyPI confirms the package.
+
 - Keep Markdown as the source of truth.
 - Do not add global-setup requirements unless they are optional compatibility paths.
 - Do not rewrite existing KB notes or wiki links by default.

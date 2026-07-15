@@ -59,6 +59,27 @@ Package examples can be run as `uvx owledge ...` or, after `uv tool install owle
 | `python tools/owledge.py concept-audit --profile .owledge/concept-audit-profile.json --project-root .` | No | Run the audit with a custom weights/overrides profile |
 | `python tools/owledge.py concept-audit --format summary --project-root .` | No | Print a one-line-per-dimension summary instead of JSON |
 
+## Release QA Contracts
+
+The machine-readable release surface at contracts/release-surface.json names
+every current-version sink, the public documentation surface, historical
+document exclusions, and feature documentation/test obligations.
+
+| Command | Writes | Purpose |
+| --- | --- | --- |
+| python tools/owledge.py test version-contract --project-root . | No | Verify every declared current-version sink against VERSION |
+| python tools/owledge.py test docs-contract --project-root . --base-ref origin/main | No | Verify all public docs and require impacted docs in a PR |
+| python tools/owledge.py test release-contract --project-root . --require-dist --evidence-path dist/release-evidence.json | Yes, build artifact | Combine version, documentation, package-artifact, and evidence checks |
+
+Product PRs run docs-contract against their base branch. A change to a declared
+product surface must update every mapped public document in the same PR.
+Historical release and migration documents retain older version references only
+when explicitly labelled Historical.
+
+Releases run from release/vX.Y.Z, not from a direct version bump on main. After
+PyPI confirms the version, the release workflow fast-forwards the tested commit
+to main, creates the tag, and uploads release-evidence.json.
+
 ## Lower-Level Memory CLI
 
 | Command | Writes | Purpose |

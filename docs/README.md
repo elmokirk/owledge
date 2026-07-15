@@ -8,6 +8,9 @@ installs and [upgrading.md](upgrading.md) for existing projects.
 
 Start with the path that matches your setup.
 
+Maintainers: distribution.md defines the release-branch, PyPI confirmation,
+main-promotion, and release-evidence contract.
+
 ## I only want the principles in an existing agent system
 
 - This is the default minimal path

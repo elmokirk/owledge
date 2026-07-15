@@ -1095,6 +1095,177 @@ def public_docs_gate(root: pathlib.Path) -> dict[str, Any]:
     return results.payload(project=str(root))
 
 
+def load_release_surface_contract(root: pathlib.Path) -> dict[str, Any]:
+    path = root / "contracts" / "release-surface.json"
+    if not path.exists():
+        raise FileNotFoundError(f"release surface contract is missing: {path}")
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if payload.get("schema_version") != 1:
+        raise ValueError("release surface contract schema_version must be 1")
+    return payload
+
+
+def version_contract_gate(root: pathlib.Path) -> dict[str, Any]:
+    results = ResultSet()
+    try:
+        contract = load_release_surface_contract(root)
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        results.add("contract:load", False, str(exc))
+        return results.payload(project=str(root))
+    version_source = root / contract.get("version_source", "VERSION")
+    results.add("contract:version-source", version_source.exists(), "Canonical VERSION file exists.")
+    if not version_source.exists():
+        return results.payload(project=str(root))
+    version = version_source.read_text(encoding="utf-8", errors="replace").strip()
+    results.add("contract:version-semver", bool(re.fullmatch(r"\d+\.\d+\.\d+", version)), "Canonical version is semantic.")
+    for sink in contract.get("version_sinks", []):
+        relative, kind = sink["path"], sink["kind"]
+        path = root / relative
+        results.add(f"version-sink:exists:{relative}", path.exists(), "Version sink exists.")
+        if not path.exists():
+            continue
+        text = path.read_text(encoding="utf-8", errors="replace")
+        actual: str | None = None
+        if kind == "toml-project-version":
+            match = re.search(r'^version\s*=\s*"([^"]+)"', text, re.MULTILINE)
+            actual = match.group(1) if match else None
+        elif kind == "readme-badge":
+            actual = version if f"version-{version}-" in text or f"version-{version}" in text else None
+        elif kind == "current-release":
+            actual = version if f"v{version}" in text else None
+        elif kind == "top-changelog-heading":
+            match = re.search(r"^##\s+([0-9]+\.[0-9]+\.[0-9]+)\b", text, re.MULTILINE)
+            actual = match.group(1) if match else None
+        elif kind == "plain-version":
+            actual = text.strip()
+        elif kind == "json-version":
+            actual = json.loads(text).get("version")
+        else:
+            results.add(f"version-sink:known-kind:{relative}", False, f"Unknown version sink kind: {kind}")
+            continue
+        results.add(f"version-sink:matches:{relative}", actual == version, f"{relative} matches canonical VERSION.")
+    return results.payload(project=str(root), version=version)
+
+
+def _contract_public_docs(root: pathlib.Path, contract: dict[str, Any]) -> list[str]:
+    config = contract["public_docs"]
+    excluded = set()
+    for pattern in config.get("exclude", []):
+        excluded.update(relative_posix(path, root) for path in root.glob(pattern) if path.is_file())
+    paths: set[str] = set()
+    for pattern in config.get("include", []):
+        paths.update(relative_posix(path, root) for path in root.glob(pattern) if path.is_file())
+    return sorted(paths - excluded)
+
+
+def _changed_files(root: pathlib.Path, base_ref: str | None, explicit: list[str] | None) -> list[str] | None:
+    if explicit:
+        return sorted(set(item.replace("\\", "/") for item in explicit))
+    if not base_ref:
+        return None
+    completed = subprocess.run(
+        ["git", "diff", "--name-only", f"{base_ref}...HEAD"],
+        cwd=str(root),
+        capture_output=True,
+        text=True,
+    )
+    if completed.returncode != 0:
+        raise RuntimeError(f"Cannot resolve base ref {base_ref}: {completed.stderr.strip()}")
+    return sorted(line.strip().replace("\\", "/") for line in completed.stdout.splitlines() if line.strip())
+
+
+def docs_contract_gate(root: pathlib.Path, base_ref: str | None = None, changed_files: list[str] | None = None) -> dict[str, Any]:
+    results = ResultSet()
+    try:
+        contract = load_release_surface_contract(root)
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        results.add("contract:load", False, str(exc))
+        return results.payload(project=str(root))
+    docs = _contract_public_docs(root, contract)
+    results.add("docs-surface:nonempty", bool(docs), "Public documentation surface is declared.")
+    version = (root / contract.get("version_source", "VERSION")).read_text(encoding="utf-8", errors="replace").strip()
+    current_claim = re.compile(r"(?:current|latest|released|publish(?:ed|ing)?|ship(?:ped|ping)?)\D{0,30}v?(\d+\.\d+\.\d+)", re.IGNORECASE)
+    historical_marker = contract["public_docs"].get("historical_marker", "Historical").lower()
+    for relative in docs:
+        path = root / relative
+        text = path.read_text(encoding="utf-8", errors="replace")
+        results.add(f"docs-surface:utf8:{relative}", not any(marker in text for marker in ("\u00c2", "\u00e2", "\u00ef")), "Public document has no common mojibake.")
+        for match in re.finditer(r"\[[^\]]+\]\(([^)]+)\)", text):
+            target = match.group(1).strip()
+            if target.startswith(("http://", "https://", "mailto:", "#")):
+                continue
+            target_path = target.split("#", 1)[0]
+            if target_path:
+                results.add(f"docs-surface:link:{relative}->{target_path}", (path.parent / target_path).resolve().exists(), "Relative documentation link resolves.")
+        stale_current_claims = [match.group(1) for match in current_claim.finditer(text) if match.group(1) != version]
+        historical = historical_marker in text[:1000].lower()
+        results.add(f"docs-surface:current-version:{relative}", not stale_current_claims or historical, "Current release claims use VERSION or document is explicitly historical.")
+
+    command_reference = root / "docs" / "command-reference.md"
+    if command_reference.exists():
+        command_text = command_reference.read_text(encoding="utf-8", errors="replace")
+        cli_text = (root / "tools" / "owledge.py").read_text(encoding="utf-8", errors="replace")
+        top_level_commands = set(re.findall(r'sub\.add_parser\("([^"]+)"', cli_text))
+        for command in sorted(top_level_commands):
+            results.add(f"docs-surface:command:{command}", command in command_text, "Public CLI command is documented.")
+    else:
+        results.add("docs-surface:command-reference", False, "Command reference exists.")
+
+    try:
+        changed = _changed_files(root, base_ref, changed_files)
+    except RuntimeError as exc:
+        results.add("docs-impact:base-ref", False, str(exc))
+        return results.payload(project=str(root), version=version)
+    if changed is not None:
+        changed_set = set(changed)
+        for feature in contract.get("features", []):
+            triggered = any(any(fnmatch.fnmatch(path, pattern) for pattern in feature["source_globs"]) for path in changed_set)
+            if not triggered:
+                continue
+            for required_doc in feature["docs"]:
+                results.add(f"docs-impact:{feature['id']}:{required_doc}", required_doc in changed_set, "Impacted feature documentation is updated in this change.")
+            for required_test in feature["tests"]:
+                results.add(f"feature-contract:{feature['id']}:{required_test}", bool(required_test), "Feature contract declares verification.")
+    return results.payload(project=str(root), version=version, docs=docs, changed_files=changed)
+
+
+def release_contract_gate(root: pathlib.Path, require_dist: bool = False, evidence_path: str | None = None) -> dict[str, Any]:
+    version_payload = version_contract_gate(root)
+    docs_payload = docs_contract_gate(root)
+    trust_payload = release_trust_gate(root)
+    version = (root / "VERSION").read_text(encoding="utf-8", errors="replace").strip()
+    checks: dict[str, Any] = {
+        "version-contract": version_payload,
+        "docs-contract": docs_payload,
+        "release-trust": trust_payload,
+    }
+    dist = root / "dist"
+    if require_dist:
+        wheel = dist / f"owledge-{version}-py3-none-any.whl"
+        sdist = dist / f"owledge-{version}.tar.gz"
+        checks["distribution"] = {
+            "passed": wheel.exists() and sdist.exists(),
+            "wheel": str(wheel),
+            "sdist": str(sdist),
+        }
+    passed = all(bool(payload.get("passed")) for payload in checks.values())
+    evidence = {
+        "schema_version": 1,
+        "version": version,
+        "commit": subprocess.run(["git", "rev-parse", "HEAD"], cwd=str(root), capture_output=True, text=True).stdout.strip(),
+        "passed": passed,
+        "checks": checks,
+    }
+    if evidence_path:
+        target = pathlib.Path(evidence_path)
+        if not target.is_absolute():
+            target = root / target
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(json.dumps(evidence, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        evidence["evidence_path"] = str(target)
+    return evidence
+
+
 def release_trust_gate(root: pathlib.Path) -> dict[str, Any]:
     results = ResultSet()
     version = (root / "VERSION").read_text(encoding="utf-8", errors="replace").strip()
@@ -1235,6 +1406,9 @@ def launch_readiness_gate(root: pathlib.Path) -> dict[str, Any]:
 
 def publish_readiness_gate(root: pathlib.Path, min_score: int = 95) -> dict[str, Any]:
     checks: list[tuple[str, int, Callable[[], dict[str, Any]]]] = [
+        ("version-contract", 15, lambda: version_contract_gate(root)),
+        ("docs-contract", 15, lambda: docs_contract_gate(root)),
+        ("release-contract", 15, lambda: release_contract_gate(root)),
         ("legacy-naming-clean", 15, lambda: legacy_naming_gate(root)),
         ("private-path-clean", 10, lambda: private_path_gate(root)),
         ("public-docs", 15, lambda: public_docs_gate(root)),
@@ -3340,6 +3514,9 @@ def main(argv: list[str] | None = None) -> int:
             "all",
             "public-docs",
             "release-trust",
+            "version-contract",
+            "docs-contract",
+            "release-contract",
             "principles-skill",
             "principles-only",
             "principles-scenarios",
@@ -3365,6 +3542,10 @@ def main(argv: list[str] | None = None) -> int:
         default="all",
         nargs="?",
     )
+    test_p.add_argument("--base-ref", default=None, help="Git ref used to determine changed files for docs-contract.")
+    test_p.add_argument("--changed-file", action="append", default=[], help="Explicit changed file; repeatable and useful for contract tests.")
+    test_p.add_argument("--require-dist", action="store_true", help="Require wheel and sdist for release-contract.")
+    test_p.add_argument("--evidence-path", default=None, help="Write release-contract JSON evidence to this path.")
 
     gates_p = sub.add_parser("finalization-gates", parents=[project_parent])
     gates_p.add_argument("--include-exports", action="store_true")
@@ -3493,6 +3674,9 @@ def main(argv: list[str] | None = None) -> int:
             suites: dict[str, Callable[[], dict[str, Any]]] = {
                 "public-docs": lambda: public_docs_gate(root),
                 "release-trust": lambda: release_trust_gate(root),
+                "version-contract": lambda: version_contract_gate(root),
+                "docs-contract": lambda: docs_contract_gate(root, base_ref=args.base_ref, changed_files=args.changed_file),
+                "release-contract": lambda: release_contract_gate(root, require_dist=args.require_dist, evidence_path=args.evidence_path),
                 "principles-skill": lambda: principles_skill_gate(root),
                 "principles-only": lambda: principles_only_gate(root),
                 "principles-scenarios": lambda: principles_scenarios_gate(root),

@@ -32,6 +32,15 @@ jobs:
       - name: Release trust
         run: python tools/owledge.py test release-trust --project-root .
 
+      - name: Version contract
+        run: python tools/owledge.py test version-contract --project-root .
+
+      - name: Documentation contract
+        run: python tools/owledge.py test docs-contract --project-root .
+
+      - name: Release contract
+        run: python tools/owledge.py test release-contract --project-root .
+
       - name: Legacy naming
         run: python tools/owledge.py test legacy-naming-clean --project-root .
 
@@ -49,6 +58,12 @@ jobs:
 
       - name: Contracts
         run: python tools/owledge_core.py --project-root . test-contracts
+
+      - name: Release QA contracts
+        run: |
+          python tools/owledge.py test version-contract --project-root .
+          python tools/owledge.py test docs-contract --project-root .
+          python tools/owledge.py test release-contract --project-root .
 
       - name: Wikilink audit
         run: python tools/owledge.py wikilink-audit --project-root . --check

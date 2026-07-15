@@ -454,6 +454,14 @@ python tools/owledge.py test quality-ratchet --project-root .
 python tools/owledge.py test launch-readiness --project-root .
 ```
 
+## Release QA
+
+Release QA is contract-backed: contracts/release-surface.json declares every
+current version sink, public documentation file, and product feature's required
+documentation and verification. Run the docs-contract against origin/main for a
+product PR and the release-contract with require-dist before publishing a
+release branch.
+
 ## Documentation
 
 Start here: [Documentation index](docs/README.md)

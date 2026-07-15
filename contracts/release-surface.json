@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "product": "owledge",
+  "version_source": "VERSION",
+  "version_sinks": [
+    {"path": "pyproject.toml", "kind": "toml-project-version"},
+    {"path": "README.md", "kind": "readme-badge"},
+    {"path": "docs/README.md", "kind": "current-release"},
+    {"path": "CHANGELOG.md", "kind": "top-changelog-heading"},
+    {"path": "plugins/owledge-cowork/VERSION", "kind": "plain-version"},
+    {"path": "plugins/owledge-cowork/.claude-plugin/plugin.json", "kind": "json-version"},
+    {"path": "plugins/owledge-cowork/.codex-plugin/plugin.json", "kind": "json-version"}
+  ],
+  "public_docs": {
+    "include": ["README.md", "CONTRIBUTING.md", "SECURITY.md", "SUPPORT.md", "docs/**/*.md", "addons/**/README.md", "addons/**/docs/**/*.md", "plugins/**/README.md", "standalone-skills/**/README.md"],
+    "exclude": ["docs/archive/**", "docs/v0.*-implementation-plan.md", "docs/v0.*-fix-up-plan.md", "docs/v0.*-upgrade-foundation-plan.md"],
+    "historical_marker": "Historical"
+  },
+  "features": [
+    {"id": "cli-surface", "source_globs": ["tools/owledge.py", "tools/owledge_core.py", "tools/owledge_mcp.py"], "docs": ["README.md", "docs/command-reference.md"], "tests": ["contracts", "mcp-readonly"]},
+    {"id": "project-kit", "source_globs": ["templates/**", "OWLEDGE.template.md", "AGENTS.template.md", "CLAUDE.template.md"], "docs": ["README.md", "docs/quickstart.md", "docs/upgrading.md"], "tests": ["contracts", "generated-kit-surface"]},
+    {"id": "addons", "source_globs": ["addons/**"], "docs": ["README.md", "docs/README.md"], "tests": ["launch-readiness"]},
+    {"id": "plugin-surface", "source_globs": ["plugins/**", "standalone-skills/**"], "docs": ["README.md", "docs/install-plugin.md", "docs/harness-plugin-matrix.md"], "tests": ["runtime-adapters", "standalone-skills"]},
+    {"id": "release-surface", "source_globs": ["pyproject.toml", "MANIFEST.in", ".github/workflows/**", "VERSION"], "docs": ["README.md", "docs/README.md", "docs/distribution.md", "CHANGELOG.md"], "tests": ["release-trust", "publish-readiness"]}
+  ]
+}

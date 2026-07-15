@@ -27,6 +27,11 @@ engine, database, daemon, or hosted service.
 
 ## Release Checklist
 
+- Create release/vX.Y.Z from main; direct version bumps on main are not permitted.
+- Keep the release branch version equal to the intended PyPI version and run the docs-contract against origin/main.
+- Run the release-contract with require-dist and write dist/release-evidence.json after building artifacts.
+- Verify PyPI confirms the uploaded version before fast-forwarding the tested release commit to main and creating vX.Y.Z.
+- Treat a PyPI-to-main promotion longer than five minutes as a failed release; reconcile it before another release begins.
 - Publish from a clean tag matching `VERSION`.
 - Run `python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports`.
 - Run `python tools/owledge.py test launch-readiness --project-root .`.
