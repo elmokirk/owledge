@@ -1100,6 +1100,14 @@ def release_trust_gate(root: pathlib.Path) -> dict[str, Any]:
     version = (root / "VERSION").read_text(encoding="utf-8", errors="replace").strip()
     readme = (root / "README.md").read_text(encoding="utf-8", errors="replace")
     results.add("version:readme-badge", f"version-{version}-" in readme or f"version-{version}" in readme, "README badge matches root VERSION.")
+    pyproject = (root / "pyproject.toml").read_text(encoding="utf-8", errors="replace")
+    pyproject_match = re.search(r'^version\s*=\s*"([^"]+)"', pyproject, re.MULTILINE)
+    results.add("version:pyproject", bool(pyproject_match and pyproject_match.group(1) == version), "Package version matches root VERSION.")
+    changelog = (root / "CHANGELOG.md").read_text(encoding="utf-8", errors="replace")
+    changelog_match = re.search(r"^##\s+([0-9]+\.[0-9]+\.[0-9]+)\b", changelog, re.MULTILINE)
+    results.add("version:changelog-current", bool(changelog_match and changelog_match.group(1) == version), "Top changelog release matches root VERSION.")
+    docs_index = (root / "docs" / "README.md").read_text(encoding="utf-8", errors="replace")
+    results.add("version:docs-index", f"v{version}" in docs_index, "Documentation index names the current release.")
     for relative in [
         "plugins/owledge-cowork/VERSION",
         "plugins/owledge-cowork/.claude-plugin/plugin.json",

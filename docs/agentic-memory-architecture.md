@@ -1,4 +1,9 @@
-# Agentic Memory Architecture
+# Agentic Memory Architecture (Historical v0.5.0 Design Note)
+
+> **Release status:** This design note records the v0.5.0 scope decision.
+> The current released package is **Owledge v0.7.0**. For current install,
+> migration, and release guidance, start with [the documentation index](README.md),
+> [the quickstart](quickstart.md), and [the upgrade guide](upgrading.md).
 
 This project implements the four practical memory types used by agentic systems while keeping Markdown as the canonical store.
 
@@ -80,7 +85,7 @@ long-term learning system with destructive deletion.
 | Promotion queue UX | Promotion is hardened but CLI-centric | Acceptable for technical users | Later read-only dashboard plus reviewed promotion queue |
 | Compliance depth | Data classification exists, but regulated production needs more | Do not market as regulated enterprise compliance | Implement processing inventory, provider registry, DSAR/export/delete flows, and encrypted vault options |
 
-## Recommended Release Scope
+## Historical v0.5.0 Release Scope
 
 Ship v0.5.0 as:
 

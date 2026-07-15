@@ -1,5 +1,11 @@
 # Owledge Docs
 
+## Current release
+
+**Owledge v0.7.0** is the current released package. The canonical release
+version is [../VERSION](../VERSION); use [quickstart.md](quickstart.md) for new
+installs and [upgrading.md](upgrading.md) for existing projects.
+
 Start with the path that matches your setup.
 
 ## I only want the principles in an existing agent system
