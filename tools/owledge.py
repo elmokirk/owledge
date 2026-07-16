@@ -1149,13 +1149,23 @@ def version_contract_gate(root: pathlib.Path) -> dict[str, Any]:
 
 def _contract_public_docs(root: pathlib.Path, contract: dict[str, Any]) -> list[str]:
     config = contract["public_docs"]
-    excluded = set()
-    for pattern in config.get("exclude", []):
-        excluded.update(relative_posix(path, root) for path in root.glob(pattern) if path.is_file())
     paths: set[str] = set()
     for pattern in config.get("include", []):
         paths.update(relative_posix(path, root) for path in root.glob(pattern) if path.is_file())
-    return sorted(paths - excluded)
+
+    def is_excluded(relative: str) -> bool:
+        for pattern in config.get("exclude", []):
+            normalized = pattern.removeprefix("./")
+            # Path.glob("docs/archive/**") returns a different set of entries
+            # across supported Python versions. Match exclusion prefixes against
+            # the collected files instead of relying on that glob's output.
+            if normalized.endswith("/**") and relative.startswith(normalized[:-2]):
+                return True
+            if fnmatch.fnmatchcase(relative, normalized):
+                return True
+        return False
+
+    return sorted(relative for relative in paths if not is_excluded(relative))
 
 
 def _changed_files(root: pathlib.Path, base_ref: str | None, explicit: list[str] | None) -> list[str] | None:
@@ -2192,6 +2202,7 @@ LEGACY_NAMING_SKIP_PREFIXES = [
     "docs/archive/",
     "internal/",
     "tests/",
+    "benchmarks/results/",
 ]
 
 
