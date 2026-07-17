@@ -1,0 +1,145 @@
+---
+memory_id: "mem:owledge:global:owledge:workpackage:v1-autonomous-delivery-checklist"
+tenant_id: "owledge"
+customer_id: "global"
+project_id: "owledge"
+doc_type: "task"
+artifact_type: "workpackage"
+status: "active"
+visibility: "private"
+data_class: "internal"
+semantic_title: "Owledge v1 autonomous delivery phase checklist"
+summary: "Resume-oriented phase and QA checklist for the v0.7.1 through v1.0 autonomous delivery plan."
+concept_tags: ["v1-roadmap", "phase-checklist", "qa-gates"]
+stack_tags: ["git", "python", "mcp"]
+problem_patterns: ["partial-phase-resume", "checkbox-without-evidence"]
+architecture_patterns: ["gate-driven-delivery", "ticket-dag"]
+failure_modes: ["stale-green-gate", "unreviewed-promotion"]
+confidence: 0.94
+review_status: "reviewed"
+sanitization_status: "not_required"
+created_at: "2026-07-16T00:00:00Z"
+updated_at: "2026-07-16T00:00:00Z"
+source_hash: ""
+reusable_lessons: []
+edges:
+  - type: "derived_from"
+    target: "mem:owledge:global:owledge:plan:v1-autonomous-delivery"
+    confidence: 1.0
+    reason: "This checklist operationalizes the v1 master plan."
+---
+
+# Owledge v1 Autonomous Delivery Checklist
+
+## Resume State
+
+Current resume point: **v0.7.1 Phase 071-A - Truth and release baseline**.
+
+## Agent Rules
+
+- Read `RUN-STATE.yaml`, `BACKLOG.yaml`, active ticket, and current gate first.
+- A checkbox is checked only after linked evidence and independent QA exist.
+- If later changes stale a green result, uncheck the smallest affected item and rerun its gate.
+- Phase integration branches use `codex/vXYZ-integration`; workers use one `codex/vXYZ-<ticket>-<slug>` branch and worktree per independent ticket.
+- Worker commits stay cohesive and never land directly on the integration branch.
+- Release artifacts run from clean tracked source after source commits are frozen.
+
+## v0.7.1
+
+### Phase 071-A - Truth and baseline
+
+- [ ] tickets OW-071-01 through OW-071-03 done
+- [ ] G-071-A-TRUTH evidence passed
+- [ ] independent quick review passed
+
+### Phase 071-B - Beginner adoption
+
+- [ ] tickets OW-071-04 and OW-071-05 done
+- [ ] G-071-B-ADOPTION evidence passed
+- [ ] independent quick review passed
+
+### Phase 071-C - Compatibility and release
+
+- [ ] tickets OW-071-06 through OW-071-08 done
+- [ ] G-071-C-COMPAT and G-071-RC evidence passed
+- [ ] independent release review passed
+
+## v0.8.0
+
+### Phase 080-A - Contracts
+
+- [ ] tickets OW-080-01 through OW-080-04 done
+- [ ] G-080-A-CONTRACTS evidence passed
+- [ ] independent contract/migration review passed
+
+### Phase 080-B - Context and small models
+
+- [ ] tickets OW-080-05 through OW-080-07 done
+- [ ] G-080-B-CONTEXT evidence passed
+- [ ] independent token/quality review passed
+
+### Phase 080-C - Retrieval, migration, release
+
+- [ ] tickets OW-080-08 through OW-080-10 done
+- [ ] G-080-C-RETRIEVAL and G-080-RC evidence passed
+- [ ] independent release review passed
+
+## v0.8.1
+
+### Phase 081-A - Tier-1 adapters
+
+- [ ] tickets OW-081-01 through OW-081-05 done
+- [ ] G-081-A-ADAPTERS evidence passed
+- [ ] independent adapter review passed
+
+### Phase 081-B - Concurrency and recovery
+
+- [ ] tickets OW-081-06 through OW-081-08 done
+- [ ] G-081-B-CONCURRENCY evidence passed
+- [ ] independent Git/recovery review passed
+
+### Phase 081-C - Hub journey and release
+
+- [ ] tickets OW-081-09 and OW-081-10 done
+- [ ] G-081-C-JOURNEY and G-081-RC evidence passed
+- [ ] independent release review passed
+
+## v0.9.0
+
+### Phase 090-A - Trust and privacy
+
+- [ ] tickets OW-090-01 through OW-090-03 done
+- [ ] G-090-A-TRUST evidence passed
+- [ ] independent security/privacy review passed
+
+### Phase 090-B - Semantic writes and living docs
+
+- [ ] tickets OW-090-04 through OW-090-06 done
+- [ ] G-090-B-WRITES evidence passed
+- [ ] independent MCP/provenance review passed
+
+### Phase 090-C - RAG, hub freshness, release
+
+- [ ] tickets OW-090-07 through OW-090-10 done
+- [ ] G-090-C-RAG and G-090-RC evidence passed
+- [ ] independent release review passed
+
+## v1.0
+
+### Phase 100-A - Security and scale
+
+- [ ] tickets OW-100-01 through OW-100-03 done
+- [ ] G-100-A-HARDENING evidence passed
+- [ ] independent security/performance review passed
+
+### Phase 100-B - Outcomes and lifecycle
+
+- [ ] tickets OW-100-04 through OW-100-06 done
+- [ ] G-100-B-PRODUCT evidence passed
+- [ ] independent product/support review passed
+
+### Phase 100-C - Proof and GA
+
+- [ ] tickets OW-100-07 through OW-100-09 done
+- [ ] G-100-C-PROOF and G-100-GA evidence passed
+- [ ] owner approved v1 publication and tag

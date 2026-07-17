@@ -1,0 +1,30 @@
+schema_version: 1
+project: owledge
+plan: internal/owledge/plans/owledge-v1-autonomous-delivery-master-plan.md
+objective: Deliver Owledge v0.7.1 through v1.0 through gated autonomous execution.
+status: planned
+current_release: v0.7.1
+current_phase: 071-A
+active_ticket: null
+last_green_gate: null
+execution_mode:
+  initial_run: root_agent_sequential
+  parallel_agents: allowed_only_for_non_overlapping_ready_tickets
+  wip_per_agent: 1
+  independent_qa_required: true
+workspace:
+  code_root: .
+  planning_root: internal/owledge/workpackages/owledge-v1-autonomous-delivery
+  planning_branch: codex/owledge-v1-autonomous-roadmap
+  release_integration_branch: null
+  base_commit: null
+blockers: []
+last_completed_actions:
+  - Approved product decisions captured in the v1 autonomous delivery plan.
+next_actions:
+  - Run python tools/validate_v1_delivery_plan.py and require passed=true.
+  - Verify Definition of Ready for OW-071-01.
+  - Record clean workspace and base SHA before implementation.
+last_commands: []
+updated_at: "2026-07-16T00:00:00Z"
+updated_by: codex

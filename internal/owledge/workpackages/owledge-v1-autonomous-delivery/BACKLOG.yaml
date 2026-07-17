@@ -1,0 +1,97 @@
+schema_version: 1
+project: owledge
+source_of_truth: internal/owledge/workpackages/owledge-v1-autonomous-delivery/tickets/ALL-TICKETS.md
+status_values: [backlog, ready, in_progress, qa, blocked, done]
+priority_values: [P0, P1, P2, P3]
+release_order: [v0.7.1, v0.8.0, v0.8.1, v0.9.0, v1.0]
+gates:
+  G-071-A-TRUTH: [OW-071-01, OW-071-02, OW-071-03]
+  G-071-B-ADOPTION: [OW-071-04, OW-071-05]
+  G-071-C-COMPAT: [OW-071-06, OW-071-07]
+  G-071-RC: [OW-071-08]
+  G-080-A-CONTRACTS: [OW-080-01, OW-080-02, OW-080-03, OW-080-04]
+  G-080-B-CONTEXT: [OW-080-05, OW-080-06, OW-080-07]
+  G-080-C-RETRIEVAL: [OW-080-08, OW-080-09]
+  G-080-RC: [OW-080-10]
+  G-081-A-ADAPTERS: [OW-081-01, OW-081-02, OW-081-03, OW-081-04, OW-081-05]
+  G-081-B-CONCURRENCY: [OW-081-06, OW-081-07, OW-081-08]
+  G-081-C-JOURNEY: [OW-081-09]
+  G-081-RC: [OW-081-10]
+  G-090-A-TRUST: [OW-090-01, OW-090-02, OW-090-03]
+  G-090-B-WRITES: [OW-090-04, OW-090-05, OW-090-06]
+  G-090-C-RAG: [OW-090-07, OW-090-08, OW-090-09]
+  G-090-RC: [OW-090-10]
+  G-100-A-HARDENING: [OW-100-01, OW-100-02, OW-100-03]
+  G-100-B-PRODUCT: [OW-100-04, OW-100-05, OW-100-06]
+  G-100-C-PROOF: [OW-100-07, OW-100-08]
+  G-100-GA: [OW-100-09]
+execution_waves:
+  - {id: W-071-A, release: v0.7.1, tickets: [OW-071-01, OW-071-02, OW-071-03], policy: parallel_non_overlapping}
+  - {id: W-071-B, release: v0.7.1, tickets: [OW-071-04, OW-071-05], policy: sequential}
+  - {id: W-071-C, release: v0.7.1, tickets: [OW-071-06, OW-071-07], policy: parallel_non_overlapping}
+  - {id: W-071-RC, release: v0.7.1, tickets: [OW-071-08], policy: sequential}
+  - {id: W-080-A1, release: v0.8.0, tickets: [OW-080-01], policy: sequential}
+  - {id: W-080-A2, release: v0.8.0, tickets: [OW-080-02, OW-080-03, OW-080-04], policy: parallel_non_overlapping}
+  - {id: W-080-B, release: v0.8.0, tickets: [OW-080-05, OW-080-06, OW-080-07], policy: parallel_non_overlapping}
+  - {id: W-080-C, release: v0.8.0, tickets: [OW-080-08, OW-080-09], policy: parallel_non_overlapping}
+  - {id: W-080-RC, release: v0.8.0, tickets: [OW-080-10], policy: sequential}
+  - {id: W-081-A1, release: v0.8.1, tickets: [OW-081-01], policy: sequential}
+  - {id: W-081-A2, release: v0.8.1, tickets: [OW-081-02, OW-081-03, OW-081-04, OW-081-05], policy: parallel_non_overlapping}
+  - {id: W-081-B, release: v0.8.1, tickets: [OW-081-06, OW-081-07, OW-081-08], policy: parallel_non_overlapping}
+  - {id: W-081-C, release: v0.8.1, tickets: [OW-081-09, OW-081-10], policy: sequential}
+  - {id: W-090-A, release: v0.9.0, tickets: [OW-090-01, OW-090-02, OW-090-03], policy: parallel_non_overlapping}
+  - {id: W-090-B, release: v0.9.0, tickets: [OW-090-04, OW-090-05, OW-090-06], policy: parallel_non_overlapping}
+  - {id: W-090-C, release: v0.9.0, tickets: [OW-090-07, OW-090-08, OW-090-09], policy: parallel_non_overlapping}
+  - {id: W-090-RC, release: v0.9.0, tickets: [OW-090-10], policy: sequential}
+  - {id: W-100-A, release: v1.0, tickets: [OW-100-01, OW-100-02, OW-100-03], policy: parallel_non_overlapping}
+  - {id: W-100-B, release: v1.0, tickets: [OW-100-04, OW-100-05, OW-100-06], policy: parallel_non_overlapping}
+  - {id: W-100-C, release: v1.0, tickets: [OW-100-07, OW-100-08], policy: parallel_non_overlapping}
+  - {id: W-100-GA, release: v1.0, tickets: [OW-100-09], policy: sequential}
+tickets:
+  - {id: OW-071-01, release: v0.7.1, phase: 071-A, status: ready, priority: P0, owner_role: product-operations, qa_role: roadmap-auditor, estimated_turns: 2, depends_on: [], gate: G-071-A-TRUTH, path: "tickets/ALL-TICKETS.md#ow-071-01"}
+  - {id: OW-071-02, release: v0.7.1, phase: 071-A, status: backlog, priority: P0, owner_role: release-engineer, qa_role: contract-reviewer, estimated_turns: 2, depends_on: [OW-071-01], gate: G-071-A-TRUTH, path: "tickets/ALL-TICKETS.md#ow-071-02"}
+  - {id: OW-071-03, release: v0.7.1, phase: 071-A, status: backlog, priority: P0, owner_role: benchmark-engineer, qa_role: evaluation-reviewer, estimated_turns: 2, depends_on: [OW-071-01], gate: G-071-A-TRUTH, path: "tickets/ALL-TICKETS.md#ow-071-03"}
+  - {id: OW-071-04, release: v0.7.1, phase: 071-B, status: backlog, priority: P0, owner_role: docs-engineer, qa_role: beginner-ux-reviewer, estimated_turns: 2, depends_on: [OW-071-02], gate: G-071-B-ADOPTION, path: "tickets/ALL-TICKETS.md#ow-071-04"}
+  - {id: OW-071-05, release: v0.7.1, phase: 071-B, status: backlog, priority: P0, owner_role: demo-engineer, qa_role: beginner-ux-reviewer, estimated_turns: 2, depends_on: [OW-071-04], gate: G-071-B-ADOPTION, path: "tickets/ALL-TICKETS.md#ow-071-05"}
+  - {id: OW-071-06, release: v0.7.1, phase: 071-C, status: backlog, priority: P0, owner_role: owlib-engineer, qa_role: privacy-reviewer, estimated_turns: 2, depends_on: [OW-071-02], gate: G-071-C-COMPAT, path: "tickets/ALL-TICKETS.md#ow-071-06"}
+  - {id: OW-071-07, release: v0.7.1, phase: 071-C, status: backlog, priority: P0, owner_role: hermes-adapter-engineer, qa_role: runtime-conformance-reviewer, estimated_turns: 2, depends_on: [OW-071-03], gate: G-071-C-COMPAT, path: "tickets/ALL-TICKETS.md#ow-071-07"}
+  - {id: OW-071-08, release: v0.7.1, phase: 071-RC, status: backlog, priority: P0, owner_role: release-engineer, qa_role: release-assurance, estimated_turns: 1, depends_on: [OW-071-03, OW-071-05, OW-071-06, OW-071-07], gate: G-071-RC, path: "tickets/ALL-TICKETS.md#ow-071-08"}
+  - {id: OW-080-01, release: v0.8.0, phase: 080-A, status: backlog, priority: P0, owner_role: contract-architect, qa_role: architecture-reviewer, estimated_turns: 2, depends_on: [OW-071-08], gate: G-080-A-CONTRACTS, path: "tickets/ALL-TICKETS.md#ow-080-01"}
+  - {id: OW-080-02, release: v0.8.0, phase: 080-A, status: backlog, priority: P0, owner_role: schema-engineer, qa_role: contract-reviewer, estimated_turns: 2, depends_on: [OW-080-01], gate: G-080-A-CONTRACTS, path: "tickets/ALL-TICKETS.md#ow-080-02"}
+  - {id: OW-080-03, release: v0.8.0, phase: 080-A, status: backlog, priority: P0, owner_role: planning-engineer, qa_role: state-machine-reviewer, estimated_turns: 2, depends_on: [OW-080-01], gate: G-080-A-CONTRACTS, path: "tickets/ALL-TICKETS.md#ow-080-03"}
+  - {id: OW-080-04, release: v0.8.0, phase: 080-A, status: backlog, priority: P0, owner_role: reliability-engineer, qa_role: evidence-reviewer, estimated_turns: 2, depends_on: [OW-080-01], gate: G-080-A-CONTRACTS, path: "tickets/ALL-TICKETS.md#ow-080-04"}
+  - {id: OW-080-05, release: v0.8.0, phase: 080-B, status: backlog, priority: P0, owner_role: context-engineer, qa_role: evaluation-reviewer, estimated_turns: 2, depends_on: [OW-080-02, OW-080-03, OW-080-04], gate: G-080-B-CONTEXT, path: "tickets/ALL-TICKETS.md#ow-080-05"}
+  - {id: OW-080-06, release: v0.8.0, phase: 080-B, status: backlog, priority: P1, owner_role: context-engineer, qa_role: small-model-reviewer, estimated_turns: 2, depends_on: [OW-080-05], gate: G-080-B-CONTEXT, path: "tickets/ALL-TICKETS.md#ow-080-06"}
+  - {id: OW-080-07, release: v0.8.0, phase: 080-B, status: backlog, priority: P0, owner_role: small-model-engineer, qa_role: evaluation-reviewer, estimated_turns: 2, depends_on: [OW-080-05, OW-080-06], gate: G-080-B-CONTEXT, path: "tickets/ALL-TICKETS.md#ow-080-07"}
+  - {id: OW-080-08, release: v0.8.0, phase: 080-C, status: backlog, priority: P0, owner_role: retrieval-engineer, qa_role: rag-quality-reviewer, estimated_turns: 2, depends_on: [OW-080-02, OW-080-05], gate: G-080-C-RETRIEVAL, path: "tickets/ALL-TICKETS.md#ow-080-08"}
+  - {id: OW-080-09, release: v0.8.0, phase: 080-C, status: backlog, priority: P1, owner_role: migration-engineer, qa_role: data-safety-reviewer, estimated_turns: 2, depends_on: [OW-080-03, OW-080-04], gate: G-080-C-RETRIEVAL, path: "tickets/ALL-TICKETS.md#ow-080-09"}
+  - {id: OW-080-10, release: v0.8.0, phase: 080-RC, status: backlog, priority: P0, owner_role: release-engineer, qa_role: release-assurance, estimated_turns: 1, depends_on: [OW-080-07, OW-080-08, OW-080-09], gate: G-080-RC, path: "tickets/ALL-TICKETS.md#ow-080-10"}
+  - {id: OW-081-01, release: v0.8.1, phase: 081-A, status: backlog, priority: P0, owner_role: adapter-architect, qa_role: security-reviewer, estimated_turns: 2, depends_on: [OW-080-10], gate: G-081-A-ADAPTERS, path: "tickets/ALL-TICKETS.md#ow-081-01"}
+  - {id: OW-081-02, release: v0.8.1, phase: 081-A, status: backlog, priority: P1, owner_role: codex-adapter-engineer, qa_role: runtime-conformance-reviewer, estimated_turns: 2, depends_on: [OW-081-01], gate: G-081-A-ADAPTERS, path: "tickets/ALL-TICKETS.md#ow-081-02"}
+  - {id: OW-081-03, release: v0.8.1, phase: 081-A, status: backlog, priority: P1, owner_role: claude-adapter-engineer, qa_role: runtime-conformance-reviewer, estimated_turns: 2, depends_on: [OW-081-01], gate: G-081-A-ADAPTERS, path: "tickets/ALL-TICKETS.md#ow-081-03"}
+  - {id: OW-081-04, release: v0.8.1, phase: 081-A, status: backlog, priority: P0, owner_role: hermes-adapter-engineer, qa_role: runtime-conformance-reviewer, estimated_turns: 2, depends_on: [OW-081-01], gate: G-081-A-ADAPTERS, path: "tickets/ALL-TICKETS.md#ow-081-04"}
+  - {id: OW-081-05, release: v0.8.1, phase: 081-A, status: backlog, priority: P1, owner_role: mcp-protocol-engineer, qa_role: protocol-security-reviewer, estimated_turns: 2, depends_on: [OW-081-01], gate: G-081-A-ADAPTERS, path: "tickets/ALL-TICKETS.md#ow-081-05"}
+  - {id: OW-081-06, release: v0.8.1, phase: 081-B, status: backlog, priority: P0, owner_role: git-coordination-engineer, qa_role: git-safety-reviewer, estimated_turns: 2, depends_on: [OW-080-03, OW-081-01], gate: G-081-B-CONCURRENCY, path: "tickets/ALL-TICKETS.md#ow-081-06"}
+  - {id: OW-081-07, release: v0.8.1, phase: 081-B, status: backlog, priority: P0, owner_role: reliability-engineer, qa_role: recovery-reviewer, estimated_turns: 2, depends_on: [OW-080-04, OW-081-06], gate: G-081-B-CONCURRENCY, path: "tickets/ALL-TICKETS.md#ow-081-07"}
+  - {id: OW-081-08, release: v0.8.1, phase: 081-B, status: backlog, priority: P1, owner_role: integration-engineer, qa_role: runtime-conformance-reviewer, estimated_turns: 2, depends_on: [OW-081-02, OW-081-03, OW-081-04, OW-081-05, OW-081-07], gate: G-081-B-CONCURRENCY, path: "tickets/ALL-TICKETS.md#ow-081-08"}
+  - {id: OW-081-09, release: v0.8.1, phase: 081-C, status: backlog, priority: P1, owner_role: owlib-engineer, qa_role: privacy-reviewer, estimated_turns: 2, depends_on: [OW-071-06, OW-080-05], gate: G-081-C-JOURNEY, path: "tickets/ALL-TICKETS.md#ow-081-09"}
+  - {id: OW-081-10, release: v0.8.1, phase: 081-RC, status: backlog, priority: P0, owner_role: demo-integration-engineer, qa_role: release-assurance, estimated_turns: 2, depends_on: [OW-081-08, OW-081-09], gate: G-081-RC, path: "tickets/ALL-TICKETS.md#ow-081-10"}
+  - {id: OW-090-01, release: v0.9.0, phase: 090-A, status: backlog, priority: P0, owner_role: provenance-engineer, qa_role: security-reviewer, estimated_turns: 2, depends_on: [OW-081-10], gate: G-090-A-TRUST, path: "tickets/ALL-TICKETS.md#ow-090-01"}
+  - {id: OW-090-02, release: v0.9.0, phase: 090-A, status: backlog, priority: P0, owner_role: knowledge-lifecycle-engineer, qa_role: curator-reviewer, estimated_turns: 2, depends_on: [OW-090-01], gate: G-090-A-TRUST, path: "tickets/ALL-TICKETS.md#ow-090-02"}
+  - {id: OW-090-03, release: v0.9.0, phase: 090-A, status: backlog, priority: P0, owner_role: privacy-engineer, qa_role: security-reviewer, estimated_turns: 2, depends_on: [OW-090-01], gate: G-090-A-TRUST, path: "tickets/ALL-TICKETS.md#ow-090-03"}
+  - {id: OW-090-04, release: v0.9.0, phase: 090-B, status: backlog, priority: P0, owner_role: mcp-write-engineer, qa_role: protocol-security-reviewer, estimated_turns: 2, depends_on: [OW-090-02, OW-090-03], gate: G-090-B-WRITES, path: "tickets/ALL-TICKETS.md#ow-090-04"}
+  - {id: OW-090-05, release: v0.9.0, phase: 090-B, status: backlog, priority: P1, owner_role: docs-compiler-engineer, qa_role: provenance-reviewer, estimated_turns: 2, depends_on: [OW-090-01, OW-090-02], gate: G-090-B-WRITES, path: "tickets/ALL-TICKETS.md#ow-090-05"}
+  - {id: OW-090-06, release: v0.9.0, phase: 090-B, status: backlog, priority: P1, owner_role: drift-engineer, qa_role: contract-reviewer, estimated_turns: 2, depends_on: [OW-090-05], gate: G-090-B-WRITES, path: "tickets/ALL-TICKETS.md#ow-090-06"}
+  - {id: OW-090-07, release: v0.9.0, phase: 090-C, status: backlog, priority: P0, owner_role: rag-contract-engineer, qa_role: privacy-reviewer, estimated_turns: 2, depends_on: [OW-080-08, OW-090-03], gate: G-090-C-RAG, path: "tickets/ALL-TICKETS.md#ow-090-07"}
+  - {id: OW-090-08, release: v0.9.0, phase: 090-C, status: backlog, priority: P1, owner_role: rag-adapter-engineer, qa_role: rag-quality-reviewer, estimated_turns: 2, depends_on: [OW-090-07], gate: G-090-C-RAG, path: "tickets/ALL-TICKETS.md#ow-090-08"}
+  - {id: OW-090-09, release: v0.9.0, phase: 090-C, status: backlog, priority: P1, owner_role: owlib-engineer, qa_role: recovery-reviewer, estimated_turns: 2, depends_on: [OW-081-09, OW-090-03], gate: G-090-C-RAG, path: "tickets/ALL-TICKETS.md#ow-090-09"}
+  - {id: OW-090-10, release: v0.9.0, phase: 090-RC, status: backlog, priority: P0, owner_role: release-engineer, qa_role: release-assurance, estimated_turns: 1, depends_on: [OW-090-04, OW-090-06, OW-090-08, OW-090-09], gate: G-090-RC, path: "tickets/ALL-TICKETS.md#ow-090-10"}
+  - {id: OW-100-01, release: v1.0, phase: 100-A, status: backlog, priority: P0, owner_role: performance-engineer, qa_role: evaluation-reviewer, estimated_turns: 2, depends_on: [OW-090-10], gate: G-100-A-HARDENING, path: "tickets/ALL-TICKETS.md#ow-100-01"}
+  - {id: OW-100-02, release: v1.0, phase: 100-A, status: backlog, priority: P0, owner_role: security-engineer, qa_role: red-team-reviewer, estimated_turns: 2, depends_on: [OW-090-03, OW-090-04], gate: G-100-A-HARDENING, path: "tickets/ALL-TICKETS.md#ow-100-02"}
+  - {id: OW-100-03, release: v1.0, phase: 100-A, status: backlog, priority: P1, owner_role: supply-chain-engineer, qa_role: security-reviewer, estimated_turns: 2, depends_on: [OW-081-01, OW-100-02], gate: G-100-A-HARDENING, path: "tickets/ALL-TICKETS.md#ow-100-03"}
+  - {id: OW-100-04, release: v1.0, phase: 100-B, status: backlog, priority: P0, owner_role: evaluation-engineer, qa_role: independent-evaluation-reviewer, estimated_turns: 2, depends_on: [OW-071-03, OW-080-07, OW-081-10, OW-090-10, OW-100-01], gate: G-100-B-PRODUCT, path: "tickets/ALL-TICKETS.md#ow-100-04"}
+  - {id: OW-100-05, release: v1.0, phase: 100-B, status: backlog, priority: P1, owner_role: cli-lifecycle-engineer, qa_role: recovery-ux-reviewer, estimated_turns: 2, depends_on: [OW-080-09, OW-100-01], gate: G-100-B-PRODUCT, path: "tickets/ALL-TICKETS.md#ow-100-05"}
+  - {id: OW-100-06, release: v1.0, phase: 100-B, status: backlog, priority: P1, owner_role: governance-engineer, qa_role: claim-proof-reviewer, estimated_turns: 2, depends_on: [OW-100-02, OW-100-03], gate: G-100-B-PRODUCT, path: "tickets/ALL-TICKETS.md#ow-100-06"}
+  - {id: OW-100-07, release: v1.0, phase: 100-C, status: backlog, priority: P0, owner_role: docs-engineer, qa_role: beginner-ux-reviewer, estimated_turns: 2, depends_on: [OW-100-04, OW-100-05, OW-100-06], gate: G-100-C-PROOF, path: "tickets/ALL-TICKETS.md#ow-100-07"}
+  - {id: OW-100-08, release: v1.0, phase: 100-C, status: backlog, priority: P0, owner_role: integration-engineer, qa_role: release-assurance, estimated_turns: 2, depends_on: [OW-100-04, OW-100-07], gate: G-100-C-PROOF, path: "tickets/ALL-TICKETS.md#ow-100-08"}
+  - {id: OW-100-09, release: v1.0, phase: 100-GA, status: backlog, priority: P0, owner_role: release-engineer, qa_role: final-release-reviewer, estimated_turns: 2, depends_on: [OW-100-08], gate: G-100-GA, path: "tickets/ALL-TICKETS.md#ow-100-09"}
