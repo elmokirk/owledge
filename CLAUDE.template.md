@@ -53,6 +53,7 @@ This file is intentionally mirrored with the sibling runtime instruction file. K
 ## Multi-Agent Session Rules
 
 - One writer per file.
+- `subagent: true` means delegation is eligible only; it never authorizes spawning, worktrees, writes, merges, or runtime calls without recorded user approval. Use the optional `owledge-autonomous-delivery` skill to classify work and request consent first.
 - Subagents never edit canonical docs.
 - Orchestrators own deltas.
 - Reviewers own reviews.

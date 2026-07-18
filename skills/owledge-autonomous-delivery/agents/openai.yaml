@@ -1,0 +1,6 @@
+interface:
+  display_name: "Owledge Autonomous Delivery"
+  short_description: "Plan consent-first multi-agent delivery"
+  default_prompt: "Use $owledge-autonomous-delivery to assess this ticket and propose a safe delivery workflow."
+policy:
+  allow_implicit_invocation: false

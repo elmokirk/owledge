@@ -46,7 +46,9 @@ edges: []
 | Owlib current-layout compatibility and scoped hub | OW-071-06, OW-081-09, OW-090-09 | G-071-C-COMPAT, G-081-C-JOURNEY, G-090-C-RAG |
 | Hermes native Tier 1 | OW-071-07, OW-081-04, OW-081-10 | G-071-C-COMPAT, G-081-A-ADAPTERS, G-081-RC |
 | Long-horizon portable contracts | OW-080-01 through OW-080-04 | G-080-A-CONTRACTS |
-| 4B/8k small-model support | OW-080-06, OW-080-07, OW-100-04 | G-080-B-CONTEXT, G-100-B-PRODUCT |
+| 4B/8k small-model support | OW-080-06, OW-080-07, OW-081-14, OW-100-04 | G-080-B-CONTEXT, G-081-C-JOURNEY, G-100-B-PRODUCT |
+| Optional consent-first autonomous delivery, isolated lanes, and runtime-neutral adapters | OW-080-12, OW-081-12, OW-081-13 | G-080-A-CONTRACTS, G-081-B-CONCURRENCY |
+| Edge/local-model task capsules and real smoke evidence | OW-080-07, OW-081-14, OW-100-04 | G-080-B-CONTEXT, G-081-C-JOURNEY, G-100-B-PRODUCT |
 | RAG projection improves or preserves retrieval | OW-080-08, OW-090-07, OW-090-08 | G-080-C-RETRIEVAL, G-090-C-RAG |
 | Four Tier-1 profiles and explicit degradation | OW-081-01 through OW-081-05 | G-081-A-ADAPTERS |
 | Git-safe parallel execution and resume | OW-081-06 through OW-081-08 | G-081-B-CONCURRENCY |

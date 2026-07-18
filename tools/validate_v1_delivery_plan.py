@@ -24,6 +24,8 @@ RUN_STATE = CONTROL_ROOT / "RUN-STATE.yaml"
 ALIGNMENT_PROTOCOL = CONTROL_ROOT / "ALIGNMENT-PROTOCOL.md"
 CONTROL_POLICY = CONTROL_ROOT / "CONTROL-PLANE-POLICY.md"
 GOAL = CONTROL_ROOT / "GOAL.md"
+ORCHESTRATION_PROTOCOL = CONTROL_ROOT / "ORCHESTRATION-PROTOCOL.md"
+EXECUTION_MATRIX = CONTROL_ROOT / "AGENT-EXECUTION-MATRIX.yaml"
 
 TICKET_ROW = re.compile(
     r"^  - \{id: (?P<id>OW-[^,]+), release: (?P<release>[^,]+), phase: (?P<phase>[^,]+), "
@@ -76,6 +78,18 @@ ALIGNMENT_ROW = re.compile(
 )
 
 
+EXECUTION_ROW = re.compile(
+    r"^  - \{id: (?P<id>OW-[^,]+), blockers: (?P<blockers>false|\[[^\]]*\]), "
+    r"subagent: (?P<subagent>true|false), orchestrator: (?P<orchestrator>[^,]+), "
+    r"model_profile: (?P<model>[^,]+), qa_checker: (?P<qa>true|false), "
+    r"red_team: (?P<red>true|false), approval_mode: (?P<approval>[^,]+), "
+    r"git_lane: (?P<lane>[^,]+), max_parallelism: (?P<parallel>\d+)\}$",
+    re.MULTILINE,
+)
+
+
+def parse_execution_rows(text: str) -> list[dict[str, str]]:
+    return [match.groupdict() for match in EXECUTION_ROW.finditer(text)]
 def read(path: pathlib.Path) -> str:
     return path.read_text(encoding="utf-8")
 
@@ -126,6 +140,7 @@ def validate_frontmatter(errors: list[str]) -> None:
         ALIGNMENT_PROTOCOL,
         TICKETS,
         GATES,
+        ORCHESTRATION_PROTOCOL,
     ]
     memory_ids: set[str] = set()
     for path in paths:
@@ -148,6 +163,8 @@ def validate() -> dict[str, Any]:
     alignment_text = read(ALIGNMENT_PROTOCOL)
     policy_text = read(CONTROL_POLICY)
     goal_text = read(GOAL)
+    protocol_text = read(ORCHESTRATION_PROTOCOL)
+    matrix_text = read(EXECUTION_MATRIX)
     rows = parse_ticket_rows(backlog_text)
     if not rows:
         errors.append("BACKLOG.yaml: no ticket rows matched the required contract")
@@ -158,6 +175,25 @@ def validate() -> dict[str, Any]:
     if len(ids) != len(known):
         errors.append("BACKLOG.yaml: duplicate ticket ids")
 
+    execution_rows = parse_execution_rows(matrix_text)
+    execution_by_id = {row["id"]: row for row in execution_rows}
+    if len(execution_rows) != len(execution_by_id):
+        errors.append("AGENT-EXECUTION-MATRIX.yaml: duplicate ticket ids")
+    if set(execution_by_id) != known:
+        errors.append(f"AGENT-EXECUTION-MATRIX.yaml: ticket coverage mismatch missing={sorted(known-set(execution_by_id))} extra={sorted(set(execution_by_id)-known)}")
+    for row in rows:
+        execution = execution_by_id.get(row["id"])
+        if not execution:
+            continue
+        expected_blockers = "false" if not row["depends_on"] else "[" + ", ".join(row["depends_on"]) + "]"
+        if execution["blockers"] != expected_blockers:
+            errors.append(f"{row['id']}: execution-matrix blockers disagree with BACKLOG.yaml")
+        if execution["subagent"] == "true" and execution["approval"] == "off":
+            errors.append(f"{row['id']}: delegable ticket cannot have approval_mode=off")
+        if execution["red"] == "true" and execution["qa"] != "true":
+            errors.append(f"{row['id']}: Red Team requires QA")
+        if int(execution["parallel"]) != 1:
+            errors.append(f"{row['id']}: max_parallelism must remain 1 per ticket")
     gate_map = parse_gate_map(backlog_text)
     if not gate_map:
         errors.append("BACKLOG.yaml: no gates found")
@@ -284,6 +320,12 @@ def validate() -> dict[str, Any]:
     for heading in REQUIRED_ALIGNMENT_PROTOCOL_SECTIONS:
         if heading not in alignment_text:
             errors.append(f"ALIGNMENT-PROTOCOL.md: missing {heading}")
+    if "## Optional Autonomous Delivery" not in policy_text or "`subagent: true` is eligibility only" not in policy_text:
+        errors.append("CONTROL-PLANE-POLICY.md: missing optional-delivery consent rule")
+    if "# Optional Autonomous Delivery Protocol" not in protocol_text or "## Classification and Consent" not in protocol_text:
+        errors.append("ORCHESTRATION-PROTOCOL.md: missing classification or consent protocol")
+    if not (REPO_ROOT / "skills" / "owledge-autonomous-delivery" / "SKILL.md").is_file():
+        errors.append("skills/owledge-autonomous-delivery/SKILL.md: missing")
     if "## Version Alignment and User Authority" not in policy_text or "## Phase Question Register" not in policy_text:
         errors.append("CONTROL-PLANE-POLICY.md: missing version-alignment or phase-question policy")
     if "## `/goal` Version-Stop Protocol" not in goal_text or "awaiting_user_alignment" not in goal_text:
@@ -368,6 +410,18 @@ def main() -> int:
             "Assignment contract: "
             f"owner_role={row['owner']}; qa_role={row['qa']}; estimated_turns={row['estimated_turns']}; "
             f"gate={row['gate']}; depends_on={row['depends_on']}\n\n"
+        )
+        execution_rows = parse_execution_rows(read(EXECUTION_MATRIX))
+        execution = next((item for item in execution_rows if item["id"] == args.ticket_id), None)
+        if execution is None:
+            raise SystemExit(f"Missing execution guidance for ticket: {args.ticket_id}")
+        print(
+            "Execution guidance: "
+            f"blockers={execution['blockers']}; subagent={execution['subagent']}; "
+            f"orchestrator={execution['orchestrator']}; model_profile={execution['model']}; "
+            f"qa_checker={execution['qa']}; red_team={execution['red']}; "
+            f"approval_mode={execution['approval']}; git_lane={execution['lane']}; "
+            f"max_parallelism={execution['parallel']}\n\n"
         )
         print(section(read(TICKETS), args.ticket_id), end="")
         return 0

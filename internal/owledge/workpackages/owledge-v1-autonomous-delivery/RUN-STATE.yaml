@@ -19,7 +19,14 @@ execution_mode:
   parallel_agents: allowed_only_for_non_overlapping_ready_tickets
   wip_per_agent: 1
   independent_qa_required: true
-workspace:
+orchestration:
+  profile: off
+  consent_mode: off
+  approved_by: null
+  approved_at: null
+  expires_at_alignment: true
+  active_dispatch: null
+  pending_risk_brief: nullworkspace:
   code_root: .
   planning_root: internal/owledge/workpackages/owledge-v1-autonomous-delivery
   planning_branch: codex/owledge-v1-autonomous-roadmap

@@ -89,10 +89,10 @@ Every gate starts from the tested integration commit and controlled environment 
 
 ### G-080-A-CONTRACTS - Portable contracts
 
-- Tickets: `OW-080-01` through `OW-080-04`.
-- Commands: schema suites; migration round-trip; DAG/state-machine tests; checkpoint/evidence integrity tests.
-- Thresholds: stable IDs/typed edges/unknown extensions preserved; cycles rejected; no done/accepted without gates/evidence; stale evidence rejected; atomic state consistency=100%.
-- Demonstrable increment: human intent compiles into a ready ticket DAG and resumable state without prose-only completion.
+- Tickets: `OW-080-01` through `OW-080-04`, `OW-080-12`.
+- Commands: schema suites; migration round-trip; DAG/state-machine tests; checkpoint/evidence integrity tests; autonomous-profile default-off, consent, dependency-link, and no-dispatch fixtures.
+- Thresholds: stable IDs/typed edges/unknown extensions preserved; cycles rejected; no done/accepted without gates/evidence; stale evidence rejected; atomic state consistency=100%; profile disabled means zero spawned lanes; unknown profile, missing consent, and overlapping lane fail closed.
+- Demonstrable increment: human intent compiles into a ready ticket DAG and resumable state without prose-only completion; optional delivery planning produces a risk brief but cannot dispatch.
 - Promotion: contract version is frozen for v0.8 implementation.
 
 ### G-080-B-CONTEXT - Context and small models
@@ -140,18 +140,18 @@ Every gate starts from the tested integration commit and controlled environment 
 
 ### G-081-B-CONCURRENCY - Git safety and recovery
 
-- Tickets: `OW-081-06`, `OW-081-07`, `OW-081-08`.
-- Commands: eight-worker non-overlap simulation; overlap/dirty/stale-base negatives; kill/retry matrix; hook and integration-manifest fixtures.
-- Thresholds: clobbered files=0; duplicate canonical writes=0; uncertain side effects block; overlaps require decision; every merged commit/evidence reachable.
-- Demonstrable increment: parallel work is integrated after one worker is killed and resumed in another harness.
+- Tickets: `OW-081-06`, `OW-081-07`, `OW-081-08`, `OW-081-12`, `OW-081-13`.
+- Commands: eight-worker non-overlap simulation; overlap/dirty/stale-base negatives; kill/retry matrix; hook and integration-manifest fixtures; skill classifier, consent, runtime dry-run, and capability-degradation fixtures.
+- Thresholds: clobbered files=0; duplicate canonical writes=0; uncertain side effects block; overlaps require decision; every merged commit/evidence reachable; default-off profiles spawn zero lanes; high-risk dispatch has fresh approval; QA context is independent; Red Team is risk-triggered; unsupported runtime never launches silently.
+- Demonstrable increment: after the user approves a displayed dry-run plan, parallel work is integrated after one worker is killed and resumed in another harness.
 - Promotion: autonomous parallel execution may be enabled within declared lanes.
 
 ### G-081-C-JOURNEY - Scoped hub journey
 
-- Tickets: `OW-081-09`.
-- Commands: Owlib project-filter/privacy fixtures; hub context determinism and relevance eval.
-- Thresholds: default all-project scan=never; unauthorized project results=0; every selected/excluded project and source explained; context budget honored.
-- Demonstrable increment: task context uses current project plus one explicit related project.
+- Tickets: `OW-081-09`, `OW-081-14`.
+- Commands: Owlib project-filter/privacy fixtures; hub context determinism and relevance eval; edge-small task-capsule, budget, structured-output, fallback, and real local-model smoke fixtures.
+- Thresholds: default all-project scan=never; unauthorized project results=0; every selected/excluded project and source explained; context budget honored; edge-small model receives no full-plan injection; unsupported authority actions=0; real local-model smoke evidence=present.
+- Demonstrable increment: task context uses current project plus one explicit related project, while an edge-small model completes one declared bounded task from its capsule.
 - Promotion: scoped cross-project context becomes supported preview.
 
 ### G-081-RC - v0.8.1 multi-agent release

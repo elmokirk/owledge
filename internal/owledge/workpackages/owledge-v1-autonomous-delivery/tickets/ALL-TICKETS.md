@@ -189,9 +189,18 @@ For every ticket:
 - Verify/evidence: recovery and evidence-integrity fixtures; `evidence/OW-080-04/`.
 - Negative QA: mismatched input hash, missing exit code, self-only QA, and stale tested commit fail.
 
-### OW-080-05 - Build deterministic Context Compiler v1
+### OW-080-12 - Define the optional Autonomous Delivery Profile v1
 
 - Priority/dependencies: P0; `OW-080-02`, `OW-080-03`, `OW-080-04`.
+- Outcome: small work stays single-agent by default, while larger work can use a runtime-neutral, consent-first delivery profile.
+- Allowed paths: execution schemas/templates, planning tools/CLI/tests/docs, `internal/owledge/workpackages/`.
+- Implement: default-off profile fields for blockers, subagent eligibility, orchestrator, model profile, QA, Red Team, approval mode, Git lane, and parallelism; render dependency links from the canonical backlog; record a risk brief and consent state without dispatching a runtime.
+- Accept: parsing or dry-run planning cannot spawn an agent or create a worktree; `subagent: true` is eligibility only; unknown model, missing consent, overlapping lane, or raw credential fails closed.
+- Verify/evidence: profile round-trip, default-off, consent, dependency-link, and negative fixtures; `evidence/OW-080-12/`.
+- Negative QA: implicit spawn, generic write fallback, same-context QA, unsupported profile, or unapproved high-risk ticket is rejected.
+### OW-080-05 - Build deterministic Context Compiler v1
+
+- Priority/dependencies: P0; `OW-080-02`, `OW-080-03`, `OW-080-04`, `OW-080-12`.
 - Outcome: bootstrap, task, reviewer, handoff, and release packs explain inclusion/exclusion and respect budgets.
 - Allowed paths: context-pack core/CLI, schemas, fixtures, tests, docs.
 - Implement: deterministic ordering/digest, typed selection reasons, privacy/staleness filters, dropped-source list, pack version.
@@ -341,6 +350,35 @@ For every ticket:
 - Verify/evidence: hook and merge fixtures; `evidence/OW-081-08/`.
 - Negative QA: missing evidence, failed hook, scope conflict, or unreachable commit blocks integration.
 
+### OW-081-12 - Ship the optional autonomous-delivery skill
+
+- Priority/dependencies: P1; `OW-080-12`, `OW-081-01`, `OW-081-06`, `OW-081-08`.
+- Outcome: one portable skill assesses ticket risk, proposes lanes and models, explains risks, and requests user consent before a runtime is allowed to act.
+- Allowed paths: `skills/owledge-autonomous-delivery/`, plugin skill entrypoints, runtime docs, fixtures/tests, workpackage templates.
+- Implement: small/medium/high-risk classifier, phase/per-ticket approval flow, model-profile guidance, isolated Worker/QA/Red-Team handoff rules, Git-lane checklist, risk brief, and safe single-agent fallback.
+- Accept: the skill starts with recommendation rather than execution; small tickets stay simple; high-risk tickets cannot dispatch without fresh approval; each runtime receives a compact, explicit capability boundary.
+- Verify/evidence: classifier, consent, capability-degradation, and lane-isolation fixtures; `evidence/OW-081-12/`.
+- Negative QA: implicit invocation, automatic spawn, omitted risk, same-context QA, or claimed unsupported runtime capability fails.
+
+### OW-081-13 - Add optional runtime orchestration adapters
+
+- Priority/dependencies: P1; `OW-081-12`.
+- Outcome: Codex, Claude/Cowork, Hermes, and generic MCP/CLI can consume the approved delivery plan without making any runtime a Core dependency.
+- Allowed paths: runtime adapters, integration manifests, CLI/tests/docs, adapter fixtures.
+- Implement: read-only `execution plan` dry-run, model-profile resolution, consent verification, worktree/branch/merge manifests, explicit capability/degradation results, and `/goal` mapping as a Codex adapter.
+- Accept: adapters never launch externally while planning; approved non-overlapping lanes can be proposed; unsupported features degrade visibly and safely; integration writes remain owned by the integration role.
+- Verify/evidence: cross-runtime dry-run, consent, worktree, merge-manifest, and degradation fixtures; `evidence/OW-081-13/`.
+- Negative QA: no consent, overlap, direct integration write, unsupported model/runtime, or hidden external launch blocks dispatch.
+
+### OW-081-14 - Add the edge/local-model delivery profile
+
+- Priority/dependencies: P0; `OW-080-07`, `OW-081-12`, `OW-081-13`.
+- Outcome: constrained local models receive compact task capsules and deterministic guardrails instead of excessive context or unsafe authority.
+- Allowed paths: context profiles, adapter configuration, benchmark fixtures, deterministic validators, docs/tests.
+- Implement: `edge_small` capability boundary, task-capsule format, hard budgets, progressive disclosure, unsupported-task responses, offline fixtures, and one real local-model smoke protocol.
+- Accept: edge models can perform declared bounded tasks without full-plan injection; deterministic validators catch malformed output; unsupported architecture, merge, security, and cross-project actions are refused clearly.
+- Verify/evidence: 4B-class local-model smoke run plus budget, structured-output, false-pass, and fallback fixtures; `evidence/OW-081-14/`.
+- Negative QA: oversized context, hidden model downgrade, improvised unsupported action, false acceptance, or missing real-model evidence blocks the v0.8.1 claim.
 ### OW-081-09 - Add scoped Owlib retrieval and hub context packs
 
 - Priority/dependencies: P1; `OW-071-06`, `OW-080-05`, `OW-080-11`.
@@ -353,7 +391,7 @@ For every ticket:
 
 ### OW-081-10 - Prove multi-agent golden journey and cut v0.8.1
 
-- Priority/dependencies: P0; `OW-081-08`, `OW-081-09`.
+- Priority/dependencies: P0; `OW-081-08`, `OW-081-09`, `OW-081-12`, `OW-081-13`, `OW-081-14`.
 - Outcome: plan, parallel dispatch, deliberate interruption, cross-harness resume, failed review, correction, integration, and source-linked report run end to end.
 - Allowed paths: golden fixtures/demo, conformance kit, release/version/docs/workflows.
 - Implement: deterministic journey using all Tier-1 profiles, clean artifact build, public support matrix.

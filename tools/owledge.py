@@ -137,6 +137,7 @@ HOST_SKILL_DIRS = [
     "skills/owledge-planning-layer",
     "skills/owledge-brainstorm",
     "skills/concept-blindspot-audit",
+    "skills/owledge-autonomous-delivery",
 ]
 
 

@@ -123,6 +123,7 @@ SKILL_DIRS = [
     "skills/render-memory-report",
     "skills/owledge-planning-layer",
     "skills/owledge-brainstorm",
+    "skills/owledge-autonomous-delivery",
 ]
 
 

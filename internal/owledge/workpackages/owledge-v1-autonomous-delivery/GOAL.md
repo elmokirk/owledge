@@ -50,13 +50,15 @@ Run `python tools/validate_v1_delivery_plan.py`, then start `OW-071-01` only aft
 - One active ticket per agent.
 - Only dependency-ready tickets may start.
 - Parallel tickets require separate worktrees and non-overlapping `allowed_paths`.
+- `subagent: true` is eligibility only; use the optional `owledge-autonomous-delivery` skill to classify work, display risks, and record user approval before dispatch.
+- Small tickets remain single-agent. Medium work needs phase approval; high-risk work needs per-ticket approval and isolated QA/Red-Team lanes.
 - The release integration branch advances only through an integration owner.
 - After every RC/GA gate, run only its matching alignment ticket. It must set `RUN-STATE.yaml` to `awaiting_user_alignment`, create the required version update, and stop until the user responds.
 - During each version, append non-blocking questions to `alignment.open_questions`; include every accumulated question in the version update rather than silently deciding it.
 
 ## Prohibited Shortcuts
 
-- No automatic canonical promotion.
+- No automatic canonical promotion or implicit subagent dispatch.
 - No arbitrary MCP filesystem-write tool.
 - No loading the full control plane into every model prompt.
 - No raw frontmatter in embedding text.

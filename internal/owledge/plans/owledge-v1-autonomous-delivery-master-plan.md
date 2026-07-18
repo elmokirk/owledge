@@ -62,7 +62,7 @@ evidence bundle.
 - Existing-project migration is opt-in, preview-first, dry-run capable, and must not
   overwrite user-owned Markdown silently.
 - MCP writes are semantic operations, never a general arbitrary-file-write API.
-- Small-model Tier 1 targets a 4B-class model with at least an 8k context window.
+- Small-model Tier 1 targets a 4B-class model with at least an 8k context window; v0.8.1 claims require deterministic fixtures plus one real local-model smoke run.
 - The existing v0.7 benchmark fixture must retain at least 80% reduction in tokens per
   correct answer against its naive baseline, with no quality, privacy, or stale-source
   regression. New harder fixtures use separate thresholds.
@@ -75,7 +75,7 @@ evidence bundle.
 - No hosted Owledge SaaS, account system, billing, or mandatory cloud backend.
 - No replacement for agent runtimes, vector databases, graph databases, issue
   trackers, or IDEs.
-- No automatic canonical promotion, autonomous conflict resolution, or hidden writes.
+- No automatic canonical promotion, autonomous conflict resolution, hidden writes, or implicit subagent dispatch.
 - No claim that the synthetic benchmark percentages generalize to every repository.
 - No Docker-first installation or remote multi-tenant MCP service before v1.0.
 
@@ -146,10 +146,10 @@ Gate: `G-071-C-COMPAT` and release gate `G-071-RC`.
 
 ### Phase 080-A - Versioned contract foundation
 
-Tickets: `OW-080-01`, `OW-080-02`, `OW-080-03`, `OW-080-04`.
+Tickets: `OW-080-01`, `OW-080-02`, `OW-080-03`, `OW-080-04`, `OW-080-12`.
 
 Outcome: ProjectManifest, ArtifactEnvelope, WorkContract, Backlog, RunState,
-Checkpoint, GateResult, and EvidenceManifest are versioned, validated, and migratable.
+Checkpoint, GateResult, EvidenceManifest, and a default-off Autonomous Delivery Profile are versioned, validated, and migratable.
 
 Gate: `G-080-A-CONTRACTS`.
 
@@ -185,19 +185,17 @@ Gate: `G-081-A-ADAPTERS`.
 
 ### Phase 081-B - Git-safe concurrency and recovery
 
-Tickets: `OW-081-06`, `OW-081-07`, `OW-081-08`.
+Tickets: `OW-081-06`, `OW-081-07`, `OW-081-08`, `OW-081-12`, `OW-081-13`.
 
-Outcome: claims, path scopes, worktrees, checkpoints, hooks, and integration manifests
-support safe parallel execution and cross-harness resume.
+Outcome: the optional autonomous-delivery skill, consent checks, claims, path scopes, worktrees, checkpoints, hooks, runtime adapters, and integration manifests support safe parallel execution and cross-harness resume.
 
 Gate: `G-081-B-CONCURRENCY`.
 
 ### Phase 081-C - Scoped hub context and golden multi-agent journey
 
-Tickets: `OW-081-09`, `OW-081-10`.
+Tickets: `OW-081-09`, `OW-081-14`, `OW-081-10`.
 
-Outcome: Owlib can compile explicitly scoped cross-project context and the golden
-journey proves interrupted work can resume in another Tier-1 harness.
+Outcome: Owlib can compile explicitly scoped cross-project context; edge/local models receive constrained task capsules; and the golden journey proves interrupted work can resume in another Tier-1 harness.
 
 Gate: `G-081-C-JOURNEY` and release gate `G-081-RC`.
 

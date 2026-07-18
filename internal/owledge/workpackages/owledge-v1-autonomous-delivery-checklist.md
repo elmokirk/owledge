@@ -63,7 +63,7 @@ Current resume point: **v0.7.1 Phase 071-A - Truth and release baseline**.
 
 - [ ] tickets OW-071-06 through OW-071-08 done
 - [ ] G-071-C-COMPAT and G-071-RC evidence passed
-- [ ] independent release review passed
+- [ ] independent edge-model and release review passed
 
 ### Version alignment stop
 
@@ -75,7 +75,7 @@ Current resume point: **v0.7.1 Phase 071-A - Truth and release baseline**.
 
 ### Phase 080-A - Contracts
 
-- [ ] tickets OW-080-01 through OW-080-04 done
+- [ ] tickets OW-080-01 through OW-080-04 and OW-080-12 done
 - [ ] G-080-A-CONTRACTS evidence passed
 - [ ] independent contract/migration review passed
 
@@ -89,7 +89,7 @@ Current resume point: **v0.7.1 Phase 071-A - Truth and release baseline**.
 
 - [ ] tickets OW-080-08 through OW-080-10 done
 - [ ] G-080-C-RETRIEVAL and G-080-RC evidence passed
-- [ ] independent release review passed
+- [ ] independent edge-model and release review passed
 
 ### Version alignment stop
 
@@ -107,15 +107,15 @@ Current resume point: **v0.7.1 Phase 071-A - Truth and release baseline**.
 
 ### Phase 081-B - Concurrency and recovery
 
-- [ ] tickets OW-081-06 through OW-081-08 done
+- [ ] tickets OW-081-06 through OW-081-08, OW-081-12, and OW-081-13 done
 - [ ] G-081-B-CONCURRENCY evidence passed
-- [ ] independent Git/recovery review passed
+- [ ] independent Git/recovery/autonomy review passed
 
 ### Phase 081-C - Hub journey and release
 
-- [ ] tickets OW-081-09 and OW-081-10 done
+- [ ] tickets OW-081-09, OW-081-14, and OW-081-10 done
 - [ ] G-081-C-JOURNEY and G-081-RC evidence passed
-- [ ] independent release review passed
+- [ ] independent edge-model and release review passed
 
 ### Version alignment stop
 
@@ -141,7 +141,7 @@ Current resume point: **v0.7.1 Phase 071-A - Truth and release baseline**.
 
 - [ ] tickets OW-090-07 through OW-090-10 done
 - [ ] G-090-C-RAG and G-090-RC evidence passed
-- [ ] independent release review passed
+- [ ] independent edge-model and release review passed
 
 ### Version alignment stop
 

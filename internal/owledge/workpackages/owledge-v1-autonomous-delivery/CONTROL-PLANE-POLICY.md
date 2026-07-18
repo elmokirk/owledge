@@ -55,6 +55,15 @@ Use `python tools/validate_v1_delivery_plan.py --ticket-id <ID>` and `--gate-id 
 - Every evidence manifest records the concrete actor/runtime and QA mode, not only the abstract role.
 
 ## Evidence Retention and Privacy
+## Optional Autonomous Delivery
+
+- Default execution is single-agent. Use `owledge-autonomous-delivery` only to assess and propose an optional delivery workflow.
+- `subagent: true` is eligibility only. It does not authorize spawning, worktrees, writes, merges, or runtime calls; recorded user consent is required first.
+- Small tickets have one bounded outcome, at most three implementation files, and no public contract, migration, security/privacy, MCP, release, cross-project, or concurrent-write impact. They remain single-agent.
+- Medium work requires phase approval for one Worker plus independent QA. High-risk refactors, merges, migrations, public API/schema, MCP, security/privacy, release, cross-project, or concurrent-write work requires per-ticket approval and a risk-triggered Red Team.
+- User consent records lanes, model profiles, allowed paths, Git/worktree plan, write/network/cost risk, evidence retention, rollback, and safe fallback. It expires at the next alignment stop.
+- Worker, QA, and Red Team contexts are isolated. One Worker may write per ticket; only the integration owner may merge an evidenced manifest to the integration branch.
+
 
 - Commit compact manifests, reports required for reproducibility, and stable hashes—not raw model transcripts or unrestricted command logs.
 - Redact secrets, credentials, personal paths, customer data, and private prompts before persistence.
