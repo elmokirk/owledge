@@ -24,7 +24,7 @@ confidence: 0.95
 review_status: "reviewed"
 sanitization_status: "not_required"
 created_at: "2026-07-16T00:00:00Z"
-updated_at: "2026-07-16T00:00:00Z"
+updated_at: "2026-07-18T00:00:00Z"
 source_hash: ""
 owners:
   - "release-orchestrator"
@@ -58,4 +58,5 @@ edges: []
 | Independent solo QA and evidence retention | OW-080-04, OW-090-03, OW-100-02, OW-100-06 | G-080-A-CONTRACTS, G-090-A-TRUST, G-100-A-HARDENING |
 | Benchmark integrity and cross-profile RAG proof | OW-071-03, OW-080-07, OW-090-08, OW-100-04 | G-071-A-TRUTH, G-080-B-CONTEXT, G-090-C-RAG, G-100-B-PRODUCT |
 | Semantic MCP threat boundary | OW-090-04, OW-100-02 | G-090-B-WRITES, G-100-A-HARDENING |
+| Mandatory user alignment after every version | OW-071-09, OW-080-11, OW-081-11, OW-090-11, OW-100-10 | G-071-ALIGNMENT, G-080-ALIGNMENT, G-081-ALIGNMENT, G-090-ALIGNMENT, G-100-ALIGNMENT |
 | PI.dev is non-critical post-v1 concept | no v1 ticket | explicitly deferred |

@@ -19,7 +19,7 @@ confidence: 0.94
 review_status: "reviewed"
 sanitization_status: "not_required"
 created_at: "2026-07-16T00:00:00Z"
-updated_at: "2026-07-16T00:00:00Z"
+updated_at: "2026-07-18T00:00:00Z"
 source_hash: ""
 reusable_lessons: []
 edges:
@@ -97,13 +97,21 @@ Run `python tools/validate_v1_delivery_plan.py` before claiming or promoting wor
 
 ## Release Train
 
-| Release | User-visible increment | Promotion boundary |
-| --- | --- | --- |
-| v0.7.1 | A beginner can understand, install, try, and verify Owledge; Owlib and Hermes preview paths match the v0.7 project contract. | Adoption journey and release truth are green on Windows, macOS, and Linux fixtures. |
-| v0.8.0 | Human intent becomes a validated, token-budgeted, resumable work contract and clean retrieval projection. | Contract round-trip, context determinism, small-model, RAG, and migration gates are green. |
-| v0.8.1 | Four Tier-1 harness profiles can execute and resume isolated work without silent capability degradation. | Conformance, worktree/claim safety, cross-harness resume, and multi-agent demo gates are green. |
-| v0.9.0 | Reviewed knowledge can be written, promoted, compiled, exported, and refreshed with provenance and privacy controls. | Semantic-write, promotion, privacy, drift, RAG round-trip, and Owlib freshness gates are green. |
-| v1.0 | Owledge is measurable, secure by default, supportable, and release-ready at realistic scale. | Security, scale, portability, CLI lifecycle, docs, evidence reconstruction, and final artifact gates are green. |
+| Release | User-visible increment | Technical promotion boundary | Mandatory alignment stop |
+| --- | --- | --- | --- |
+| v0.7.1 | A beginner can understand, install, try, and verify Owledge; Owlib and Hermes preview paths match the v0.7 project contract. | Adoption journey and release truth are green on Windows, macOS, and Linux fixtures. | Feature update, open questions, and explicit user alignment before publishing or v0.8.0. |
+| v0.8.0 | Human intent becomes a validated, token-budgeted, resumable work contract and clean retrieval projection. | Contract round-trip, context determinism, small-model, RAG, and migration gates are green. | Feature update, open questions, and explicit user alignment before publishing or v0.8.1. |
+| v0.8.1 | Four Tier-1 harness profiles can execute and resume isolated work without silent capability degradation. | Conformance, worktree/claim safety, cross-harness resume, and multi-agent demo gates are green. | Feature update, open questions, and explicit user alignment before publishing or v0.9.0. |
+| v0.9.0 | Reviewed knowledge can be written, promoted, compiled, exported, and refreshed with provenance and privacy controls. | Semantic-write, promotion, privacy, drift, RAG round-trip, and Owlib freshness gates are green. | Feature update, open questions, and explicit user alignment before publishing or v1.0. |
+| v1.0 | Owledge is measurable, secure by default, supportable, and release-ready at realistic scale. | Security, scale, portability, CLI lifecycle, docs, evidence reconstruction, and final artifact gates are green. | Final feature update, post-v1 question register, and explicit user closeout before GA publication. |
+
+## Version Alignment and `/goal` Handoff
+
+Every RC/GA is a technical promotion candidate, not permission to continue autonomously. After its release gate passes, Codex must execute that version's dedicated alignment ticket, write the matching `release-updates/<version>.md`, present the update and all open questions to the user, and set the run state to `awaiting_user_alignment`.
+
+The next version's tickets are dependency-blocked by the prior alignment ticket. The agent may prepare evidence and answer questions, but it must not publish/tag, begin the next version, or mark the alignment ticket `done` until the user explicitly chooses `approve`, `adjust`, or `defer`.
+
+`GOAL.md`, `ALIGNMENT-PROTOCOL.md`, `RUN-STATE.yaml`, and the active alignment ticket form the copy-ready `/goal` handoff. Each update covers shipped features, user benefits, evidence/gates, migrations, known limitations, deferred work, proposed next-version scope, and a complete decision/question register.
 
 ## Version v0.7.1 - Adoption, Truth, and Compatibility
 
@@ -260,6 +268,8 @@ Gate: `G-100-C-PROOF` and final gate `G-100-GA`.
   integration-owner decision before dispatch.
 - Every ticket includes positive, negative, privacy/security where relevant,
   regression, rollback, and checkpoint evidence.
+- Passing a release candidate or GA gate triggers its alignment ticket; it never authorizes the next release by itself.
+- Alignment tickets are deliberate hard stops: the agent records `awaiting_user_alignment`, asks every unresolved question in the user update, and does no next-version or publication work until an explicit user decision is recorded.
 - A worker may not be the sole QA owner for its ticket. A separate reviewer verifies
   evidence and attack/failure cases before `done`.
 - Failed gates create findings and new tickets. Gates are never made green by silently
@@ -313,7 +323,7 @@ second source of truth.
 
 ## Definition of v1.0 Done
 
-- All tickets through `OW-100-09` are `done` with independent QA evidence.
+- All tickets through `OW-100-10` are `done` with independent QA evidence and every version alignment decision is recorded.
 - All version and final gates are green from documented clean states.
 - Four Tier-1 runtime profiles achieve at least 95% declared contract equivalence on
   the same fixture; unsupported capabilities fail explicitly.

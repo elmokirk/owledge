@@ -24,7 +24,7 @@ confidence: 0.95
 review_status: "reviewed"
 sanitization_status: "not_required"
 created_at: "2026-07-16T00:00:00Z"
-updated_at: "2026-07-16T00:00:00Z"
+updated_at: "2026-07-18T00:00:00Z"
 source_hash: ""
 owners:
   - "release-orchestrator"
@@ -53,6 +53,7 @@ For every ticket:
 - Checkpoint: record last completed action, changed files, passed/failed commands, workspace/commit state, next exact action, assumptions, blockers, and prohibited shortcuts.
 - Rollback: revert the cohesive ticket commit or disable the additive capability; migrations must retain a reversible preview or backup path.
 - QA handoff: include attack/failure cases, residual risks, and the smallest cumulative gate affected.
+- Alignment tickets: after a release RC/GA, create the required version update from `ALIGNMENT-PROTOCOL.md`, set the run state to `awaiting_user_alignment`, and stop. Only an explicit recorded user `approve`, `adjust`, or `defer` decision may resolve the ticket.
 
 ## v0.7.1 - Adoption, Truth, and Compatibility
 
@@ -136,11 +137,21 @@ For every ticket:
 - Verify/evidence: build, twine, wheel/sdist inspection, `uvx` quickstart/doctor; `evidence/OW-071-08/`.
 - Negative QA: dirty source state or mismatched version blocks promotion.
 
+### OW-071-09 - Align v0.7.1 with the product owner
+
+- Priority/dependencies: P0; `OW-071-08`.
+- Outcome: the product owner receives an evidence-linked v0.7.1 feature update, all unresolved questions, and an explicit choice before publishing or beginning v0.8.0.
+- Allowed paths: `internal/owledge/workpackages/owledge-v1-autonomous-delivery/release-updates/`, `RUN-STATE.yaml`, `BACKLOG.yaml`, `TRACEABILITY.md`, release evidence/manifests.
+- Implement: create `release-updates/v0.7.1.md` from `ALIGNMENT-PROTOCOL.md`; summarize features, user benefit, gates/evidence, compatibility, limitations, deferred work, and every question; present it in chat and set the run state to `awaiting_user_alignment`.
+- Accept: `G-071-RC` is green; the update contains every required heading and no untracked claim; user `approve`, `adjust`, or `defer` is recorded with scope/constraints; only `approve` unlocks v0.8.0.
+- Verify/evidence: `python tools/validate_v1_delivery_plan.py`; required-heading check; update, decision, and evidence links under `evidence/OW-071-09/`.
+- Negative QA: missing question, absent decision, automatic next-ticket selection, or autonomous publish/tag leaves the ticket blocked.
+
 ## v0.8.0 - Portable Control Plane and Retrieval Foundation
 
 ### OW-080-01 - Accept contract architecture and migrations
 
-- Priority/dependencies: P0; `OW-071-08`.
+- Priority/dependencies: P0; `OW-071-09`.
 - Outcome: accepted ADRs fix source-of-truth, schema versioning, lifecycle, extension, authority, and migration rules.
 - Allowed paths: `docs/architecture*`, `internal/owledge/decisions/`, schemas overview, plan references.
 - Implement: ADRs for contract set, Markdown/YAML boundary, unknown-field preservation, ID stability, status machine, compatibility window.
@@ -238,11 +249,21 @@ For every ticket:
 - Verify/evidence: release matrix; `evidence/OW-080-10/`.
 - Negative QA: schema/version mismatch or missing migration path blocks release.
 
+### OW-080-11 - Align v0.8.0 with the product owner
+
+- Priority/dependencies: P0; `OW-080-10`.
+- Outcome: the product owner receives an evidence-linked v0.8.0 feature update and decides whether the portable control plane and retrieval foundation may publish and unlock v0.8.1.
+- Allowed paths: `internal/owledge/workpackages/owledge-v1-autonomous-delivery/release-updates/`, `RUN-STATE.yaml`, `BACKLOG.yaml`, `TRACEABILITY.md`, release evidence/manifests.
+- Implement: create `release-updates/v0.8.0.md` from `ALIGNMENT-PROTOCOL.md`; include contract/migration impact, small-model and retrieval evidence, limitations, deferred work, and all questions; present it in chat and set the run state to `awaiting_user_alignment`.
+- Accept: `G-080-RC` is green; the update contains every required heading and no untracked claim; user `approve`, `adjust`, or `defer` is recorded with scope/constraints; only `approve` unlocks v0.8.1.
+- Verify/evidence: `python tools/validate_v1_delivery_plan.py`; required-heading check; update, decision, and evidence links under `evidence/OW-080-11/`.
+- Negative QA: omitted migration limitation, absent decision, automatic next-ticket selection, or autonomous publish/tag leaves the ticket blocked.
+
 ## v0.8.1 - Tier-1 Agentic Coding
 
 ### OW-081-01 - Define AdapterManifest and conformance protocol
 
-- Priority/dependencies: P0; `OW-080-10`.
+- Priority/dependencies: P0; `OW-080-11`.
 - Outcome: adapters declare detect/install/inject/capture/execute/resume/health/cleanup, versions, permissions, limits, and degradation.
 - Allowed paths: runtime conformance add-on, schemas, adapter templates, tests/docs.
 - Implement: capability schema, negotiation result, fixture protocol, support-tier rules.
@@ -322,7 +343,7 @@ For every ticket:
 
 ### OW-081-09 - Add scoped Owlib retrieval and hub context packs
 
-- Priority/dependencies: P1; `OW-071-06`, `OW-080-05`.
+- Priority/dependencies: P1; `OW-071-06`, `OW-080-05`, `OW-080-11`.
 - Outcome: Owlib queries current project plus explicit allowlisted projects and explains source selection.
 - Allowed paths: `owlib/`, hub skills/MCP/docs/tests.
 - Implement: `--projects`, exclusions, scope profiles, project-filter-first retrieval, context-pack budget/digest, source reasons.
@@ -340,11 +361,21 @@ For every ticket:
 - Verify/evidence: full journey and release artifact matrix; `evidence/OW-081-10/`.
 - Negative QA: overlap and missing test evidence deliberately fail before recovery.
 
+### OW-081-11 - Align v0.8.1 with the product owner
+
+- Priority/dependencies: P0; `OW-081-10`.
+- Outcome: the product owner receives an evidence-linked Tier-1 agentic-coding update and decides whether the adapter release may publish and unlock v0.9.0.
+- Allowed paths: `internal/owledge/workpackages/owledge-v1-autonomous-delivery/release-updates/`, `RUN-STATE.yaml`, `BACKLOG.yaml`, `TRACEABILITY.md`, release evidence/manifests.
+- Implement: create `release-updates/v0.8.1.md` from `ALIGNMENT-PROTOCOL.md`; include profile conformance, Hermes boundary, multi-agent journey, known degradation, limitations, deferred work, and all questions; present it in chat and set the run state to `awaiting_user_alignment`.
+- Accept: `G-081-RC` is green; the update contains every required heading and no untracked claim; user `approve`, `adjust`, or `defer` is recorded with scope/constraints; only `approve` unlocks v0.9.0.
+- Verify/evidence: `python tools/validate_v1_delivery_plan.py`; required-heading check; update, decision, and evidence links under `evidence/OW-081-11/`.
+- Negative QA: untested Tier-1 claim, absent decision, automatic next-ticket selection, or autonomous publish/tag leaves the ticket blocked.
+
 ## v0.9.0 - Trusted Writes and Knowledge Lifecycle
 
 ### OW-090-01 - Implement append-only Evidence Ledger and authority policy
 
-- Priority/dependencies: P0; `OW-081-10`.
+- Priority/dependencies: P0; `OW-081-11`.
 - Outcome: claims trace to source, run, commit, test, reviewer, and explicit authority/supersession rules.
 - Allowed paths: evidence/authority schemas, core/CLI/tests/docs.
 - Implement: append-only events, stable refs, code/ADR/issue/memory conflict policy, tamper/digest checks.
@@ -442,11 +473,21 @@ For every ticket:
 - Verify/evidence: release matrix; `evidence/OW-090-10/`.
 - Negative QA: write capability without policy or missing RAG deletion proof blocks release.
 
+### OW-090-11 - Align v0.9.0 with the product owner
+
+- Priority/dependencies: P0; `OW-090-10`.
+- Outcome: the product owner receives an evidence-linked trusted-knowledge update and decides whether scoped semantic writes and RAG/Owlib workflows may publish and unlock v1.0.
+- Allowed paths: `internal/owledge/workpackages/owledge-v1-autonomous-delivery/release-updates/`, `RUN-STATE.yaml`, `BACKLOG.yaml`, `TRACEABILITY.md`, release evidence/manifests.
+- Implement: create `release-updates/v0.9.0.md` from `ALIGNMENT-PROTOCOL.md`; include write-policy boundaries, privacy/RAG evidence, compatibility, limitations, deferred work, and all questions; present it in chat and set the run state to `awaiting_user_alignment`.
+- Accept: `G-090-RC` is green; the update contains every required heading and no untracked claim; user `approve`, `adjust`, or `defer` is recorded with scope/constraints; only `approve` unlocks v1.0.
+- Verify/evidence: `python tools/validate_v1_delivery_plan.py`; required-heading check; update, decision, and evidence links under `evidence/OW-090-11/`.
+- Negative QA: unsafe write claim, absent decision, automatic next-ticket selection, or autonomous publish/tag leaves the ticket blocked.
+
 ## v1.0 - Product Hardening and Release
 
 ### OW-100-01 - Establish scale and performance SLOs
 
-- Priority/dependencies: P0; `OW-090-10`.
+- Priority/dependencies: P0; `OW-090-11`.
 - Outcome: 10, 1k, and 10k artifact profiles publish index, context, drift, sync, and status latency/resource targets.
 - Allowed paths: benchmark kits/results methodology, performance core/tests/docs.
 - Implement: controlled fixtures, a hardware-independent deterministic correctness suite, cold/warm runs, p50/p95, memory/disk, and Windows/macOS/Linux performance profiles.
@@ -456,7 +497,7 @@ For every ticket:
 
 ### OW-100-02 - Harden secrets, PII, and prompt-injection boundaries
 
-- Priority/dependencies: P0; `OW-090-03`, `OW-090-04`.
+- Priority/dependencies: P0; `OW-090-03`, `OW-090-04`, `OW-090-11`.
 - Outcome: ingestion and export identify secrets/PII, label untrusted external instructions, and block unsafe sharing.
 - Allowed paths: security/privacy core, trust add-on, threat model, fixtures/tests/docs.
 - Implement: detectors with explicit limitations, injection provenance labels, safe preview, audit events, retention classes, redaction before persistence, committed-artifact size limits, ignore rules, and hash-linked external evidence.
@@ -533,3 +574,13 @@ For every ticket:
 - Accept: `G-100-GA` passes with no unresolved P0/P1, no private path/secret, and no dirty tracked source state.
 - Verify/evidence: full release commands and hashes; `evidence/OW-100-09/`.
 - Negative QA: publishing/tagging remains owner-controlled; failed artifact or dirty worktree blocks GA.
+
+### OW-100-10 - Align v1.0 closeout with the product owner
+
+- Priority/dependencies: P0; `OW-100-09`.
+- Outcome: the product owner receives the final evidence-linked v1.0 feature update, post-v1 questions, and explicitly authorizes or adjusts GA publication and post-v1 work.
+- Allowed paths: `internal/owledge/workpackages/owledge-v1-autonomous-delivery/release-updates/`, `RUN-STATE.yaml`, `BACKLOG.yaml`, `TRACEABILITY.md`, release evidence/manifests, post-v1 backlog.
+- Implement: create `release-updates/v1.0.md` from `ALIGNMENT-PROTOCOL.md`; include shipped v1 scope, support/compatibility position, final quality evidence, limitations, post-v1 candidates, and all questions; present it in chat and set the run state to `awaiting_user_alignment`.
+- Accept: `G-100-GA` is green; the update contains every required heading and no untracked claim; user `approve`, `adjust`, or `defer` is recorded with scope/constraints; only `approve` authorizes GA publication and v1 closeout.
+- Verify/evidence: `python tools/validate_v1_delivery_plan.py`; required-heading check; update, decision, and evidence links under `evidence/OW-100-10/`.
+- Negative QA: false GA claim, absent decision, autonomous publish/tag, or unrecorded post-v1 question leaves the ticket blocked.

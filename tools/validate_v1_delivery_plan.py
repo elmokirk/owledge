@@ -21,6 +21,9 @@ BACKLOG = CONTROL_ROOT / "BACKLOG.yaml"
 TICKETS = CONTROL_ROOT / "tickets" / "ALL-TICKETS.md"
 GATES = CONTROL_ROOT / "gates" / "ALL-GATES.md"
 RUN_STATE = CONTROL_ROOT / "RUN-STATE.yaml"
+ALIGNMENT_PROTOCOL = CONTROL_ROOT / "ALIGNMENT-PROTOCOL.md"
+CONTROL_POLICY = CONTROL_ROOT / "CONTROL-PLANE-POLICY.md"
+GOAL = CONTROL_ROOT / "GOAL.md"
 
 TICKET_ROW = re.compile(
     r"^  - \{id: (?P<id>OW-[^,]+), release: (?P<release>[^,]+), phase: (?P<phase>[^,]+), "
@@ -47,6 +50,30 @@ REQUIRED_GATE_LABELS = [
     "Demonstrable increment:",
     "Promotion:",
 ]
+
+REQUIRED_ALIGNMENT_HEADINGS = [
+    "## Feature Update",
+    "## User Benefits and Adoption Impact",
+    "## Gate and Evidence Summary",
+    "## Compatibility, Migration, and Operations",
+    "## Known Limitations and Deferred Work",
+    "## Questions and Decisions Required",
+    "## Recommendation and Safe Default",
+    "## Recorded User Decision",
+]
+
+REQUIRED_ALIGNMENT_PROTOCOL_SECTIONS = [
+    "## Hard Stop",
+    "## Question Capture During a Version",
+    "## Copy-Ready `/goal` Resume Prompt",
+    "## Version Update Template",
+]
+
+ALIGNMENT_ROW = re.compile(
+    r'^  - \{release: (?P<release>[^,]+), ticket: (?P<ticket>OW-[^,]+), gate: (?P<gate>G-[^,]+), '
+    r'release_gate: (?P<release_gate>G-[^,]+), next_release: (?P<next_release>[^,]+), report: "(?P<report>[^"]+)"\}$',
+    re.MULTILINE,
+)
 
 
 def read(path: pathlib.Path) -> str:
@@ -81,6 +108,10 @@ def parse_gate_map(text: str) -> dict[str, list[str]]:
     }
 
 
+def parse_alignment_rows(text: str) -> list[dict[str, str]]:
+    return [match.groupdict() for match in ALIGNMENT_ROW.finditer(text)]
+
+
 def validate_frontmatter(errors: list[str]) -> None:
     sys.path.insert(0, str(REPO_ROOT / "tools"))
     import owledge_core as core  # type: ignore
@@ -91,7 +122,8 @@ def validate_frontmatter(errors: list[str]) -> None:
         REPO_ROOT / "internal" / "owledge" / "reports" / "owledge-v1-roadmap-blindspot-analysis.md",
         CONTROL_ROOT / "GOAL.md",
         CONTROL_ROOT / "TRACEABILITY.md",
-        CONTROL_ROOT / "CONTROL-PLANE-POLICY.md",
+        CONTROL_POLICY,
+        ALIGNMENT_PROTOCOL,
         TICKETS,
         GATES,
     ]
@@ -113,6 +145,9 @@ def validate() -> dict[str, Any]:
     backlog_text = read(BACKLOG)
     ticket_text = read(TICKETS)
     gate_text = read(GATES)
+    alignment_text = read(ALIGNMENT_PROTOCOL)
+    policy_text = read(CONTROL_POLICY)
+    goal_text = read(GOAL)
     rows = parse_ticket_rows(backlog_text)
     if not rows:
         errors.append("BACKLOG.yaml: no ticket rows matched the required contract")
@@ -126,6 +161,7 @@ def validate() -> dict[str, Any]:
     gate_map = parse_gate_map(backlog_text)
     if not gate_map:
         errors.append("BACKLOG.yaml: no gates found")
+    alignment_rows = parse_alignment_rows(backlog_text)
 
     assigned_to_gate: dict[str, list[str]] = {}
     for gate, ticket_ids in gate_map.items():
@@ -139,6 +175,10 @@ def validate() -> dict[str, Any]:
     release_rank = {release: index for index, release in enumerate(release_order)}
     if not release_order:
         errors.append("BACKLOG.yaml: release_order is missing")
+    if {row["release"] for row in alignment_rows} != set(release_order):
+        errors.append("BACKLOG.yaml: version_alignment must contain exactly one row per release")
+    if len(alignment_rows) != len({row["release"] for row in alignment_rows}):
+        errors.append("BACKLOG.yaml: duplicate version_alignment release")
 
     dependencies: dict[str, list[str]] = {}
     release_by_id = {row["id"]: row["release"] for row in rows}
@@ -191,6 +231,64 @@ def validate() -> dict[str, Any]:
     if complete != known:
         errors.append(f"BACKLOG.yaml: cyclic or unreachable tickets {sorted(known - complete)}")
 
+    row_by_id = {row["id"]: row for row in rows}
+
+    def reaches(ticket_id: str, target_id: str, visited: set[str] | None = None) -> bool:
+        if ticket_id == target_id:
+            return True
+        seen = visited or set()
+        if ticket_id in seen:
+            return False
+        seen.add(ticket_id)
+        return any(reaches(dep, target_id, seen.copy()) for dep in dependencies.get(ticket_id, []))
+
+    for alignment in alignment_rows:
+        release = alignment["release"]
+        ticket_id = alignment["ticket"]
+        gate = alignment["gate"]
+        release_gate = alignment["release_gate"]
+        next_release = alignment["next_release"]
+        if ticket_id not in row_by_id:
+            errors.append(f"version_alignment {release}: unknown ticket {ticket_id}")
+            continue
+        ticket_row = row_by_id[ticket_id]
+        if ticket_row["release"] != release:
+            errors.append(f"version_alignment {release}: ticket belongs to {ticket_row['release']}")
+        if gate not in gate_map or gate_map[gate] != [ticket_id]:
+            errors.append(f"version_alignment {release}: gate must contain only {ticket_id}")
+        if release_gate not in gate_map:
+            errors.append(f"version_alignment {release}: unknown release_gate {release_gate}")
+        elif not set(ticket_row["depends_on"]) & set(gate_map[release_gate]):
+            errors.append(f"version_alignment {release}: ticket must depend on its release-gate ticket")
+        expected_report = f"release-updates/{release}.md"
+        if alignment["report"] != expected_report:
+            errors.append(f"version_alignment {release}: report must be {expected_report}")
+        expected_next = "null" if release == release_order[-1] else release_order[release_rank[release] + 1]
+        if next_release != expected_next:
+            errors.append(f"version_alignment {release}: next_release must be {expected_next}")
+        try:
+            alignment_section = section(ticket_text, ticket_id)
+        except ValueError:
+            alignment_section = ""
+        for phrase in ["awaiting_user_alignment", "approve", "adjust", "defer"]:
+            if phrase not in alignment_section:
+                errors.append(f"{ticket_id}: missing alignment action {phrase}")
+        if next_release != "null":
+            for next_ticket in (row for row in rows if row["release"] == next_release):
+                if not reaches(next_ticket["id"], ticket_id):
+                    errors.append(f"{next_ticket['id']}: is not blocked by prior alignment {ticket_id}")
+
+    for heading in REQUIRED_ALIGNMENT_HEADINGS:
+        if heading not in alignment_text:
+            errors.append(f"ALIGNMENT-PROTOCOL.md: missing {heading}")
+    for heading in REQUIRED_ALIGNMENT_PROTOCOL_SECTIONS:
+        if heading not in alignment_text:
+            errors.append(f"ALIGNMENT-PROTOCOL.md: missing {heading}")
+    if "## Version Alignment and User Authority" not in policy_text or "## Phase Question Register" not in policy_text:
+        errors.append("CONTROL-PLANE-POLICY.md: missing version-alignment or phase-question policy")
+    if "## `/goal` Version-Stop Protocol" not in goal_text or "awaiting_user_alignment" not in goal_text:
+        errors.append("GOAL.md: missing /goal version-stop contract")
+
     gate_headings = set(re.findall(r"^### (G-[^ ]+) ", gate_text, re.MULTILINE))
     if gate_headings != set(gate_map):
         errors.append(f"Gate heading mismatch: missing={sorted(set(gate_map)-gate_headings)} extra={sorted(gate_headings-set(gate_map))}")
@@ -203,6 +301,8 @@ def validate() -> dict[str, Any]:
         for label in REQUIRED_GATE_LABELS:
             if label not in gate_section:
                 errors.append(f"{gate}: missing {label}")
+        if gate in {item["gate"] for item in alignment_rows} and "User alignment:" not in gate_section:
+            errors.append(f"{gate}: missing User alignment")
         tickets_line = re.search(r"^- Tickets:\s*(.+)$", gate_section, re.MULTILINE)
         references = set(re.findall(r"OW-\d{3}-\d{2}", tickets_line.group(1) if tickets_line else ""))
         if tickets_line:
@@ -232,6 +332,9 @@ def validate() -> dict[str, Any]:
         errors.append(f"RUN-STATE.yaml: unknown active_ticket={active}")
     if active in {"", "null", "None"} and ready and ready[0] not in run_state_text:
         errors.append(f"RUN-STATE.yaml: next action does not identify ready ticket {ready[0]}")
+    for key in ["alignment:", "state:", "awaiting_release:", "active_alignment_ticket:", "user_decision:", "open_questions:", "update_path:"]:
+        if key not in run_state_text:
+            errors.append(f"RUN-STATE.yaml: missing alignment field {key}")
 
     validate_frontmatter(errors)
 
@@ -254,6 +357,7 @@ def main() -> int:
     group = parser.add_mutually_exclusive_group()
     group.add_argument("--ticket-id")
     group.add_argument("--gate-id")
+    group.add_argument("--alignment-release")
     args = parser.parse_args()
     if args.ticket_id:
         rows = parse_ticket_rows(read(BACKLOG))
@@ -269,6 +373,15 @@ def main() -> int:
         return 0
     if args.gate_id:
         print(section(read(GATES), args.gate_id), end="")
+        return 0
+    if args.alignment_release:
+        alignment = next((item for item in parse_alignment_rows(read(BACKLOG)) if item["release"] == args.alignment_release), None)
+        if alignment is None:
+            raise SystemExit(f"Unknown alignment release: {args.alignment_release}")
+        print(f"Alignment handoff: release={alignment['release']}; report={alignment['report']}; next_release={alignment['next_release']}\n\n")
+        print(read(ALIGNMENT_PROTOCOL), end="\n")
+        print(section(read(TICKETS), alignment["ticket"]), end="")
+        print(section(read(GATES), alignment["gate"]), end="")
         return 0
     payload = validate()
     print(json.dumps(payload, indent=2, sort_keys=True))

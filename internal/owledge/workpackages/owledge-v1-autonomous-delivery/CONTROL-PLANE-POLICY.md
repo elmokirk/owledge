@@ -19,7 +19,7 @@ confidence: 0.94
 review_status: "reviewed"
 sanitization_status: "not_required"
 created_at: "2026-07-16T00:00:00Z"
-updated_at: "2026-07-16T00:00:00Z"
+updated_at: "2026-07-18T00:00:00Z"
 source_hash: ""
 reusable_lessons:
   - "Planning detail should improve resumability without becoming default prompt context."
@@ -93,3 +93,17 @@ Before write-enabled MCP promotion, negative fixtures cover traversal, symlink e
 ## Scope Control
 
 Each version is independently releasable. Downstream v0.9/v1 functionality may enter a v0.8 ticket only when a current acceptance criterion is otherwise impossible. New ideas go to a later backlog instead of expanding an active ticket silently.
+
+## Version Alignment and User Authority
+
+- A passed RC/GA gate proves technical release readiness only. It does not authorize a publish/tag, the next release, a scope change, or closure of open product questions.
+- Each release has one alignment ticket and gate. The ticket compiles a factual feature update from committed evidence, lists all design/product/release questions, and creates `release-updates/<version>.md` using `ALIGNMENT-PROTOCOL.md`.
+- After the update is presented, the agent sets the run state to `awaiting_user_alignment` and the alignment ticket to `blocked` with the exact questions and safe default. This is an intentional pause, not a failure.
+- Until an explicit user response is recorded, no next-release ticket may become `ready`, and no publish/tag occurs. Agents may answer questions or repair evidence only within the active release.
+- `approve`, `adjust`, and `defer` are the only valid outcomes. `adjust` requires the smallest ticket/gate update and a fresh validation run; `defer` records impact, limitation, and the user decision before further work.
+
+## Phase Question Register
+
+- During every ticket and gate, capture non-blocking product, architecture, UX/DX, integration, performance, security, privacy, and scope questions in `RUN-STATE.yaml` under `alignment.open_questions`. Each entry states the source ticket/gate, the question, impact, recommendation, and safe default.
+- Do not interrupt a version for ordinary alignment questions. Carry them into the next mandatory version update, where every entry must be answered, explicitly deferred, or marked `None` when the register is empty.
+- Escalate immediately instead of waiting for the version stop when a question affects safety, privacy, credentials/cost, data loss, external commitments, or an irreversible architecture decision.

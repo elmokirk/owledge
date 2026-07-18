@@ -9,7 +9,7 @@ status: "active"
 visibility: "private"
 data_class: "internal"
 semantic_title: "Owledge v1 autonomous delivery phase checklist"
-summary: "Resume-oriented phase and QA checklist for the v0.7.1 through v1.0 autonomous delivery plan."
+summary: "Resume-oriented phase, QA, and mandatory user-alignment checklist for the v0.7.1 through v1.0 autonomous delivery plan."
 concept_tags: ["v1-roadmap", "phase-checklist", "qa-gates"]
 stack_tags: ["git", "python", "mcp"]
 problem_patterns: ["partial-phase-resume", "checkbox-without-evidence"]
@@ -19,7 +19,7 @@ confidence: 0.94
 review_status: "reviewed"
 sanitization_status: "not_required"
 created_at: "2026-07-16T00:00:00Z"
-updated_at: "2026-07-16T00:00:00Z"
+updated_at: "2026-07-18T00:00:00Z"
 source_hash: ""
 reusable_lessons: []
 edges:
@@ -43,6 +43,7 @@ Current resume point: **v0.7.1 Phase 071-A - Truth and release baseline**.
 - Phase integration branches use `codex/vXYZ-integration`; workers use one `codex/vXYZ-<ticket>-<slug>` branch and worktree per independent ticket.
 - Worker commits stay cohesive and never land directly on the integration branch.
 - Release artifacts run from clean tracked source after source commits are frozen.
+- After each RC/GA, execute the matching alignment ticket, write its version update, set `awaiting_user_alignment`, and stop until an explicit user decision is recorded.
 
 ## v0.7.1
 
@@ -64,6 +65,12 @@ Current resume point: **v0.7.1 Phase 071-A - Truth and release baseline**.
 - [ ] G-071-C-COMPAT and G-071-RC evidence passed
 - [ ] independent release review passed
 
+### Version alignment stop
+
+- [ ] OW-071-09 update and question register presented
+- [ ] G-071-ALIGNMENT passed with an explicit user decision
+- [ ] v0.8.0 remains locked until the decision is recorded
+
 ## v0.8.0
 
 ### Phase 080-A - Contracts
@@ -83,6 +90,12 @@ Current resume point: **v0.7.1 Phase 071-A - Truth and release baseline**.
 - [ ] tickets OW-080-08 through OW-080-10 done
 - [ ] G-080-C-RETRIEVAL and G-080-RC evidence passed
 - [ ] independent release review passed
+
+### Version alignment stop
+
+- [ ] OW-080-11 update and question register presented
+- [ ] G-080-ALIGNMENT passed with an explicit user decision
+- [ ] v0.8.1 remains locked until the decision is recorded
 
 ## v0.8.1
 
@@ -104,6 +117,12 @@ Current resume point: **v0.7.1 Phase 071-A - Truth and release baseline**.
 - [ ] G-081-C-JOURNEY and G-081-RC evidence passed
 - [ ] independent release review passed
 
+### Version alignment stop
+
+- [ ] OW-081-11 update and question register presented
+- [ ] G-081-ALIGNMENT passed with an explicit user decision
+- [ ] v0.9.0 remains locked until the decision is recorded
+
 ## v0.9.0
 
 ### Phase 090-A - Trust and privacy
@@ -124,6 +143,12 @@ Current resume point: **v0.7.1 Phase 071-A - Truth and release baseline**.
 - [ ] G-090-C-RAG and G-090-RC evidence passed
 - [ ] independent release review passed
 
+### Version alignment stop
+
+- [ ] OW-090-11 update and question register presented
+- [ ] G-090-ALIGNMENT passed with an explicit user decision
+- [ ] v1.0 remains locked until the decision is recorded
+
 ## v1.0
 
 ### Phase 100-A - Security and scale
@@ -142,4 +167,5 @@ Current resume point: **v0.7.1 Phase 071-A - Truth and release baseline**.
 
 - [ ] tickets OW-100-07 through OW-100-09 done
 - [ ] G-100-C-PROOF and G-100-GA evidence passed
-- [ ] owner approved v1 publication and tag
+- [ ] OW-100-10 final update and post-v1 question register presented
+- [ ] G-100-ALIGNMENT passed with explicit user approval before v1 publication/tag

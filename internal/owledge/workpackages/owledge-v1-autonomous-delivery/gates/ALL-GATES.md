@@ -24,7 +24,7 @@ confidence: 0.96
 review_status: "reviewed"
 sanitization_status: "not_required"
 created_at: "2026-07-16T00:00:00Z"
-updated_at: "2026-07-16T00:00:00Z"
+updated_at: "2026-07-18T00:00:00Z"
 source_hash: ""
 owners:
   - "release-assurance"
@@ -40,7 +40,7 @@ edges: []
 
 ## Common Gate Contract
 
-Every gate starts from the tested integration commit and controlled environment recorded in `evidence/<gate-id>/manifest.yaml`. Entry requires all listed tickets `done`, a QA role distinct from every ticket owner, the independence mode recorded under `CONTROL-PLANE-POLICY.md`, and agreement among backlog, run state, tickets, commits, and evidence manifests. Commands run non-interactively; manual observations must be reproducible. Evidence must obey retention, redaction, and size policy. Security, privacy, data integrity, canonical-promotion, and acceptance boundaries are not silently waiverable. Failure creates a finding and the smallest corrective ticket.
+Every gate starts from the tested integration commit and controlled environment recorded in `evidence/<gate-id>/manifest.yaml`. Entry requires all listed tickets `done`, a QA role distinct from every ticket owner, the independence mode recorded under `CONTROL-PLANE-POLICY.md`, and agreement among backlog, run state, tickets, commits, and evidence manifests. Commands run non-interactively; manual observations must be reproducible. Evidence must obey retention, redaction, and size policy. Security, privacy, data integrity, canonical-promotion, and acceptance boundaries are not silently waiverable. A release RC/GA gate authorizes only its user-alignment stop; publication and next-version execution require the matching alignment gate. Failure creates a finding and the smallest corrective ticket.
 
 ## v0.7.1 Gates
 
@@ -74,7 +74,16 @@ Every gate starts from the tested integration commit and controlled environment 
 - Commands: kit doctor; strict validation; public docs; quality ratchet; build; twine check; wheel/sdist inspection; wheel-based `uvx` help/quickstart/doctor.
 - Thresholds: clean tracked source state; version alignment; all prior gates green; no private path/secret; artifacts install on supported fixtures.
 - Demonstrable increment: fresh user installs v0.7.1 and completes the golden demo.
-- Promotion: owner may publish/tag only after evidence review.
+- Promotion: technical candidate only; execute `G-071-ALIGNMENT` before publication/tag or v0.8.0 work.
+
+### G-071-ALIGNMENT - v0.7.1 user alignment
+
+- Tickets: `OW-071-09`.
+- Commands: `python tools/validate_v1_delivery_plan.py`; required-heading check for `release-updates/v0.7.1.md`; evidence and source-link review.
+- Thresholds: `G-071-RC` green; update has all eight protocol headings; every claim links evidence; every unresolved topic is a numbered question or `None`; user decision is explicit and recorded.
+- Demonstrable increment: the product owner can assess v0.7.1 benefits, compatibility, proof, limitations, and exact v0.8.0 implications without chat reconstruction.
+- User alignment: agent stops in `awaiting_user_alignment`; only user `approve` unlocks v0.8.0 and optional publication, while `adjust`/`defer` remain blocked.
+- Promotion: user-approved alignment authorizes recorded publication constraints and v0.8.0 execution.
 
 ## v0.8.0 Gates
 
@@ -108,7 +117,16 @@ Every gate starts from the tested integration commit and controlled environment 
 - Commands: cumulative contract/context/retrieval suites; upgrade from v0.7.1; build/twine/wheel smoke; docs extraction.
 - Thresholds: all v0.8 gates green; v0.7 regression green; schema/version/migration docs aligned; clean artifacts.
 - Demonstrable increment: fresh and upgraded projects complete planning-to-context journey.
-- Promotion: owner-controlled publish/tag.
+- Promotion: technical candidate only; execute `G-080-ALIGNMENT` before publication/tag or v0.8.1 work.
+
+### G-080-ALIGNMENT - v0.8.0 user alignment
+
+- Tickets: `OW-080-11`.
+- Commands: `python tools/validate_v1_delivery_plan.py`; required-heading check for `release-updates/v0.8.0.md`; evidence and source-link review.
+- Thresholds: `G-080-RC` green; update has all eight protocol headings; contract, migration, small-model, and retrieval claims link evidence; every unresolved topic is a numbered question or `None`; user decision is explicit and recorded.
+- Demonstrable increment: the product owner can assess v0.8.0 adoption impact and v0.8.1 scope without reopening planning history.
+- User alignment: agent stops in `awaiting_user_alignment`; only user `approve` unlocks v0.8.1 and optional publication, while `adjust`/`defer` remain blocked.
+- Promotion: user-approved alignment authorizes recorded publication constraints and v0.8.1 execution.
 
 ## v0.8.1 Gates
 
@@ -142,7 +160,16 @@ Every gate starts from the tested integration commit and controlled environment 
 - Commands: complete golden multi-agent journey; cumulative conformance; release artifact and upgrade smoke.
 - Thresholds: no chat dependency, silent degradation, clobber, or duplicate write; deliberate evidence failure blocks and recovers; all support claims evidence-linked.
 - Demonstrable increment: plan-to-merge journey switches harness mid-ticket.
-- Promotion: owner-controlled publish/tag.
+- Promotion: technical candidate only; execute `G-081-ALIGNMENT` before publication/tag or v0.9.0 work.
+
+### G-081-ALIGNMENT - v0.8.1 user alignment
+
+- Tickets: `OW-081-11`.
+- Commands: `python tools/validate_v1_delivery_plan.py`; required-heading check for `release-updates/v0.8.1.md`; evidence and source-link review.
+- Thresholds: `G-081-RC` green; update has all eight protocol headings; Tier-1 claims, Hermes boundary, degradation, and golden-journey claims link evidence; every unresolved topic is a numbered question or `None`; user decision is explicit and recorded.
+- Demonstrable increment: the product owner can assess agentic-coding readiness and v0.9.0 risk without reopening planning history.
+- User alignment: agent stops in `awaiting_user_alignment`; only user `approve` unlocks v0.9.0 and optional publication, while `adjust`/`defer` remain blocked.
+- Promotion: user-approved alignment authorizes recorded publication constraints and v0.9.0 execution.
 
 ## v0.9.0 Gates
 
@@ -176,7 +203,16 @@ Every gate starts from the tested integration commit and controlled environment 
 - Commands: cumulative trust/write/RAG suites; default read-only install test; opt-in write profile test; build and upgrade smoke.
 - Thresholds: default cannot write; policy-enabled semantic writes audited; RAG deletion proof present; all privacy gates green.
 - Demonstrable increment: user enables one scoped write workflow and one RAG adapter safely.
-- Promotion: owner-controlled publish/tag.
+- Promotion: technical candidate only; execute `G-090-ALIGNMENT` before publication/tag or v1.0 work.
+
+### G-090-ALIGNMENT - v0.9.0 user alignment
+
+- Tickets: `OW-090-11`.
+- Commands: `python tools/validate_v1_delivery_plan.py`; required-heading check for `release-updates/v0.9.0.md`; evidence and source-link review.
+- Thresholds: `G-090-RC` green; update has all eight protocol headings; privacy, semantic-write, RAG, and Owlib claims link evidence; every unresolved topic is a numbered question or `None`; user decision is explicit and recorded.
+- Demonstrable increment: the product owner can assess trusted-write boundaries and final-v1 scope without reopening planning history.
+- User alignment: agent stops in `awaiting_user_alignment`; only user `approve` unlocks v1.0 and optional publication, while `adjust`/`defer` remain blocked.
+- Promotion: user-approved alignment authorizes recorded publication constraints and v1.0 execution.
 
 ## v1.0 Gates
 
@@ -210,4 +246,13 @@ Every gate starts from the tested integration commit and controlled environment 
 - Commands: clean-source finalization gates; full test/eval/conformance matrix; build/twine; artifact inspection; fresh install; supported upgrades; uninstall; offline smoke; private path/secret scans.
 - Thresholds: every prior gate green; unresolved P0/P1=0; dirty tracked source=0; version mismatch=0; artifact secret/private path=0; evidence manifest complete and hashed.
 - Demonstrable increment: a clean machine can install the artifacts and reproduce the documented golden journey.
-- Promotion: owner explicitly approves publication and tag; agents do not publish autonomously.
+- Promotion: technical GA candidate only; execute `G-100-ALIGNMENT` before publication/tag or v1 closeout.
+
+### G-100-ALIGNMENT - v1.0 user closeout
+
+- Tickets: `OW-100-10`.
+- Commands: `python tools/validate_v1_delivery_plan.py`; required-heading check for `release-updates/v1.0.md`; final evidence and source-link review.
+- Thresholds: `G-100-GA` green; update has all eight protocol headings; shipped scope, support, quality, compatibility, and post-v1 claims link evidence; every unresolved topic is a numbered question or `None`; user decision is explicit and recorded.
+- Demonstrable increment: the product owner can approve or adjust v1.0 GA with a complete evidence-backed product handover.
+- User alignment: agent stops in `awaiting_user_alignment`; only explicit user `approve` authorizes publication/tag and v1 closeout; `adjust`/`defer` remain blocked.
+- Promotion: user-approved alignment authorizes recorded v1.0 GA publication constraints; agents still never publish autonomously.

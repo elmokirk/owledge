@@ -7,6 +7,13 @@ current_release: v0.7.1
 current_phase: 071-A
 active_ticket: null
 last_green_gate: null
+alignment:
+  state: none
+  awaiting_release: null
+  active_alignment_ticket: null
+  user_decision: null
+  open_questions: []
+  update_path: null
 execution_mode:
   initial_run: root_agent_sequential
   parallel_agents: allowed_only_for_non_overlapping_ready_tickets
@@ -26,5 +33,5 @@ next_actions:
   - Verify Definition of Ready for OW-071-01.
   - Record clean workspace and base SHA before implementation.
 last_commands: []
-updated_at: "2026-07-16T00:00:00Z"
+updated_at: "2026-07-18T00:00:00Z"
 updated_by: codex
