@@ -4,8 +4,8 @@ plan: internal/owledge/plans/owledge-v1-autonomous-delivery-master-plan.md
 objective: Deliver Owledge v0.7.1 through v1.0 through gated autonomous execution.
 status: in_progress
 current_release: v0.7.1
-current_phase: 071-FOUNDATION-FINAL-REPLAY
-active_ticket: null
+current_phase: 071-A1
+active_ticket: OW-071-01
 last_green_gate: PHASE0-FOUNDATION-38-OF-38
 alignment:
   state: none
@@ -181,25 +181,25 @@ orchestration:
   approved_by: product-owner
   approved_at: "2026-07-27T14:25:00Z"
   expires_at_alignment: true
-  active_dispatch: phase0_reflection_commit_and_final_replay
+  active_dispatch: ow07101_isolated_worker_lane
   pending_risk_brief: "OW-071-01 is the only next implementation lane; OW-071-13 remains a dedicated sequential W-071-A4 security lane."
 workspace:
   code_root: .
   planning_root: internal/owledge/workpackages/owledge-v1-autonomous-delivery
   planning_branch: codex/owledge-v1-autonomous-roadmap
   release_integration_branch: codex/v071-integration
-  base_commit: 5d6c4339432b4ccc4b4eec09004b6f80c7846f44
-blockers:
-  - "One final 38/38 replay and evidence-only commit are required after the durable Phase-0 reflection commit."
+  base_commit: a25798958b3f1866c7e0e1bb6e2596adbe83bcbe
+blockers: []
 last_completed_actions:
   - Approved product decisions captured in the v1 autonomous delivery plan.
   - Handoff Decision Bridge mapped KEOS/Hermes findings into the existing v0.7.1-v1 ticket train.
   - Version reflection, finding/decision logging, and next-plan steering contract implemented and validated.
   - Bounded long-horizon modes, durable MVP/roadmap routing, and reliable project/plugin skill discovery implemented and regression-tested.
+  - Phase 0 promoted on codex/v071-integration with reflected 38/38 evidence and a clean source tree.
 next_actions:
-  - Commit this Phase-0 reflection on codex/v071-integration.
-  - Replay 38/38 finalization gates from that clean reflected SHA and commit sanitized evidence separately.
-  - Dispatch only OW-071-01 in an isolated ticket lane with fresh-context QA.
+  - Dispatch OW-071-01 in an isolated ticket worktree.
+  - Validate its live-work register and stale-state negative fixtures in fresh context.
+  - Integrate only the accepted worker commit, then reflect Phase 1 before unblocking W-071-A2.
 last_commands:
   - "python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports (exit 0; 38/38 passed on 5d6c433; quality ratchet all 100)"
   - "python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports (exit 1; 36/38 passed; F-071-10 and F-071-11 logged)"
@@ -213,7 +213,7 @@ last_commands:
   - "uv run --no-project --with pytest --with pyyaml python -m pytest targeted suites (exit 0; 24 tests passed)"
   - "python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports (exit 0; 35 gates passed; all quality-ratchet dimensions 100)"
 checkpoint:
-  last_completed_action: "Promoted Phase 0 after independent re-review and a clean-SHA 38/38 finalization run; created codex/v071-integration."
+  last_completed_action: "Committed reflected 38/38 Phase-0 evidence and activated OW-071-01 as the only in-progress ticket."
   changed_files:
     - "skills/owledge-long-horizon-delivery/"
     - "skills/owledge-planning-layer/"
@@ -247,8 +247,8 @@ checkpoint:
     - "Initial skill/test QA under bare system Python: PyYAML and pytest missing; rerun in isolated uv environment passed."
     - "First discovery regression run: tree_hash helper was missing in owledge_core.py; added helper and rerun passed."
     - "One sandboxed pytest run could not create its default temp directory; rerun with a workspace-local basetemp passed."
-  workspace_state: "Integration branch with only the durable Phase-0 reflection and generated 5d6c433 evidence pending; evidence must be replayed after the reflection commit."
-  next_exact_action: "Commit the Phase-0 reflection, replay 38/38 on the new clean SHA, then commit only sanitized evidence."
+  workspace_state: "Clean codex/v071-integration control plane; OW-071-01 is the sole active ticket and all later 071-A tickets remain blocked."
+  next_exact_action: "Create the isolated OW-071-01 worktree and dispatch its product-operations worker."
   open_assumptions:
     - "The product owner wants the existing five-release train retained unless a later version reflection changes it."
     - "Local subagent execution is authorized through the v0.7.1 alignment stop within recorded non-destructive scope."
@@ -256,5 +256,5 @@ checkpoint:
     - "Do not start v0.8.0 before G-071-ALIGNMENT and an explicit owner approve decision."
     - "Do not silently normalize legacy planning metadata outside OW-071-01."
     - "Do not cite the current generated finalization exports as release evidence until the non-vacuous scan and path sanitization fixes pass."
-updated_at: "2026-07-27T15:35:00Z"
+updated_at: "2026-07-27T15:40:00Z"
 updated_by: codex
