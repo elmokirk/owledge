@@ -14,8 +14,9 @@ Start here:
 - [Injected benchmark traps](v0.7.0/benchmark-explained.md)
 
 On the v0.7.0 synthetic Markdown fixture, Owledge reduced context pollution by
-88.36% on average and reduced tokens per correct answer by 83.54% on average
-against the naive baseline. This is a fixture-bounded result; real-world
+88.36% on average and reduced tokens per correct answer by 86.47% on average
+across two complete reference runs against the naive baseline. This is a
+fixture-bounded result; real-world
 savings vary by vault shape, model, runtime, and retrieval configuration.
 
 ## Included Scenarios

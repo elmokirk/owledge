@@ -64,9 +64,18 @@ The v0.7.0 release includes curated benchmark artifacts:
 - [Injected benchmark traps](../benchmarks/v0.7.0/benchmark-explained.md)
 
 On the v0.7.0 small fixture, Owledge reduced context pollution by 88.36% on
-average and reduced tokens per correct answer by 83.54% on average compared
-with the naive baseline. This is a fixture-bounded result; real-world savings
-vary by vault shape, model, runtime, and retrieval configuration.
+average and reduced tokens per correct answer by 86.47% on average across two
+complete reference runs compared with the naive baseline. The incomplete Qwen
+run remains available as historical evidence but is excluded fail-closed. This
+is a fixture-bounded result; real-world savings vary by vault shape, model,
+runtime, and retrieval configuration.
+
+The v0.7.1 regression contract freezes the synthetic fixture, three reference
+profiles, complete source reports, comparison artifact, thresholds, and sealed
+held-out journeys by SHA-256. It gates answer/retrieval quality separately from
+token efficiency and requires at least 80% average tokens-per-correct-answer
+reduction. Any threshold or fixture change requires a new baseline version and
+an explicit decision.
 
 ## Scale Modes
 

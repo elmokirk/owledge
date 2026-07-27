@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "baseline_version": "1.0.0",
+  "scope": "synthetic-fixture-bounded",
+  "description": "Sealed contract journeys validate release thresholds independently from the published model measurements.",
+  "journeys": [
+    {
+      "id": "passing-boundary",
+      "metrics": {
+        "min_avg_answer_correctness": 0.95,
+        "min_avg_precision_at_k": 0.9,
+        "min_avg_recall_at_k": 1.0,
+        "min_avg_citation_accuracy": 1.0,
+        "max_avg_irrelevant_token_ratio": 0.1,
+        "privacy_failures": 0,
+        "staleness_failures": 0,
+        "avg_token_reduction_percent": 80.0
+      },
+      "expected_pass": true
+    },
+    {
+      "id": "privacy-leak",
+      "metrics": {
+        "min_avg_answer_correctness": 0.95,
+        "min_avg_precision_at_k": 0.9,
+        "min_avg_recall_at_k": 1.0,
+        "min_avg_citation_accuracy": 1.0,
+        "max_avg_irrelevant_token_ratio": 0.1,
+        "privacy_failures": 1,
+        "staleness_failures": 0,
+        "avg_token_reduction_percent": 90.0
+      },
+      "expected_pass": false
+    },
+    {
+      "id": "stale-answer",
+      "metrics": {
+        "min_avg_answer_correctness": 0.95,
+        "min_avg_precision_at_k": 0.9,
+        "min_avg_recall_at_k": 1.0,
+        "min_avg_citation_accuracy": 1.0,
+        "max_avg_irrelevant_token_ratio": 0.1,
+        "privacy_failures": 0,
+        "staleness_failures": 1,
+        "avg_token_reduction_percent": 90.0
+      },
+      "expected_pass": false
+    },
+    {
+      "id": "quality-drop",
+      "metrics": {
+        "min_avg_answer_correctness": 0.9499,
+        "min_avg_precision_at_k": 0.9,
+        "min_avg_recall_at_k": 1.0,
+        "min_avg_citation_accuracy": 1.0,
+        "max_avg_irrelevant_token_ratio": 0.1,
+        "privacy_failures": 0,
+        "staleness_failures": 0,
+        "avg_token_reduction_percent": 90.0
+      },
+      "expected_pass": false
+    },
+    {
+      "id": "pollution-regression",
+      "metrics": {
+        "min_avg_answer_correctness": 0.95,
+        "min_avg_precision_at_k": 0.9,
+        "min_avg_recall_at_k": 1.0,
+        "min_avg_citation_accuracy": 1.0,
+        "max_avg_irrelevant_token_ratio": 0.1001,
+        "privacy_failures": 0,
+        "staleness_failures": 0,
+        "avg_token_reduction_percent": 90.0
+      },
+      "expected_pass": false
+    },
+    {
+      "id": "token-boundary-79-99",
+      "metrics": {
+        "min_avg_answer_correctness": 0.95,
+        "min_avg_precision_at_k": 0.9,
+        "min_avg_recall_at_k": 1.0,
+        "min_avg_citation_accuracy": 1.0,
+        "max_avg_irrelevant_token_ratio": 0.1,
+        "privacy_failures": 0,
+        "staleness_failures": 0,
+        "avg_token_reduction_percent": 79.99
+      },
+      "expected_pass": false
+    }
+  ]
+}

@@ -1,0 +1,143 @@
+schema_version: 1
+ticket: OW-071-03
+gate: G-071-A-TRUTH
+status: local_implementation_complete_pending_integration
+branch: codex/ow07103-benchmark-baseline
+base_commit: 77912df04aff4c2dbef9c3198b456a6f8e634f87
+execution_mode: local_serial
+outcome: >-
+  Freeze a versioned, fixture-bounded benchmark baseline that gates answer and
+  retrieval quality separately from at least 80% average token efficiency.
+decisions:
+  - id: D-071-03-A
+    decision: >-
+      Count only reports with passed=true and no run errors as completed
+      comparison or release-proof inputs.
+    rationale: >-
+      The historical Qwen artifact records passed=false and four timeouts even
+      though its profile-level verdict says pass.
+  - id: D-071-03-B
+    decision: >-
+      Retain the incomplete Qwen raw artifact unchanged for audit, exclude it
+      from proof, and rebuild the public comparison from Gemma and GLM.
+    rationale: >-
+      This preserves evidence without fabricating a successful run. The three
+      required reference profiles remain metadata_scan, owledge_context_pack,
+      and oracle in each complete report.
+  - id: D-071-03-C
+    decision: >-
+      Freeze baseline version 1.0.0 with exact fixture/report/comparison/hash
+      inventory and sealed held-out threshold journeys.
+    rationale: >-
+      Any fixture or threshold change now requires a new baseline version plus
+      an explicit code and decision review.
+artifacts:
+  - addons/benchmark-kit/tools/compare-benchmark-runs.py
+  - benchmarks/README.md
+  - benchmarks/v0.7.0/README.md
+  - benchmarks/v0.7.0/methodology.md
+  - benchmarks/v0.7.0/baseline-contract-v1.json
+  - benchmarks/v0.7.0/held-out-journeys-v1.json
+  - benchmarks/v0.7.0/results/comparison/latest.json
+  - benchmarks/v0.7.0/results/comparison/latest.md
+  - benchmarks/v0.7.0/results/comparison/index.html
+  - benchmarks/v0.7.0/results/comparison/charts.svg
+  - benchmarks/v0.7.0/results/qwen3-5-4b/STATUS.md
+  - docs/benchmark-kit.md
+  - tools/validate_benchmark_baseline.py
+  - tools/owledge.py
+  - tests/unit/test_ow07103_benchmark_baseline.py
+  - evidence/OW-071-03/manifest.yaml
+measured_baseline:
+  claim_scope: synthetic-fixture-bounded
+  reference_reports: 2
+  reference_profiles: 3
+  scenarios_per_profile: 6
+  min_avg_answer_correctness: 0.9625
+  min_avg_precision_at_k: 0.9166666666666666
+  min_avg_recall_at_k: 1.0
+  min_avg_citation_accuracy: 1.0
+  max_avg_irrelevant_token_ratio: 0.0856
+  privacy_failures: 0
+  staleness_failures: 0
+  avg_token_reduction_percent_from_raw_reports: 86.48
+  public_comparison_rounded_average_percent: 86.47
+commands:
+  - command: python -m unittest tests.unit.test_ow07103_benchmark_baseline -q
+    exit_code: 0
+    result: 11 tests passed
+  - command: python tools/validate_benchmark_baseline.py --project-root .
+    exit_code: 0
+    result: baseline version 1.0.0 passed with no errors
+  - command: python tools/owledge.py test benchmark-kit-ci --project-root .
+    exit_code: 0
+    result: 103 checks passed; zero failed
+  - command: python tools/owledge.py test public-docs --project-root .
+    exit_code: 0
+    result: 233 checks passed; zero failed
+  - command: python tools/owledge.py test private-path-clean --project-root .
+    exit_code: 0
+    result: zero findings
+  - command: python tools/owledge.py test release-contract --project-root .
+    exit_code: 0
+    result: release contract passed
+  - command: git diff --check
+    exit_code: 0
+    result: no whitespace errors
+negative_qa:
+  - An incomplete report with passed=false or errors cannot enter comparison.
+  - A missing profile/scenario matrix row fails.
+  - Privacy or staleness failure count 1 fails.
+  - Answer correctness 0.9499 fails.
+  - Context pollution 0.1001 fails.
+  - Token reduction 79.99% fails.
+  - A threshold change under baseline version 1.0.0 fails.
+  - A fixture hash change under baseline version 1.0.0 fails.
+  - Held-out expected verdict drift fails.
+  - Generated public comparison artifacts must use portable LF endings.
+findings:
+  - id: F-071-20
+    severity: high
+    status: resolved
+    detail: >-
+      The prior comparison counted an incomplete Qwen run as completed proof
+      because it trusted the profile verdict while ignoring top-level run
+      errors. Comparison now rejects it and public claims use only complete
+      reports.
+  - id: F-071-21
+    severity: medium
+    status: resolved
+    detail: >-
+      Windows-native generated line endings would have invalidated SHA-256
+      locks after Git LF checkout. The generator now writes LF explicitly and
+      regression tests enforce it.
+  - id: F-071-22
+    severity: low
+    status: routed
+    detail: >-
+      The existing comparison renderer contains illustrative external API price
+      snapshots without a machine-readable retrieval date. Its text already
+      requires verification before budgeting; source-date claim governance
+      remains assigned to OW-071-04 and is not part of this baseline verdict.
+limitations:
+  - >-
+    The threshold claim is synthetic and fixture-bounded. It is not a promise
+    of the same savings on arbitrary user or enterprise vaults.
+  - >-
+    The baseline uses two complete model reports. The three reference profiles
+    are retrieval profiles inside each report, not three model vendors.
+  - >-
+    The incomplete Qwen evidence is retained for transparency and is not
+    silently repaired or counted.
+review:
+  method: focused_local_red_team
+  result: pass
+  cumulative_independent_gate: G-071-A-TRUTH
+qa_handoff:
+  required_replay:
+    - python -m unittest tests.unit.test_ow07103_benchmark_baseline -q
+    - python tools/validate_benchmark_baseline.py --project-root .
+    - python tools/owledge.py test benchmark-kit-ci --project-root .
+    - python tools/owledge.py test public-docs --project-root .
+    - python tools/owledge.py test private-path-clean --project-root .
+    - git diff --check

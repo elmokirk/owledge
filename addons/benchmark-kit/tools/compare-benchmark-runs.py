@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compare completed Owledge Benchmark Kit runs without running models."""
+"""Compare verified completed Owledge Benchmark Kit runs without running models."""
 
 from __future__ import annotations
 
@@ -482,7 +482,7 @@ def render_html(payload: dict[str, Any], svg: str) -> str:
   </table>
   <h2>Caveats</h2>
   <p>Inputs are completed Benchmark Kit reports; this command does not run models. Oracle is ground-truth reference, not a model or product claim. API prices are illustrative snapshots and must be verified against provider pricing before budgeting. Small scale is release proof for v0.7.0.</p>
-  {skipped_section}
+{skipped_section}
 </body>
 </html>
 """
@@ -498,10 +498,12 @@ def write_outputs(root: pathlib.Path, payload: dict[str, Any], output: pathlib.P
     latest_md = export_dir / "latest.md"
     index_html = report_dir / "index.html"
     charts_svg = report_dir / "charts.svg"
-    latest_json.write_text(json.dumps(payload, indent=2), encoding="utf-8")
-    latest_md.write_text(render_markdown(payload), encoding="utf-8")
-    charts_svg.write_text(svg, encoding="utf-8")
-    index_html.write_text(render_html(payload, svg), encoding="utf-8")
+    latest_json.write_text(
+        json.dumps(payload, indent=2), encoding="utf-8", newline="\n"
+    )
+    latest_md.write_text(render_markdown(payload), encoding="utf-8", newline="\n")
+    charts_svg.write_text(svg, encoding="utf-8", newline="\n")
+    index_html.write_text(render_html(payload, svg), encoding="utf-8", newline="\n")
     return {
         "latest_json": latest_json.relative_to(root).as_posix(),
         "latest_md": latest_md.relative_to(root).as_posix(),
@@ -514,6 +516,18 @@ def compare(root: pathlib.Path, inputs: list[str], output: str) -> dict[str, Any
     reports, skipped = load_reports(inputs, root)
     if len(reports) < 2:
         return {"passed": False, "error": "At least two existing benchmark report JSON files are required.", "skipped_inputs": skipped}
+    incomplete = [
+        report["_input"]
+        for report in reports
+        if report.get("passed") is not True or bool(report.get("errors"))
+    ]
+    if incomplete:
+        return {
+            "passed": False,
+            "error": "Incomplete benchmark reports cannot be used as comparison or release proof.",
+            "incomplete_inputs": sorted(incomplete),
+            "skipped_inputs": skipped,
+        }
     rows = [comparison_row(report) for report in reports]
     payload = {
         "passed": True,

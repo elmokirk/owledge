@@ -69,6 +69,7 @@ if str(SCRIPT_DIR) not in sys.path:
 import owledge_core as core  # noqa: E402
 import build_kb_module  # noqa: E402
 import build_project_folder_kit  # noqa: E402
+import validate_benchmark_baseline as benchmark_baseline  # noqa: E402
 import validate_upgrade_notes as upgrade_notes  # noqa: E402
 
 
@@ -1633,6 +1634,21 @@ def benchmark_addon_gate(root: pathlib.Path) -> dict[str, Any]:
     renderer = root / "addons" / "benchmark-kit" / "tools" / "render-benchmark-report.py"
     comparer = root / "addons" / "benchmark-kit" / "tools" / "compare-benchmark-runs.py"
     results = ResultSet()
+    baseline_contract = benchmark_baseline.validate_benchmark_baseline(root)
+    results.add(
+        "benchmark-addon:frozen-baseline",
+        bool(baseline_contract.get("passed")),
+        (
+            "Frozen synthetic fixture baseline, held-out journeys, and 80% token-efficiency contract pass."
+            if baseline_contract.get("passed")
+            else "Frozen baseline errors: "
+            + ", ".join(
+                str(item.get("code"))
+                for item in baseline_contract.get("errors", [])
+                if isinstance(item, dict)
+            )
+        ),
+    )
     results.add("benchmark-addon:manifest", manifest.exists(), "Benchmark Kit add-on manifest exists.")
     results.add("benchmark-addon:runner", runner.exists(), "Benchmark Kit runner exists.")
     results.add("benchmark-addon:renderer", renderer.exists(), "Benchmark Kit report renderer exists.")
@@ -1649,12 +1665,15 @@ def benchmark_addon_gate(root: pathlib.Path) -> dict[str, Any]:
         "README.md",
         "methodology.md",
         "benchmark-explained.md",
+        "baseline-contract-v1.json",
+        "held-out-journeys-v1.json",
         "results/comparison/index.html",
         "results/comparison/latest.json",
         "results/comparison/latest.md",
         "results/comparison/charts.svg",
         "results/gemma4-latest/index.html",
         "results/qwen3-5-4b/index.html",
+        "results/qwen3-5-4b/STATUS.md",
         "results/glm-5-1-cloud/index.html",
     ]:
         results.add(f"benchmark-addon:public-artifact:{rel}", (public_benchmark / rel).exists(), "Public v0.7.0 benchmark artifact exists.")

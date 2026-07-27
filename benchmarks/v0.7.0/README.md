@@ -7,15 +7,19 @@ Owledge Benchmark Kit.
 
 On the deterministic v0.7.0 small Markdown fixture, Owledge reduced context
 pollution by **88.36% on average** and reduced tokens per correct answer by
-**83.54% on average** compared with the naive metadata-scan baseline.
+**86.47% on average** across the two complete reference runs compared with the
+naive metadata-scan baseline.
 
-All three completed release-proof runs passed the Owledge profile:
+Both completed release-proof runs passed the Owledge profile:
 
 | Model | Runtime tier | Baseline verdict | Owledge verdict | Pollution reduction | Tokens/correct reduction |
 | --- | --- | --- | --- | ---: | ---: |
 | `gemma4:latest` | local | fail | pass | 88.36% | 87.15% |
-| `qwen3.5:4b` | local | fail | pass | 88.36% | 77.66% |
 | `glm-5.1:cloud` | Ollama cloud | fail | pass | 88.36% | 85.80% |
+
+The historical `qwen3.5:4b` artifact is retained but excluded from release
+proof because its raw report records `passed: false` and four timeout errors.
+See its [status note](results/qwen3-5-4b/STATUS.md).
 
 Read the comparison report first:
 
@@ -46,10 +50,21 @@ configuration.
 
 ## Why Small Local Models Matter
 
-`gemma4:latest` and `qwen3.5:4b` are intentionally included because they
-represent realistic local setups. The result is not that small models become
-frontier models. The result is that cleaner context lets small models spend
-less of their limited budget on stale, private, or irrelevant text.
+`gemma4:latest` is intentionally included as a realistic local setup. The
+result is not that small models become a frontier model. The result is that
+cleaner context lets small models spend less of their limited budget on stale,
+private, or irrelevant text.
+
+## Frozen Regression Contract
+
+[`baseline-contract-v1.json`](baseline-contract-v1.json) binds the synthetic
+fixture, three reference profiles, complete source reports, comparison
+artifact, thresholds, and sealed held-out journeys by SHA-256. The release gate
+keeps answer quality and retrieval quality separate from token efficiency and
+requires at least 80% average tokens-per-correct-answer reduction. Privacy or
+staleness failures, a quality drop, excessive pollution, or 79.99% reduction
+fail. Threshold or fixture changes require a new baseline version and an
+explicit decision.
 
 ## Privacy Trap Result
 
@@ -80,11 +95,12 @@ vaults.
 | --- | --- |
 | `results/comparison/` | Multi-model Baseline vs Owledge proof report. |
 | `results/gemma4-latest/` | Single-model local run for `gemma4:latest`. |
-| `results/qwen3-5-4b/` | Single-model local run for `qwen3.5:4b`. |
+| `results/qwen3-5-4b/` | Incomplete historical local run retained and explicitly excluded from release proof. |
 | `results/glm-5-1-cloud/` | Single-model Ollama cloud run for `glm-5.1:cloud`. |
 | `fixtures/small/` | 100-file deterministic Markdown fixture used for release proof. |
 | `fixtures/mid/` | 500-file deterministic Markdown fixture for user reproduction. |
 | `fixtures/large/` | 1000-file deterministic Markdown fixture for user reproduction. |
 | `methodology.md` | How the benchmark was run and how to interpret it. |
 | `benchmark-explained.md` | Explanation of the injected benchmark traps. |
-
+| `baseline-contract-v1.json` | Frozen fixture, report, threshold, and hash contract. |
+| `held-out-journeys-v1.json` | Sealed positive and adversarial threshold journeys. |

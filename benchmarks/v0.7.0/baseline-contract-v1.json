@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "baseline_version": "1.0.0",
+  "claim_scope": "synthetic-fixture-bounded",
+  "fixture": {
+    "name": "owledge-v0.7.0-small-seed42",
+    "scale_mode": "small",
+    "file_count": 100,
+    "seed": 42,
+    "artifacts": {
+      "addons/benchmark-kit/fixtures/small.zip": "41bac27b61cd2907048b3822546777fcee1cfa56399e797a2acb77782d018af9",
+      "benchmarks/v0.7.0/fixtures/small/fixture-manifest.json": "080095f8a46db0c063a8ca623b22facc289c0527354e638281bea1c576261b2f",
+      "benchmarks/v0.7.0/fixtures/small/oracle.json": "95b9441472fc66ce062040cc53cadcca6b52ef1ef743a7789a0e7829363874e7",
+      "benchmarks/v0.7.0/fixtures/small/queries.json": "ac731efe65295c7b906412095f51b332a4c0b6633b62605136f73a709ef07a4d"
+    }
+  },
+  "reference_profiles": [
+    "metadata_scan",
+    "owledge_context_pack",
+    "oracle"
+  ],
+  "expected_scenarios": [
+    "needle",
+    "multi-hop",
+    "stale-conflict",
+    "privacy-trap",
+    "distractor-heavy",
+    "handoff-resume"
+  ],
+  "reference_reports": {
+    "benchmarks/v0.7.0/results/gemma4-latest/latest.json": "3aca9170f21fdc0a146af77d3f992864be69e70f050d45c3c3f9a038152f9c8d",
+    "benchmarks/v0.7.0/results/glm-5-1-cloud/latest.json": "d70501287556ea3d10c968931f147f70a665dd9e00893f9ff3a54554163894a4"
+  },
+  "excluded_reports": {
+    "benchmarks/v0.7.0/results/qwen3-5-4b/latest.json": "Incomplete historical run: four timeout errors and passed=false; retained for transparency, excluded from release proof."
+  },
+  "comparison": {
+    "path": "benchmarks/v0.7.0/results/comparison/latest.json",
+    "sha256": "cc3875a732e8a1a594ca9b532338255664d3d8a70f7df3e24f3025c2477b97bb"
+  },
+  "held_out": {
+    "path": "benchmarks/v0.7.0/held-out-journeys-v1.json",
+    "sha256": "52f973d4048c071e8c8e7dced084a4cc23cd5fd05beec5f03b0fe5f5988b6276"
+  },
+  "thresholds": {
+    "min_avg_answer_correctness": 0.95,
+    "min_avg_precision_at_k": 0.9,
+    "min_avg_recall_at_k": 1.0,
+    "min_avg_citation_accuracy": 1.0,
+    "max_avg_irrelevant_token_ratio": 0.1,
+    "max_privacy_failures": 0,
+    "max_staleness_failures": 0,
+    "min_avg_token_reduction_percent": 80.0
+  },
+  "change_policy": "Any threshold, fixture, reference-report, or held-out change requires a new baseline_version and an explicit Owledge decision."
+}

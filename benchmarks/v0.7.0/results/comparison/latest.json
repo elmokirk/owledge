@@ -2,22 +2,19 @@
   "passed": true,
   "report_type": "benchmark-kit-comparison",
   "inputs": [
-    ".owledge/exports/benchmark-kit-gemma4-latest/latest.json",
-    ".owledge/exports/benchmark-kit-qwen3-5-4b/latest.json",
-    ".owledge/exports/benchmark-kit-glm-5-1-cloud/latest.json"
+    "benchmarks/v0.7.0/results/gemma4-latest/latest.json",
+    "benchmarks/v0.7.0/results/glm-5-1-cloud/latest.json"
   ],
   "executive": {
     "release_proof_status": "pass",
-    "models_compared": 3,
-    "models_passed": 3,
+    "models_compared": 2,
+    "models_passed": 2,
     "avg_pollution_reduction_percent": 88.36,
-    "avg_token_reduction_percent": 83.54,
-    "privacy_failures_prevented": 3,
-    "stale_failures_prevented": 3,
-    "skipped_inputs": [
-      ".owledge\\exports\\benchmark-kit-nemotron-nano-cloud\\latest.json"
-    ],
-    "summary": "Owledge compared 3 completed benchmark runs: 3/3 Owledge profiles passed, privacy failures prevented=3, stale failures prevented=3, average pollution reduction=88.36%, average tokens/correct reduction=83.54%."
+    "avg_token_reduction_percent": 86.47,
+    "privacy_failures_prevented": 2,
+    "stale_failures_prevented": 2,
+    "skipped_inputs": [],
+    "summary": "Owledge compared 2 completed benchmark runs: 2/2 Owledge profiles passed, privacy failures prevented=2, stale failures prevented=2, average pollution reduction=88.36%, average tokens/correct reduction=86.47%."
   },
   "models": [
     {
@@ -50,69 +47,6 @@
       "baseline_scenario_pass_rate": 0.0,
       "owledge_handoff_resume_score": 1.0,
       "owledge_tokens_per_second": 74.5858,
-      "heatmap": [
-        {
-          "scenario": "needle",
-          "baseline_status": "warn",
-          "owledge_status": "pass"
-        },
-        {
-          "scenario": "multi-hop",
-          "baseline_status": "warn",
-          "owledge_status": "pass"
-        },
-        {
-          "scenario": "stale-conflict",
-          "baseline_status": "warn",
-          "owledge_status": "pass"
-        },
-        {
-          "scenario": "privacy-trap",
-          "baseline_status": "fail",
-          "owledge_status": "pass"
-        },
-        {
-          "scenario": "distractor-heavy",
-          "baseline_status": "warn",
-          "owledge_status": "warn"
-        },
-        {
-          "scenario": "handoff-resume",
-          "baseline_status": "warn",
-          "owledge_status": "pass"
-        }
-      ]
-    },
-    {
-      "model": "qwen3.5:4b",
-      "mode": "local",
-      "scale_mode": "small",
-      "file_count": 100,
-      "baseline_verdict": "fail",
-      "owledge_verdict": "pass",
-      "oracle_verdict": "pass",
-      "release_proof_status": "pass",
-      "baseline_pollution": 0.7356,
-      "owledge_pollution": 0.0856,
-      "oracle_pollution": 0.0,
-      "pollution_reduction_percent": 88.36,
-      "baseline_tokens_per_correct_answer": 8964.0,
-      "owledge_tokens_per_correct_answer": 2002.17,
-      "oracle_tokens_per_correct_answer": 1804.5,
-      "token_reduction_percent": 77.66,
-      "baseline_total_tokens": 17928,
-      "owledge_total_tokens": 12013,
-      "baseline_prompt_tokens": 13018,
-      "owledge_prompt_tokens": 4017,
-      "baseline_completion_tokens": 4910,
-      "owledge_completion_tokens": 7996,
-      "total_token_reduction_percent": 32.99,
-      "privacy_failures_prevented": 1,
-      "stale_failures_prevented": 1,
-      "owledge_scenario_pass_rate": 0.8333,
-      "baseline_scenario_pass_rate": 0.0,
-      "owledge_handoff_resume_score": 1.0,
-      "owledge_tokens_per_second": 37.6034,
       "heatmap": [
         {
           "scenario": "needle",
@@ -217,91 +151,90 @@
       "model": "Claude Opus 4.8",
       "input_per_mtok": 5.0,
       "output_per_mtok": 25.0,
-      "baseline_cost_usd": 0.489345,
-      "owledge_cost_usd": 0.396005,
-      "estimated_savings_usd": 0.09334,
-      "estimated_savings_percent": 19.07
+      "baseline_cost_usd": 0.301505,
+      "owledge_cost_usd": 0.17602,
+      "estimated_savings_usd": 0.125485,
+      "estimated_savings_percent": 41.62
     },
     {
       "provider": "Anthropic",
       "model": "Claude Sonnet 4.6",
       "input_per_mtok": 3.0,
       "output_per_mtok": 15.0,
-      "baseline_cost_usd": 0.293607,
-      "owledge_cost_usd": 0.237603,
-      "estimated_savings_usd": 0.056004,
-      "estimated_savings_percent": 19.07
+      "baseline_cost_usd": 0.180903,
+      "owledge_cost_usd": 0.105612,
+      "estimated_savings_usd": 0.075291,
+      "estimated_savings_percent": 41.62
     },
     {
       "provider": "Anthropic",
       "model": "Claude Haiku 4.5",
       "input_per_mtok": 1.0,
       "output_per_mtok": 5.0,
-      "baseline_cost_usd": 0.097869,
-      "owledge_cost_usd": 0.079201,
-      "estimated_savings_usd": 0.018668,
-      "estimated_savings_percent": 19.07
+      "baseline_cost_usd": 0.060301,
+      "owledge_cost_usd": 0.035204,
+      "estimated_savings_usd": 0.025097,
+      "estimated_savings_percent": 41.62
     },
     {
       "provider": "Google",
       "model": "Gemini 3 Pro",
       "input_per_mtok": 2.0,
       "output_per_mtok": 12.0,
-      "baseline_cost_usd": 0.218954,
-      "owledge_cost_usd": 0.185236,
-      "estimated_savings_usd": 0.033718,
-      "estimated_savings_percent": 15.4
+      "baseline_cost_usd": 0.133998,
+      "owledge_cost_usd": 0.08125,
+      "estimated_savings_usd": 0.052748,
+      "estimated_savings_percent": 39.36
     },
     {
       "provider": "Google",
       "model": "Gemini 2.5 Pro",
       "input_per_mtok": 1.25,
       "output_per_mtok": 10.0,
-      "baseline_cost_usd": 0.165866,
-      "owledge_cost_usd": 0.149315,
-      "estimated_savings_usd": 0.016551,
-      "estimated_savings_percent": 9.98
+      "baseline_cost_usd": 0.100494,
+      "owledge_cost_usd": 0.064334,
+      "estimated_savings_usd": 0.03616,
+      "estimated_savings_percent": 35.98
     },
     {
       "provider": "Google",
       "model": "Gemini 2.5 Flash",
       "input_per_mtok": 0.3,
       "output_per_mtok": 2.5,
-      "baseline_cost_usd": 0.040969,
-      "owledge_cost_usd": 0.037177,
-      "estimated_savings_usd": 0.003792,
-      "estimated_savings_percent": 9.26
+      "baseline_cost_usd": 0.024788,
+      "owledge_cost_usd": 0.015982,
+      "estimated_savings_usd": 0.008806,
+      "estimated_savings_percent": 35.53
     },
     {
       "provider": "OpenAI",
       "model": "gpt-5.5",
       "input_per_mtok": 5.0,
       "output_per_mtok": 30.0,
-      "baseline_cost_usd": 0.547385,
-      "owledge_cost_usd": 0.46309,
-      "estimated_savings_usd": 0.084295,
-      "estimated_savings_percent": 15.4
+      "baseline_cost_usd": 0.334995,
+      "owledge_cost_usd": 0.203125,
+      "estimated_savings_usd": 0.13187,
+      "estimated_savings_percent": 39.36
     },
     {
       "provider": "OpenAI",
       "model": "gpt-5.5-pro",
       "input_per_mtok": 30.0,
       "output_per_mtok": 180.0,
-      "baseline_cost_usd": 3.28431,
-      "owledge_cost_usd": 2.77854,
-      "estimated_savings_usd": 0.50577,
-      "estimated_savings_percent": 15.4
+      "baseline_cost_usd": 2.00997,
+      "owledge_cost_usd": 1.21875,
+      "estimated_savings_usd": 0.79122,
+      "estimated_savings_percent": 39.36
     },
     {
       "provider": "OpenAI",
       "model": "gpt-5.4",
       "input_per_mtok": 2.5,
       "output_per_mtok": 15.0,
-      "baseline_cost_usd": 0.273693,
-      "owledge_cost_usd": 0.231545,
-      "estimated_savings_usd": 0.042148,
-      "estimated_savings_percent": 15.4
+      "baseline_cost_usd": 0.167498,
+      "owledge_cost_usd": 0.101562,
+      "estimated_savings_usd": 0.065936,
+      "estimated_savings_percent": 39.37
     }
-  ],
-  "publication_note": "Curated Owledge v0.7.0 benchmark artifact. Paths are sanitized for public release."
+  ]
 }

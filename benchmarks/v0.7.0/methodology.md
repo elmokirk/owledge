@@ -35,15 +35,17 @@ reproducible and resource-conscious.
 
 ## Models Published
 
-The v0.7.0 public report includes completed runs for:
+The v0.7.0 release-proof comparison includes complete runs for:
 
 - `gemma4:latest`
-- `qwen3.5:4b`
 - `glm-5.1:cloud`
 
-`nemotron-nano:cloud` is not included because no completed release-proof report
-was available in the verified artifact set. The comparison tool supports
-skipped optional inputs and does not fabricate missing model results.
+The historical `qwen3.5:4b` report is excluded because it records four timeouts
+and `passed: false`; its raw files remain available for audit. Incomplete
+reports now fail comparison input validation. `nemotron-nano:cloud` is not
+included because no completed release-proof report was available in the
+verified artifact set. The comparison tool does not fabricate missing or
+incomplete model results.
 
 ## Metrics
 
@@ -57,6 +59,17 @@ skipped optional inputs and does not fabricate missing model results.
 | Scenario pass rate | Higher is better | Shows reliability across the fixture scenarios. |
 | Handoff resume score | Higher is better | Shows whether compact handoff context is enough to resume. |
 | tokens/sec | Higher is better | Shows runtime/model throughput; it is hardware and provider dependent. |
+
+Quality and retrieval metrics are gated independently from token efficiency.
+The frozen baseline requires at least 0.95 average answer correctness, 0.90
+precision@k, 1.0 recall@k, 1.0 citation accuracy, no privacy or staleness
+failures, at most 0.10 average context pollution, and at least 80% average
+tokens-per-correct-answer reduction across complete reference reports.
+
+`baseline-contract-v1.json` binds the fixture and source reports by SHA-256.
+`held-out-journeys-v1.json` seals the exact threshold and adversarial boundary
+cases. Any fixture, threshold, reference-report, or held-out change requires a
+new baseline version and an explicit Owledge decision.
 
 ## Reproduction
 
