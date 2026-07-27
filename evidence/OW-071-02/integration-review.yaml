@@ -1,0 +1,31 @@
+schema_version: 1
+ticket: OW-071-02
+status: integrated_pending_cumulative_independent_gate
+integration_branch: codex/v071-integration
+accepted_source:
+  commit: 7bda99691abd48bb3946b8fd2676b03a5c89e16f
+  tree: f2f6a632412167737df493fb1a4630af9d34459e
+  manifest_blob: f68b4f39c3daf918b09f28c02bfef1ea2dc78d20
+review:
+  mode: focused_local_red_team
+  independent_ticket_agent_spawned: false
+  rationale: >-
+    Product-owner direction makes local serial execution the default. One
+    independent cumulative review remains mandatory at G-071-A-TRUTH after the
+    three serial slices are integrated.
+verification:
+  - command: python -m unittest tests.unit.test_ow07102_release_trust -q
+    result: 17 passed against the clean accepted commit
+  - command: python tools/owledge.py test release-trust --project-root .
+    result: 18 passed
+  - command: python tools/owledge.py test private-path-clean --project-root .
+    result: zero findings
+  - command: python tools/owledge.py test publish-readiness --project-root .
+    result: score 155; zero blockers; promote-candidate
+  - command: isolated wheel inventory smoke
+    result: CHANGELOG.md, upgrade-notes schema, and validator present
+disposition:
+  FB-019: shipped
+  FB-020: shipped_by_explicit_retraction_and_dead_flag_removal
+  FB-021: shipped
+next_minimum_increment: OW-071-03

@@ -4,9 +4,9 @@ plan: internal/owledge/plans/owledge-v1-autonomous-delivery-master-plan.md
 objective: Deliver Owledge v0.7.1 through v1.0 through gated autonomous execution.
 status: in_progress
 current_release: v0.7.1
-current_phase: 071-A2
-active_ticket: OW-071-02
-last_green_gate: OW-071-01-INDEPENDENT-QA-93
+current_phase: 071-A3
+active_ticket: OW-071-03
+last_green_gate: OW-071-02-LOCAL-PUBLISH-READINESS-155
 alignment:
   state: none
   awaiting_release: null
@@ -184,6 +184,26 @@ alignment:
       recommendation: "Do not trust inherited dist artifacts; prove ticket gates without dist and rebuild wheel/sdist during OW-071-08."
       safe_default: "No deletion or publication action is authorized; stale dist is never cited as evidence."
       status: routed
+    - id: F-071-18
+      source: OW-071-02-wheel-inventory-smoke-2026-07-27
+      evidence: "Setuptools reports deprecated project.license table and license classifiers with a 2027-02-18 support deadline."
+      severity: low
+      user_impact: "A future packaging-tool upgrade could turn current metadata warnings into a build failure."
+      release_impact: "No v0.7.1 correctness impact; the clean wheel built and contained every required OW-071-02 artifact."
+      options: ["normalize SPDX license metadata in a later packaging ticket", "expand OW-071-02 beyond release-trust scope"]
+      recommendation: "Route to later packaging maintenance and keep the v0.7.1 release-trust slice bounded."
+      safe_default: "Do not ignore the deadline, but do not destabilize this release slice with unrelated metadata churn."
+      status: routed
+    - id: F-071-19
+      source: OW-071-02-sandboxed-gate-replay-2026-07-27
+      evidence: "Initial uv cache, py_compile, and MCP temporary writes were denied by the managed sandbox; authorized local replays passed."
+      severity: low
+      user_impact: "A contributor can misread environment write denial as a product regression."
+      release_impact: "Resolved for this ticket by an exact clean-commit replay; publish-readiness scored 155 with zero blockers."
+      options: ["run temporary-write gates with required permissions", "change product behavior to work around the host sandbox"]
+      recommendation: "Classify host permission failures explicitly and replay the unchanged gate with the required local permissions."
+      safe_default: "Never waive a failed gate; require a successful replay against the same source."
+      status: resolved
   decisions:
     - id: D-071-01
       related: F-071-01
@@ -246,9 +266,9 @@ alignment:
       authority: release-orchestrator
       decision: "Execute OW-071-02 as one local serial release-trust slice: retain visible additive would_update lists, retract the semantically undefined --since feature and remove its dead flag, and use type plus agent_id as the concept-audit identity."
       rationale: "The bounded choices preserve actionable upgrade output, avoid a false date-filter contract, and reuse the shipped audit schema without unauthorized template expansion."
-      constraints: "Worker scope is limited to tools/owledge.py, tools/owledge_core.py, tools/validate_upgrade_notes.py, docs/upgrade-notes-schema.json, docs/upgrading.md, tests/unit/test_ow07102_release_trust.py, tests/fixtures/upgrade-notes/, and evidence/OW-071-02/. CHANGELOG and central state remain orchestrator-owned."
+      constraints: "The implementation scope includes tools/owledge.py, tools/owledge_core.py, tools/validate_upgrade_notes.py, docs/upgrade-notes-schema.json, docs/upgrading.md, tests/unit/test_ow07102_release_trust.py, tests/fixtures/upgrade-notes/, and evidence/OW-071-02/. The orchestrator expanded only to CHANGELOG.md, pyproject.toml, and tests/unit/test_release_notes.py so the current release and built wheel satisfy the same contract."
       affected_artifacts: ["OW-071-02", "FB-019", "FB-020", "FB-021"]
-      verification_status: approved_for_implementation
+      verification_status: implemented_and_tested
     - id: D-071-09
       related: usage-and-context-efficiency
       authority: product-owner-request
@@ -257,6 +277,14 @@ alignment:
       constraints: "Subagents remain available only for genuinely independent high-risk gates or clearly non-overlapping specialist work."
       affected_artifacts: ["v0.7.1-release-execution-orchestration-plan.md", "RUN-STATE.yaml"]
       verification_status: active
+    - id: D-071-10
+      related: [OW-071-02, F-071-18, F-071-19]
+      authority: release-orchestrator
+      decision: "Accept and integrate OW-071-02 at immutable commit 7bda99691abd48bb3946b8fd2676b03a5c89e16f; consolidate independent agent review at cumulative G-071-A-TRUTH."
+      rationale: "The clean commit passed focused negative QA, release trust, privacy, publish readiness, and wheel inventory proof; a separate reviewer per serial slice would duplicate context without changing the promotion boundary."
+      constraints: "OW-071-02 is source-complete, but G-071-A-TRUTH remains blocked until OW-071-03 and OW-071-13 pass and one independent cumulative review accepts the combined boundary."
+      affected_artifacts: ["evidence/OW-071-02/", "BACKLOG.yaml", "LIVE-WORK-REGISTER.yaml", "v0.7.1 release checklist"]
+      verification_status: implemented_and_tested
   next_plan_reflection:
     status: not_started
     target_release: v0.8.0
@@ -275,8 +303,8 @@ orchestration:
   approved_by: product-owner
   approved_at: "2026-07-27T14:25:00Z"
   expires_at_alignment: true
-  active_dispatch: local_serial_ow07102
-  pending_risk_brief: "OW-071-02 is the only active implementation lane; stale dist artifacts are excluded from proof and OW-071-13 remains a dedicated later security lane."
+  active_dispatch: local_serial_ow07103
+  pending_risk_brief: "OW-071-03 is the only active implementation lane; benchmark thresholds and fixtures must remain reproducible and clearly synthetic/fixture-bounded. OW-071-13 remains the next dedicated security lane."
 workspace:
   code_root: .
   planning_root: internal/owledge/workpackages/owledge-v1-autonomous-delivery
@@ -292,10 +320,12 @@ last_completed_actions:
   - Phase 0 promoted on codex/v071-integration with reflected 38/38 evidence and a clean source tree.
   - OW-071-01 accepted at 86871c6 after a revise/fix/re-review loop and integrated with immutable provenance.
   - Phase 1 reflected; OW-071-02 activated as the sole local serial implementation lane.
+  - OW-071-02 accepted at 7bda996 after focused local red-team review, score-155 publish readiness, wheel inventory smoke, and clean-commit replay.
+  - The OW-071-02 increment was reflected; FB-019 through FB-021 are closed and OW-071-03 is the sole active lane.
 next_actions:
-  - Create the isolated OW-071-02 worktree from the reflected integration commit.
-  - Implement the bounded release-trust contract and its standard-library negative fixtures locally.
-  - Integrate only after focused review, then reflect the OW-071-02 increment before OW-071-03.
+  - Preflight OW-071-03 against the current benchmark implementation, public claims, fixtures, and thresholds.
+  - Implement the smallest reproducible sealed-baseline increment locally with explicit 79.99-percent and privacy/staleness negative cases.
+  - Integrate only after focused review, then reflect the OW-071-03 increment before OW-071-13.
 last_commands:
   - "python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports (exit 0; 38/38 passed on 5d6c433; quality ratchet all 100)"
   - "python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports (exit 1; 36/38 passed; F-071-10 and F-071-11 logged)"
@@ -309,31 +339,33 @@ last_commands:
   - "uv run --no-project --with pytest --with pyyaml python -m pytest targeted suites (exit 0; 24 tests passed)"
   - "python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports (exit 0; 35 gates passed; all quality-ratchet dimensions 100)"
 checkpoint:
-  last_completed_action: "Integrated accepted OW-071-01 commit 86871c6, recorded immutable integration evidence, reflected Phase 1, and activated OW-071-02."
+  last_completed_action: "Integrated OW-071-02 commit 7bda996, bound its immutable source, reflected all findings/decisions, and activated OW-071-03."
   changed_files:
-    - "ROADMAP.md"
-    - "docs/feedback-round-2026-06.md"
-    - "docs/roadmap-ideas-2026-06.md"
-    - "docs/strategic-roadmap-2026-2027.md"
-    - "docs/v0.6.0-implementation-plan.md"
+    - "CHANGELOG.md"
+    - "docs/upgrade-notes-schema.json"
+    - "docs/upgrading.md"
+    - "pyproject.toml"
+    - "tools/validate_upgrade_notes.py"
+    - "tools/owledge.py"
+    - "tools/owledge_core.py"
+    - "tests/unit/test_ow07102_release_trust.py"
+    - "tests/unit/test_release_notes.py"
+    - "tests/fixtures/upgrade-notes/"
     - "internal/owledge/workpackages/owledge-v1-autonomous-delivery/LIVE-WORK-REGISTER.yaml"
-    - "tools/validate_live_work_register.py"
-    - "tests/unit/test_validate_live_work_register.py"
-    - "tests/fixtures/live-work-register/"
-    - "evidence/OW-071-01/"
+    - "evidence/OW-071-02/"
   passed_commands:
-    - "Live-work validator under python -I, 21/21 records and 17 sources"
-    - "Live-work unittest suite, 18/18 passed"
-    - "Delivery-plan validator, 61 tickets, 25 gates, 42 waves"
-    - "Public docs, 233/233 passed"
-    - "Private-path scan, 2,081 files and zero findings"
-    - "Independent re-review, 93/100 with no P0/P1"
+    - "OW-071-02 focused unittest suite, 17/17 passed"
+    - "Existing release-notes pytest suite, 5/5 passed"
+    - "Release trust, 18/18 passed"
+    - "Publish readiness, score 155 with zero blockers"
+    - "Private-path scan, zero findings"
+    - "Isolated wheel inventory included CHANGELOG.md, upgrade-note schema, and validator"
     - "git diff --check, exit 0"
   failed_commands:
-    - "First OW-071-01 independent review scored 80/100 and found F-071-12 through F-071-14; all were corrected before integration."
-    - "Central publish-readiness preflight encountered an unreadable stale dist artifact; excluded from ticket proof and routed to RC rebuild."
-  workspace_state: "OW-071-01 accepted and integrated; Phase-1 reflection pending commit on codex/v071-integration; OW-071-02 is the sole active ticket."
-  next_exact_action: "Commit Phase-1 reflection, verify a clean tree, then create the isolated OW-071-02 worktree."
+    - "Initial sandboxed pytest/cache and publish-readiness writes were permission-denied; unchanged authorized replays passed and F-071-19 records the distinction."
+    - "Wheel build emitted future setuptools license metadata deprecations; routed as F-071-18."
+  workspace_state: "OW-071-02 source is integrated; its reflection is pending commit on codex/v071-integration; OW-071-03 is the sole active ticket."
+  next_exact_action: "Validate and commit the OW-071-02 reflection, verify a clean tree, then preflight OW-071-03."
   open_assumptions:
     - "The product owner wants the existing five-release train retained unless a later version reflection changes it."
     - "Local serial execution is the default; subagents are exceptional and justified only by independent risk reduction."
@@ -341,5 +373,5 @@ checkpoint:
     - "Do not start v0.8.0 before G-071-ALIGNMENT and an explicit owner approve decision."
     - "Do not trust or publish inherited dist artifacts; rebuild from committed source at RC."
     - "Do not start OW-071-03 until OW-071-02 is integrated and reflected."
-updated_at: "2026-07-27T16:13:00Z"
+updated_at: "2026-07-27T16:45:00Z"
 updated_by: codex

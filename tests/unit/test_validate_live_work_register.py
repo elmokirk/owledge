@@ -106,7 +106,7 @@ class ValidateLiveWorkRegisterTests(unittest.TestCase):
         self.assertEqual(result["counts"]["items"], 21)
         self.assertEqual(
             result["counts"]["states"],
-            {"shipped": 4, "open": 5, "superseded": 11, "deferred": 1},
+            {"shipped": 7, "open": 2, "superseded": 11, "deferred": 1},
         )
 
     def test_missing_duplicate_and_extra_feedback_ids_fail(self) -> None:

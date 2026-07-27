@@ -328,13 +328,14 @@
     {
       "id": "FB-019",
       "title": "Deferred release-polish batch",
-      "state": "open",
+      "state": "shipped",
       "source": "docs/feedback-round-2026-06.md",
-      "shipped_evidence": [],
-      "acceptance_gap": "Every retained P2/P3 correctness item still needs executable proof or an explicit retraction.",
+      "shipped_evidence": [
+        "internal/owledge/workpackages/v0.7.1-release-execution-orchestration-checklist.md"
+      ],
+      "acceptance_gap": null,
       "target_release": "v0.7.1",
       "owner_role": "release-engineer",
-      "work_reference": "ticket:OW-071-02",
       "evidence_links": [
         "docs/strategic-roadmap-2026-2027.md",
         "internal/owledge/workpackages/v0.7.1-release-execution-orchestration-checklist.md"
@@ -345,13 +346,14 @@
     {
       "id": "FB-020",
       "title": "Concept-audit since filter",
-      "state": "open",
+      "state": "shipped",
       "source": "docs/feedback-round-2026-06.md",
-      "shipped_evidence": [],
-      "acceptance_gap": "The removed dead flag must stay removed or return only with dispatch and boundary tests.",
+      "shipped_evidence": [
+        "internal/owledge/workpackages/v0.7.1-release-execution-orchestration-checklist.md"
+      ],
+      "acceptance_gap": null,
       "target_release": "v0.7.1",
       "owner_role": "release-engineer",
-      "work_reference": "ticket:OW-071-02",
       "evidence_links": [
         "docs/strategic-roadmap-2026-2027.md",
         "internal/owledge/workpackages/v0.7.1-release-execution-orchestration-checklist.md"
@@ -362,14 +364,17 @@
     {
       "id": "FB-021",
       "title": "Upgrade-notes release contract",
-      "state": "open",
+      "state": "shipped",
       "source": "docs/feedback-round-2026-06.md",
-      "shipped_evidence": [],
-      "acceptance_gap": "Malformed upgrade metadata is not yet rejected by a structured release contract.",
+      "shipped_evidence": [
+        "CHANGELOG.md",
+        "internal/owledge/workpackages/v0.7.1-release-execution-orchestration-checklist.md"
+      ],
+      "acceptance_gap": null,
       "target_release": "v0.7.1",
       "owner_role": "release-engineer",
-      "work_reference": "ticket:OW-071-02",
       "evidence_links": [
+        "CHANGELOG.md",
         "docs/strategic-roadmap-2026-2027.md",
         "internal/owledge/workpackages/v0.7.1-release-execution-orchestration-checklist.md"
       ],
