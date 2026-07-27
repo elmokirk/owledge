@@ -2174,11 +2174,16 @@ def scan_sensitive_data(root: pathlib.Path) -> dict[str, Any]:
     findings: list[dict[str, Any]] = []
     def scan_text(text: str, rel: str, memory_id: str = "") -> None:
         for line_no, line in enumerate(text.splitlines(), start=1):
+            scan_line = re.sub(
+                r"(?i)\bid-token\s*:\s*(?:read|write|none)\b",
+                "",
+                line,
+            )
             redacted_line = line.strip()
             if len(redacted_line) > 180:
                 redacted_line = redacted_line[:177] + "..."
             for pattern in SECRET_VALUE_PATTERNS:
-                if pattern.search(line):
+                if pattern.search(scan_line):
                     findings.append(
                         {
                             "severity": "error",
@@ -2192,7 +2197,7 @@ def scan_sensitive_data(root: pathlib.Path) -> dict[str, Any]:
                     )
                     break
             else:
-                if SECRET_KEY_RE.search(line) and re.search(r"[:=]\s*['\"]?[A-Za-z0-9._~+/=-]{12,}", line):
+                if SECRET_KEY_RE.search(scan_line) and re.search(r"[:=]\s*['\"]?[A-Za-z0-9._~+/=-]{12,}", scan_line):
                     findings.append(
                         {
                             "severity": "warning",

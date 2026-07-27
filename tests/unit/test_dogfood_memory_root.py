@@ -69,10 +69,18 @@ def test_retrieval_and_finalization_payloads_do_not_persist_private_paths(tmp_pa
     assert repo.as_posix() not in persisted
 
     sanitized = owledge.sanitize_generated_payload(
-        {"project": str(repo), "nested": {"path": str(repo / "internal" / "owledge")}},
+        {
+            "project": str(repo),
+            "nested": {"path": str(repo / "internal" / "owledge")},
+            "escaped_error": json.dumps({"project": str(repo)}),
+        },
         repo,
     )
-    assert sanitized == {"project": ".", "nested": {"path": "./internal/owledge"}}
+    assert sanitized == {
+        "project": ".",
+        "nested": {"path": "./internal/owledge"},
+        "escaped_error": '{"project": "."}',
+    }
     assert str(pathlib.Path.home()) not in json.dumps(sanitized)
 
 
@@ -119,3 +127,36 @@ def test_generated_evidence_private_path_gate_rejects_and_accepts_sanitized_payl
     result = owledge.generated_evidence_private_path_gate(repo)
     assert result["passed"] is True
     assert result["scanned_files"] == 1
+
+
+def test_sensitive_scan_allows_github_oidc_permission_but_rejects_token_value(tmp_path):
+    repo = tmp_path / "repo"
+    record = repo / "internal" / "owledge" / "canonical" / "release.md"
+    record.parent.mkdir(parents=True)
+    record.write_text(
+        "---\n"
+        'memory_id: "mem:test:global:test:decision:release"\n'
+        'tenant_id: "test"\n'
+        'customer_id: "global"\n'
+        'project_id: "test"\n'
+        'doc_type: "decision"\n'
+        'status: "active"\n'
+        'visibility: "private"\n'
+        'data_class: "internal"\n'
+        'semantic_title: "Release setup"\n'
+        'summary: "Release setup"\n'
+        'review_status: "reviewed"\n'
+        'sanitization_status: "not_required"\n'
+        "---\n\n"
+        "GitHub Actions permission: `id-token: write`.\n",
+        encoding="utf-8",
+    )
+    assert owledge_core.scan_sensitive_data(repo)["passed"] is True
+
+    record.write_text(
+        record.read_text(encoding="utf-8") + "token: definitely-a-real-secret-value\n",
+        encoding="utf-8",
+    )
+    result = owledge_core.scan_sensitive_data(repo)
+    assert result["passed"] is False
+    assert result["counts"]["error"] == 1

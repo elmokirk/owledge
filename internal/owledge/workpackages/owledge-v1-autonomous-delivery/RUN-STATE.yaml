@@ -104,6 +104,26 @@ alignment:
       recommendation: "Resolve under OW-071-13 with negative security fixtures before public capability claims."
       safe_default: "Local loopback-only prototype; no supported remote/team-server claim."
       status: open
+    - id: F-071-10
+      source: phase0-clean-sha-finalization-attempt-1-2026-07-27
+      evidence: "The sensitive-data gate treated the documented GitHub Actions permission id-token: write as a secret value."
+      severity: high
+      user_impact: "A legitimate release workflow permission blocked release finalization and obscured real secret findings."
+      release_impact: "The scanner needs a narrow OIDC-permission exception while retaining positive token-value detection."
+      options: ["allowlist exact GitHub OIDC permission values", "rewrite historical evidence to avoid the syntax"]
+      recommendation: "Allow only id-token read/write/none permission values and keep an explicit real-token negative fixture."
+      safe_default: "Do not weaken the generic token-value patterns."
+      status: resolved
+    - id: F-071-11
+      source: phase0-clean-sha-finalization-attempt-1-2026-07-27
+      evidence: "The generated-evidence privacy gate scanned the prior finalization latest report before the current sanitized report was persisted; escaped JSON paths also bypassed the first sanitizer."
+      severity: high
+      user_impact: "A safe current run could be blocked by stale evidence, while nested escaped errors could retain a private path."
+      release_impact: "Finalization privacy must evaluate every newly persisted artifact and sanitize native plus JSON-escaped roots."
+      options: ["post-write verification", "exclude finalization reports permanently"]
+      recommendation: "Use a pre-write scan for other exports plus a mandatory post-write full scan, and sanitize escaped roots."
+      safe_default: "No evidence commit until the post-write full scan passes."
+      status: resolved
   decisions:
     - id: D-071-01
       related: F-071-01
@@ -182,6 +202,8 @@ next_actions:
   - Run non-vacuous finalization gates from the clean source SHA and commit sanitized evidence separately.
   - Create codex/v071-integration, record its base SHA, then dispatch OW-071-01.
 last_commands:
+  - "python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports (exit 1; 36/38 passed; F-071-10 and F-071-11 logged)"
+  - "uv run --no-project --with pytest --with pyyaml pytest tests/unit/test_dogfood_memory_root.py -q (exit 0; 6 tests passed)"
   - "uv run --no-project --with pytest --with pyyaml pytest tests/unit -q (exit 0; 52 tests passed)"
   - "python tools/validate_v1_delivery_plan.py (exit 0; 61 tickets, 25 gates, 42 waves, 0 warnings)"
   - "python tools/owledge_core.py --project-root . validate-memory (exit 0; 142 checks passed)"

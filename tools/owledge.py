@@ -198,10 +198,14 @@ def sanitize_generated_payload(value: Any, root: pathlib.Path) -> Any:
     if not isinstance(value, str):
         return value
     sanitized = value
+    root_native = str(root.resolve())
+    home_native = str(pathlib.Path.home().resolve())
     for private_root, replacement in (
-        (str(root.resolve()), "."),
+        (root_native.replace("\\", "\\\\"), "."),
+        (home_native.replace("\\", "\\\\"), "<home>"),
+        (root_native, "."),
         (root.resolve().as_posix(), "."),
-        (str(pathlib.Path.home().resolve()), "<home>"),
+        (home_native, "<home>"),
         (pathlib.Path.home().resolve().as_posix(), "<home>"),
     ):
         sanitized = sanitized.replace(private_root, replacement)
@@ -2714,7 +2718,10 @@ def clean_source_gate(root: pathlib.Path) -> dict[str, Any]:
     return {"passed": True, **identity}
 
 
-def generated_evidence_private_path_gate(root: pathlib.Path) -> dict[str, Any]:
+def generated_evidence_private_path_gate(
+    root: pathlib.Path,
+    ignored_relative_paths: set[str] | None = None,
+) -> dict[str, Any]:
     """Reject machine-private absolute paths in persisted dogfood evidence."""
     export_root = _active_memory_dir(root) / "exports"
     if not export_root.is_dir():
@@ -2731,18 +2738,22 @@ def generated_evidence_private_path_gate(root: pathlib.Path) -> dict[str, Any]:
     ]
     findings: list[dict[str, Any]] = []
     scanned = 0
+    ignored = ignored_relative_paths or set()
     for path in sorted(export_root.rglob("*"), key=lambda item: item.as_posix()):
         if not path.is_file() or path.suffix.lower() not in {".json", ".jsonl", ".md", ".html", ".svg", ".txt"}:
+            continue
+        rel_path = relative_posix(path, root)
+        if rel_path in ignored:
             continue
         scanned += 1
         text_value = path.read_text(encoding="utf-8", errors="ignore")
         for token in literal_tokens:
             if token and token in text_value:
-                findings.append({"path": relative_posix(path, root), "kind": "private-root"})
+                findings.append({"path": rel_path, "kind": "private-root"})
                 break
         else:
             if any(pattern.search(text_value) for pattern in private_patterns):
-                findings.append({"path": relative_posix(path, root), "kind": "absolute-user-path"})
+                findings.append({"path": rel_path, "kind": "absolute-user-path"})
     if findings:
         preview = ", ".join(row["path"] for row in findings[:12])
         raise RuntimeError(f"Generated evidence contains machine-private paths: {preview}")
@@ -2799,7 +2810,14 @@ def finalization_gates(root: pathlib.Path, include_exports: bool, include_compli
         add("export-lightrag-shared", lambda: core.export_lightrag(memory_root, corpus_type="shared"))
         add("export-graphrag-shared", lambda: core.export_graphrag(memory_root, corpus_type="shared"))
         add("report-shared", lambda: core.render_memory_report(memory_root, "project-dashboard", audience="shared"))
-    add("generated-evidence-private-paths", lambda: generated_evidence_private_path_gate(root))
+    finalization_report_paths = {
+        "internal/owledge/exports/finalization-gates/latest.json",
+        "internal/owledge/exports/finalization-gates/latest.md",
+    }
+    add(
+        "generated-evidence-private-paths",
+        lambda: generated_evidence_private_path_gate(root, finalization_report_paths),
+    )
 
     failed = [gate for gate in gates if not gate["passed"]]
     report_dir = _active_memory_dir(memory_root) / "exports" / "finalization-gates"
@@ -2821,28 +2839,44 @@ def finalization_gates(root: pathlib.Path, include_exports: bool, include_compli
         "quality_ratchet_summary_path": relative_posix(quality_summary_path, root) if quality_summary_path.exists() else "",
         "quality_ratchet_scores": quality_scores,
     }, root)
-    (report_dir / "latest.json").write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    lines = [
-        "# Finalization Gates",
-        "",
-        f"- Generated at: {result['generated_at']}",
-        f"- Passed: {result['passed']}",
-        f"- Failed gates: {result['failed']}",
-        f"- Tested source commit: {result['source_identity']['commit'] or 'unavailable'}",
-        f"- Tested source tree hash: {result['source_identity']['source_tree_hash'] or 'unavailable'}",
-        f"- Source clean at start: {result['source_identity']['source_clean']}",
-        f"- Quality ratchet summary: {result['quality_ratchet_summary_path'] or 'not generated'}",
-        "",
-        "## Gates",
-        "",
-    ]
-    for gate in gates:
-        status = "PASS" if gate["passed"] else "FAIL"
-        line = f"- {status} `{gate['name']}` in {gate['seconds']}s"
-        if not gate["passed"] and gate.get("error"):
-            line += f" - {gate['error']}"
-        lines.append(line)
-    (report_dir / "latest.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    def persist_report(payload: dict[str, Any]) -> None:
+        (report_dir / "latest.json").write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        lines = [
+            "# Finalization Gates",
+            "",
+            f"- Generated at: {payload['generated_at']}",
+            f"- Passed: {payload['passed']}",
+            f"- Failed gates: {payload['failed']}",
+            f"- Tested source commit: {payload['source_identity']['commit'] or 'unavailable'}",
+            f"- Tested source tree hash: {payload['source_identity']['source_tree_hash'] or 'unavailable'}",
+            f"- Source clean at start: {payload['source_identity']['source_clean']}",
+            f"- Quality ratchet summary: {payload['quality_ratchet_summary_path'] or 'not generated'}",
+            "",
+            "## Gates",
+            "",
+        ]
+        for gate in payload["gates"]:
+            status = "PASS" if gate["passed"] else "FAIL"
+            line = f"- {status} `{gate['name']}` in {gate['seconds']}s"
+            if not gate["passed"] and gate.get("error"):
+                line += f" - {gate['error']}"
+            lines.append(line)
+        (report_dir / "latest.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+    persist_report(result)
+    post_write_privacy = run_gate(
+        "generated-evidence-private-paths",
+        lambda: generated_evidence_private_path_gate(root),
+    )
+    if not post_write_privacy["passed"]:
+        result["gates"] = [
+            post_write_privacy if gate["name"] == "generated-evidence-private-paths" else gate
+            for gate in result["gates"]
+        ]
+        result["failed"] = sum(not gate["passed"] for gate in result["gates"])
+        result["passed"] = result["failed"] == 0
+        result = sanitize_generated_payload(result, root)
+        persist_report(result)
     return result
 
 
