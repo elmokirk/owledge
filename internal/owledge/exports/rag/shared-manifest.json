@@ -23,15 +23,15 @@
       "data_class in ['internal', 'public']"
     ]
   },
-  "generated_at": "2026-06-26T19:26:28Z",
-  "generation_id": "shared-rag-20260626192628-40116-6eb38463",
+  "generated_at": "2026-07-27T15:35:19Z",
+  "generation_id": "shared-rag-20260727153519-23220-e0d2b2c4",
   "include_drafts": false,
   "include_sessions": false,
   "policy_version": "rag-export-v0.2",
   "project_id": "",
   "rejected_counts": {
-    "doc_type_not_in_default_rag": 94,
-    "status_not_reviewed_or_promoted": 2
+    "doc_type_not_in_default_rag": 50,
+    "status_not_reviewed_or_promoted": 5
   },
   "tenant_id": ""
 }

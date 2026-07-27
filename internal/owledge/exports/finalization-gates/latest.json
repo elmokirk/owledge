@@ -2,129 +2,139 @@
   "failed": 0,
   "gates": [
     {
+      "name": "source-identity",
+      "passed": true,
+      "seconds": 0.785
+    },
+    {
       "name": "python-compile",
       "passed": true,
-      "seconds": 0.235
+      "seconds": 0.529
     },
     {
       "name": "public-docs",
       "passed": true,
-      "seconds": 0.014
+      "seconds": 0.04
     },
     {
       "name": "release-trust",
       "passed": true,
-      "seconds": 0.001
+      "seconds": 0.003
     },
     {
       "name": "principles-skill",
       "passed": true,
-      "seconds": 0.002
+      "seconds": 0.003
     },
     {
       "name": "principles-only",
       "passed": true,
-      "seconds": 0.001
+      "seconds": 0.002
     },
     {
       "name": "principles-scenarios",
       "passed": true,
-      "seconds": 1.536
+      "seconds": 3.742
     },
     {
       "name": "poweruser-simulations",
       "passed": true,
-      "seconds": 10.702
+      "seconds": 26.698
     },
     {
       "name": "contracts",
       "passed": true,
-      "seconds": 0.02
+      "seconds": 0.057
     },
     {
       "name": "core-platform-neutral",
       "passed": true,
-      "seconds": 0.19
+      "seconds": 3.02
     },
     {
       "name": "generated-kit-surface",
       "passed": true,
-      "seconds": 2.603
+      "seconds": 6.16
     },
     {
       "name": "doctor",
       "passed": true,
-      "seconds": 0.012
+      "seconds": 0.031
+    },
+    {
+      "name": "dogfood-memory-scan",
+      "passed": true,
+      "seconds": 0.084
     },
     {
       "name": "validate",
       "passed": true,
-      "seconds": 0.097
+      "seconds": 0.141
     },
     {
       "name": "index-full",
       "passed": true,
-      "seconds": 0.062
+      "seconds": 0.077
     },
     {
       "name": "index-incremental",
       "passed": true,
-      "seconds": 0.067
+      "seconds": 0.085
     },
     {
       "name": "retention",
       "passed": true,
-      "seconds": 0.016
+      "seconds": 0.026
     },
     {
       "name": "conflicts",
       "passed": true,
-      "seconds": 0.052
+      "seconds": 0.064
     },
     {
       "name": "sensitive-scan",
       "passed": true,
-      "seconds": 0.083
+      "seconds": 0.169
     },
     {
       "name": "runtime-adapters",
       "passed": true,
-      "seconds": 1.377
+      "seconds": 3.005
     },
     {
       "name": "memory-evals",
       "passed": true,
-      "seconds": 5.159
+      "seconds": 4.121
     },
     {
       "name": "retrieval-fixture",
       "passed": true,
-      "seconds": 0.03
+      "seconds": 0.062
     },
     {
       "name": "kb-ingestion-safety",
       "passed": true,
-      "seconds": 0.179
+      "seconds": 0.233
     },
     {
       "name": "benchmark",
       "passed": true,
-      "seconds": 2.289
+      "seconds": 4.107
     },
     {
       "name": "quality-ratchet",
       "passed": true,
-      "seconds": 6.384
+      "seconds": 16.147
     },
     {
       "name": "kb-module",
       "passed": true,
-      "seconds": 0.115
+      "seconds": 0.13
     },
     {
       "name": "project-folder-kit",
       "passed": true,
-      "seconds": 1.071
+      "seconds": 1.259
     },
     {
       "name": "dogfood-sync",
@@ -134,7 +144,7 @@
     {
       "name": "upgrade-drift",
       "passed": true,
-      "seconds": 0.334
+      "seconds": 0.621
     },
     {
       "name": "concept-audit-fresh",
@@ -149,39 +159,44 @@
     {
       "name": "project-folder-kit-compliance",
       "passed": true,
-      "seconds": 1.058
+      "seconds": 1.833
     },
     {
       "name": "compliance-gates",
       "passed": true,
-      "seconds": 0.02
+      "seconds": 0.046
     },
     {
       "name": "export-rag-shared",
       "passed": true,
-      "seconds": 0.063
+      "seconds": 0.085
     },
     {
       "name": "export-lightrag-shared",
       "passed": true,
-      "seconds": 0.081
+      "seconds": 0.082
     },
     {
       "name": "export-graphrag-shared",
       "passed": true,
-      "seconds": 0.071
+      "seconds": 0.059
     },
     {
       "name": "report-shared",
       "passed": true,
-      "seconds": 0.064
+      "seconds": 0.052
+    },
+    {
+      "name": "generated-evidence-private-paths",
+      "passed": true,
+      "seconds": 0.063
     }
   ],
-  "generated_at": "2026-06-26T19:26:28Z",
+  "generated_at": "2026-07-27T15:35:19Z",
   "include_compliance": true,
   "include_exports": true,
   "passed": true,
-  "project": "C:\\Users\\Kirk\\Documents\\Playground\\owledge-standalone",
+  "project": ".",
   "quality_ratchet_scores": {
     "benchmark": 100,
     "docs": 100,
@@ -193,5 +208,12 @@
     "retrieval": 100,
     "runtime": 100
   },
-  "quality_ratchet_summary_path": "internal/owledge/exports/finalization-gates/quality-ratchet-summary.json"
+  "quality_ratchet_summary_path": "internal/owledge/exports/finalization-gates/quality-ratchet-summary.json",
+  "source_identity": {
+    "available": true,
+    "commit": "f16efd5d3bbeeb925b253371b186fd736db38e0c",
+    "dirty_source_paths": [],
+    "source_clean": true,
+    "source_tree_hash": "d1bc27ae856ec7eef427a5520e1cab9f8e06171e46754e4ba15b90edac8eba61"
+  }
 }
