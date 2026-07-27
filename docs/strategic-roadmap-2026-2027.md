@@ -31,7 +31,12 @@ Intent → Decision → Plan → Work contract → Run → Evidence → Gate
 
 Markdown and typed frontmatter remain canonical. Indexes, databases, MCP servers, dashboards, graphs, and runtime hooks are replaceable adapters or generated views. Owledge must remain useful without a hosted service or model provider.
 
-The first strategic move is a **truth reset**: reconcile roadmap, version, ticket, and implementation state before building further surface area. The existing product already contains a substantial CLI, promotion and privacy model, reports, evaluations, add-ons, upgrade/drift tooling, and several runtime bridges. The current planning documents do not represent that state consistently.
+The FB-001 through FB-021 **truth reset is complete**: the live register now
+reconciles roadmap, version, ticket, and implementation state before further
+surface area is built. The existing product already contains a substantial
+CLI, promotion and privacy model, reports, evaluations, add-ons,
+upgrade/drift tooling, and several runtime bridges. Historical planning
+documents remain evidence and cannot reactivate work.
 
 ## Scope, Evidence, and Review Verdict
 
@@ -40,7 +45,9 @@ This roadmap synthesizes the current product sources, open feedback tickets, act
 Key repo evidence:
 
 - `VERSION`, `pyproject.toml`, public README, GitHub `main`, and PyPI now align on `owledge==0.7.0`; older v0.6.x docs are historical evidence, not current release truth.
-- `ROADMAP.md` still contains some legacy near-term rows beside the v0.7 release board and newer OKF work; the next reset should consolidate these into one live work register.
+- `ROADMAP.md` now identifies one active Release Board; legacy capability and
+  feedback tables are historical inventories, while the live work register
+  holds the sole FB-001 through FB-021 disposition.
 - `docs/v0.6.1-fix-up-plan.md` and `docs/v0.6.0-implementation-plan.md` remain useful historical context, but their unchecked items must not be treated as live backlog without explicit re-triage.
 - The current code confirms that ticket board, `quick_read`, scan allowlist, parallel notice, and OKF CLI commands are not yet present.
 - The current public demo proves artifact creation, but it installs prepared artifacts rather than demonstrating a live work-contract, interruption, gate failure, resume, and documentation update.
@@ -70,9 +77,12 @@ Multi-perspective strategic readiness score: **64/100 — REVISE**. The category
 
 Initial product target: **90% of golden-path increments are evidence-complete and resumable across two Tier-1 harnesses.**
 
-## Status Normalization: Existing Work to Preserve, Complete, or Retire
+## Historical Status-Normalization Decision Basis
 
-The following is the authoritative triage target for the next planning reset. “Partially covered” means a related capability exists but the stated acceptance criteria are not met.
+The following table preserves the 2026-07-10 analysis that informed the
+completed reset. It is not a current triage queue and does not override the
+live register. “Partially covered” was the review-time assessment that a
+related capability existed while the stated acceptance criteria were not met.
 
 | Existing item | Current reading | Proposed disposition | Roadmap home |
 | --- | --- | --- | --- |
@@ -99,9 +109,15 @@ The following is the authoritative triage target for the next planning reset. �
 | LightRAG, reports, snapshots, hub, swarm add-ons | Related add-ons/CLI are already present | Mark shipped experimental/add-on, define support tier rather than rebuild | Baseline / Phase 2 |
 | OKF roadmap | Preserved as `docs/okf-integration-plan.md` | Treat as a standards-bound interchange profile, not as generated output | Phase 3 |
 
-### Required status-reset deliverable
+### Implemented status-reset contract
 
-Create one machine-readable work register from the above table with: `id`, `title`, `state`, `source`, `implementation_evidence`, `acceptance_gap`, `target_phase`, `owner`, and `supersedes`. Historical plans remain evidence; the register becomes the live backlog source. No feature may be shown as “shipped” without a linked gate or release proof.
+The machine-readable live register now contains exactly FB-001 through FB-021
+with `id`, `title`, finite `state`, `source`, shipped evidence or acceptance
+gap, concrete target release, owner role, evidence links, and resolvable work
+or replacement references. Historical plans remain evidence. A feature cannot
+be `shipped` without existing release proof, an `open` item requires a
+control-plane ticket, `superseded` requires an acyclic replacement, and
+`deferred` requires a later release plus reason.
 
 ## Gap and Blindspot Analysis
 

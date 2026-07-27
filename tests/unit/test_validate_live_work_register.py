@@ -4,6 +4,8 @@ import copy
 import importlib.util
 import json
 import pathlib
+import subprocess
+import sys
 import tempfile
 import unittest
 from unittest import mock
@@ -64,6 +66,30 @@ class ValidateLiveWorkRegisterTests(unittest.TestCase):
                 text_overrides=text_overrides,
             )
 
+    def validate_cli_payload(self, payload):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            path = pathlib.Path(temp_dir) / "LIVE-WORK-REGISTER.yaml"
+            path.write_text(
+                json.dumps(payload, indent=2, ensure_ascii=False) + "\n",
+                encoding="utf-8",
+            )
+            completed = subprocess.run(
+                [
+                    sys.executable,
+                    "-I",
+                    str(VALIDATOR_PATH),
+                    "--project-root",
+                    str(REPO_ROOT),
+                    "--register",
+                    str(path),
+                ],
+                cwd=REPO_ROOT,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            return completed, json.loads(completed.stdout)
+
     def item(self, payload, item_id):
         return next(item for item in payload["items"] if item["id"] == item_id)
 
@@ -107,7 +133,7 @@ class ValidateLiveWorkRegisterTests(unittest.TestCase):
                 self.assert_has_error(self.validate_payload(payload), diagnostic)
 
     def test_invalid_state_and_state_case_fail(self) -> None:
-        for state in ("active", "Open", "SHIPPED"):
+        for state in ("active", "Open", "SHIPPED", {}):
             payload = copy.deepcopy(self.valid_register)
             self.item(payload, "FB-003")["state"] = state
             with self.subTest(state=state):
@@ -115,6 +141,54 @@ class ValidateLiveWorkRegisterTests(unittest.TestCase):
                     self.validate_payload(payload),
                     f"FB-003.state: invalid state {state!r}",
                 )
+
+    def test_malformed_container_types_fail_closed_without_traceback(self) -> None:
+        cases = (
+            (
+                "allowed_states",
+                lambda payload: payload.__setitem__("allowed_states", 1),
+                "allowed_states: expected a list",
+            ),
+            (
+                "source_documents",
+                lambda payload: payload.__setitem__("source_documents", [{}]),
+                "source_documents[0]: expected a string",
+            ),
+            (
+                "live_status_sources",
+                lambda payload: payload["authority"].__setitem__(
+                    "live_status_sources", 1
+                ),
+                "authority.live_status_sources: expected a list",
+            ),
+            (
+                "historical_sources",
+                lambda payload: payload["authority"].__setitem__(
+                    "historical_sources", 1
+                ),
+                "authority.historical_sources: expected a list",
+            ),
+        )
+        for name, mutate, diagnostic in cases:
+            payload = copy.deepcopy(self.valid_register)
+            mutate(payload)
+            with self.subTest(name=name):
+                completed, result = self.validate_cli_payload(payload)
+                self.assertEqual(completed.returncode, 1, completed.stdout)
+                self.assertNotIn("Traceback", completed.stderr)
+                self.assert_has_error(result, diagnostic)
+                self.assertEqual(result["errors"], sorted(result["errors"]))
+
+    def test_feedback_items_require_numeric_order(self) -> None:
+        payload = copy.deepcopy(self.valid_register)
+        payload["items"][1], payload["items"][9] = (
+            payload["items"][9],
+            payload["items"][1],
+        )
+        self.assert_has_error(
+            self.validate_payload(payload),
+            "items: feedback ids must be in numeric order FB-001..FB-021",
+        )
 
     def test_shipped_item_requires_existing_evidence(self) -> None:
         payload = copy.deepcopy(self.valid_register)
@@ -214,6 +288,60 @@ class ValidateLiveWorkRegisterTests(unittest.TestCase):
         self.assert_has_error(
             result,
             "historical_source: docs/feedback-round-2026-06.md reactivates historical work",
+        )
+
+    def test_duplicate_outstanding_artifact_cut_fails(self) -> None:
+        source = (REPO_ROOT / "ROADMAP.md").read_text(encoding="utf-8")
+        stale = source + (
+            "\n| P0 | Final release artifact cut | Run build and publish later. |\n"
+        )
+        result = self.validate_payload(
+            copy.deepcopy(self.valid_register),
+            text_overrides={"ROADMAP.md": stale},
+        )
+        self.assert_has_error(
+            result,
+            "active_source: ROADMAP.md retains a duplicate outstanding artifact cut",
+        )
+
+    def test_cli_simplification_wrong_release_fails(self) -> None:
+        source = (REPO_ROOT / "ROADMAP.md").read_text(encoding="utf-8")
+        post_row = next(
+            line for line in source.splitlines() if "| POST-002 / OW-100-05 |" in line
+        )
+        stale = source.replace(post_row, post_row.replace("| v1.0 |", "| v0.7.1 |"))
+        result = self.validate_payload(
+            copy.deepcopy(self.valid_register),
+            text_overrides={"ROADMAP.md": stale},
+        )
+        self.assert_has_error(
+            result,
+            "active_source: ROADMAP.md POST-002 must map to OW-100-05 at v1.0",
+        )
+
+    def test_future_status_reset_wording_fails(self) -> None:
+        path = REPO_ROOT / "docs" / "strategic-roadmap-2026-2027.md"
+        source = path.read_text(encoding="utf-8")
+        stale = source.replace(
+            "truth reset is complete",
+            "truth reset remains future",
+            1,
+        )
+        stale += "\nThe next reset should consolidate these sources.\n"
+        result = self.validate_payload(
+            copy.deepcopy(self.valid_register),
+            text_overrides={
+                "docs/strategic-roadmap-2026-2027.md": stale,
+            },
+        )
+        self.assert_has_error(
+            result,
+            "active_source: strategic roadmap must record the truth reset as complete",
+        )
+        self.assert_has_error(
+            result,
+            "active_source: strategic roadmap retains future reset wording "
+            "'the next reset should consolidate'",
         )
 
     def test_stale_fixture_fails_with_expected_diagnostics(self) -> None:

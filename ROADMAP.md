@@ -34,7 +34,7 @@ Public contract:
 | Done | REL-009 | Release gates and CI | CI and local gates check naming, public docs, release trust, launch readiness, MCP read-only, Wikilinks, Benchmark Kit CI, standalone skills, contracts, and publish readiness. | v0.7.0 |
 | Done | REL-010 | Final publishing docs | README, docs index, quickstart, command reference, roadmap, changelog, troubleshooting, Mermaid workflows, plugin docs, and benchmark docs match the implemented v0.7 surface. | v0.7.0 |
 | Done | POST-001 | Final release artifact cut | v0.7.0 package publication is retained as release evidence; future cuts use the active release control plane. | v0.7.0 final |
-| Planned | POST-002 | CLI UX simplification | Add short commands such as `owledge init`, `owledge add benchmark-kit`, and `owledge benchmark local` while preserving explicit script paths. | v0.7.1 |
+| Planned | POST-002 / OW-100-05 | CLI UX simplification | Add short lifecycle commands such as `owledge init`, `owledge add benchmark-kit`, and `owledge benchmark local` while preserving explicit script paths and recovery behavior. | v1.0 |
 | Planned | POST-003 | Agent-native runtime contract | Define a compact runtime contract for session start, context-pack loading, task/handoff discovery, hook events, and token-aware read order across harnesses. | v0.8.0 |
 | Planned | POST-004 | PI Agent runtime adapter | Evaluate and implement PI Agent as a lightweight Owledge runtime lane only if it can preserve `.owledge/` as source of truth and pass conformance gates. | v0.8.0 |
 | Planned | POST-005 | Harness benchmarks | Benchmark Claude Code, Codex, OpenCode, Cursor, and Zed with local/cloud model setups and clear caveats. | v0.8.x |
@@ -48,6 +48,10 @@ Public contract:
 
 ## Shipped In v0.7.0 Pre-Release
 
+The Release Board above is the only active roadmap table. Sections below are
+historical release evidence or thematic inventories and do not assign current
+work status; current FB dispositions remain in the live work register.
+
 | Priority | Area | Outcome |
 | --- | --- | --- |
 | P0 | `.owledge` foundation | New quickstarts and generated kits create `.owledge/` plus `OWLEDGE.md`; contracts validate the v0.7 surface. |
@@ -60,23 +64,11 @@ Public contract:
 
 ## Deferred After v0.7.0
 
-| Priority | Area | Outcome |
-| --- | --- | --- |
-| P0 | Final release artifact cut | Run build, wheel/sdist checks, uvx smoke, final release notes, tag discipline, and artifact inspection before publishing. |
-| P1 | CLI UX simplification | Add short commands such as `owledge init`, `owledge add benchmark-kit`, and `owledge benchmark local`. |
-| P1 | Agent-native runtime contract | Define token-aware read order, hook events, context-pack loading, handoff discovery, and conformance checks across harnesses. |
-| P1 | PI Agent runtime adapter | Evaluate PI Agent as a lightweight runtime adapter for Owledge when it preserves `.owledge/` as canonical memory. |
-| P1 | Harness benchmarks | Benchmark Claude Code, Codex, OpenCode, Cursor, and Zed with local/cloud model setups. |
-| P1 | Own-vault benchmark mode | Let users benchmark their own local Owledge vaults without leaking private data. |
-| P2 | Write-enabled MCP | Add reviewed write tools with explicit scopes, locks, privacy checks, and audit artifacts. |
-| P2 | Cloud/frontier benchmark matrix | Extend Benchmark Kit to Ollama cloud/frontier models with clear cost warnings. |
-| P2 | RAG integrations | Export Owledge's canonical Markdown layer to Mem0, Graphiti, LlamaIndex, or vector/RAG engines. |
-| P2 | OKF interchange profile | Support OKF validation, safe exports, quarantined draft imports, and readiness reporting while keeping Owledge Markdown as canonical source. |
-| P3 | Hermes adapter | Full adapter only when SOUL.md, project context, memory rules, runtime hooks, and docs can ship together. |
-| P3 | Marketplace certification | Claude/Codex marketplace claims only after standards, manifests, screenshots, install flows, and review gates are complete. |
-| P2 | Public case studies | Add 3-5 real repo/vault case studies after the release surface is stable. |
+This former parallel backlog is retired. Use the Release Board for release
+sequencing and the live work register for FB-001 through FB-021. POST-001 is
+complete; no outstanding v0.7.0 artifact cut remains.
 
-## Near-Term Roadmap
+## Historical Capability Inventory
 
 | Priority | Area | Outcome |
 | --- | --- | --- |

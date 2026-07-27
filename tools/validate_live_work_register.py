@@ -103,6 +103,23 @@ def _load_register(path: pathlib.Path) -> dict[str, Any]:
     return payload
 
 
+def _string_list(
+    errors: list[str],
+    field: str,
+    value: Any,
+) -> list[str]:
+    if not isinstance(value, list):
+        errors.append(f"{field}: expected a list")
+        return []
+    strings: list[str] = []
+    for index, item in enumerate(value):
+        if not isinstance(item, str):
+            errors.append(f"{field}[{index}]: expected a string")
+            continue
+        strings.append(item)
+    return strings
+
+
 def _validate_reference_path(
     errors: list[str],
     root: pathlib.Path,
@@ -203,15 +220,22 @@ def validate_register(
 
     if register.get("schema_version") != 1:
         errors.append("schema_version: expected 1")
-    if tuple(register.get("allowed_states") or ()) != ALLOWED_STATES:
+    declared_states = _string_list(
+        errors,
+        "allowed_states",
+        register.get("allowed_states"),
+    )
+    if tuple(declared_states) != ALLOWED_STATES:
         errors.append(
             "allowed_states: expected exactly shipped, open, superseded, deferred"
         )
 
-    declared_sources = register.get("source_documents")
-    if not isinstance(declared_sources, list):
-        errors.append("source_documents: expected a list")
-        declared_sources = []
+    raw_declared_sources = register.get("source_documents")
+    declared_sources = _string_list(
+        errors,
+        "source_documents",
+        raw_declared_sources,
+    )
     if (
         set(declared_sources) != set(APPROVED_SOURCES)
         or len(declared_sources) != len(APPROVED_SOURCES)
@@ -232,9 +256,19 @@ def validate_register(
     if not isinstance(authority, dict):
         errors.append("authority: expected an object")
         authority = {}
-    if tuple(authority.get("live_status_sources") or ()) != ACTIVE_SOURCES:
+    live_status_sources = _string_list(
+        errors,
+        "authority.live_status_sources",
+        authority.get("live_status_sources"),
+    )
+    historical_sources = _string_list(
+        errors,
+        "authority.historical_sources",
+        authority.get("historical_sources"),
+    )
+    if tuple(live_status_sources) != ACTIVE_SOURCES:
         errors.append("authority.live_status_sources: active truth set mismatch")
-    if tuple(authority.get("historical_sources") or ()) != HISTORICAL_SOURCES:
+    if tuple(historical_sources) != HISTORICAL_SOURCES:
         errors.append("authority.historical_sources: historical source set mismatch")
     if authority.get("historical_unchecked_boxes_are_active") is not False:
         errors.append(
@@ -245,23 +279,31 @@ def validate_register(
     if not isinstance(items, list):
         errors.append("items: expected a list")
         items = []
-    item_ids = [item.get("id") for item in items if isinstance(item, dict)]
+    raw_item_ids = [item.get("id") for item in items if isinstance(item, dict)]
+    item_ids = [item_id for item_id in raw_item_ids if isinstance(item_id, str)]
     duplicate_ids = sorted(
         {
             item_id
             for item_id in item_ids
-            if isinstance(item_id, str) and item_ids.count(item_id) > 1
+            if item_ids.count(item_id) > 1
         }
     )
     for item_id in duplicate_ids:
         errors.append(f"items: duplicate feedback id {item_id}")
-    actual_ids = {item_id for item_id in item_ids if isinstance(item_id, str)}
+    actual_ids = set(item_ids)
     missing_ids = sorted(set(EXPECTED_IDS) - actual_ids)
     extra_ids = sorted(actual_ids - set(EXPECTED_IDS))
     if missing_ids:
         errors.append(f"items: missing feedback ids {missing_ids}")
     if extra_ids:
         errors.append(f"items: extra feedback ids {extra_ids}")
+    if (
+        len(raw_item_ids) == len(EXPECTED_IDS)
+        and len(item_ids) == len(EXPECTED_IDS)
+        and set(item_ids) == set(EXPECTED_IDS)
+        and tuple(item_ids) != EXPECTED_IDS
+    ):
+        errors.append("items: feedback ids must be in numeric order FB-001..FB-021")
 
     known_tickets: set[str] = set()
     try:
@@ -290,7 +332,7 @@ def validate_register(
             if not _is_nonempty(item.get(field)):
                 errors.append(f"{label}.{field}: required non-empty value")
         state = item.get("state")
-        if state not in ALLOWED_STATES:
+        if not isinstance(state, str) or state not in ALLOWED_STATES:
             errors.append(
                 f"{label}.state: invalid state {state!r}; expected one of {list(ALLOWED_STATES)}"
             )
@@ -333,7 +375,7 @@ def validate_register(
                 errors.append(
                     f"{label}.acceptance_gap: shipped state cannot retain an acceptance gap"
                 )
-        elif state in {"open", "superseded", "deferred"}:
+        elif state in ("open", "superseded", "deferred"):
             if not _is_nonempty(item.get("acceptance_gap")):
                 errors.append(
                     f"{label}.acceptance_gap: {state} state requires a concrete gap"
@@ -435,6 +477,61 @@ def validate_register(
             errors.append(
                 f"active_source: ROADMAP.md current goal omits {active_delivery}"
             )
+        if "The Release Board above is the only active roadmap table." not in roadmap:
+            errors.append(
+                "active_source: ROADMAP.md must declare the Release Board as "
+                "the only active roadmap table"
+            )
+        if roadmap.count("| Done | POST-001 | Final release artifact cut |") != 1:
+            errors.append(
+                "active_source: ROADMAP.md must contain exactly one completed "
+                "POST-001 artifact cut"
+            )
+        if "| P0 | Final release artifact cut |" in roadmap:
+            errors.append(
+                "active_source: ROADMAP.md retains a duplicate outstanding artifact cut"
+            )
+        cli_row = re.search(r"^\| Planned \| POST-002[^\r\n]+$", roadmap, re.MULTILINE)
+        if (
+            cli_row is None
+            or "OW-100-05" not in cli_row.group(0)
+            or not cli_row.group(0).endswith("| v1.0 |")
+        ):
+            errors.append(
+                "active_source: ROADMAP.md POST-002 must map to OW-100-05 at v1.0"
+            )
+    except OSError:
+        pass
+
+    try:
+        strategic = _read_text(
+            root,
+            "docs/strategic-roadmap-2026-2027.md",
+            text_overrides,
+        )
+        strategic_lower = strategic.lower()
+        if "truth reset is complete" not in strategic_lower:
+            errors.append(
+                "active_source: strategic roadmap must record the truth reset as complete"
+            )
+        if "## historical status-normalization decision basis" not in strategic_lower:
+            errors.append(
+                "active_source: strategic roadmap must label status normalization historical"
+            )
+        if "### implemented status-reset contract" not in strategic_lower:
+            errors.append(
+                "active_source: strategic roadmap must describe the implemented register contract"
+            )
+        forbidden_future_phrases = (
+            "the next reset should consolidate",
+            "authoritative triage target for the next planning reset",
+            "create one machine-readable work register",
+        )
+        for phrase in forbidden_future_phrases:
+            if phrase in strategic_lower:
+                errors.append(
+                    f"active_source: strategic roadmap retains future reset wording {phrase!r}"
+                )
     except OSError:
         pass
 
@@ -468,7 +565,9 @@ def validate_register(
             "expected_items": len(EXPECTED_IDS),
             "items": len(items),
             "states": state_counts,
-            "sources": len(declared_sources),
+            "sources": len(raw_declared_sources)
+            if isinstance(raw_declared_sources, list)
+            else 0,
         },
         "register": path.as_posix(),
     }
