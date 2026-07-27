@@ -1,0 +1,37 @@
+schema_version: 1
+ticket: OW-071-01
+status: accepted
+reviewed_base: 23642cc484cd49d916d3cecb7c6a4a23fcf1ba3c
+reviewed_commit: 86871c63411607195dc6c4484f125eb16b0a04d5
+reviewed_tree: e00efc870823478cd272f897456fe472bafa753c
+reviewed_manifest_blob: 3c5299043d07bc6a9de631d41a8b5f795cbacab9
+independent_review:
+  verdict: pass
+  score: 93
+  p0_findings: 0
+  p1_findings: 0
+  residual:
+    - "The worker manifest preserves its honest self-SHA placeholder."
+    - "Unknown extension fields remain tolerated pending a later strict-schema decision."
+supersedes_worker_manifest_status: true
+commands:
+  - "python -I tools/validate_live_work_register.py --project-root ."
+  - "python -m unittest tests.unit.test_validate_live_work_register -v"
+  - "python tools/validate_v1_delivery_plan.py"
+  - "python tools/owledge.py test public-docs --project-root ."
+  - "python tools/owledge.py test private-path-clean --project-root ."
+  - "git diff --check 23642cc484cd49d916d3cecb7c6a4a23fcf1ba3c..86871c63411607195dc6c4484f125eb16b0a04d5"
+results:
+  register_items: 21
+  register_sources: 17
+  unit_tests_passed: 18
+  delivery_tickets: 61
+  delivery_gates: 25
+  delivery_waves: 42
+  public_docs_passed: 233
+  private_path_files_scanned: 2081
+  private_path_findings: 0
+integration_policy:
+  worker_commit_immutable: true
+  central_state_updated_separately: true
+  no_push_tag_publish_or_main_merge: true

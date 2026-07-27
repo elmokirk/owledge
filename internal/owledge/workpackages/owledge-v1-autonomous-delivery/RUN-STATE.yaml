@@ -4,9 +4,9 @@ plan: internal/owledge/plans/owledge-v1-autonomous-delivery-master-plan.md
 objective: Deliver Owledge v0.7.1 through v1.0 through gated autonomous execution.
 status: in_progress
 current_release: v0.7.1
-current_phase: 071-A1
-active_ticket: OW-071-01
-last_green_gate: PHASE0-FOUNDATION-38-OF-38
+current_phase: 071-A2
+active_ticket: OW-071-02
+last_green_gate: OW-071-01-INDEPENDENT-QA-93
 alignment:
   state: none
   awaiting_release: null
@@ -23,7 +23,7 @@ alignment:
       options: ["normalize in OW-071-01", "define a documented legacy exception", "expand validator coverage before promotion"]
       recommendation: "Normalize affected canonical planning artifacts in OW-071-01 and add deliberate validator coverage."
       safe_default: "Do not promote schema-invalid planning artifacts as canonical."
-      status: open
+      status: resolved
     - id: F-071-02
       source: long-horizon-modes-and-skill-discovery-2026-07-27
       evidence: "Current Codex skill loader contract and fresh-init discovery regression tests"
@@ -133,7 +133,7 @@ alignment:
       options: ["remove the duplicate status table and synchronize targets", "mark the conflicting sections as historical snapshots"]
       recommendation: "Keep one active release board, bind CLI simplification to OW-100-05/v1.0, and describe the register reset as completed."
       safe_default: "Do not promote OW-071-01 while active sources contradict the live register."
-      status: open
+      status: resolved
     - id: F-071-13
       source: OW-071-01-independent-qa-2026-07-27
       evidence: "Malformed allowed_states, source_documents, or authority source-list types raised uncaught TypeError instead of structured deterministic JSON."
@@ -143,7 +143,7 @@ alignment:
       options: ["validate container and element types before conversion", "adopt a runtime schema dependency"]
       recommendation: "Add explicit standard-library type validation and adversarial regression tests."
       safe_default: "Treat traceback-producing malformed inputs as a failed ticket gate."
-      status: open
+      status: resolved
     - id: F-071-14
       source: OW-071-01-independent-qa-2026-07-27
       evidence: "The ticket required python -m pytest although pytest is not a runtime dependency; the committed manifest truthfully replayed the unittest-based suite instead."
@@ -156,13 +156,33 @@ alignment:
       status: resolved
     - id: F-071-15
       source: OW-071-01-independent-qa-2026-07-27
-      evidence: "The worker manifest cannot contain its own commit SHA and therefore retains an explicit placeholder."
+      evidence: "The accepted worker manifest cannot contain its own commit SHA and therefore retains an explicit placeholder; integration-review.yaml now binds the immutable accepted source."
       severity: low
       user_impact: "Ticket evidence is human-readable but not fully machine-bound to the reviewed commit by itself."
       release_impact: "Integration evidence must bind the immutable worker commit, tree, and manifest blob without amending the reviewed commit."
       options: ["create separate integration evidence", "attempt a self-referential manifest amendment"]
-      recommendation: "Record reviewed commit f189bace, tree 6395194, and manifest blob 70d69162 in a separate central QA artifact."
+      recommendation: "Use the separate binding for commit 86871c6, tree e00efc8, and manifest blob 3c52990 as the authoritative integration status."
       safe_default: "Never rewrite the reviewed worker commit merely to embed its own SHA."
+      status: resolved
+    - id: F-071-16
+      source: OW-071-01-independent-rereview-2026-07-27
+      evidence: "The v1 live-work validator deliberately tolerates unknown extension fields while strictly validating all release-critical known fields."
+      severity: low
+      user_impact: "A misspelled non-critical extension field may be preserved without an immediate schema error."
+      release_impact: "No v0.7.1 gate impact; strict additionalProperties behavior requires an explicit schema-versioning decision."
+      options: ["reject all unknown fields in schema v1", "retain extension tolerance and decide under schema contracts"]
+      recommendation: "Route strict-field policy to OW-080-02 rather than expanding the frozen v0.7.1 register contract."
+      safe_default: "Known release-critical fields remain fail-closed; unknown fields confer no authority."
+      status: routed
+    - id: F-071-17
+      source: OW-071-02-definition-of-ready-2026-07-27
+      evidence: "The central worktree contains an unreadable legacy dist/owledge-0.7.0.tar.gz that can make publish-readiness non-reproducible outside a fresh worktree."
+      severity: medium
+      user_impact: "A maintainer may mistake a corrupt stale local artifact for a source-level publish-readiness failure."
+      release_impact: "OW-071-02 must test in a fresh isolated worktree; RC must rebuild artifacts from committed source."
+      options: ["reuse the stale artifact", "exclude it from ticket proof and rebuild at RC"]
+      recommendation: "Do not trust inherited dist artifacts; prove ticket gates without dist and rebuild wheel/sdist during OW-071-08."
+      safe_default: "No deletion or publication action is authorized; stale dist is never cited as evidence."
       status: routed
   decisions:
     - id: D-071-01
@@ -196,7 +216,7 @@ alignment:
       rationale: "Release evidence must prove the committed source rather than a dirty or incomplete tree."
       constraints: "Generated exports remain excluded from source commits and no 38/38 claim is current until revalidation."
       affected_artifacts: ["tools/owledge.py", "tools/owledge_core.py", "internal/owledge/exports/", "Phase 0 commit plan"]
-      verification_status: in_progress
+      verification_status: implemented_and_tested
     - id: D-071-05
       related: F-071-07
       authority: product-owner-authorization
@@ -213,6 +233,30 @@ alignment:
       constraints: "Repository-wide development QA may still use pytest through an isolated environment; pytest must not become a shipped runtime dependency."
       affected_artifacts: ["tickets/ALL-TICKETS.md", "evidence/OW-071-01/manifest.yaml"]
       verification_status: recorded
+    - id: D-071-07
+      related: [F-071-12, F-071-13, F-071-15]
+      authority: release-orchestrator
+      decision: "Accept OW-071-01 at immutable commit 86871c63411607195dc6c4484f125eb16b0a04d5 and bind its tree and manifest blob in separate integration evidence."
+      rationale: "Fresh re-review scored 93/100 with no P0/P1 while preserving non-self-referential provenance."
+      constraints: "The worker manifest remains immutable; integration-review.yaml supersedes its pending worker-time status."
+      affected_artifacts: ["evidence/OW-071-01/integration-review.yaml", "BACKLOG.yaml", "v0.7.1 release checklist"]
+      verification_status: implemented_and_tested
+    - id: D-071-08
+      related: [OW-071-02, F-071-17]
+      authority: release-orchestrator
+      decision: "Execute OW-071-02 as one local serial release-trust slice: retain visible additive would_update lists, retract the semantically undefined --since feature and remove its dead flag, and use type plus agent_id as the concept-audit identity."
+      rationale: "The bounded choices preserve actionable upgrade output, avoid a false date-filter contract, and reuse the shipped audit schema without unauthorized template expansion."
+      constraints: "Worker scope is limited to tools/owledge.py, tools/owledge_core.py, tools/validate_upgrade_notes.py, docs/upgrade-notes-schema.json, docs/upgrading.md, tests/unit/test_ow07102_release_trust.py, tests/fixtures/upgrade-notes/, and evidence/OW-071-02/. CHANGELOG and central state remain orchestrator-owned."
+      affected_artifacts: ["OW-071-02", "FB-019", "FB-020", "FB-021"]
+      verification_status: approved_for_implementation
+    - id: D-071-09
+      related: usage-and-context-efficiency
+      authority: product-owner-request
+      decision: "Use local serial execution by default and do not spawn subagents for every run or ticket."
+      rationale: "Specialist agents should provide independent risk reduction, not routine context duplication."
+      constraints: "Subagents remain available only for genuinely independent high-risk gates or clearly non-overlapping specialist work."
+      affected_artifacts: ["v0.7.1-release-execution-orchestration-plan.md", "RUN-STATE.yaml"]
+      verification_status: active
   next_plan_reflection:
     status: not_started
     target_release: v0.8.0
@@ -220,7 +264,9 @@ alignment:
   update_path: null
 execution_mode:
   initial_run: root_agent_sequential
-  parallel_agents: allowed_only_for_non_overlapping_ready_tickets
+  default_execution: local_serial
+  parallel_agents: exceptional_only_for_high_value_non_overlapping_work
+  specialist_agents: independent_high_risk_gates_only
   wip_per_agent: 1
   independent_qa_required: true
 orchestration:
@@ -229,8 +275,8 @@ orchestration:
   approved_by: product-owner
   approved_at: "2026-07-27T14:25:00Z"
   expires_at_alignment: true
-  active_dispatch: ow07101_isolated_worker_lane
-  pending_risk_brief: "OW-071-01 is the only next implementation lane; OW-071-13 remains a dedicated sequential W-071-A4 security lane."
+  active_dispatch: local_serial_ow07102
+  pending_risk_brief: "OW-071-02 is the only active implementation lane; stale dist artifacts are excluded from proof and OW-071-13 remains a dedicated later security lane."
 workspace:
   code_root: .
   planning_root: internal/owledge/workpackages/owledge-v1-autonomous-delivery
@@ -244,10 +290,12 @@ last_completed_actions:
   - Version reflection, finding/decision logging, and next-plan steering contract implemented and validated.
   - Bounded long-horizon modes, durable MVP/roadmap routing, and reliable project/plugin skill discovery implemented and regression-tested.
   - Phase 0 promoted on codex/v071-integration with reflected 38/38 evidence and a clean source tree.
+  - OW-071-01 accepted at 86871c6 after a revise/fix/re-review loop and integrated with immutable provenance.
+  - Phase 1 reflected; OW-071-02 activated as the sole local serial implementation lane.
 next_actions:
-  - Dispatch OW-071-01 in an isolated ticket worktree.
-  - Validate its live-work register and stale-state negative fixtures in fresh context.
-  - Integrate only the accepted worker commit, then reflect Phase 1 before unblocking W-071-A2.
+  - Create the isolated OW-071-02 worktree from the reflected integration commit.
+  - Implement the bounded release-trust contract and its standard-library negative fixtures locally.
+  - Integrate only after focused review, then reflect the OW-071-02 increment before OW-071-03.
 last_commands:
   - "python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports (exit 0; 38/38 passed on 5d6c433; quality ratchet all 100)"
   - "python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports (exit 1; 36/38 passed; F-071-10 and F-071-11 logged)"
@@ -261,48 +309,37 @@ last_commands:
   - "uv run --no-project --with pytest --with pyyaml python -m pytest targeted suites (exit 0; 24 tests passed)"
   - "python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports (exit 0; 35 gates passed; all quality-ratchet dimensions 100)"
 checkpoint:
-  last_completed_action: "Committed reflected 38/38 Phase-0 evidence and activated OW-071-01 as the only in-progress ticket."
+  last_completed_action: "Integrated accepted OW-071-01 commit 86871c6, recorded immutable integration evidence, reflected Phase 1, and activated OW-071-02."
   changed_files:
-    - "skills/owledge-long-horizon-delivery/"
-    - "skills/owledge-planning-layer/"
-    - "skills/owledge-brainstorm/"
-    - "plugins/owledge-cowork/skills/"
-    - "standalone-skills/"
-    - "tools/owledge.py"
-    - "tools/owledge_core.py"
-    - "tools/build_project_folder_kit.py"
-    - "tests/unit/test_skill_discovery_and_modes.py"
-    - "internal/owledge/plans/long-horizon-modes-and-skill-discovery-plan.md"
-    - "internal/owledge/workpackages/long-horizon-modes-and-skill-discovery-checklist.md"
-    - "internal/owledge/ideas/pre-plan-idea-concept-harness-hooks.md"
-    - "internal/owledge/decisions/skill-discovery-and-bounded-planning-2026-07-27.md"
-    - "internal/owledge/decisions/v0.7.1-v1-version-reflection-contract-2026-07-27.md"
-    - "internal/owledge/plans/owledge-v1-autonomous-delivery-master-plan.md"
-    - "internal/owledge/workpackages/owledge-v1-autonomous-delivery-checklist.md"
-    - "internal/owledge/workpackages/owledge-v1-autonomous-delivery/"
-    - "tools/validate_v1_delivery_plan.py"
-    - "tests/unit/test_validate_v1_delivery_plan.py"
+    - "ROADMAP.md"
+    - "docs/feedback-round-2026-06.md"
+    - "docs/roadmap-ideas-2026-06.md"
+    - "docs/strategic-roadmap-2026-2027.md"
+    - "docs/v0.6.0-implementation-plan.md"
+    - "internal/owledge/workpackages/owledge-v1-autonomous-delivery/LIVE-WORK-REGISTER.yaml"
+    - "tools/validate_live_work_register.py"
+    - "tests/unit/test_validate_live_work_register.py"
+    - "tests/fixtures/live-work-register/"
+    - "evidence/OW-071-01/"
   passed_commands:
-    - "Delivery-plan validator, exit 0"
-    - "Validator regression tests, exit 0"
-    - "Skill validator, exit 0"
-    - "Targeted skill/discovery/upgrade tests, 24 passed"
-    - "Generated-kit, standalone-skill, runtime-adapter, release-trust, public-docs, and principles-skill gates, exit 0"
-    - "Dogfood finalization gates with compliance and exports, exit 0"
+    - "Live-work validator under python -I, 21/21 records and 17 sources"
+    - "Live-work unittest suite, 18/18 passed"
+    - "Delivery-plan validator, 61 tickets, 25 gates, 42 waves"
+    - "Public docs, 233/233 passed"
+    - "Private-path scan, 2,081 files and zero findings"
+    - "Independent re-review, 93/100 with no P0/P1"
     - "git diff --check, exit 0"
   failed_commands:
-    - "Initial validator run, exit 1: new decision artifact used legacy frontmatter values; corrected and revalidated."
-    - "Initial skill/test QA under bare system Python: PyYAML and pytest missing; rerun in isolated uv environment passed."
-    - "First discovery regression run: tree_hash helper was missing in owledge_core.py; added helper and rerun passed."
-    - "One sandboxed pytest run could not create its default temp directory; rerun with a workspace-local basetemp passed."
-  workspace_state: "Clean codex/v071-integration control plane; OW-071-01 is the sole active ticket and all later 071-A tickets remain blocked."
-  next_exact_action: "Create the isolated OW-071-01 worktree and dispatch its product-operations worker."
+    - "First OW-071-01 independent review scored 80/100 and found F-071-12 through F-071-14; all were corrected before integration."
+    - "Central publish-readiness preflight encountered an unreadable stale dist artifact; excluded from ticket proof and routed to RC rebuild."
+  workspace_state: "OW-071-01 accepted and integrated; Phase-1 reflection pending commit on codex/v071-integration; OW-071-02 is the sole active ticket."
+  next_exact_action: "Commit Phase-1 reflection, verify a clean tree, then create the isolated OW-071-02 worktree."
   open_assumptions:
     - "The product owner wants the existing five-release train retained unless a later version reflection changes it."
-    - "Local subagent execution is authorized through the v0.7.1 alignment stop within recorded non-destructive scope."
+    - "Local serial execution is the default; subagents are exceptional and justified only by independent risk reduction."
   prohibited_shortcuts:
     - "Do not start v0.8.0 before G-071-ALIGNMENT and an explicit owner approve decision."
-    - "Do not silently normalize legacy planning metadata outside OW-071-01."
-    - "Do not cite the current generated finalization exports as release evidence until the non-vacuous scan and path sanitization fixes pass."
-updated_at: "2026-07-27T15:40:00Z"
+    - "Do not trust or publish inherited dist artifacts; rebuild from committed source at RC."
+    - "Do not start OW-071-03 until OW-071-02 is integrated and reflected."
+updated_at: "2026-07-27T16:13:00Z"
 updated_by: codex
