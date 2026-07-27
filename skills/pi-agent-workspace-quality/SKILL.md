@@ -1,6 +1,6 @@
 ---
 name: pi-agent-workspace-quality
-description: Use as a PI Agent workspace guardian for Owledge projects. Checks quality, asks targeted planning questions, reviews workspace health, inspects ideas before new plans, and routes Codex, Claude Code, Hermes, OpenClaw/OpenCode, PI Agents, or generic CLI engines through Owledge's Markdown-first memory contract.
+description: Use as a PI Agent workspace guardian for Owledge projects. Checks quality, asks only cutline-changing planning questions, reviews workspace health, inspects ideas and concepts before new plans, and routes Codex, Claude Code, Hermes, OpenClaw/OpenCode, PI Agents, or generic CLI engines through Owledge's Markdown-first memory contract.
 ---
 
 # PI Agent Workspace Quality
@@ -12,10 +12,12 @@ Use this skill when the user asks for workspace quality, PI Agent review, planni
 1. `OWLEDGE.md`
 2. `.owledge/indexes/memory-index.jsonl`
 3. `.owledge/ideas/`
-4. `.owledge/compiled/`
-5. `.owledge/canonical/`
-6. `.owledge/decisions/`
-7. `.owledge/patterns/` and `.owledge/lessons/`
+4. `.owledge/pi-agent/concepts/`
+5. active roadmap/backlog
+6. `.owledge/compiled/`
+7. `.owledge/canonical/`
+8. `.owledge/decisions/`
+9. `.owledge/patterns/` and `.owledge/lessons/`
 
 ## Default Check
 
@@ -38,7 +40,11 @@ Then answer with:
 
 ## Ideation Rule
 
-Before a new plan, inspect `.owledge/ideas/` for matching `concept_tags`, `problem_patterns`, `architecture_patterns`, and `similar_to` edges.
+Before a new plan, inspect `.owledge/ideas/`,
+`.owledge/pi-agent/concepts/`, and the active roadmap/backlog for matching
+`concept_tags`, `problem_patterns`, `architecture_patterns`, and `similar_to`
+edges. Route the result into the `mvp-sparring` mode of
+`owledge-long-horizon-delivery`.
 
 When the user captures a new idea, use:
 
@@ -53,6 +59,8 @@ python tools/owledge_core.py --project-root . run-review-workflow --review-type 
 - Do not write canonical memory directly.
 - Do not promote ideas without review.
 - Keep answers short and question-driven.
+- Stop planning after one decision-complete MVP cutline; route extra value to
+  the roadmap or idea layer.
 
 ## Engine Bridge
 

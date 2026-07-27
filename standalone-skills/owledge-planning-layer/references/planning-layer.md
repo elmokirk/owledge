@@ -36,6 +36,21 @@ Every plan should answer:
 - What review gate prevents overengineering or unsafe promotion?
 - What should the next agent read first?
 
+## Minimum Planning Stop
+
+Planning is sufficient when one smallest useful increment has:
+
+- one target user and observable outcome;
+- one measurable success signal;
+- explicit in-scope and non-goal boundaries;
+- only required dependencies;
+- one first executable task;
+- one QA/promotion gate;
+- a durable route for every useful out-of-scope idea.
+
+At that point present `lock`, `adjust`, or `defer` and stop. Do not create more
+alternatives unless the user selects `adjust`.
+
 ## Context Hygiene
 
 Default to this order:
@@ -74,6 +89,10 @@ When an agent discovers extra work:
 - If useful but not required, capture it as an idea or future task.
 - If risky or unclear, route it to review.
 - If it changes architecture, require a decision record.
+
+Before writing a new plan, also inspect `.owledge/pi-agent/concepts/` and the
+active roadmap/backlog. Classify each relevant candidate as required now,
+enabling dependency, roadmap, idea candidate, or reject/defer.
 
 ## Handoff Shape
 

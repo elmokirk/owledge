@@ -152,6 +152,99 @@ def test_idempotent(fresh_project):
     assert len(second_json.get("created", [])) == 0, f"second run created files: {second_json.get('created')}"
 
 
+def test_safe_upgrade_adds_current_inventory_to_true_legacy_manifest(fresh_project):
+    """Safe upgrade discovers files that did not exist in a legacy manifest."""
+    project = fresh_project
+    discovery_root = project / ".agents" / "skills"
+    shutil.rmtree(discovery_root)
+    manifest_path = project / "kit-manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["kit_version"] = "0.6.0"
+    manifest["files"] = [
+        row for row in manifest["files"]
+        if not row["path"].startswith(".agents/skills/")
+    ]
+    manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+    dry_run = run_owledge(["upgrade", "--dry-run", "--mode=safe"], project)
+    assert dry_run.returncode == 0, dry_run.stderr
+    preview = json.loads(dry_run.stdout)
+    expected = ".agents/skills/owledge-autonomous-delivery/SKILL.md"
+    assert expected in preview["would_create"]
+    classified = {row["path"]: row for row in preview["classified"]}
+    assert classified[expected]["additive"] is True
+
+    apply = run_owledge(["upgrade", "--apply", "--mode=safe"], project)
+    assert apply.returncode == 0, apply.stderr
+    result = json.loads(apply.stdout)
+    assert expected in result["created"]
+    assert (project / expected).is_file()
+    upgraded = json.loads(manifest_path.read_text(encoding="utf-8"))
+    row = next(item for item in upgraded["files"] if item["path"] == expected)
+    assert row["sha256_original"]
+    assert row["sha256_installed"]
+
+
+def test_safe_upgrade_mirrors_user_edited_canonical_skill(fresh_project):
+    """An additive discovery mirror must match the installed canonical skill."""
+    project = fresh_project
+    skill_name = "owledge-autonomous-delivery"
+    canonical = project / "skills" / skill_name / "SKILL.md"
+    discoverable_root = project / ".agents" / "skills" / skill_name
+    shutil.rmtree(discoverable_root)
+    canonical.write_text(
+        canonical.read_text(encoding="utf-8") + "\n<!-- local user policy -->\n",
+        encoding="utf-8",
+        newline="\n",
+    )
+    user_hash = file_sha(project, f"skills/{skill_name}/SKILL.md")
+
+    manifest_path = project / "kit-manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["kit_version"] = "0.6.0"
+    manifest["files"] = [
+        row for row in manifest["files"]
+        if not row["path"].startswith(f".agents/skills/{skill_name}/")
+    ]
+    manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+    apply = run_owledge(["upgrade", "--apply", "--mode=safe"], project)
+    assert apply.returncode == 0, apply.stderr
+    mirror_rel = f".agents/skills/{skill_name}/SKILL.md"
+    assert file_sha(project, mirror_rel) == user_hash
+    assert file_sha(project, f"skills/{skill_name}/SKILL.md") == user_hash
+
+    upgraded = json.loads(manifest_path.read_text(encoding="utf-8"))
+    rows = {row["path"]: row for row in upgraded["files"]}
+    assert rows[mirror_rel]["sha256_installed"] == user_hash
+    assert rows[mirror_rel]["sha256_original"] != user_hash
+
+
+def test_safe_upgrade_resynchronizes_existing_mirror_from_user_edited_canonical(fresh_project):
+    """An existing pristine mirror follows the installed canonical user policy."""
+    project = fresh_project
+    skill_name = "owledge-long-horizon-delivery"
+    canonical_rel = f"skills/{skill_name}/SKILL.md"
+    mirror_rel = f".agents/skills/{skill_name}/SKILL.md"
+    canonical = project / canonical_rel
+    canonical.write_text(
+        canonical.read_text(encoding="utf-8") + "\n<!-- local delivery policy -->\n",
+        encoding="utf-8",
+        newline="\n",
+    )
+    user_hash = file_sha(project, canonical_rel)
+    assert file_sha(project, mirror_rel) != user_hash
+
+    set_manifest_kit_version(project, "0.6.0")
+    apply = run_owledge(["upgrade", "--apply", "--mode=safe"], project)
+    assert apply.returncode == 0, apply.stderr
+    result = json.loads(apply.stdout)
+    assert mirror_rel in result["updated"]
+    assert any(canonical_rel in item and "user-edited" in item for item in result["skipped"])
+    assert file_sha(project, canonical_rel) == user_hash
+    assert file_sha(project, mirror_rel) == user_hash
+
+
 def test_manifest_deleted_graceful(fresh_project):
     """Plan: delete kit-manifest.json, upgrade -> friendly error, no crash."""
     project = fresh_project

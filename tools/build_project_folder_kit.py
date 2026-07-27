@@ -121,10 +121,13 @@ SKILL_DIRS = [
     "skills/owledge-runtime-bridge",
     "skills/review-evaluation-workflow",
     "skills/render-memory-report",
+    "skills/owledge-long-horizon-delivery",
     "skills/owledge-planning-layer",
     "skills/owledge-brainstorm",
     "skills/owledge-autonomous-delivery",
 ]
+
+DISCOVERABLE_SKILL_ROOT = pathlib.Path(".agents") / "skills"
 
 
 def copy_file(source: pathlib.Path, target: pathlib.Path) -> None:
@@ -224,13 +227,16 @@ python tools/owledge_core.py --project-root . build-memory-index
 
 1. Read `OWLEDGE.md`.
 2. Use `AGENTS.md` / `CLAUDE.md` for local operating rules.
-3. Build task context with:
+3. Codex discovers the installed project skills from `.agents/skills/`.
+   The matching root `skills/` tree remains the Owledge source/vendor bundle;
+   `.owledge/skills/` is not an automatic discovery path.
+4. Build task context with:
 
 ```bash
 python tools/owledge.py build-context-pack --project-root . --task-id "<task-id>" --agent-role worker
 ```
 
-4. Write durable findings to `.owledge/` using the templates; do not treat
+5. Write durable findings to `.owledge/` using the templates; do not treat
 generated indexes or exports as canonical memory.
 
 ## Optional Adapters
@@ -287,6 +293,10 @@ def build(args: argparse.Namespace) -> dict[str, object]:
 
     for skill in SKILL_DIRS:
         copy_tree_filtered(source / skill, target / skill)
+        copy_tree_filtered(
+            source / skill,
+            target / DISCOVERABLE_SKILL_ROOT / pathlib.Path(skill).name,
+        )
 
     hook_profile = "none"
     if args.include_plugin_adapter:
@@ -312,7 +322,11 @@ def build(args: argparse.Namespace) -> dict[str, object]:
             for chunk in iter(lambda: handle.read(65536), b""):
                 digest.update(chunk)
         sha_installed = digest.hexdigest()
-        src_path = source / rel
+        if rel.startswith(f"{DISCOVERABLE_SKILL_ROOT.as_posix()}/"):
+            discovery_rel = pathlib.PurePosixPath(rel).relative_to(DISCOVERABLE_SKILL_ROOT.as_posix())
+            src_path = source / "skills" / pathlib.Path(discovery_rel)
+        else:
+            src_path = source / rel
         sha_original = ""
         if src_path.is_file():
             od = hashlib.sha256()

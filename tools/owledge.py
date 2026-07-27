@@ -134,11 +134,14 @@ HOST_SKILL_DIRS = [
     "skills/owledge-runtime-bridge",
     "skills/review-evaluation-workflow",
     "skills/render-memory-report",
+    "skills/owledge-long-horizon-delivery",
     "skills/owledge-planning-layer",
     "skills/owledge-brainstorm",
     "skills/concept-blindspot-audit",
     "skills/owledge-autonomous-delivery",
 ]
+
+DISCOVERABLE_SKILL_ROOT = pathlib.Path(".agents") / "skills"
 
 
 class ResultSet:
@@ -172,23 +175,120 @@ def resolve_path(value: str | pathlib.Path, base: pathlib.Path | None = None) ->
 
 
 def resolve_memory_root(root: pathlib.Path) -> pathlib.Path:
-    """Return the directory holding the active memory tree.
+    """Keep the project root while core helpers resolve its active memory tree.
 
-    In the Owledge source repo, dogfood memory may live at
-    ``internal/owledge/`` while tools and docs live at the repo root.
-    This helper auto-detects that layout so gate functions can be invoked with
-    ``--project-root .`` and still operate on the dogfood memory tree.
-    In a normal host project, it falls back to ``root`` itself.
+    Generated paths and record source paths must stay relative to the project,
+    including in the source repository where dogfood records live below
+    ``internal/owledge``. Passing ``root/internal`` previously made the core
+    scanner look for ``root/internal/.owledge`` and silently return zero rows.
     """
-    internal_modern = root / "internal" / ".owledge"
-    if internal_modern.is_dir():
-        return internal_modern.parent
-    internal = root / "internal" / "owledge"
-    return internal.parent if internal.is_dir() else root
+    return root
 
 
 def relative_posix(path: pathlib.Path, root: pathlib.Path) -> str:
     return path.resolve().relative_to(root.resolve()).as_posix()
+
+
+def sanitize_generated_payload(value: Any, root: pathlib.Path) -> Any:
+    """Remove machine-private path prefixes from persisted generated evidence."""
+    if isinstance(value, dict):
+        return {key: sanitize_generated_payload(item, root) for key, item in value.items()}
+    if isinstance(value, list):
+        return [sanitize_generated_payload(item, root) for item in value]
+    if not isinstance(value, str):
+        return value
+    sanitized = value
+    for private_root, replacement in (
+        (str(root.resolve()), "."),
+        (root.resolve().as_posix(), "."),
+        (str(pathlib.Path.home().resolve()), "<home>"),
+        (pathlib.Path.home().resolve().as_posix(), "<home>"),
+    ):
+        sanitized = sanitized.replace(private_root, replacement)
+    if sanitized != value:
+        sanitized = sanitized.replace("\\", "/")
+    return sanitized
+
+
+GENERATED_EVIDENCE_PREFIXES = (
+    "internal/owledge/exports/",
+    "internal/owledge/indexes/",
+    "internal/owledge/compiled/",
+    ".agent-control/tmp/",
+    ".pytest_cache/",
+)
+
+
+def _is_generated_evidence_path(path: str) -> bool:
+    normalized = path.strip().strip('"').replace("\\", "/")
+    if " -> " in normalized:
+        normalized = normalized.split(" -> ", 1)[1].strip().strip('"')
+    return any(normalized == prefix.rstrip("/") or normalized.startswith(prefix) for prefix in GENERATED_EVIDENCE_PREFIXES)
+
+
+def git_source_identity(root: pathlib.Path) -> dict[str, Any]:
+    """Fingerprint release-relevant source while excluding generated evidence.
+
+    The content hash stays stable across an evidence-only commit, while any
+    tracked or untracked source edit makes existing finalization evidence stale.
+    """
+    head = run_subprocess(["git", "rev-parse", "HEAD"], cwd=root)
+    status = run_subprocess(["git", "status", "--porcelain=v1", "--untracked-files=all"], cwd=root)
+    inventory = run_subprocess(["git", "ls-files", "--cached", "--others", "--exclude-standard"], cwd=root)
+    if head.returncode != 0 or status.returncode != 0 or inventory.returncode != 0:
+        return {
+            "available": False,
+            "commit": "",
+            "source_tree_hash": "",
+            "source_clean": False,
+            "dirty_source_paths": [],
+            "error": (head.stderr or status.stderr or inventory.stderr).strip() or "git source identity unavailable",
+        }
+
+    dirty_source_paths: list[str] = []
+    for line in status.stdout.splitlines():
+        rel = line[3:].strip() if len(line) >= 4 else line.strip()
+        if rel and not _is_generated_evidence_path(rel):
+            dirty_source_paths.append(rel.replace("\\", "/"))
+
+    rows: list[str] = []
+    for rel in sorted({line.strip().replace("\\", "/") for line in inventory.stdout.splitlines() if line.strip()}):
+        if _is_generated_evidence_path(rel):
+            continue
+        path = root / pathlib.Path(rel)
+        if path.is_file():
+            rows.append(f"{rel}\0{sha256_file(path)}")
+    digest = hashlib.sha256("\n".join(rows).encode("utf-8")).hexdigest()
+    return {
+        "available": True,
+        "commit": head.stdout.strip(),
+        "source_tree_hash": digest,
+        "source_clean": not dirty_source_paths,
+        "dirty_source_paths": sorted(dirty_source_paths),
+    }
+
+
+def finalization_evidence_freshness(root: pathlib.Path, evidence: dict[str, Any]) -> dict[str, Any]:
+    """Check whether persisted evidence still describes the current source tree."""
+    recorded = evidence.get("source_identity") or {}
+    current = git_source_identity(root)
+    recorded_hash = str(recorded.get("source_tree_hash") or "")
+    passed = bool(
+        current.get("available")
+        and recorded.get("available")
+        and recorded.get("source_clean")
+        and current.get("source_clean")
+        and recorded_hash
+        and recorded_hash == current.get("source_tree_hash")
+    )
+    return {
+        "passed": passed,
+        "recorded_commit": str(recorded.get("commit") or ""),
+        "current_commit": str(current.get("commit") or ""),
+        "source_tree_hash_match": bool(recorded_hash and recorded_hash == current.get("source_tree_hash")),
+        "current_source_clean": bool(current.get("source_clean")),
+        "dirty_source_paths": current.get("dirty_source_paths", []),
+    }
 
 
 def sha256_file(path: pathlib.Path) -> str:
@@ -319,7 +419,52 @@ def _collect_kit_files(source_root: pathlib.Path, project_root: pathlib.Path) ->
             src = skill_src / pathlib.Path(rel_posix).relative_to(skill_dir)
             sha_original = sha256_file(src) if src.is_file() else ""
             entries.append({"path": rel_posix, "sha256_installed": sha_installed, "sha256_original": sha_original})
+        discovery_dst = project_root / DISCOVERABLE_SKILL_ROOT / pathlib.Path(skill_dir).name
+        if not discovery_dst.is_dir():
+            continue
+        for path in sorted(discovery_dst.rglob("*"), key=lambda item: item.as_posix()):
+            if not path.is_file() or "__pycache__" in path.parts:
+                continue
+            rel_posix = path.relative_to(project_root).as_posix()
+            if rel_posix in seen:
+                continue
+            seen.add(rel_posix)
+            sha_installed = sha256_file(path)
+            src = skill_src / path.relative_to(discovery_dst)
+            sha_original = sha256_file(src) if src.is_file() else ""
+            entries.append({"path": rel_posix, "sha256_installed": sha_installed, "sha256_original": sha_original})
     return entries
+
+
+def _current_kit_inventory(source_root: pathlib.Path) -> dict[str, str]:
+    """Return every additive file supplied by the current host kit."""
+    inventory: dict[str, str] = {}
+
+    def add(rel_posix: str, source: pathlib.Path) -> None:
+        if source.is_file():
+            inventory[rel_posix] = sha256_file(source)
+
+    for source_rel, target_rel in ROOT_FILE_MAP:
+        add(target_rel, source_root / source_rel)
+    template_root = _product_template_dir(source_root)
+    if template_root.is_dir():
+        for source in sorted(template_root.rglob("*"), key=lambda item: item.as_posix()):
+            if source.is_file() and "__pycache__" not in source.parts:
+                add(f".owledge/{source.relative_to(template_root).as_posix()}", source)
+    for tool in HOST_TOOL_FILES:
+        add(f"tools/{tool}", source_root / "tools" / tool)
+    for skill_dir in HOST_SKILL_DIRS:
+        source_skill = source_root / skill_dir
+        if not source_skill.is_dir():
+            continue
+        skill_name = pathlib.Path(skill_dir).name
+        for source in sorted(source_skill.rglob("*"), key=lambda item: item.as_posix()):
+            if not source.is_file() or "__pycache__" in source.parts:
+                continue
+            suffix = source.relative_to(source_skill).as_posix()
+            add(f"{skill_dir}/{suffix}", source)
+            add(f"{DISCOVERABLE_SKILL_ROOT.as_posix()}/{skill_name}/{suffix}", source)
+    return inventory
 
 
 def _write_kit_manifest(project_root: pathlib.Path, source_root: pathlib.Path) -> None:
@@ -439,6 +584,9 @@ def init_project(project_root: pathlib.Path, source_root: pathlib.Path, include_
         source = source_root / skill
         if source.exists():
             created.extend(copy_tree_missing(source, project_root / skill))
+            discovery_target = project_root / DISCOVERABLE_SKILL_ROOT / pathlib.Path(skill).name
+            discovery_created = copy_tree_missing(source, discovery_target)
+            created.extend(f"{DISCOVERABLE_SKILL_ROOT.as_posix()}/{item}" for item in discovery_created)
 
     if include_plugin_adapter:
         created.extend(
@@ -509,6 +657,9 @@ def _resolve_source_path(rel_posix: str, source_root: pathlib.Path) -> pathlib.P
         return source_root / rel_posix
     if rel_posix.startswith("skills/"):
         return source_root / rel_posix
+    if rel_posix.startswith(f"{DISCOVERABLE_SKILL_ROOT.as_posix()}/"):
+        relative = pathlib.PurePosixPath(rel_posix).relative_to(DISCOVERABLE_SKILL_ROOT.as_posix())
+        return source_root / "skills" / pathlib.Path(relative)
     return source_root / rel_posix
 
 
@@ -576,12 +727,21 @@ def upgrade_project(root: pathlib.Path, source_root: pathlib.Path, dry_run: bool
     version_mismatch = bool(manifest_kit and target_kit and manifest_kit != target_kit)
     alert_level = _read_upgrade_notes(root) if version_mismatch else "current"
 
+    manifest_entries = {
+        str(entry.get("path") or ""): entry
+        for entry in manifest.get("files", []) or []
+        if str(entry.get("path") or "")
+    }
+    current_inventory = _current_kit_inventory(source_root)
+    inventory_paths = list(manifest_entries)
+    inventory_paths.extend(path for path in current_inventory if path not in manifest_entries)
+
     classified: list[dict[str, Any]] = []
-    for entry in manifest.get("files", []) or []:
-        rel_posix = str(entry.get("path") or "")
-        if not rel_posix:
-            continue
-        sha_original = str(entry.get("sha256_original") or "")
+    for path_key in inventory_paths:
+        entry = manifest_entries.get(path_key, {})
+        rel_posix = str(entry.get("path") or path_key)
+        is_additive = rel_posix not in manifest_entries
+        sha_original = str(entry.get("sha256_original") or current_inventory.get(rel_posix) or "")
         current_path = root / rel_posix
         state = "missing"
         current_hash = ""
@@ -602,6 +762,7 @@ def upgrade_project(root: pathlib.Path, source_root: pathlib.Path, dry_run: bool
             "sha256_current": current_hash,
             "sha256_original": sha_original,
             "never_touch": _is_never_touch(rel_posix),
+            "additive": is_additive,
         })
 
     outdated_paths = [
@@ -738,9 +899,18 @@ def upgrade_project(root: pathlib.Path, source_root: pathlib.Path, dry_run: bool
         created: list[str] = []
         skipped: list[str] = list(skip_targets)
 
+        def installed_upgrade_source(rel: str) -> pathlib.Path:
+            source_path = _resolve_source_path(rel, source_root)
+            if rel.startswith(f"{DISCOVERABLE_SKILL_ROOT.as_posix()}/"):
+                discovery_rel = pathlib.PurePosixPath(rel).relative_to(DISCOVERABLE_SKILL_ROOT.as_posix())
+                installed_canonical = root / "skills" / pathlib.Path(discovery_rel)
+                if installed_canonical.is_file():
+                    return installed_canonical
+            return source_path
+
         for rel in update_targets:
             assert not _is_never_touch(rel), f"refuse to write never-touch file: {rel}"
-            source_path = _resolve_source_path(rel, source_root)
+            source_path = installed_upgrade_source(rel)
             if not source_path.is_file():
                 skipped.append(f"{rel} (source missing)")
                 continue
@@ -751,7 +921,7 @@ def upgrade_project(root: pathlib.Path, source_root: pathlib.Path, dry_run: bool
 
         for rel in create_targets:
             assert not _is_never_touch(rel), f"refuse to write never-touch file: {rel}"
-            source_path = _resolve_source_path(rel, source_root)
+            source_path = installed_upgrade_source(rel)
             if not source_path.is_file():
                 skipped.append(f"{rel} (source missing)")
                 continue
@@ -2339,6 +2509,8 @@ def standalone_skills_gate(root: pathlib.Path) -> dict[str, Any]:
         "owledge-blindspot-audit",
         "owledge-agentic-review",
         "owledge-brainstorm",
+        "owledge-long-horizon-delivery",
+        "owledge-planning-layer",
     }
     listed = {str(item.get("name")) for item in skills if isinstance(item, dict)}
     for name in sorted(required):
@@ -2514,9 +2686,73 @@ def _read_project_mode_from_context(root: pathlib.Path) -> str:
     return "mvp"
 
 
+def dogfood_memory_scan_gate(root: pathlib.Path) -> dict[str, Any]:
+    """Prove finalization is evaluating real dogfood records, not an empty path."""
+    memory_root = resolve_memory_root(root)
+    files = core.memory_markdown_files(memory_root, include_sessions=True)
+    records = core.load_memory_records(memory_root, include_sessions=True)
+    if not files or not records:
+        raise RuntimeError(
+            "Dogfood memory scan is empty; finalization would be vacuous "
+            f"(markdown_files={len(files)}, indexed_records={len(records)})."
+        )
+    return {
+        "passed": True,
+        "memory_dir": relative_posix(core.active_memory_dir(memory_root), root),
+        "markdown_files": len(files),
+        "indexed_records": len(records),
+    }
+
+
+def clean_source_gate(root: pathlib.Path) -> dict[str, Any]:
+    identity = git_source_identity(root)
+    if not identity.get("available"):
+        raise RuntimeError(identity.get("error") or "Git source identity is unavailable.")
+    if not identity.get("source_clean"):
+        paths = ", ".join(identity.get("dirty_source_paths", [])[:12])
+        raise RuntimeError(f"Release source tree is dirty; finalization evidence would be stale: {paths}")
+    return {"passed": True, **identity}
+
+
+def generated_evidence_private_path_gate(root: pathlib.Path) -> dict[str, Any]:
+    """Reject machine-private absolute paths in persisted dogfood evidence."""
+    export_root = _active_memory_dir(root) / "exports"
+    if not export_root.is_dir():
+        return {"passed": True, "scanned_files": 0, "findings": []}
+    literal_tokens = {
+        str(root.resolve()),
+        root.resolve().as_posix(),
+        str(pathlib.Path.home().resolve()),
+        pathlib.Path.home().resolve().as_posix(),
+    }
+    private_patterns = [
+        re.compile(r"[A-Za-z]:[\\/]+Users[\\/]+[^\\/\s\"']+", re.IGNORECASE),
+        re.compile(r"/(?:home|Users)/[^/\s\"']+/", re.IGNORECASE),
+    ]
+    findings: list[dict[str, Any]] = []
+    scanned = 0
+    for path in sorted(export_root.rglob("*"), key=lambda item: item.as_posix()):
+        if not path.is_file() or path.suffix.lower() not in {".json", ".jsonl", ".md", ".html", ".svg", ".txt"}:
+            continue
+        scanned += 1
+        text_value = path.read_text(encoding="utf-8", errors="ignore")
+        for token in literal_tokens:
+            if token and token in text_value:
+                findings.append({"path": relative_posix(path, root), "kind": "private-root"})
+                break
+        else:
+            if any(pattern.search(text_value) for pattern in private_patterns):
+                findings.append({"path": relative_posix(path, root), "kind": "absolute-user-path"})
+    if findings:
+        preview = ", ".join(row["path"] for row in findings[:12])
+        raise RuntimeError(f"Generated evidence contains machine-private paths: {preview}")
+    return {"passed": True, "scanned_files": scanned, "findings": []}
+
+
 def finalization_gates(root: pathlib.Path, include_exports: bool, include_compliance: bool) -> dict[str, Any]:
     gates: list[dict[str, Any]] = []
     memory_root = resolve_memory_root(root)
+    source_identity = git_source_identity(root)
 
     def add(name: str, func: Callable[[], Any]) -> None:
         gate = run_gate(name, func)
@@ -2524,6 +2760,7 @@ def finalization_gates(root: pathlib.Path, include_exports: bool, include_compli
         status = "PASS" if gate["passed"] else "FAIL"
         print(f"{status} {name} ({gate['seconds']}s)")
 
+    add("source-identity", lambda: clean_source_gate(root))
     add("python-compile", lambda: py_compile_gate(root))
     add("public-docs", lambda: public_docs_gate(root))
     add("release-trust", lambda: release_trust_gate(root))
@@ -2535,6 +2772,7 @@ def finalization_gates(root: pathlib.Path, include_exports: bool, include_compli
     add("core-platform-neutral", lambda: platform_neutral_core_gate(root))
     add("generated-kit-surface", lambda: generated_kit_surface_gate(root))
     add("doctor", lambda: core.memory_doctor(root, mode="kit"))
+    add("dogfood-memory-scan", lambda: dogfood_memory_scan_gate(root))
     add("validate", lambda: core.validate_memory(memory_root, strict=False))
     add("index-full", lambda: core.build_memory_index(memory_root))
     add("index-incremental", lambda: core.build_memory_index(memory_root, incremental=True, track_tombstones=True))
@@ -2561,6 +2799,7 @@ def finalization_gates(root: pathlib.Path, include_exports: bool, include_compli
         add("export-lightrag-shared", lambda: core.export_lightrag(memory_root, corpus_type="shared"))
         add("export-graphrag-shared", lambda: core.export_graphrag(memory_root, corpus_type="shared"))
         add("report-shared", lambda: core.render_memory_report(memory_root, "project-dashboard", audience="shared"))
+    add("generated-evidence-private-paths", lambda: generated_evidence_private_path_gate(root))
 
     failed = [gate for gate in gates if not gate["passed"]]
     report_dir = _active_memory_dir(memory_root) / "exports" / "finalization-gates"
@@ -2570,7 +2809,7 @@ def finalization_gates(root: pathlib.Path, include_exports: bool, include_compli
     if quality_summary_path.exists():
         quality_summary = json.loads(quality_summary_path.read_text(encoding="utf-8"))
         quality_scores = quality_summary.get("scores", {})
-    result = {
+    result = sanitize_generated_payload({
         "generated_at": core.utc_now(),
         "project": str(root),
         "passed": not failed,
@@ -2578,9 +2817,10 @@ def finalization_gates(root: pathlib.Path, include_exports: bool, include_compli
         "failed": len(failed),
         "include_exports": include_exports,
         "include_compliance": include_compliance,
+        "source_identity": source_identity,
         "quality_ratchet_summary_path": relative_posix(quality_summary_path, root) if quality_summary_path.exists() else "",
         "quality_ratchet_scores": quality_scores,
-    }
+    }, root)
     (report_dir / "latest.json").write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     lines = [
         "# Finalization Gates",
@@ -2588,6 +2828,9 @@ def finalization_gates(root: pathlib.Path, include_exports: bool, include_compli
         f"- Generated at: {result['generated_at']}",
         f"- Passed: {result['passed']}",
         f"- Failed gates: {result['failed']}",
+        f"- Tested source commit: {result['source_identity']['commit'] or 'unavailable'}",
+        f"- Tested source tree hash: {result['source_identity']['source_tree_hash'] or 'unavailable'}",
+        f"- Source clean at start: {result['source_identity']['source_clean']}",
         f"- Quality ratchet summary: {result['quality_ratchet_summary_path'] or 'not generated'}",
         "",
         "## Gates",
@@ -2863,15 +3106,19 @@ def quality_ratchet_gate(root: pathlib.Path) -> dict[str, Any]:
     temp_gate_report = root / ".agent-control" / "tmp" / "quality-ratchet-redteam-source.json"
     temp_gate_report.parent.mkdir(parents=True, exist_ok=True)
     pre_qa_passed = all(gate["passed"] for gate in component_gates)
+    temp_payload = sanitize_generated_payload(
+        {
+            "generated_at": core.utc_now(),
+            "project": str(root),
+            "passed": pre_qa_passed,
+            "include_compliance": False,
+            "gates": component_gates,
+        },
+        root,
+    )
     temp_gate_report.write_text(
         json.dumps(
-            {
-                "generated_at": core.utc_now(),
-                "project": str(root),
-                "passed": pre_qa_passed,
-                "include_compliance": False,
-                "gates": component_gates,
-            },
+            temp_payload,
             indent=2,
             sort_keys=True,
         )
@@ -2882,7 +3129,7 @@ def quality_ratchet_gate(root: pathlib.Path) -> dict[str, Any]:
     component_gates.append(qa_gate)
     scores = {gate["name"]: 100 if gate["passed"] else 0 for gate in component_gates}
     failed = [gate for gate in component_gates if not gate["passed"]]
-    summary = {
+    summary = sanitize_generated_payload({
         "generated_at": core.utc_now(),
         "project": str(root),
         "passed": not failed,
@@ -2890,7 +3137,7 @@ def quality_ratchet_gate(root: pathlib.Path) -> dict[str, Any]:
         "gates": component_gates,
         "failed": len(failed),
         "components": component_payloads,
-    }
+    }, root)
     (report_dir / "quality-ratchet-summary.json").write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return summary
 

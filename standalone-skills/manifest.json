@@ -32,6 +32,13 @@
       "supported_runtimes": ["codex-style", "claude-style", "generic-agent"]
     },
     {
+      "name": "owledge-long-horizon-delivery",
+      "path": "owledge-long-horizon-delivery",
+      "requires_full_owledge_kit": false,
+      "optional_owledge_cli": true,
+      "supported_runtimes": ["codex", "claude-code", "opencode", "generic-agent"]
+    },
+    {
       "name": "owledge-planning-layer",
       "path": "owledge-planning-layer",
       "requires_full_owledge_kit": false,

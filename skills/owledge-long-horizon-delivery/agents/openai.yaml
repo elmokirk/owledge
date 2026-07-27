@@ -1,0 +1,4 @@
+interface:
+  display_name: "Owledge Long-Horizon Delivery"
+  short_description: "Ship bounded MVPs through evidence-backed gates"
+  default_prompt: "Use $owledge-long-horizon-delivery to reduce this request to a ship-ready MVP and route future ideas to the roadmap."

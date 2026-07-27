@@ -78,6 +78,17 @@ connect to an existing Markdown knowledgebase, Obsidian vault, or LLM wiki
 without forcing the preset folder structure. It supports a principles-first
 workflow with an optional local `owledge-map.json`.
 
+Use `owledge-long-horizon-delivery` for multi-step work. Its default planning
+mode is bounded `mvp-sparring`: inspect relevant existing ideas and concepts,
+lock the smallest useful increment, and route additional value to the roadmap
+or idea layer. After every version, use `version-steering` and stop for an
+explicit owner decision before executing the next version.
+
+The plugin manifest declares `plugins/owledge-cowork/skills/` as its discovery
+root. A normal initialized Codex repository additionally receives
+`.agents/skills/`; root `skills/` remains Owledge's source/vendor bundle.
+`.owledge/skills/` is not an automatic discovery location.
+
 ## Local Starter
 
 ```bash

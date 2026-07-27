@@ -80,6 +80,43 @@ jobs:
           uvx --from "$WHEEL" owledge quickstart --target "$tmp"
           test -f "$tmp/OWLEDGE.md"
           test -d "$tmp/.owledge"
+          python - "$tmp" <<'PY'
+          import hashlib
+          import json
+          import pathlib
+          import sys
+
+          from tools.owledge import HOST_SKILL_DIRS
+
+          target = pathlib.Path(sys.argv[1])
+          manifest = json.loads((target / "kit-manifest.json").read_text(encoding="utf-8"))
+          rows = {row["path"]: row for row in manifest["files"]}
+          for skill_dir in HOST_SKILL_DIRS:
+              name = pathlib.PurePosixPath(skill_dir).name
+              source_root = pathlib.Path(skill_dir)
+              expected = {
+                  path.relative_to(source_root).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
+                  for path in source_root.rglob("*")
+                  if path.is_file() and "__pycache__" not in path.parts
+              }
+              assert expected, skill_dir
+              for installed_root in (
+                  target / skill_dir,
+                  target / ".agents" / "skills" / name,
+              ):
+                  actual = {
+                      path.relative_to(installed_root).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
+                      for path in installed_root.rglob("*")
+                      if path.is_file() and "__pycache__" not in path.parts
+                  }
+                  assert actual == expected, (installed_root, sorted(set(expected) ^ set(actual)))
+                  for suffix, installed_hash in actual.items():
+                      rel = installed_root.relative_to(target).as_posix()
+                      manifest_path = f"{rel}/{suffix}"
+                      row = rows[manifest_path]
+                      assert row["sha256_original"] == expected[suffix], manifest_path
+                      assert row["sha256_installed"] == installed_hash, manifest_path
+          PY
 
       - name: Release contracts and evidence
         run: python tools/owledge.py test release-contract --project-root . --require-dist --evidence-path dist/release-evidence.json

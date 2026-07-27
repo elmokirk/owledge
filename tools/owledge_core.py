@@ -49,6 +49,17 @@ def active_memory_dir(root: pathlib.Path) -> pathlib.Path:
     return root / ".owledge"
 
 
+def stable_output_path(path: pathlib.Path, root: pathlib.Path) -> str:
+    """Render generated-output paths without leaking a machine-private prefix."""
+    resolved_path = path.resolve()
+    resolved_root = root.resolve()
+    try:
+        relative = resolved_path.relative_to(resolved_root)
+    except ValueError:
+        return f"<external>/{resolved_path.name}"
+    return "." if not relative.parts else relative.as_posix()
+
+
 def product_template_dir(root: pathlib.Path) -> pathlib.Path:
     modern = root / "templates" / "owledge"
     if modern.is_dir():
@@ -164,6 +175,7 @@ REQUIRED_DIRS = [
     "skills/owledge-runtime-bridge",
     "skills/render-memory-report",
     "skills/review-evaluation-workflow",
+    "skills/owledge-long-horizon-delivery",
     "skills/owledge-planning-layer",
     "skills/owledge-brainstorm",
     "skills/personal-pi-agent",
@@ -177,6 +189,9 @@ REQUIRED_DIRS = [
     "plugins/owledge-cowork/skills/owledge-runtime-bridge",
     "plugins/owledge-cowork/skills/render-memory-report",
     "plugins/owledge-cowork/skills/review-evaluation-workflow",
+    "plugins/owledge-cowork/skills/owledge-long-horizon-delivery",
+    "plugins/owledge-cowork/skills/owledge-planning-layer",
+    "plugins/owledge-cowork/skills/owledge-brainstorm",
     "plugins/owledge-cowork/agents",
     "plugins/owledge-cowork/commands",
     "plugins/owledge-cowork/scripts",
@@ -349,6 +364,9 @@ REQUIRED_FILES = [
     "skills/personal-pi-agent/SKILL.md",
     "skills/render-memory-report/SKILL.md",
     "skills/review-evaluation-workflow/SKILL.md",
+    "skills/owledge-long-horizon-delivery/SKILL.md",
+    "skills/owledge-long-horizon-delivery/agents/openai.yaml",
+    "skills/owledge-long-horizon-delivery/references/modes.md",
     "skills/owledge-planning-layer/SKILL.md",
     "skills/owledge-brainstorm/SKILL.md",
     "skills/concept-blindspot-audit/SKILL.md",
@@ -375,6 +393,12 @@ REQUIRED_FILES = [
     "plugins/owledge-cowork/skills/bootstrap-owledge/SKILL.md",
     "plugins/owledge-cowork/skills/render-memory-report/SKILL.md",
     "plugins/owledge-cowork/skills/review-evaluation-workflow/SKILL.md",
+    "plugins/owledge-cowork/skills/owledge-long-horizon-delivery/SKILL.md",
+    "plugins/owledge-cowork/skills/owledge-long-horizon-delivery/agents/openai.yaml",
+    "plugins/owledge-cowork/skills/owledge-long-horizon-delivery/references/modes.md",
+    "plugins/owledge-cowork/skills/owledge-planning-layer/SKILL.md",
+    "plugins/owledge-cowork/skills/owledge-planning-layer/references/planning-layer.md",
+    "plugins/owledge-cowork/skills/owledge-brainstorm/SKILL.md",
     "plugins/owledge-cowork/skills/render-memory-report/references/decision-report.md",
     "plugins/owledge-cowork/skills/render-memory-report/references/handoff-report.md",
     "plugins/owledge-cowork/skills/render-memory-report/references/rag-readiness-report.md",
@@ -691,6 +715,17 @@ def sha256_file(path: pathlib.Path) -> str:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
             h.update(chunk)
     return h.hexdigest()
+
+
+def tree_hash(root: pathlib.Path) -> str:
+    """Return a deterministic content hash for a directory tree."""
+    rows: list[str] = []
+    if not root.is_dir():
+        return ""
+    for path in sorted(root.rglob("*"), key=lambda item: item.as_posix()):
+        if path.is_file() and "__pycache__" not in path.parts:
+            rows.append(f"{path.relative_to(root).as_posix()}={sha256_file(path)}")
+    return "\n".join(rows)
 
 
 def atomic_write_text(path: pathlib.Path, text: str, encoding: str = "utf-8") -> None:
@@ -1791,7 +1826,7 @@ def markdown_body(text: str) -> str:
 
 
 def memory_markdown_files(root: pathlib.Path, include_sessions: bool = True) -> list[pathlib.Path]:
-    bases = [
+    project_bases = [
         "USER_CONTEXT.md",
         "USER_CONTEXT.template.md",
         "OWLEDGE.md",
@@ -1806,55 +1841,46 @@ def memory_markdown_files(root: pathlib.Path, include_sessions: bool = True) -> 
         "global-memory/research",
         "global-memory/patterns",
         "global-memory/coach",
-        ".owledge/context",
-        ".owledge/canonical",
-        ".owledge/compiled",
-        ".owledge/patterns",
-        ".owledge/lessons",
-        ".owledge/ideas",
-        ".owledge/plans",
-        ".owledge/tasks",
-        ".owledge/workpackages",
-        ".owledge/reviews",
-        ".owledge/audiences",
-        ".owledge/research",
-        ".owledge/decisions",
-        ".owledge/evidence",
-        ".owledge/handoffs",
-        ".owledge/pi-agent/reports",
-        ".owledge/pi-agent/parallels",
-        ".owledge/pi-agent/trends",
-        ".owledge/pi-agent/recurring-errors",
-        ".owledge/pi-agent/concepts",
-        ".owledge/pi-agent/red-team",
-        ".owledge/pi-agent/evaluations",
-        ".owledge/pi-agent/scorecards",
-        ".owledge/canonical",
-        ".owledge/compiled",
-        ".owledge/patterns",
-        ".owledge/lessons",
-        ".owledge/ideas",
-        ".owledge/decisions",
-        ".owledge/evidence",
-        ".owledge/handoffs",
-        ".owledge/pi-agent/reports",
-        ".owledge/pi-agent/parallels",
-        ".owledge/pi-agent/trends",
-        ".owledge/pi-agent/recurring-errors",
-        ".owledge/pi-agent/concepts",
-        ".owledge/pi-agent/red-team",
-        ".owledge/pi-agent/evaluations",
-        ".owledge/pi-agent/scorecards",
+    ]
+    memory_bases = [
+        "context",
+        "canonical",
+        "compiled",
+        "patterns",
+        "lessons",
+        "ideas",
+        "plans",
+        "tasks",
+        "workpackages",
+        "reviews",
+        "reports",
+        "audiences",
+        "research",
+        "decisions",
+        "evidence",
+        "handoffs",
+        "pi-agent/reports",
+        "pi-agent/parallels",
+        "pi-agent/trends",
+        "pi-agent/recurring-errors",
+        "pi-agent/concepts",
+        "pi-agent/red-team",
+        "pi-agent/evaluations",
+        "pi-agent/scorecards",
     ]
     if include_sessions:
-        bases.append(".owledge/sessions")
-        bases.append(".owledge/sessions")
+        memory_bases.append("sessions")
     files: list[pathlib.Path] = []
-    for rel in bases:
+    for rel in project_bases:
         path = root / rel
         if path.is_file() and path.suffix.lower() == ".md":
             files.append(path)
         elif path.is_dir():
+            files.extend(sorted(path.rglob("*.md")))
+    memory_dir = active_memory_dir(root)
+    for rel in memory_bases:
+        path = memory_dir / rel
+        if path.is_dir():
             files.extend(sorted(path.rglob("*.md")))
     return sorted(set(files))
 
@@ -2262,6 +2288,52 @@ def memory_doctor(root: pathlib.Path, mode: str = "auto") -> dict[str, Any]:
         "Local or installed Owledge CLI is available.",
         "Install Owledge or copy tools/owledge_core.py into the project when local tooling is required.",
     )
+    if effective_mode == "host":
+        vendor_skill_root = root / "skills"
+        discovery_skill_root = root / ".agents" / "skills"
+        vendor_skills = {
+            path.name: path
+            for path in vendor_skill_root.iterdir()
+            if path.is_dir() and (path / "SKILL.md").is_file()
+        } if vendor_skill_root.is_dir() else {}
+        missing_discovery = sorted(
+            name for name in vendor_skills
+            if not (discovery_skill_root / name / "SKILL.md").is_file()
+        )
+        drifting_discovery = sorted(
+            name for name, source in vendor_skills.items()
+            if name not in missing_discovery
+            and tree_hash(source) != tree_hash(discovery_skill_root / name)
+        )
+        discovery_ok = bool(vendor_skills) and not missing_discovery and not drifting_discovery
+        add(
+            "agent-skill-discovery",
+            discovery_ok,
+            "warning",
+            (
+                f"Discoverable skill mirrors: {len(vendor_skills) - len(missing_discovery) - len(drifting_discovery)}"
+                f"/{len(vendor_skills)}; missing={missing_discovery}; drifting={drifting_discovery}."
+            ),
+            "Run owledge init-project again or upgrade safely to materialize matching .agents/skills mirrors.",
+        )
+        plugin_skill_root = root / "plugins" / "owledge-cowork" / "skills"
+        if plugin_skill_root.is_dir():
+            planning_plugin_skills = {
+                "owledge-long-horizon-delivery",
+                "owledge-planning-layer",
+                "owledge-brainstorm",
+            }
+            missing_plugin_skills = sorted(
+                name for name in planning_plugin_skills
+                if not (plugin_skill_root / name / "SKILL.md").is_file()
+            )
+            add(
+                "plugin-planning-skill-discovery",
+                not missing_plugin_skills,
+                "warning",
+                f"Planning skills missing from plugin discovery root: {missing_plugin_skills}.",
+                "Reinstall the Owledge plugin adapter or restore its planning skill mirrors.",
+            )
     add("raw-events-ignored", bool(_gitignore_contains(root, ".owledge/sessions/**/events.jsonl") or _gitignore_contains(root, ".owledge/sessions/**/events.jsonl")), "warning", "Raw runtime event logs are ignored by git.", "Add .owledge/sessions/**/events.jsonl to .gitignore for privacy.")
     validation = validate_memory(am_base.parent if effective_mode == "kit" else root)
     add("memory-validation", bool(validation["passed"]), "error", f"Memory validation: {validation['failedChecks']} failed of {validation['totalChecks']}.", "Run python tools/owledge_core.py --project-root . validate-memory --strict and fix reported frontmatter/edge issues.")
@@ -3371,9 +3443,9 @@ def evaluate_memory_retrieval(
         failures.append({"metric": "corpus.documents", "actual": 0, "required": ">0"})
     result = {
         "generated_at": utc_now(),
-        "project_roots": [str(path) for path in project_roots],
+        "project_roots": [stable_output_path(path, root) for path in project_roots],
         "project_ids": project_ids,
-        "queries_file": str(queries_file) if queries_file else "",
+        "queries_file": stable_output_path(queries_file, root) if queries_file else "",
         "thresholds": thresholds,
         "failures": failures,
         "passed": not failures,
@@ -3460,8 +3532,8 @@ def evaluate_memory_retrieval(
         lines.append(f"- `{candidate['left']}` <-> `{candidate['right']}` via {candidate['matches']}")
     locked_atomic_write_text(out_dir / "retrieval-eval.md", "\n".join(lines) + "\n")
     result["outputs"] = {
-        "json": str((out_dir / "retrieval-eval.json").resolve()),
-        "markdown": str((out_dir / "retrieval-eval.md").resolve()),
+        "json": stable_output_path(out_dir / "retrieval-eval.json", root),
+        "markdown": stable_output_path(out_dir / "retrieval-eval.md", root),
     }
     return result
 
