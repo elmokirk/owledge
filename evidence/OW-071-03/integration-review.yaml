@@ -1,0 +1,29 @@
+schema_version: 1
+ticket: OW-071-03
+status: integrated_pending_cumulative_independent_gate
+integration_branch: codex/v071-integration
+accepted_source:
+  commit: 8fbf9caff3ac73d24c4e2200ee8a6f9a79f445ce
+  tree: e46f81222880b02de2110862c07f9ff7240c5c2d
+  manifest_blob: a47e3cc7d7133a5a3e4c2b75c687f27098bdfd96
+review:
+  mode: focused_local_red_team
+  independent_ticket_agent_spawned: false
+  rationale: >-
+    Local serial execution remains the product-owner default. Independent
+    acceptance is consolidated at G-071-A-TRUTH after OW-071-13.
+verification:
+  - command: python -m unittest tests.unit.test_ow07103_benchmark_baseline -q
+    result: 11 passed against the clean accepted commit
+  - command: python tools/validate_benchmark_baseline.py --project-root .
+    result: baseline 1.0.0 passed; raw-report token reduction 86.48%
+  - command: python tools/owledge.py test benchmark-kit-ci --project-root .
+    result: 103 passed; zero failed
+  - command: python tools/owledge.py test public-docs --project-root .
+    result: 233 passed
+  - command: python tools/owledge.py test private-path-clean --project-root .
+    result: zero findings
+disposition:
+  FB-003: shipped
+  incomplete_qwen_report: retained_but_excluded
+next_minimum_increment: OW-071-13

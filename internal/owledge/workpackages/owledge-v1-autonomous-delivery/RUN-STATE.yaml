@@ -4,9 +4,9 @@ plan: internal/owledge/plans/owledge-v1-autonomous-delivery-master-plan.md
 objective: Deliver Owledge v0.7.1 through v1.0 through gated autonomous execution.
 status: in_progress
 current_release: v0.7.1
-current_phase: 071-A3
-active_ticket: OW-071-03
-last_green_gate: OW-071-02-LOCAL-PUBLISH-READINESS-155
+current_phase: 071-A4
+active_ticket: OW-071-13
+last_green_gate: OW-071-03-LOCAL-BENCHMARK-103
 alignment:
   state: none
   awaiting_release: null
@@ -204,6 +204,36 @@ alignment:
       recommendation: "Classify host permission failures explicitly and replay the unchanged gate with the required local permissions."
       safe_default: "Never waive a failed gate; require a successful replay against the same source."
       status: resolved
+    - id: F-071-20
+      source: OW-071-03-benchmark-truth-preflight-2026-07-27
+      evidence: "A published Qwen raw run reported passed=false and four timeouts but was still counted as completed release proof."
+      severity: high
+      user_impact: "A public benchmark comparison could overstate the number of successfully evaluated model profiles."
+      release_impact: "The v0.7 regression baseline must exclude incomplete runs fail-closed while retaining their raw evidence."
+      options: ["reject incomplete reports from comparison", "rerun and replace the raw report", "keep counting failed runs"]
+      recommendation: "Reject incomplete reports, preserve the raw artifact unchanged, and publish its exclusion status."
+      safe_default: "Only reports with passed=true and no errors can contribute to the release verdict."
+      status: resolved
+    - id: F-071-21
+      source: OW-071-03-cross-platform-hash-replay-2026-07-27
+      evidence: "Windows-generated comparison files used CRLF while Git-normalized checkouts used LF, changing frozen artifact hashes."
+      severity: medium
+      user_impact: "A valid clean checkout could fail baseline validation solely because of platform newline conversion."
+      release_impact: "Frozen benchmark evidence requires byte-stable cross-platform generation."
+      options: ["emit LF explicitly", "remove generated-file hashes", "accept platform-specific baselines"]
+      recommendation: "Emit LF explicitly and regression-test the generated files for CRLF absence."
+      safe_default: "Do not weaken the hash contract."
+      status: resolved
+    - id: F-071-22
+      source: OW-071-03-public-claim-review-2026-07-27
+      evidence: "Illustrative external API price snapshots lack a machine-readable retrieval date."
+      severity: low
+      user_impact: "Readers may mistake time-sensitive illustrative pricing for a current verified claim."
+      release_impact: "No baseline-verdict impact; freshness governance remains necessary for public claims."
+      options: ["add dated claim metadata", "remove pricing examples", "leave them undated"]
+      recommendation: "Route dated claim governance to OW-071-04 and keep pricing outside the baseline verdict."
+      safe_default: "Treat undated prices as illustrative only."
+      status: routed
   decisions:
     - id: D-071-01
       related: F-071-01
@@ -285,6 +315,14 @@ alignment:
       constraints: "OW-071-02 is source-complete, but G-071-A-TRUTH remains blocked until OW-071-03 and OW-071-13 pass and one independent cumulative review accepts the combined boundary."
       affected_artifacts: ["evidence/OW-071-02/", "BACKLOG.yaml", "LIVE-WORK-REGISTER.yaml", "v0.7.1 release checklist"]
       verification_status: implemented_and_tested
+    - id: D-071-11
+      related: [OW-071-03, F-071-20, F-071-21, F-071-22]
+      authority: release-orchestrator
+      decision: "Accept and integrate OW-071-03 at immutable commit 8fbf9caff3ac73d24c4e2200ee8a6f9a79f445ce with baseline-contract v1; preserve but exclude the incomplete Qwen raw run and consolidate independent review at G-071-A-TRUTH."
+      rationale: "Two complete model reports, fail-closed comparison logic, byte-stable hashes, 11 focused tests, and 103/103 benchmark gates provide reproducible and honest regression evidence."
+      constraints: "Any fixture, threshold, reference profile, or held-out boundary change requires a new baseline version and decision. F-071-22 remains routed to OW-071-04."
+      affected_artifacts: ["benchmarks/v0.7.0/", "tools/validate_benchmark_baseline.py", "evidence/OW-071-03/", "OW-071-04"]
+      verification_status: implemented_and_tested
   next_plan_reflection:
     status: not_started
     target_release: v0.8.0
@@ -303,8 +341,8 @@ orchestration:
   approved_by: product-owner
   approved_at: "2026-07-27T14:25:00Z"
   expires_at_alignment: true
-  active_dispatch: local_serial_ow07103
-  pending_risk_brief: "OW-071-03 is the only active implementation lane; benchmark thresholds and fixtures must remain reproducible and clearly synthetic/fixture-bounded. OW-071-13 remains the next dedicated security lane."
+  active_dispatch: local_serial_ow07113
+  pending_risk_brief: "OW-071-13 is the only active lane. The local HTTP boundary must be loopback-only, fail-closed, size-limited, and free of sensitive unauthenticated health disclosure; F-071-09 remains critical until proven closed."
 workspace:
   code_root: .
   planning_root: internal/owledge/workpackages/owledge-v1-autonomous-delivery
@@ -322,10 +360,11 @@ last_completed_actions:
   - Phase 1 reflected; OW-071-02 activated as the sole local serial implementation lane.
   - OW-071-02 accepted at 7bda996 after focused local red-team review, score-155 publish readiness, wheel inventory smoke, and clean-commit replay.
   - The OW-071-02 increment was reflected; FB-019 through FB-021 are closed and OW-071-03 is the sole active lane.
+  - OW-071-03 accepted at 8fbf9ca with two complete model runs, baseline-contract v1, and 103/103 benchmark gates.
 next_actions:
-  - Preflight OW-071-03 against the current benchmark implementation, public claims, fixtures, and thresholds.
-  - Implement the smallest reproducible sealed-baseline increment locally with explicit 79.99-percent and privacy/staleness negative cases.
-  - Integrate only after focused review, then reflect the OW-071-03 increment before OW-071-13.
+  - Preflight OW-071-13 against the current local HTTP implementation and define the threat contract plus negative fixtures.
+  - Implement and locally red-team all three OW-071-13 checkpoints serially.
+  - Integrate only after the security matrix passes, then run one independent cumulative review at G-071-A-TRUTH.
 last_commands:
   - "python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports (exit 0; 38/38 passed on 5d6c433; quality ratchet all 100)"
   - "python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports (exit 1; 36/38 passed; F-071-10 and F-071-11 logged)"
@@ -339,39 +378,34 @@ last_commands:
   - "uv run --no-project --with pytest --with pyyaml python -m pytest targeted suites (exit 0; 24 tests passed)"
   - "python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports (exit 0; 35 gates passed; all quality-ratchet dimensions 100)"
 checkpoint:
-  last_completed_action: "Integrated OW-071-02 commit 7bda996, bound its immutable source, reflected all findings/decisions, and activated OW-071-03."
+  last_completed_action: "Integrated OW-071-03 commit 8fbf9ca, froze baseline-contract v1, preserved the excluded Qwen raw evidence, and activated OW-071-13."
   changed_files:
-    - "CHANGELOG.md"
-    - "docs/upgrade-notes-schema.json"
-    - "docs/upgrading.md"
-    - "pyproject.toml"
-    - "tools/validate_upgrade_notes.py"
-    - "tools/owledge.py"
-    - "tools/owledge_core.py"
-    - "tests/unit/test_ow07102_release_trust.py"
-    - "tests/unit/test_release_notes.py"
-    - "tests/fixtures/upgrade-notes/"
+    - "benchmarks/v0.7.0/baseline-contract-v1.json"
+    - "benchmarks/v0.7.0/held-out-journeys-v1.json"
+    - "benchmarks/v0.7.0/public-comparison.json"
+    - "benchmarks/v0.7.0/public-comparison.md"
+    - "tools/validate_benchmark_baseline.py"
+    - "tests/unit/test_ow07103_benchmark_baseline.py"
     - "internal/owledge/workpackages/owledge-v1-autonomous-delivery/LIVE-WORK-REGISTER.yaml"
-    - "evidence/OW-071-02/"
+    - "evidence/OW-071-03/"
   passed_commands:
-    - "OW-071-02 focused unittest suite, 17/17 passed"
-    - "Existing release-notes pytest suite, 5/5 passed"
-    - "Release trust, 18/18 passed"
-    - "Publish readiness, score 155 with zero blockers"
+    - "OW-071-03 focused unittest suite, 11/11 passed"
+    - "Benchmark baseline validator passed with raw average token reduction 86.48 percent"
+    - "Benchmark kit gate, 103/103 passed"
+    - "Public documentation gate, score 233"
     - "Private-path scan, zero findings"
-    - "Isolated wheel inventory included CHANGELOG.md, upgrade-note schema, and validator"
     - "git diff --check, exit 0"
   failed_commands:
-    - "Initial sandboxed pytest/cache and publish-readiness writes were permission-denied; unchanged authorized replays passed and F-071-19 records the distinction."
-    - "Wheel build emitted future setuptools license metadata deprecations; routed as F-071-18."
-  workspace_state: "OW-071-02 source is integrated; its reflection is pending commit on codex/v071-integration; OW-071-03 is the sole active ticket."
-  next_exact_action: "Validate and commit the OW-071-02 reflection, verify a clean tree, then preflight OW-071-03."
+    - "The preflight rejected an incomplete Qwen report previously counted as release proof; F-071-20 records the corrected truth boundary."
+    - "Cross-platform replay exposed CRLF-sensitive hashes; F-071-21 records the byte-stable LF correction."
+  workspace_state: "OW-071-03 source is integrated; its central reflection is ready for validation on codex/v071-integration; OW-071-13 is the sole active ticket."
+  next_exact_action: "Validate and commit the OW-071-03 reflection, verify a clean tree, then preflight OW-071-13."
   open_assumptions:
     - "The product owner wants the existing five-release train retained unless a later version reflection changes it."
     - "Local serial execution is the default; subagents are exceptional and justified only by independent risk reduction."
   prohibited_shortcuts:
     - "Do not start v0.8.0 before G-071-ALIGNMENT and an explicit owner approve decision."
     - "Do not trust or publish inherited dist artifacts; rebuild from committed source at RC."
-    - "Do not start OW-071-03 until OW-071-02 is integrated and reflected."
-updated_at: "2026-07-27T16:45:00Z"
+    - "Do not start cumulative G-071-A-TRUTH until OW-071-13 is integrated and reflected."
+updated_at: "2026-07-27T17:20:00+02:00"
 updated_by: codex

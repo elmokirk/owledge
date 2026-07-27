@@ -106,7 +106,7 @@ class ValidateLiveWorkRegisterTests(unittest.TestCase):
         self.assertEqual(result["counts"]["items"], 21)
         self.assertEqual(
             result["counts"]["states"],
-            {"shipped": 7, "open": 2, "superseded": 11, "deferred": 1},
+            {"shipped": 8, "open": 1, "superseded": 11, "deferred": 1},
         )
 
     def test_missing_duplicate_and_extra_feedback_ids_fail(self) -> None:
@@ -201,10 +201,10 @@ class ValidateLiveWorkRegisterTests(unittest.TestCase):
 
     def test_open_item_requires_resolvable_ticket_not_historical_checkbox(self) -> None:
         payload = copy.deepcopy(self.valid_register)
-        self.item(payload, "FB-003")["work_reference"] = "ticket:OW-999-99"
+        self.item(payload, "FB-004")["work_reference"] = "ticket:OW-999-99"
         self.assert_has_error(
             self.validate_payload(payload),
-            "FB-003.work_reference: open state requires a resolvable ticket",
+            "FB-004.work_reference: open state requires a resolvable ticket",
         )
 
     def test_missing_evidence_path_fails(self) -> None:

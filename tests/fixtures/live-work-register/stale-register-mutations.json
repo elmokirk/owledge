@@ -3,12 +3,12 @@
   "description": "A deterministic negative fixture that turns an open item into an unproven shipped claim and regresses the recorded product version.",
   "mutations": [
     {
-      "item_id": "FB-003",
+      "item_id": "FB-004",
       "field": "state",
       "value": "shipped"
     },
     {
-      "item_id": "FB-003",
+      "item_id": "FB-004",
       "field": "acceptance_gap",
       "value": null
     },
@@ -18,7 +18,7 @@
     }
   ],
   "expected_diagnostics": [
-    "FB-003.shipped_evidence: shipped state requires existing evidence",
+    "FB-004.shipped_evidence: shipped state requires existing evidence",
     "version_truth: current_product_version, VERSION, and pyproject.toml disagree"
   ]
 }
