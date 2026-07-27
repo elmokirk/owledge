@@ -35,7 +35,7 @@ edges:
 
 Deliver Owledge v1.0 as a local-first, Git-native project knowledge and agentic
 delivery control plane that a solo power user can install and understand quickly,
-while Codex, Claude/Cowork, Hermes, and generic MCP/CLI agents can execute the same
+while Codex, Claude Code, OpenCode, Hermes, and generic MCP/CLI agents can execute the same
 portable work contracts safely and efficiently.
 
 The v1.0 promotion boundary requires the full golden journey to work without chat
@@ -52,12 +52,16 @@ evidence bundle.
 - All public product documentation is English.
 - Canonical promotion is explicit and gate-controlled. Agents may create candidates,
   evidence, handoffs, and checkpoints automatically within declared paths.
-- Tier-1 runtime profiles: Codex, Claude/Cowork, Hermes, and generic MCP/CLI.
-- Hermes is a native repository adapter profile, including local and VPS use. Docker
-  is not required for Tier-1 support.
+- Tier-1 runtime profiles through v1: Codex, Claude Code, OpenCode, and Hermes,
+  with generic MCP/CLI as the portable baseline. Hermes begins as a required
+  read-only profile and must gain explicit conformance evidence; it is not an
+  optional path.
 - Docker is a lower-priority optional hub/runtime distribution after v1.0.
-- Owlib remains a technically separate optional package, exposed through coherent
-  Owledge CLI UX. It reads projects and writes central candidates, never project truth.
+- Owlib remains a technically separate optional package behind coherent Owledge
+  UX. Its long-term role is the central synchronization and intelligence
+  interface for reviewed cross-project agent learnings, parallel extraction,
+  PI intelligence, and agent-maintenance knowledge. It writes central
+  candidates, never project truth.
 - Owlib retrieval defaults to the current project plus an explicit project allowlist.
 - Existing-project migration is opt-in, preview-first, dry-run capable, and must not
   overwrite user-owned Markdown silently.
@@ -68,7 +72,10 @@ evidence bundle.
   regression. New harder fixtures use separate thresholds.
 - RAG v1 begins with a generic JSONL retrieval projection and a LightRAG reference
   adapter. Raw frontmatter is metadata, not embedding text.
-- PI.dev is post-v1.x concept work and is not on the v1.0 critical path.
+- A Pi.dev planning/documentation adapter is post-v1 concept work and is not on
+  the v1.0 critical path.
+- A hosted Team Hub is post-v1 multi-tenant vision work. Remote Git/CI sync and
+  a Sync Layer have no v1 priority; local single-user value must be proven first.
 
 ## Non-Goals Through v1.0
 
@@ -99,7 +106,7 @@ Run `python tools/validate_v1_delivery_plan.py` before claiming or promoting wor
 
 | Release | User-visible increment | Technical promotion boundary | Mandatory alignment stop |
 | --- | --- | --- | --- |
-| v0.7.1 | A beginner can understand, install, try, and verify Owledge; Owlib and Hermes preview paths match the v0.7 project contract. | Adoption journey and release truth are green on Windows, macOS, and Linux fixtures. | Feature update, open questions, and explicit user alignment before publishing or v0.8.0. |
+| v0.7.1 | A beginner can understand, install, try, and verify Owledge; Owlib and the required Hermes read-only profile match the v0.7 project contract. | Adoption journey and release truth are green on Windows, macOS, and Linux fixtures. | Feature update, open questions, and explicit user alignment before publishing or v0.8.0. |
 | v0.8.0 | Human intent becomes a validated, token-budgeted, resumable work contract and clean retrieval projection. | Contract round-trip, context determinism, small-model, RAG, and migration gates are green. | Feature update, open questions, and explicit user alignment before publishing or v0.8.1. |
 | v0.8.1 | Four Tier-1 harness profiles can execute and resume isolated work without silent capability degradation. | Conformance, worktree/claim safety, cross-harness resume, and multi-agent demo gates are green. | Feature update, open questions, and explicit user alignment before publishing or v0.9.0. |
 | v0.9.0 | Reviewed knowledge can be written, promoted, compiled, exported, and refreshed with provenance and privacy controls. | Semantic-write, promotion, privacy, drift, RAG round-trip, and Owlib freshness gates are green. | Feature update, open questions, and explicit user alignment before publishing or v1.0. |
@@ -117,28 +124,36 @@ The next version's tickets are dependency-blocked by the prior alignment ticket.
 
 ### Phase 071-A - Truth and release baseline
 
-Tickets: `OW-071-01`, `OW-071-02`, `OW-071-03`.
+Tickets: `OW-071-01`, `OW-071-02`, `OW-071-03`, `OW-071-13`.
 
-Outcome: one truthful work register, a reproducible release baseline, and an enforced
-token-efficiency floor.
+Outcome: one truthful work register, a reproducible release baseline, an enforced
+token-efficiency floor, and a safe explicit boundary for the shipped local HTTP
+control-plane prototype.
 
 Gate: `G-071-A-TRUTH`.
 
 ### Phase 071-B - Beginner adoption journey
 
-Tickets: `OW-071-04`, `OW-071-05`.
+Tickets: `OW-071-04`, `OW-071-10`, `OW-071-11`, `OW-071-12`, `OW-071-14`, `OW-071-05`.
 
-Outcome: an English README and Easy Install journey directly answer why, when, how,
-and what benefit; the vibecoding demo works without maintainer assistance.
+Outcome: an English adoption surface first explains why, when, benefits,
+boundaries, and the end-to-end Owledge lifecycle; a dedicated Installation Hub
+separates integration footprint, delivery method, runtime adapter, and optional
+capabilities; skills and agent recipes are explicit; the vibecoding demo works
+without maintainer interpretation. Named adoption presets separate personal
+global memory, static Hub maps, Owlib, the local HTTP prototype, and a future
+remote Team Hub.
+
+Plan: `internal/owledge/plans/v0.7.1-public-docs-adoption-plan.md`.
 
 Gate: `G-071-B-ADOPTION`.
 
-### Phase 071-C - Owlib and Hermes preview compatibility
+### Phase 071-C - Owlib and Hermes Tier-1 read compatibility
 
 Tickets: `OW-071-06`, `OW-071-07`, `OW-071-08`.
 
-Outcome: Owlib reads the current `.owledge` layout safely and Hermes can use the
-minimal read-only MCP profile locally or on a VPS.
+Outcome: Owlib reads the current `.owledge` layout safely and Hermes proves the
+required minimal read-only MCP profile locally or on a VPS.
 
 Gate: `G-071-C-COMPAT` and release gate `G-071-RC`.
 
@@ -178,8 +193,10 @@ Gate: `G-080-C-RETRIEVAL` and release gate `G-080-RC`.
 
 Tickets: `OW-081-01`, `OW-081-02`, `OW-081-03`, `OW-081-04`, `OW-081-05`.
 
-Outcome: Codex, Claude/Cowork, Hermes, and generic MCP/CLI declare and prove the same
-portable capability contract without pretending unsupported hooks exist.
+Outcome: Codex, Claude Code, OpenCode, Hermes, and generic MCP/CLI declare and
+prove the same portable capability contract without pretending unsupported
+hooks exist. Hermes' read-only capability proof begins in `OW-071-07` and its
+full runtime orchestration conformance is completed in `OW-081-13`.
 
 Gate: `G-081-A-ADAPTERS`.
 
@@ -339,6 +356,11 @@ second source of truth.
 ## Post-v1 Deferred Concepts
 
 - PI.dev runtime concept and optional long-running knowledge guardian.
+- Add-on Decision Layer: provenance-preserving ingestion of external feedback,
+  agent evaluations, and plan comparisons; independent model sparring and
+  Project Hardening use shared metrics and owner-approved conclusions rather
+  than automatic plan rewrites. Discovery plan:
+  `internal/owledge/plans/add-on-decision-layer-discovery-plan.md`.
 - Docker-first hub distribution and authenticated remote MCP.
 - Hosted team sync, multi-tenant service, marketplace certification, and commercial
   features.

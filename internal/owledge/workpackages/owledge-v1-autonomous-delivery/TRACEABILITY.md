@@ -40,17 +40,23 @@ edges: []
 
 | Requirement | Tickets | Gates |
 | --- | --- | --- |
-| English beginner adoption and vibecoding demo | OW-071-04, OW-071-05, OW-100-07 | G-071-B-ADOPTION, G-100-C-PROOF |
+| English product narrative and beginner adoption | OW-071-04, OW-071-05, OW-100-07 | G-071-B-ADOPTION, G-100-C-PROOF |
+| Canonical installation and cross-platform command truth | OW-071-10, OW-071-05, OW-100-05 | G-071-B-ADOPTION, G-100-B-PRODUCT |
+| End-to-end workflow and privacy-boundary explanation | OW-071-11, OW-090-06, OW-100-07 | G-071-B-ADOPTION, G-090-B-WRITES, G-100-C-PROOF |
+| Skills taxonomy and executable agent integration guidance | OW-071-12, OW-081-01 through OW-081-05 | G-071-B-ADOPTION, G-081-A-ADAPTERS |
+| Adoption presets and Global/Hub maturity boundaries | OW-071-14, OW-071-06, OW-081-09, OW-090-09 | G-071-B-ADOPTION, G-071-C-COMPAT, G-081-C-JOURNEY, G-090-C-RAG |
 | Truthful work register and release state | OW-071-01, OW-071-02 | G-071-A-TRUTH |
+| Local HTTP control-plane truth and safe exposure boundary | OW-071-13, OW-100-02 | G-071-A-TRUTH, G-100-A-HARDENING |
 | Preserve context/token efficiency | OW-071-03, OW-080-05, OW-080-07, OW-100-04 | G-071-A-TRUTH, G-080-B-CONTEXT, G-100-B-PRODUCT |
 | Owlib current-layout compatibility and scoped hub | OW-071-06, OW-081-09, OW-090-09 | G-071-C-COMPAT, G-081-C-JOURNEY, G-090-C-RAG |
-| Hermes native Tier 1 | OW-071-07, OW-081-04, OW-081-10 | G-071-C-COMPAT, G-081-A-ADAPTERS, G-081-RC |
+| OpenCode native Tier 1 | OW-081-04, OW-081-10 | G-081-A-ADAPTERS, G-081-RC |
+| Hermes required Tier-1 read-only profile | OW-071-07, OW-081-13 | G-071-C-COMPAT, G-081-B-CONCURRENCY |
 | Long-horizon portable contracts | OW-080-01 through OW-080-04 | G-080-A-CONTRACTS |
 | 4B/8k small-model support | OW-080-06, OW-080-07, OW-081-14, OW-100-04 | G-080-B-CONTEXT, G-081-C-JOURNEY, G-100-B-PRODUCT |
 | Optional consent-first autonomous delivery, isolated lanes, and runtime-neutral adapters | OW-080-12, OW-081-12, OW-081-13 | G-080-A-CONTRACTS, G-081-B-CONCURRENCY |
 | Edge/local-model task capsules and real smoke evidence | OW-080-07, OW-081-14, OW-100-04 | G-080-B-CONTEXT, G-081-C-JOURNEY, G-100-B-PRODUCT |
 | RAG projection improves or preserves retrieval | OW-080-08, OW-090-07, OW-090-08 | G-080-C-RETRIEVAL, G-090-C-RAG |
-| Four Tier-1 profiles and explicit degradation | OW-081-01 through OW-081-05 | G-081-A-ADAPTERS |
+| Four Tier-1 profiles and explicit degradation | OW-071-07, OW-081-02, OW-081-03, OW-081-04, OW-081-13 | G-071-C-COMPAT, G-081-A-ADAPTERS, G-081-B-CONCURRENCY |
 | Git-safe parallel execution and resume | OW-081-06 through OW-081-08 | G-081-B-CONCURRENCY |
 | Gate-controlled canonical promotion | OW-090-01 through OW-090-04 | G-090-A-TRUST, G-090-B-WRITES |
 | Semantic MCP writes only | OW-090-04 | G-090-B-WRITES |

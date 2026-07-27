@@ -1,0 +1,4 @@
+interface:
+  display_name: "Owledge Contract"
+  short_description: "Plan, recover, and hand off durable agent work"
+  default_prompt: "Use $owledge-contract to turn this request into an MVP-first phased plan and checklist before implementation."

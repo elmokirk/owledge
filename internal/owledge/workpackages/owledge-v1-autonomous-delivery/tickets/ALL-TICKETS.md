@@ -87,23 +87,162 @@ For every ticket:
 - Verify/evidence: Benchmark Kit CI and comparison commands; `evidence/OW-071-03/`.
 - Negative QA: privacy leak, stale answer, quality drop, or 79.99% result fails.
 
+### OW-071-13 - Classify and secure the local HTTP control-plane boundary
+
+- Priority/dependencies: P0; `OW-071-01`.
+- Outcome: the shipped `serve` surface has one truthful product status and
+  cannot be mistaken for a production Team Hub.
+- Allowed paths: `tools/owledge_core.py`, control-plane security tests,
+  command/reference/security docs, capability registry, release gates.
+- Implement: decide product/internal/prototype status; default to loopback-only
+  unless an approved remote contract exists; remove sensitive health details;
+  bind actor identity to tenant/customer/project authorization; publish and
+  test an Endpoint x Role x Tenant matrix, including explicit administrator
+  cross-tenant behavior; add versioned maximum body-size, request-timeout,
+  concurrency, rate/abuse, and stable error-code bounds for the supported local
+  profile; document TLS,
+  token rotation/revocation, backup/restore, and deployment as unsupported or
+  required future work.
+- Accept: unsupported non-loopback bind fails closed; no unauthenticated local
+  path disclosure; cross-tenant task/evidence/gate/promotion operations fail;
+  every endpoint is covered by the authorization matrix; every documented
+  bound has a boundary and over-limit fixture; public capability matrix labels
+  the surface accurately.
+- Verify/evidence: auth, tenant, health disclosure, remote bind, payload, and
+  regression fixtures; security review; `evidence/OW-071-13/`.
+- Negative QA: the existence of an admin token alone cannot authorize remote
+  exposure; no docs call this a hosted, production, or team-sync service.
+
 ### OW-071-04 - Rewrite adoption-first English documentation
 
-- Priority/dependencies: P0; `OW-071-02`.
-- Outcome: README and Easy Install answer why, when, how, benefits, privacy, and removal for a beginner.
-- Allowed paths: `README.md`, `docs/README.md`, `docs/try-owledge-in-5-minutes.md`, new English beginner docs, docs navigation.
-- Implement: two paths—beginner local setup and agent/MCP setup; define terms inline; show first value before architecture; include expected output and recovery.
-- Accept: moderated fixture users can select an install path and reach first success without maintainer interpretation.
-- Verify/evidence: docs link/lint gates and scripted fresh-install walkthrough; `evidence/OW-071-04/`.
-- Negative QA: no step assumes MCP, Git, Python packaging, or frontmatter knowledge without explanation.
+- Priority/dependencies: P0; `OW-071-02`, `OW-071-13`.
+- Outcome: README and docs navigation explain why, when, benefits, boundaries,
+  and the Owledge lifecycle before routing a beginner to installation.
+- Allowed paths: `README.md`, `docs/README.md`, new English concept and
+  navigation docs, public-doc tests, adoption fixtures.
+- Implement: resolve category and default-path decisions; enforce a pre-install
+  information budget; move maintainer detail below adoption; add an early
+  lifecycle diagram; pair capabilities with outcomes; surface privacy/non-goals;
+  define one canonical page per concern and keep every primary adoption route
+  within two navigation clicks; establish `contracts/public-capabilities.json`
+  as the versioned capability registry with schema and release-owner review;
+  publish maturity as available, local experimental, preview, planned, or
+  post-v1 with evidence.
+- Accept: a five-second fixture identifies audience, problem, outcome,
+  boundary, and next action; no install command precedes the mental model;
+  every claim is current or explicitly labelled roadmap.
+- Verify/evidence: comprehension, claim-map, navigation, link, and lint checks;
+  `evidence/OW-071-04/`.
+- Negative QA: artifact inventory, repo layout, benchmark detail, or install
+  syntax cannot displace the first-screen product explanation.
+
+### OW-071-10 - Build the canonical Installation Hub and command contract
+
+- Priority/dependencies: P0; `OW-071-04`.
+- Outcome: a user or agent selects a complete supported recipe without mixing
+  delivery mechanisms or assuming unavailable commands.
+- Allowed paths: `docs/install/`, setup/upgrade/uninstall docs, README/docs
+  routing, CLI help/manifests, extracted-command fixtures and tests.
+- Implement: separate footprint, package delivery, runtime adapter, and
+  optional capability; publish complete supported recipes with prerequisites,
+  working directory, writes, output, verification, idempotency, recovery,
+  upgrade, and uninstall; eliminate unexplained `uvx` to `owledge` transitions;
+  generate per-preset compressed artifact size, installed CLI footprint, host
+  project footprint, file count, folder purpose,
+  canonical/private/generated ownership, rebuildability, and removal impact.
+- Accept: each command chain runs from its documented clean state and links
+  from top navigation; Principles-only reports zero host writes and N/A install
+  footprint; command truth has one canonical owner.
+- Verify/evidence: extracted-command smoke on Windows, macOS, and Linux;
+  `evidence/OW-071-10/`.
+- Negative QA: package recipes cannot require a checkout/persistent binary;
+  source recipes cannot leave checkout/target roots ambiguous; unsupported
+  runtime wiring cannot be labelled supported.
+
+### OW-071-11 - Explain the lifecycle and core workflows
+
+- Priority/dependencies: P0; `OW-071-04`.
+- Outcome: beginners and agents can explain how project truth becomes scoped
+  context, work, evidence, handoff, resume state, and reviewed knowledge.
+- Allowed paths: concept/workflow docs, README/docs routing, Mermaid checks,
+  templates/CLI references, adoption fixtures.
+- Implement: canonical how-it-works page; read/write/privacy and
+  canonical/candidate/generated boundaries; setup, context, planning,
+  execution, evidence, review, handoff, resume, KB, and MCP workflows; glossary;
+  prose fallbacks for diagrams; action-by-actor automation matrix with fixed
+  `Action`, `Actor`, `Trigger`, `Default`, `Side effect`, `Authority`, and
+  `Recovery` columns, covering
+  instructions, harness discovery, hooks, skills, CLI, MCP, curator, sync, and
+  background processes; canonical best-practice loop with task variants.
+- Accept: every diagram node maps to a real artifact/current command and a
+  beginner can narrate the lifecycle and locate the files.
+- Verify/evidence: traceability, diagram validation, narration, and
+  architecture/privacy review; `evidence/OW-071-11/`.
+- Negative QA: Owledge cannot be presented as a runtime, hosted store,
+  automatic truth engine, automatic promoter, or required vector database.
+
+### OW-071-12 - Separate skills and make agent integrations executable
+
+- Priority/dependencies: P0; `OW-071-04`.
+- Outcome: humans and agents distinguish policy skills, workflow skills,
+  runtime adapters, read-only MCP, and add-ons and execute a verified path.
+- Allowed paths: skill READMEs/metadata, agent/harness/integration and plugin
+  docs, instruction templates, runtime and agent-choice fixtures/tests.
+- Implement: public registry with trigger, IO, effects, dependencies, runtime
+  support, and stability; instruction/skill/hook precedence; exact verified
+  runtime recipes; agent preflight, writes, report, recovery, and stop contract;
+  skill invocation and reviewed-promotion diagram; official happy-path skill
+  order and explicit small-task, multi-agent, KB, and advanced variants; make
+  the runtime-independent `owledge-contract` the Principles-only default and
+  exclude skills that would require runtime-dependent rewrites.
+- Accept: fixture agents select the correct path and prove it in the host
+  project; manual and experimental steps are bounded explicitly.
+- Verify/evidence: agent-choice scenarios, host integration smoke, runtime
+  conformance review; `evidence/OW-071-12/`.
+- Negative QA: implied plugin folders, maintainer-repo checks as host proof,
+  implied write-enabled MCP, or hidden canonical mutation fails.
+
+### OW-071-14 - Define adoption presets and Global/Hub maturity
+
+- Priority/dependencies: P0; `OW-071-04`.
+- Outcome: users can choose a supported adoption preset and distinguish local
+  personal context, static maps, local cross-project indexing, and future team
+  synchronization.
+- Allowed paths: English adoption/global/hub docs, README/docs routing,
+  capability registry, preset decision fixtures/tests.
+- Implement: presets for no-install principles, manual mini-kit, existing repo,
+  standalone project, Markdown KB, runtime adapter, private global layer, and
+  cross-project power-user use; separate `global-memory`, Cross-Project Hub
+  Kit, Owlib, local HTTP prototype, and future Team Hub; show maturity, value,
+  authority, automation, privacy, prerequisites, limits, and upgrade path.
+  Define Owlib's future central role for reviewed cross-project learnings,
+  parallel extraction, PI intelligence, and agent maintenance, while keeping
+  it local/explicit before v1; label the multi-tenant Team Hub and Git/CI Sync
+  Layer post-v1 with no v1 dependency.
+- Accept: users select a preset without source-code interpretation; no local
+  capability is presented as automatic remote team sync; current Owlib claims
+  cannot be labelled `available` or `current` until `G-071-C-COMPAT` is green
+  and otherwise remain explicitly labelled preview/legacy.
+- Verify/evidence: preset-choice scenarios, maturity/evidence traceability,
+  power-user and architecture review; `evidence/OW-071-14/`.
+- Negative QA: global link, Hub Kit, Owlib, HTTP serve, remote MCP, and hosted
+  team sync cannot be used as synonyms or share an unsupported Ready claim.
 
 ### OW-071-05 - Ship the vibecoding golden demo v1
 
-- Priority/dependencies: P0; `OW-071-04`.
+- Priority/dependencies: P0; `OW-071-10`, `OW-071-11`, `OW-071-12`, `OW-071-14`.
 - Outcome: a user tries one feature request and sees scoped context, evidence, resume, and benefit.
 - Allowed paths: `examples/`, `docs/`, `addons/launch-demo-kit/`, demo fixtures/tests.
-- Implement: offline deterministic eight-minute journey, expected outputs, reset command, Windows/macOS/Linux path handling, token-before/after explanation.
-- Accept: demo runs from clean fixture without API key; human steps are explicit; generated artifacts link to sources.
+- Implement: 30-second no-install mental-model/example proof with zero disk
+  writes, one visible representative result, and an unambiguous success signal;
+  package-only
+  five-minute scratch journey with expected output, verification, and reset;
+  fresh-session/second-agent resume proof using documented entrypoints; keep
+  source-only add-on demo separate and labelled; bounded before/after explanation.
+- Accept: all three proofs meet their time/scope contracts without API key or
+  maintainer interpretation; the 30-second proof performs zero writes and names
+  its visible result and success signal; package-only proof needs no checkout; fresh agent
+  resumes without chat; generated artifacts link to sources.
 - Verify/evidence: scripted demo smoke on three OS fixtures; `evidence/OW-071-05/`.
 - Negative QA: rerun is idempotent and missing optional runtime degrades with a clear message.
 
@@ -117,10 +256,11 @@ For every ticket:
 - Verify/evidence: Owlib unit/quality/benchmark suites; `evidence/OW-071-06/`.
 - Negative QA: traversal, missing project entrypoint, unsafe shared data, and mixed legacy/current ambiguity fail safely.
 
-### OW-071-07 - Hermes read-only Tier-1 preview
+### OW-071-07 - Hermes required Tier-1 read-only profile
 
 - Priority/dependencies: P0; `OW-071-03`.
-- Outcome: Hermes uses the minimal Owledge MCP profile locally or on a VPS without prompt stuffing.
+- Outcome: Hermes proves the minimal required Tier-1 read-only Owledge MCP
+  profile locally or on a VPS without implying unsupported write authority.
 - Allowed paths: `tools/owledge_mcp.py`, Hermes adapter/skill paths, runtime conformance fixtures, English integration docs/tests.
 - Implement: installation/routing skill, project-root binding, tool allowlist, MCP reload/test instructions, memory-boundary guidance, compact tool descriptions.
 - Accept: Hermes can read entrypoint, search, build context pack, list tasks/reviews; no write tool exists; repository path errors are clear.
@@ -290,27 +430,32 @@ For every ticket:
 - Verify/evidence: Tier-1 suite; `evidence/OW-081-02/`.
 - Negative QA: missing hook is declared unsupported rather than silently skipped.
 
-### OW-081-03 - Claude/Cowork Tier-1 adapter
+### OW-081-03 - Claude Code Tier-1 adapter
 
 - Priority/dependencies: P1; `OW-081-01`.
-- Outcome: Claude/Cowork plugin hooks and skills pass the common contract.
+- Outcome: Claude Code plugin hooks and skills pass the common contract.
 - Allowed paths: `plugins/owledge-cowork/`, Claude fixtures, runtime docs/tests.
 - Implement: lifecycle validation, compact routing, tool/scoped write mapping, fixture transcript.
 - Accept: same artifacts and lifecycle semantics as other Tier-1 profiles.
 - Verify/evidence: Tier-1 suite; `evidence/OW-081-03/`.
 - Negative QA: hook failure surfaces at session close and cannot mark ticket done.
 
-### OW-081-04 - Hermes Tier-1 adapter
+### OW-081-04 - OpenCode Tier-1 adapter
 
 - Priority/dependencies: P0; `OW-081-01`.
-- Outcome: native Hermes local/VPS skill and MCP configuration pass the common contract.
-- Allowed paths: Hermes adapter/skill/fixtures, MCP server, runtime docs/tests.
-- Implement: repo-bound project discovery, tool allowlist, memory boundary, MCP reload/test, context/resume flow, upstream handoff contract.
-- Accept: Hermes runs with compact permanent prompt and on-demand Owledge context; adapter ownership boundary is documented.
-- Verify/evidence: pinned Hermes fixture/conformance transcript; `evidence/OW-081-04/`.
-- Negative QA: VPS path mismatch, disabled tool, unavailable server, and unsupported write fail clearly.
+- Outcome: OpenCode bootstrap, context, task, checkpoint, handoff, supported
+  hooks, and cleanup pass the common contract.
+- Allowed paths: OpenCode adapter/skill/fixtures, runtime docs/tests.
+- Implement: pinned install/setup, capability manifest, compact instruction
+  layer, context and resume wiring, health/cleanup, and explicit degradation.
+- Accept: OpenCode completes the common conformance fixture with source-linked
+  outputs and no hidden canonical writes.
+- Verify/evidence: pinned OpenCode fixture/conformance transcript;
+  `evidence/OW-081-04/`.
+- Negative QA: instruction-path mismatch, disabled capability, unsupported hook,
+  and unavailable integration fail clearly.
 
-### OW-081-05 - Generic MCP/CLI Tier-1 adapter
+### OW-081-05 - Generic MCP/CLI portable baseline adapter
 
 - Priority/dependencies: P1; `OW-081-01`.
 - Outcome: any capable harness can use the same versioned read/control contract without runtime-specific files.
@@ -363,7 +508,9 @@ For every ticket:
 ### OW-081-13 - Add optional runtime orchestration adapters
 
 - Priority/dependencies: P1; `OW-081-12`.
-- Outcome: Codex, Claude/Cowork, Hermes, and generic MCP/CLI can consume the approved delivery plan without making any runtime a Core dependency.
+- Outcome: Codex, Claude Code, OpenCode, Hermes, and generic MCP/CLI can
+  consume the approved delivery plan without making any runtime a Core
+  dependency.
 - Allowed paths: runtime adapters, integration manifests, CLI/tests/docs, adapter fixtures.
 - Implement: read-only `execution plan` dry-run, model-profile resolution, consent verification, worktree/branch/merge manifests, explicit capability/degradation results, and `/goal` mapping as a Codex adapter.
 - Accept: adapters never launch externally while planning; approved non-overlapping lanes can be proposed; unsupported features degrade visibly and safely; integration writes remain owned by the integration role.

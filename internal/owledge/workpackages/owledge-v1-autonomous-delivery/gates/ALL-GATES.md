@@ -46,18 +46,43 @@ Every gate starts from the tested integration commit and controlled environment 
 
 ### G-071-A-TRUTH - Truth and baseline
 
-- Tickets: `OW-071-01`, `OW-071-02`, `OW-071-03`.
-- Commands: `python tools/validate_v1_delivery_plan.py`; roadmap/state validator; focused FB-019/020/021 tests; `python tools/owledge.py test public-docs --project-root .`; Benchmark Kit CI and held-out comparison.
-- Thresholds: delivery-plan contract errors=0; zero active version contradictions; zero dead retained flags; malformed upgrade note fails; legacy fixture token/correct reduction >=80%; held-out correctness/retrieval quality non-regressing; privacy failures=0; stale failures=0.
+- Tickets: `OW-071-01`, `OW-071-02`, `OW-071-03`, `OW-071-13`.
+- Commands: `python tools/validate_v1_delivery_plan.py`; roadmap/state validator;
+  focused FB-019/020/021 tests; public docs; Benchmark Kit CI and held-out
+  comparison; local HTTP auth, Endpoint x Role x Tenant authorization matrix,
+  health-disclosure, remote-bind, body-size, timeout, concurrency, rate, and
+  stable error-code negative fixtures.
+- Thresholds: delivery-plan contract errors=0; zero active version
+  contradictions; zero dead retained flags; malformed upgrade note fails;
+  token/correct reduction >=80%; retrieval quality non-regressing; privacy and
+  stale failures=0; unsupported remote bind fails; unauthenticated local path
+  disclosure=0; cross-tenant writes=0; every endpoint and administrator action
+  has an explicit tenant rule; every published bound has boundary/over-limit
+  coverage.
 - Demonstrable increment: an agent selects the first real open ticket from the live register and reproduces the benchmark baseline.
 - Promotion: pass enables adoption and compatibility work; failure blocks all later releases.
 
 ### G-071-B-ADOPTION - Beginner first value
 
-- Tickets: `OW-071-04`, `OW-071-05`.
-- Commands: docs link/lint gate; extracted-command smoke; clean demo setup/run/reset on Windows/macOS/Linux fixtures.
-- Thresholds: all public docs English; no unexplained prerequisite in beginner path; demo completes without API key or maintainer help; rerun idempotent.
-- Demonstrable increment: a vibecoder understands why/when/how, installs, runs one feature journey, and sees scoped-context benefit.
+- Tickets: `OW-071-04`, `OW-071-10`, `OW-071-11`, `OW-071-12`, `OW-071-14`, `OW-071-05`.
+- Commands: docs link/lint and claim-map gates; Mermaid source validation;
+  extracted-command smoke for every install route; host-project agent scenarios;
+  clean human and agent demo setup/run/reset on Windows/macOS/Linux fixtures.
+- Thresholds: all public docs English; five-second fixture identifies audience,
+  problem, outcome, boundary, and next action; no install command before the
+  minimum mental model; no unexplained prerequisite or working directory;
+  primary adoption routes require no more than two navigation clicks; command
+  chains pass 100%; every preset reports compressed artifact, installed CLI,
+  and host-project footprint plus ownership; Principles-only writes=0;
+  automation/responsibility and capability maturity are complete; fixture
+  agents select the supported path and report exact writes; 30-second,
+  no-write 30-second proof exposes its result and success signal; package-only
+  five-minute and cross-session proofs pass; rerun is idempotent; Owlib cannot
+  be labelled available/current before `G-071-C-COMPAT` is green;
+  privacy, Hub-conflation, and unsupported-runtime overclaim failures=0.
+- Demonstrable increment: a vibecoder or coding agent understands
+  why/when/how, distinguishes footprint from delivery and runtime integration,
+  installs, runs one feature journey, and sees scoped-context benefit.
 - Promotion: pass permits v0.7.1 public adoption claims.
 
 ### G-071-C-COMPAT - Owlib and Hermes preview

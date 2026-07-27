@@ -5,8 +5,8 @@ status_values: [backlog, ready, in_progress, qa, blocked, done]
 priority_values: [P0, P1, P2, P3]
 release_order: [v0.7.1, v0.8.0, v0.8.1, v0.9.0, v1.0]
 gates:
-  G-071-A-TRUTH: [OW-071-01, OW-071-02, OW-071-03]
-  G-071-B-ADOPTION: [OW-071-04, OW-071-05]
+  G-071-A-TRUTH: [OW-071-01, OW-071-02, OW-071-03, OW-071-13]
+  G-071-B-ADOPTION: [OW-071-04, OW-071-10, OW-071-11, OW-071-12, OW-071-14, OW-071-05]
   G-071-C-COMPAT: [OW-071-06, OW-071-07]
   G-071-RC: [OW-071-08]
   G-071-ALIGNMENT: [OW-071-09]
@@ -37,8 +37,10 @@ version_alignment:
   - {release: v0.9.0, ticket: OW-090-11, gate: G-090-ALIGNMENT, release_gate: G-090-RC, next_release: v1.0, report: "release-updates/v0.9.0.md"}
   - {release: v1.0, ticket: OW-100-10, gate: G-100-ALIGNMENT, release_gate: G-100-GA, next_release: null, report: "release-updates/v1.0.md"}
 execution_waves:
-  - {id: W-071-A, release: v0.7.1, tickets: [OW-071-01, OW-071-02, OW-071-03], policy: parallel_non_overlapping}
-  - {id: W-071-B, release: v0.7.1, tickets: [OW-071-04, OW-071-05], policy: sequential}
+  - {id: W-071-A, release: v0.7.1, tickets: [OW-071-01, OW-071-02, OW-071-03, OW-071-13], policy: parallel_non_overlapping}
+  - {id: W-071-B1, release: v0.7.1, tickets: [OW-071-04], policy: sequential}
+  - {id: W-071-B2, release: v0.7.1, tickets: [OW-071-10, OW-071-11, OW-071-12, OW-071-14], policy: parallel_non_overlapping}
+  - {id: W-071-B3, release: v0.7.1, tickets: [OW-071-05], policy: sequential}
   - {id: W-071-C, release: v0.7.1, tickets: [OW-071-06, OW-071-07], policy: parallel_non_overlapping}
   - {id: W-071-RC, release: v0.7.1, tickets: [OW-071-08], policy: sequential}
   - {id: W-071-ALIGNMENT, release: v0.7.1, tickets: [OW-071-09], policy: user_alignment_stop}
@@ -73,8 +75,13 @@ tickets:
   - {id: OW-071-01, release: v0.7.1, phase: 071-A, status: ready, priority: P0, owner_role: product-operations, qa_role: roadmap-auditor, estimated_turns: 2, depends_on: [], gate: G-071-A-TRUTH, path: "tickets/ALL-TICKETS.md#ow-071-01"}
   - {id: OW-071-02, release: v0.7.1, phase: 071-A, status: backlog, priority: P0, owner_role: release-engineer, qa_role: contract-reviewer, estimated_turns: 2, depends_on: [OW-071-01], gate: G-071-A-TRUTH, path: "tickets/ALL-TICKETS.md#ow-071-02"}
   - {id: OW-071-03, release: v0.7.1, phase: 071-A, status: backlog, priority: P0, owner_role: benchmark-engineer, qa_role: evaluation-reviewer, estimated_turns: 2, depends_on: [OW-071-01], gate: G-071-A-TRUTH, path: "tickets/ALL-TICKETS.md#ow-071-03"}
-  - {id: OW-071-04, release: v0.7.1, phase: 071-B, status: backlog, priority: P0, owner_role: docs-engineer, qa_role: beginner-ux-reviewer, estimated_turns: 2, depends_on: [OW-071-02], gate: G-071-B-ADOPTION, path: "tickets/ALL-TICKETS.md#ow-071-04"}
-  - {id: OW-071-05, release: v0.7.1, phase: 071-B, status: backlog, priority: P0, owner_role: demo-engineer, qa_role: beginner-ux-reviewer, estimated_turns: 2, depends_on: [OW-071-04], gate: G-071-B-ADOPTION, path: "tickets/ALL-TICKETS.md#ow-071-05"}
+  - {id: OW-071-13, release: v0.7.1, phase: 071-A, status: backlog, priority: P0, owner_role: security-engineer, qa_role: protocol-security-reviewer, estimated_turns: 2, depends_on: [OW-071-01], gate: G-071-A-TRUTH, path: "tickets/ALL-TICKETS.md#ow-071-13"}
+  - {id: OW-071-04, release: v0.7.1, phase: 071-B, status: backlog, priority: P0, owner_role: docs-engineer, qa_role: beginner-ux-reviewer, estimated_turns: 2, depends_on: [OW-071-02, OW-071-13], gate: G-071-B-ADOPTION, path: "tickets/ALL-TICKETS.md#ow-071-04"}
+  - {id: OW-071-10, release: v0.7.1, phase: 071-B, status: backlog, priority: P0, owner_role: install-docs-engineer, qa_role: cross-platform-install-reviewer, estimated_turns: 2, depends_on: [OW-071-04], gate: G-071-B-ADOPTION, path: "tickets/ALL-TICKETS.md#ow-071-10"}
+  - {id: OW-071-11, release: v0.7.1, phase: 071-B, status: backlog, priority: P0, owner_role: workflow-docs-engineer, qa_role: architecture-privacy-reviewer, estimated_turns: 2, depends_on: [OW-071-04], gate: G-071-B-ADOPTION, path: "tickets/ALL-TICKETS.md#ow-071-11"}
+  - {id: OW-071-12, release: v0.7.1, phase: 071-B, status: backlog, priority: P0, owner_role: agent-docs-engineer, qa_role: runtime-conformance-reviewer, estimated_turns: 2, depends_on: [OW-071-04], gate: G-071-B-ADOPTION, path: "tickets/ALL-TICKETS.md#ow-071-12"}
+  - {id: OW-071-14, release: v0.7.1, phase: 071-B, status: backlog, priority: P0, owner_role: product-architecture-docs, qa_role: power-user-reviewer, estimated_turns: 2, depends_on: [OW-071-04], gate: G-071-B-ADOPTION, path: "tickets/ALL-TICKETS.md#ow-071-14"}
+  - {id: OW-071-05, release: v0.7.1, phase: 071-B, status: backlog, priority: P0, owner_role: demo-engineer, qa_role: beginner-ux-reviewer, estimated_turns: 2, depends_on: [OW-071-10, OW-071-11, OW-071-12, OW-071-14], gate: G-071-B-ADOPTION, path: "tickets/ALL-TICKETS.md#ow-071-05"}
   - {id: OW-071-06, release: v0.7.1, phase: 071-C, status: backlog, priority: P0, owner_role: owlib-engineer, qa_role: privacy-reviewer, estimated_turns: 2, depends_on: [OW-071-02], gate: G-071-C-COMPAT, path: "tickets/ALL-TICKETS.md#ow-071-06"}
   - {id: OW-071-07, release: v0.7.1, phase: 071-C, status: backlog, priority: P0, owner_role: hermes-adapter-engineer, qa_role: runtime-conformance-reviewer, estimated_turns: 2, depends_on: [OW-071-03], gate: G-071-C-COMPAT, path: "tickets/ALL-TICKETS.md#ow-071-07"}
   - {id: OW-071-08, release: v0.7.1, phase: 071-RC, status: backlog, priority: P0, owner_role: release-engineer, qa_role: release-assurance, estimated_turns: 1, depends_on: [OW-071-03, OW-071-05, OW-071-06, OW-071-07], gate: G-071-RC, path: "tickets/ALL-TICKETS.md#ow-071-08"}

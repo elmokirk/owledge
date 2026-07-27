@@ -49,13 +49,14 @@ Current resume point: **v0.7.1 Phase 071-A - Truth and release baseline**.
 
 ### Phase 071-A - Truth and baseline
 
-- [ ] tickets OW-071-01 through OW-071-03 done
+- [ ] tickets OW-071-01 through OW-071-03 and OW-071-13 done
 - [ ] G-071-A-TRUTH evidence passed
 - [ ] independent quick review passed
 
 ### Phase 071-B - Beginner adoption
 
-- [ ] tickets OW-071-04 and OW-071-05 done
+- [ ] owner decision register in the public-docs adoption plan resolved
+- [ ] tickets OW-071-04, OW-071-10, OW-071-11, OW-071-12, OW-071-14, and OW-071-05 done
 - [ ] G-071-B-ADOPTION evidence passed
 - [ ] independent quick review passed
 

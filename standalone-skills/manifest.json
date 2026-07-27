@@ -4,6 +4,13 @@
   "description": "Standalone Owledge skills that can be installed without adopting the full Owledge project kit.",
   "skills": [
     {
+      "name": "owledge-contract",
+      "path": "owledge-contract",
+      "requires_full_owledge_kit": false,
+      "optional_owledge_cli": false,
+      "supported_runtimes": ["codex", "claude-code", "opencode", "generic-agent"]
+    },
+    {
       "name": "owledge-blindspot-audit",
       "path": "owledge-blindspot-audit",
       "requires_full_owledge_kit": false,
