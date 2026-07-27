@@ -85,7 +85,7 @@ For every ticket:
   `pyproject.toml`; no historical unchecked box re-enters active scope.
 - Verify/evidence: `python tools/validate_live_work_register.py --project-root .`;
   `python tools/validate_v1_delivery_plan.py`;
-  `python -m pytest tests/unit/test_validate_live_work_register.py -q`;
+  `python -m unittest tests.unit.test_validate_live_work_register -v`;
   `python tools/owledge.py test public-docs --project-root .`;
   `evidence/OW-071-01/`.
 - Negative QA: deliberately stale fixture state is detected; historical unchecked boxes do not re-enter the live backlog.

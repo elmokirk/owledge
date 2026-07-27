@@ -124,6 +124,46 @@ alignment:
       recommendation: "Use a pre-write scan for other exports plus a mandatory post-write full scan, and sanitize escaped roots."
       safe_default: "No evidence commit until the post-write full scan passes."
       status: resolved
+    - id: F-071-12
+      source: OW-071-01-independent-qa-2026-07-27
+      evidence: "Commit f189bace left POST-001 both done and pending, targeted POST-002 at v0.7.1 despite OW-100-05, and described the live-register reset as future work."
+      severity: high
+      user_impact: "Agents can select already-completed or wrongly-versioned work from an active roadmap."
+      release_impact: "OW-071-01 cannot pass until active roadmap truth is singular and regression-tested."
+      options: ["remove the duplicate status table and synchronize targets", "mark the conflicting sections as historical snapshots"]
+      recommendation: "Keep one active release board, bind CLI simplification to OW-100-05/v1.0, and describe the register reset as completed."
+      safe_default: "Do not promote OW-071-01 while active sources contradict the live register."
+      status: open
+    - id: F-071-13
+      source: OW-071-01-independent-qa-2026-07-27
+      evidence: "Malformed allowed_states, source_documents, or authority source-list types raised uncaught TypeError instead of structured deterministic JSON."
+      severity: high
+      user_impact: "A corrupt or hand-edited register produces a traceback instead of actionable recovery guidance."
+      release_impact: "The fail-closed validator contract requires controlled diagnostics for malformed schema types."
+      options: ["validate container and element types before conversion", "adopt a runtime schema dependency"]
+      recommendation: "Add explicit standard-library type validation and adversarial regression tests."
+      safe_default: "Treat traceback-producing malformed inputs as a failed ticket gate."
+      status: open
+    - id: F-071-14
+      source: OW-071-01-independent-qa-2026-07-27
+      evidence: "The ticket required python -m pytest although pytest is not a runtime dependency; the committed manifest truthfully replayed the unittest-based suite instead."
+      severity: high
+      user_impact: "A documented release replay fails in a clean standard-library environment even though the product validator is dependency-free."
+      release_impact: "Ticket contract and evidence manifest must name the same reproducible gate command."
+      options: ["add pytest as a product dependency", "standardize the ticket on unittest", "document an isolated uv development command"]
+      recommendation: "Use python -m unittest for this dependency-free ticket and reserve isolated pytest for repository-wide development QA."
+      safe_default: "Do not add pytest to Owledge runtime dependencies."
+      status: resolved
+    - id: F-071-15
+      source: OW-071-01-independent-qa-2026-07-27
+      evidence: "The worker manifest cannot contain its own commit SHA and therefore retains an explicit placeholder."
+      severity: low
+      user_impact: "Ticket evidence is human-readable but not fully machine-bound to the reviewed commit by itself."
+      release_impact: "Integration evidence must bind the immutable worker commit, tree, and manifest blob without amending the reviewed commit."
+      options: ["create separate integration evidence", "attempt a self-referential manifest amendment"]
+      recommendation: "Record reviewed commit f189bace, tree 6395194, and manifest blob 70d69162 in a separate central QA artifact."
+      safe_default: "Never rewrite the reviewed worker commit merely to embed its own SHA."
+      status: routed
   decisions:
     - id: D-071-01
       related: F-071-01
@@ -164,6 +204,14 @@ alignment:
       rationale: "Binds evidence to exact source while preserving independent QA and non-overlapping write authority."
       constraints: "Authorization covers local v0.7.1 implementation through the alignment stop; no push, merge to main, tag, publish, paid service, credential use, or v0.8.0 execution."
       affected_artifacts: ["v0.7.1-release-execution-orchestration-plan.md", "RUN-STATE.yaml"]
+      verification_status: recorded
+    - id: D-071-06
+      related: F-071-14
+      authority: release-orchestrator
+      decision: "Standardize the OW-071-01 required replay on python -m unittest tests.unit.test_validate_live_work_register -v."
+      rationale: "The ticket suite is implemented with unittest and must remain reproducible with Owledge's zero-runtime-dependency contract."
+      constraints: "Repository-wide development QA may still use pytest through an isolated environment; pytest must not become a shipped runtime dependency."
+      affected_artifacts: ["tickets/ALL-TICKETS.md", "evidence/OW-071-01/manifest.yaml"]
       verification_status: recorded
   next_plan_reflection:
     status: not_started
