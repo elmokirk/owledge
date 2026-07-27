@@ -54,7 +54,31 @@ If an upgrade goes wrong:
 
 ## Additive vs breaking changes
 
-When a release ships an additive-only schema change (new optional field, new template), `CHANGELOG.md` declares `breaking: no` or `breaking: additive` under `## Upgrade notes`. The `--dry-run` report marks such updates as `alert_level: additive` (informational). Breaking changes are marked `alert_level: breaking`.
+Each release section in `CHANGELOG.md` contains exactly one `### Upgrade notes`
+heading and one JSON fence validated by
+`docs/upgrade-notes-schema.json`:
+
+```json
+{
+  "breaking": "additive",
+  "summary": "Adds optional fields without removing or renaming existing data."
+}
+```
+
+`breaking` is exactly `yes`, `no`, or `additive`; `summary` is required and
+non-empty. Validate the current `VERSION` section with:
+
+```bash
+python tools/validate_upgrade_notes.py --project-root .
+```
+
+The release-trust, release-contract, and publish-readiness gates run the same
+validator. A note from an older release cannot satisfy the current release.
+The `--dry-run` report maps `no` and `additive` to informational
+`alert_level: additive`, while `yes` maps to `alert_level: breaking`.
+`would_update` and `would_create` remain visible for additive changes because
+they are the actionable review list; the alert level, rather than hiding
+changes, communicates risk.
 
 ## When upgrades are needed
 
@@ -98,7 +122,8 @@ missing.
 
 Maintainers use `sync-dogfood --apply` to mirror
 `templates/owledge/templates/` → `internal/owledge/templates/` after
-editing product templates. The mirror is strictly one-way; the
+editing product Markdown templates. Only `*-template.md` files participate;
+unrelated files in the directory do not create drift. The mirror is strictly one-way; the
 `dogfood-sync` finalization gate fails if the two trees drift. See
 `internal/README.md` for the maintainer workflow.
 
@@ -116,3 +141,4 @@ python tools/owledge.py sync-dogfood --apply --project-root .
 | "Lock held by PID" | Remove `.owledge/.upgrade.lock` if the prior run is no longer active |
 | "force-templates requires --yes" | Add `--yes` (or run on a TTY for interactive confirmation) |
 | "manual mode is always dry-run" | Remove `--apply` from your `--mode=manual` invocation; manual emits a patch only |
+| "upgrade-notes-contract" fails | Add exactly one schema-valid JSON upgrade note to the current `VERSION` section in `CHANGELOG.md` |

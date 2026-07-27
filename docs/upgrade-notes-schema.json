@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://owledge.dev/schemas/upgrade-notes-v1.json",
+  "title": "Owledge Upgrade Note v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "breaking",
+    "summary"
+  ],
+  "properties": {
+    "breaking": {
+      "type": "string",
+      "enum": [
+        "yes",
+        "no",
+        "additive"
+      ]
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

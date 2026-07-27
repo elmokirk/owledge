@@ -5675,9 +5675,9 @@ def dogfood_sync_check(root: pathlib.Path) -> dict[str, Any]:
         return {"passed": True, "project": str(root), "drifted_files": [], "sync_direction": "templates->internal", "details": "internal/owledge/templates/ not found; nothing to sync"}
     drifted_files: list[str] = []
     missing_in_internal: list[str] = []
-    for src_path in sorted(source_dir.rglob("*"), key=lambda p: p.as_posix()):
-        if not src_path.is_file():
-            continue
+    for src_path in sorted(
+        source_dir.rglob("*-template.md"), key=lambda p: p.as_posix()
+    ):
         rel = src_path.relative_to(source_dir).as_posix()
         dst_path = internal_dir / rel
         if not dst_path.is_file():
@@ -6363,7 +6363,6 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("dogfood-sync-check")
     concept_audit_p = sub.add_parser("concept-audit")
     concept_audit_p.add_argument("--dimension", default=None, help="Run only one dimension")
-    concept_audit_p.add_argument("--since", default=None, help="Only consider findings since this date")
     concept_audit_p.add_argument("--profile", default=None, help="Path to concept-audit-profile.json")
     concept_audit_p.add_argument("--format", choices=["json", "summary"], default="json")
 

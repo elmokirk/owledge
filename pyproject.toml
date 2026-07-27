@@ -63,7 +63,9 @@ tools = ["*.py"]
     "REPORT_DESIGN_SELECTOR.html",
     ".gitignore",
     "VERSION",
+    "CHANGELOG.md",
 ]
+"docs" = ["docs/upgrade-notes-schema.json"]
 "templates/owledge" = ["templates/owledge/README.md"]
 "templates/owledge/schemas" = ["templates/owledge/schemas/*.json"]
 "templates/owledge/templates" = ["templates/owledge/templates/*.md", "templates/owledge/templates/*.json"]

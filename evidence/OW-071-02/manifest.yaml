@@ -1,0 +1,145 @@
+schema_version: 1
+ticket: OW-071-02
+gate: G-071-A-TRUTH
+status: local_implementation_complete_pending_integration
+branch: codex/ow07102-release-trust
+base_commit: 44fc3b6b861be2f4755446d10da5fb21f1491bc3
+execution_mode: local_serial
+scope:
+  outcome: >-
+    Close FB-019, FB-020, and FB-021 with deterministic CLI dispatch,
+    release metadata, concept-audit identity, and upgrade regression proof.
+  planned_paths:
+    - tools/owledge.py
+    - tools/owledge_core.py
+    - tools/validate_upgrade_notes.py
+    - docs/upgrade-notes-schema.json
+    - docs/upgrading.md
+    - tests/unit/test_ow07102_release_trust.py
+    - tests/fixtures/upgrade-notes/
+    - evidence/OW-071-02/
+  orchestrator_scope_expansion:
+    - path: CHANGELOG.md
+      reason: The current release itself must satisfy the new structured contract.
+    - path: pyproject.toml
+      reason: The wheel must ship CHANGELOG.md and the upgrade-note schema used by installed release gates.
+    - path: tests/unit/test_release_notes.py
+      reason: The existing release gate must use the same validator and verify package inventory.
+decisions:
+  - id: D-071-08-A
+    disposition: retained
+    item: FB-019
+    decision: >-
+      Keep would_update and would_create visible for additive upgrades; risk is
+      communicated by alert_level rather than suppressing the actionable list.
+  - id: D-071-08-B
+    disposition: retracted
+    item: FB-020
+    decision: >-
+      Remove the dead --since parser flag from both entrypoints instead of
+      inventing semantically undefined date filtering.
+  - id: D-071-08-C
+    disposition: implemented
+    item: FB-021
+    decision: >-
+      Require exactly one schema-valid JSON upgrade note in the current VERSION
+      section and bind concept-audit freshness to type=concept-audit plus
+      agent_id=concept-auditor.
+artifacts:
+  - CHANGELOG.md
+  - docs/upgrade-notes-schema.json
+  - docs/upgrading.md
+  - pyproject.toml
+  - tools/validate_upgrade_notes.py
+  - tools/owledge.py
+  - tools/owledge_core.py
+  - tests/unit/test_ow07102_release_trust.py
+  - tests/unit/test_release_notes.py
+  - tests/fixtures/upgrade-notes/valid-current.md
+  - tests/fixtures/upgrade-notes/missing-breaking.md
+  - tests/fixtures/upgrade-notes/malformed-json.md
+  - tests/fixtures/upgrade-notes/old-release-only.md
+  - tests/fixtures/upgrade-notes/duplicate-note.md
+  - evidence/OW-071-02/manifest.yaml
+commands:
+  - command: python -m unittest tests.unit.test_ow07102_release_trust -v
+    exit_code: 0
+    result: 17 tests passed
+  - command: uv run --with pytest pytest tests/unit/test_release_notes.py -q --tb=short
+    exit_code: 0
+    result: 5 tests passed in an isolated development environment
+  - command: python tools/validate_upgrade_notes.py --project-root .
+    exit_code: 0
+    result: current v0.7.0 note passed the frozen schema contract
+  - command: python tools/owledge.py test release-trust --project-root .
+    exit_code: 0
+    result: 18 checks passed
+  - command: python tools/owledge.py test release-contract --project-root .
+    exit_code: 0
+    result: release contract passed
+  - command: python tools/owledge.py test publish-readiness --project-root .
+    exit_code: 0
+    result: score 155; promote-candidate; zero blockers
+  - command: >-
+      uv build --wheel --out-dir <isolated-temp>/ow07102-wheel-smoke
+    exit_code: 0
+    result: >-
+      isolated wheel built; CHANGELOG.md, docs/upgrade-notes-schema.json, and
+      tools/validate_upgrade_notes.py were present
+  - command: git diff --check
+    exit_code: 0
+    result: no whitespace errors
+negative_qa:
+  - Missing breaking field fails with missing-breaking.
+  - Malformed JSON fails with upgrade-json-malformed.
+  - An old release note cannot satisfy the current release.
+  - Duplicate current Upgrade notes headings fail deterministically.
+  - Invalid enum values, empty summaries, and extra fields fail in stable order.
+  - Semantic drift in the frozen schema fails with schema-contract.
+  - --dry-run and --apply are mutually exclusive.
+  - Parser-only --since flags are rejected by both CLI entrypoints.
+  - Non-canonical concept-audit identity cannot satisfy freshness.
+  - Unrelated non-Markdown template files do not create dogfood drift.
+  - Upgrade drift runs doctor in kit mode.
+  - Upgrade alert metadata is read from the source kit, not the target project.
+review:
+  method: focused_local_red_team
+  result: pass
+  notes:
+    - >-
+      The validator is standard-library-only and freezes both payload behavior
+      and the semantic schema contract.
+    - >-
+      Cumulative independent QA remains required at G-071-A after OW-071-03 and
+      OW-071-13; no extra ticket-level subagent was spawned.
+limitations_and_routed_findings:
+  - id: F-071-17
+    severity: medium
+    status: routed
+    detail: >-
+      The inherited central dist artifact is not ticket evidence. RC must
+      rebuild wheel and sdist from committed clean source.
+  - id: F-071-18
+    severity: low
+    status: routed
+    detail: >-
+      The wheel build reports setuptools license-table and license-classifier
+      deprecations with a 2027-02-18 deadline. They do not affect v0.7.1
+      correctness and should be normalized in a later packaging-maintenance
+      ticket.
+  - id: F-071-19
+    severity: low
+    status: resolved
+    detail: >-
+      Initial sandboxed publish-readiness and uv cache attempts lacked temporary
+      write permissions. Replays with the required local permissions passed;
+      this was environmental rather than a product failure.
+qa_handoff:
+  cumulative_gate: G-071-A-TRUTH
+  required_replay:
+    - python -m unittest tests.unit.test_ow07102_release_trust -v
+    - uv run --with pytest pytest tests/unit/test_release_notes.py -q --tb=short
+    - python tools/validate_upgrade_notes.py --project-root .
+    - python tools/owledge.py test release-trust --project-root .
+    - python tools/owledge.py test publish-readiness --project-root .
+    - git diff --check

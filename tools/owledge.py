@@ -69,6 +69,7 @@ if str(SCRIPT_DIR) not in sys.path:
 import owledge_core as core  # noqa: E402
 import build_kb_module  # noqa: E402
 import build_project_folder_kit  # noqa: E402
+import validate_upgrade_notes as upgrade_notes  # noqa: E402
 
 
 def _read_version_file() -> str:
@@ -529,9 +530,9 @@ def sync_dogfood(root: pathlib.Path, dry_run: bool = True) -> dict[str, Any]:
         }
     updated: list[str] = []
     created: list[str] = []
-    for src_path in sorted(source_dir.rglob("*"), key=lambda p: p.as_posix()):
-        if not src_path.is_file():
-            continue
+    for src_path in sorted(
+        source_dir.rglob("*-template.md"), key=lambda p: p.as_posix()
+    ):
         rel = src_path.relative_to(source_dir)
         dst_path = internal_dir / rel
         assert str(dst_path).startswith(str(internal_dir)), f"refuse path outside internal: {dst_path}"
@@ -694,24 +695,13 @@ def _pid_running(pid: int) -> bool:
 
 
 def _read_upgrade_notes(root: pathlib.Path) -> str:
-    changelog = root / "CHANGELOG.md"
-    if not changelog.is_file():
+    result = upgrade_notes.validate_upgrade_notes(root)
+    if not result.get("passed"):
         return "unknown"
-    try:
-        text = changelog.read_text(encoding="utf-8", errors="replace")
-    except OSError:
-        return "unknown"
-    match = re.search(r"^##\s+Upgrade\s+notes\s*$", text, flags=re.IGNORECASE | re.MULTILINE)
-    if not match:
-        return "unknown"
-    tail = text[match.end():]
-    breaking_match = re.search(r"breaking:\s*(yes|no|additive)", tail, flags=re.IGNORECASE)
-    if not breaking_match:
-        return "unknown"
-    value = breaking_match.group(1).strip().lower()
+    value = str((result.get("note") or {}).get("breaking") or "").strip().lower()
     if value in {"no", "additive"}:
         return "additive"
-    return "breaking"
+    return "breaking" if value == "yes" else "unknown"
 
 
 def upgrade_project(root: pathlib.Path, source_root: pathlib.Path, dry_run: bool, mode: str, yes: bool, author: str = "owledge-cli") -> dict[str, Any]:
@@ -729,7 +719,7 @@ def upgrade_project(root: pathlib.Path, source_root: pathlib.Path, dry_run: bool
     manifest_kit = str(manifest.get("kit_version") or "").strip()
     target_kit = KIT_VERSION
     version_mismatch = bool(manifest_kit and target_kit and manifest_kit != target_kit)
-    alert_level = _read_upgrade_notes(root) if version_mismatch else "current"
+    alert_level = _read_upgrade_notes(source_root) if version_mismatch else "current"
 
     manifest_entries = {
         str(entry.get("path") or ""): entry
@@ -1452,6 +1442,21 @@ def release_trust_gate(root: pathlib.Path) -> dict[str, Any]:
     changelog = (root / "CHANGELOG.md").read_text(encoding="utf-8", errors="replace")
     changelog_match = re.search(r"^##\s+([0-9]+\.[0-9]+\.[0-9]+)\b", changelog, re.MULTILINE)
     results.add("version:changelog-current", bool(changelog_match and changelog_match.group(1) == version), "Top changelog release matches root VERSION.")
+    upgrade_note_result = upgrade_notes.validate_upgrade_notes(root)
+    upgrade_note_codes = [
+        str(item.get("code"))
+        for item in upgrade_note_result.get("errors", [])
+        if isinstance(item, dict)
+    ]
+    results.add(
+        "upgrade-notes-contract",
+        bool(upgrade_note_result.get("passed")),
+        (
+            "Current release has exactly one schema-valid structured upgrade note."
+            if upgrade_note_result.get("passed")
+            else "Upgrade-note errors: " + ", ".join(upgrade_note_codes)
+        ),
+    )
     docs_index = (root / "docs" / "README.md").read_text(encoding="utf-8", errors="replace")
     results.add("version:docs-index", f"v{version}" in docs_index, "Documentation index names the current release.")
     for relative in [
@@ -2617,7 +2622,7 @@ def upgrade_drift_check(root: pathlib.Path) -> dict[str, Any]:
     tmp = pathlib.Path(tempfile.mkdtemp(prefix="owledge-upgrade-drift-"))
     try:
         init_project(tmp, REPO_ROOT, include_plugin_adapter=False, include_compliance=False)
-        doc = core.memory_doctor(tmp, mode="host")
+        doc = core.memory_doctor(tmp, mode="kit")
         vd = [c for c in doc.get("checks", []) if c.get("name") == "version-drift"]
         passed = doc.get("passed", False) and all(c.get("passed") for c in vd)
         return {"passed": passed, "project": str(root), "temp_project": str(tmp), "version_drift_check": vd}
@@ -2636,7 +2641,27 @@ def concept_audit_fresh_gate(root: pathlib.Path) -> dict[str, Any]:
     decisions_dir = root / "internal" / "owledge" / "decisions"
     if not decisions_dir.is_dir():
         decisions_dir = root / "owledge" / "decisions"
-    audit_files = sorted(decisions_dir.glob("concept-audit-*.md")) if decisions_dir.is_dir() else []
+    audit_candidates = (
+        sorted(decisions_dir.glob("concept-audit-*.md"))
+        if decisions_dir.is_dir()
+        else []
+    )
+    audit_files: list[pathlib.Path] = []
+    ignored_audits: list[str] = []
+    for candidate in audit_candidates:
+        try:
+            meta = core.parse_frontmatter(
+                candidate.read_text(encoding="utf-8", errors="replace")
+            )
+        except OSError:
+            meta = {}
+        if (
+            meta.get("type") == "concept-audit"
+            and meta.get("agent_id") == "concept-auditor"
+        ):
+            audit_files.append(candidate)
+        else:
+            ignored_audits.append(candidate.name)
     version_file = root / "VERSION"
     version_mtime = version_file.stat().st_mtime if version_file.exists() else 0
     if not audit_files:
@@ -2646,12 +2671,19 @@ def concept_audit_fresh_gate(root: pathlib.Path) -> dict[str, Any]:
         return {
             "passed": passed,
             "project": str(root),
-            "reason": "No concept audit found; run 'owledge concept-audit'",
+            "reason": (
+                "No valid concept audit found; expected type=concept-audit "
+                "and agent_id=concept-auditor"
+            ),
             "fresh": False,
             "project_mode": project_mode,
             "severity": severity,
+            "ignored_audits": ignored_audits,
         }
-    latest_audit = audit_files[-1]
+    latest_audit = max(
+        audit_files,
+        key=lambda path: (path.stat().st_mtime, path.as_posix()),
+    )
     audit_mtime = latest_audit.stat().st_mtime
     version_fresh = audit_mtime >= version_mtime
     days_old = (_dt.datetime.now().timestamp() - audit_mtime) / 86400
@@ -2672,6 +2704,7 @@ def concept_audit_fresh_gate(root: pathlib.Path) -> dict[str, Any]:
         "version_fresh": version_fresh,
         "project_mode": project_mode,
         "severity": severity,
+        "ignored_audits": ignored_audits,
     }
 
 
@@ -3861,12 +3894,14 @@ def main(argv: list[str] | None = None) -> int:
     benchmark_kit_report_p.add_argument("--format", choices=["html"], default="html")
 
     sync_dogfood_p = sub.add_parser("sync-dogfood", parents=[project_parent])
-    sync_dogfood_p.add_argument("--dry-run", action="store_true", default=True)
-    sync_dogfood_p.add_argument("--apply", action="store_true")
+    sync_mode = sync_dogfood_p.add_mutually_exclusive_group()
+    sync_mode.add_argument("--dry-run", action="store_true")
+    sync_mode.add_argument("--apply", action="store_true")
 
     upgrade_p = sub.add_parser("upgrade", parents=[project_parent])
-    upgrade_p.add_argument("--dry-run", action="store_true", default=True)
-    upgrade_p.add_argument("--apply", action="store_true")
+    upgrade_mode = upgrade_p.add_mutually_exclusive_group()
+    upgrade_mode.add_argument("--dry-run", action="store_true")
+    upgrade_mode.add_argument("--apply", action="store_true")
     upgrade_p.add_argument("--mode", choices=["safe", "force-templates", "manual"], default="safe")
     upgrade_p.add_argument("--yes", action="store_true")
     upgrade_p.add_argument("--source-root", default=str(REPO_ROOT))
@@ -4012,14 +4047,16 @@ def main(argv: list[str] | None = None) -> int:
             print_json(result)
             return 0 if result.get("passed", True) else 1
         if args.command == "sync-dogfood":
-            result = sync_dogfood(root, dry_run=not args.apply)
+            dry_run = bool(args.dry_run or not args.apply)
+            result = sync_dogfood(root, dry_run=dry_run)
             print_json(result)
             return 0 if result.get("passed", True) else 1
         if args.command == "upgrade":
             if args.mode == "manual" and args.apply:
                 print_json({"passed": False, "error": "manual mode is always dry-run; --apply ignored. Use --dry-run --mode=manual to emit a patch, or --mode=safe/force-templates for --apply."})
                 return 2
-            result = upgrade_project(root, resolve_path(args.source_root), dry_run=not args.apply, mode=args.mode, yes=args.yes, author=args.author)
+            dry_run = bool(args.dry_run or not args.apply)
+            result = upgrade_project(root, resolve_path(args.source_root), dry_run=dry_run, mode=args.mode, yes=args.yes, author=args.author)
             if args.format == "summary":
                 lines = []
                 lines.append(f"mode: {result.get('mode')}  dry_run: {result.get('dry_run')}")

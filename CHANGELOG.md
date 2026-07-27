@@ -19,7 +19,12 @@
 
 ### Upgrade notes
 
-breaking: yes
+```json
+{
+  "breaking": "yes",
+  "summary": "v0.7.0 renames the public memory surface to OWLEDGE.md plus .owledge/; pre-v0.7 installs require regeneration or manual migration."
+}
+```
 
 v0.7.0 renames the old public memory surface. Pre-v0.7 docs and installs may mention `agent-memory/` and `PROJECT_CONTEXT.md`; those names are legacy. New projects use `OWLEDGE.md` plus `.owledge/`. Compatibility fallbacks may exist inside selected tools, but active docs, contracts, quickstarts, package data, and generated kits target the v0.7 surface. Existing pre-v0.7 local installs should regenerate from v0.7 or migrate manually before relying on v0.7 release gates.
 

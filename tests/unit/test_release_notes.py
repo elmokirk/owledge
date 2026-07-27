@@ -7,6 +7,7 @@ import pathlib
 import re
 import subprocess
 import sys
+import tomllib
 
 from conftest import REPO_ROOT
 
@@ -31,10 +32,21 @@ def test_pyproject_version_matches_version_file():
 
 
 def test_release_notes_required_on_schema_change():
-    """E6: if templates/ or schemas/ changed, CHANGELOG.md must have '## Upgrade notes' (or '### Upgrade notes')."""
-    changelog = (REPO_ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
-    assert "Upgrade notes" in changelog, "CHANGELOG.md missing '## Upgrade notes' section"
-    assert re.search(r"breaking:\s*(yes|no|additive)", changelog, re.IGNORECASE), "CHANGELOG missing 'breaking: yes|no|additive' declaration"
+    """E6: the current release must have one schema-valid structured upgrade note."""
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(REPO_ROOT / "tools" / "validate_upgrade_notes.py"),
+            "--project-root",
+            str(REPO_ROOT),
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    payload = json.loads(result.stdout)
+    assert payload["passed"], payload["errors"]
 
 
 def test_no_dead_flags():
@@ -44,7 +56,19 @@ def test_no_dead_flags():
     concept_audit_end = owledge_py.index("\n\n", concept_audit_idx)
     concept_audit_block = owledge_py[concept_audit_idx:concept_audit_end]
     assert "--since" not in concept_audit_block, "concept-audit still has dead --since flag"
+    core_py = (REPO_ROOT / "tools" / "owledge_core.py").read_text(encoding="utf-8")
+    core_idx = core_py.index('add_parser("concept-audit"')
+    core_end = core_py.index("\n\n", core_idx)
+    assert "--since" not in core_py[core_idx:core_end], "core concept-audit still has dead --since flag"
     upgrade_idx = owledge_py.index('add_parser("upgrade"')
     upgrade_end = owledge_py.index("\n\n", upgrade_idx)
     upgrade_block = owledge_py[upgrade_idx:upgrade_end]
     assert "--format" in upgrade_block, "upgrade missing --format flag"
+
+
+def test_upgrade_note_contract_files_ship_in_wheel_data():
+    """Package-first release gates need CHANGELOG plus the schema at the install prefix."""
+    pyproject = tomllib.loads((REPO_ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+    data_files = pyproject["tool"]["setuptools"]["data-files"]
+    assert "CHANGELOG.md" in data_files["."]
+    assert "docs/upgrade-notes-schema.json" in data_files["docs"]
