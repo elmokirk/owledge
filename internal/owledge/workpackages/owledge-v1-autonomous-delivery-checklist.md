@@ -19,7 +19,7 @@ confidence: 0.94
 review_status: "reviewed"
 sanitization_status: "not_required"
 created_at: "2026-07-16T00:00:00Z"
-updated_at: "2026-07-18T00:00:00Z"
+updated_at: "2026-07-27T00:00:00Z"
 source_hash: ""
 reusable_lessons: []
 edges:
@@ -44,6 +44,23 @@ Current resume point: **v0.7.1 Phase 071-A - Truth and release baseline**.
 - Worker commits stay cohesive and never land directly on the integration branch.
 - Release artifacts run from clean tracked source after source commits are frozen.
 - After each RC/GA, execute the matching alignment ticket, write its version update, set `awaiting_user_alignment`, and stop until an explicit user decision is recorded.
+- During every ticket and gate, append material problems, gaps, deviations,
+  regressions, risks, decisions, and owner questions to the matching
+  `RUN-STATE.yaml` alignment registers.
+
+## Mandatory Version-Reflection Definition of Done
+
+Apply this checklist after v0.7.1, v0.8.0, v0.8.1, v0.9.0, and v1.0:
+
+- [ ] planned versus shipped scope is reconciled from committed evidence
+- [ ] implementation findings log is complete or explicitly `None`
+- [ ] decision log is complete or explicitly `None`
+- [ ] unresolved questions are complete or explicitly `None`
+- [ ] every finding records impact, evidence, recommendation, safe default, and status
+- [ ] the next-version plan is reflected as keep/amend/defer/drop per affected ticket and gate
+- [ ] required plan/ticket/gate amendments are validated before owner review
+- [ ] owner receives the complete review and records `approve`, `adjust`, or `defer`
+- [ ] next version remains locked until the recorded decision permits it
 
 ## v0.7.1
 
@@ -68,7 +85,7 @@ Current resume point: **v0.7.1 Phase 071-A - Truth and release baseline**.
 
 ### Version alignment stop
 
-- [ ] OW-071-09 update and question register presented
+- [ ] OW-071-09 update, finding/decision/question registers, and v0.8.0 plan reflection presented
 - [ ] G-071-ALIGNMENT passed with an explicit user decision
 - [ ] v0.8.0 remains locked until the decision is recorded
 
@@ -94,7 +111,7 @@ Current resume point: **v0.7.1 Phase 071-A - Truth and release baseline**.
 
 ### Version alignment stop
 
-- [ ] OW-080-11 update and question register presented
+- [ ] OW-080-11 update, finding/decision/question registers, and v0.8.1 plan reflection presented
 - [ ] G-080-ALIGNMENT passed with an explicit user decision
 - [ ] v0.8.1 remains locked until the decision is recorded
 
@@ -120,7 +137,7 @@ Current resume point: **v0.7.1 Phase 071-A - Truth and release baseline**.
 
 ### Version alignment stop
 
-- [ ] OW-081-11 update and question register presented
+- [ ] OW-081-11 update, finding/decision/question registers, and v0.9.0 plan reflection presented
 - [ ] G-081-ALIGNMENT passed with an explicit user decision
 - [ ] v0.9.0 remains locked until the decision is recorded
 
@@ -146,7 +163,7 @@ Current resume point: **v0.7.1 Phase 071-A - Truth and release baseline**.
 
 ### Version alignment stop
 
-- [ ] OW-090-11 update and question register presented
+- [ ] OW-090-11 update, finding/decision/question registers, and v1.0 plan reflection presented
 - [ ] G-090-ALIGNMENT passed with an explicit user decision
 - [ ] v1.0 remains locked until the decision is recorded
 
@@ -168,5 +185,5 @@ Current resume point: **v0.7.1 Phase 071-A - Truth and release baseline**.
 
 - [ ] tickets OW-100-07 through OW-100-09 done
 - [ ] G-100-C-PROOF and G-100-GA evidence passed
-- [ ] OW-100-10 final update and post-v1 question register presented
+- [ ] OW-100-10 final update, finding/decision/question registers, and post-v1 plan reflection presented
 - [ ] G-100-ALIGNMENT passed with explicit user approval before v1 publication/tag

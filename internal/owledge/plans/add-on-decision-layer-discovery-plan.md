@@ -1,7 +1,7 @@
 ---
 memory_id: "mem:owledge:global:owledge:plan:add-on-decision-layer-discovery"
 doc_type: "plan"
-status: "ready"
+status: "accepted"
 visibility: "private"
 data_class: "internal"
 semantic_title: "Add-on Decision Layer and Project Hardening discovery"
@@ -60,9 +60,15 @@ content in public docs or canonical project truth.
 
 ### Checklist
 
-- [ ] intake contract drafted
-- [ ] rubric and privacy boundary reviewed
-- [ ] quick review complete
+- [x] intake contract drafted
+- [x] rubric and privacy boundary reviewed
+- [x] quick review complete
+
+### Result
+
+Completed on 2026-07-27. The owner approved the rubric and the private feedback
+was recorded as candidate evidence in
+`internal/owledge/reports/add-on-decision-layer-keos-handout-red-team-2026-07-27.md`.
 
 ## Phase 2 - Independent plan sparring
 
@@ -79,9 +85,16 @@ mistaking a model score for an owner decision.
 
 ### Checklist
 
-- [ ] comparison protocol drafted
-- [ ] disagreement and evidence rules tested
-- [ ] quick review complete
+- [x] comparison protocol drafted
+- [x] disagreement and evidence rules tested
+- [x] quick review complete
+
+### Result
+
+Completed on 2026-07-27 by comparing the KEOS handoff, the Hermes reflection,
+and the active v0.7.1/v1 roadmap. No model output was treated as authority.
+The Hermes three-tool recommendation is retained only as a first-smoke
+candidate; the current `OW-071-07` acceptance surface remains unchanged.
 
 ## Phase 3 - Project Hardening decision bridge
 
@@ -98,9 +111,16 @@ deferred finding has a roadmap trigger.
 
 ### Checklist
 
-- [ ] decision mapping contract drafted
-- [ ] example delta and handoff reviewed
-- [ ] quick review complete
+- [x] decision mapping contract drafted
+- [x] example delta and handoff reviewed
+- [x] quick review complete
+
+### Result
+
+Completed on 2026-07-27. The final implementation bridge is
+`internal/owledge/decisions/add-on-decision-layer-final-bridge-2026-07-27.md`.
+It preserves v0.7.1 local first-value scope and maps accepted findings to
+existing roadmap tickets rather than creating a parallel release.
 
 ## Integration rule
 
@@ -118,4 +138,6 @@ consensus.
 
 ## Resume state
 
-Awaiting a private-system improvement handout and user-approved sparring rubric.
+Planning bridge accepted. Continue execution from the v0.7.1 release runbook;
+use `internal/owledge/decisions/add-on-decision-layer-final-bridge-2026-07-27.md`
+as the constraint source for feedback-derived hardening work.

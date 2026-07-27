@@ -24,7 +24,7 @@ confidence: 0.95
 review_status: "reviewed"
 sanitization_status: "not_required"
 created_at: "2026-07-16T00:00:00Z"
-updated_at: "2026-07-18T00:00:00Z"
+updated_at: "2026-07-27T00:00:00Z"
 source_hash: ""
 owners:
   - "release-orchestrator"
@@ -44,6 +44,9 @@ edges: []
 | Canonical installation and cross-platform command truth | OW-071-10, OW-071-05, OW-100-05 | G-071-B-ADOPTION, G-100-B-PRODUCT |
 | End-to-end workflow and privacy-boundary explanation | OW-071-11, OW-090-06, OW-100-07 | G-071-B-ADOPTION, G-090-B-WRITES, G-100-C-PROOF |
 | Skills taxonomy and executable agent integration guidance | OW-071-12, OW-081-01 through OW-081-05 | G-071-B-ADOPTION, G-081-A-ADAPTERS |
+| Reliable skill discovery and bounded long-horizon planning modes | OW-071-12, OW-081-01 through OW-081-05 | G-071-B-ADOPTION, G-081-A-ADAPTERS |
+| MVP cutline, planning stop, and durable roadmap/idea routing | OW-080-03, OW-080-05, OW-090-02, OW-090-04 | G-080-A-CONTRACTS, G-080-B-CONTEXT, G-090-A-TRUST, G-090-B-WRITES |
+| Pre-plan idea/concept capsule and harness lifecycle hooks | OW-080-05, OW-081-01 through OW-081-05, OW-081-13 | G-080-B-CONTEXT, G-081-A-ADAPTERS, G-081-B-CONCURRENCY |
 | Adoption presets and Global/Hub maturity boundaries | OW-071-14, OW-071-06, OW-081-09, OW-090-09 | G-071-B-ADOPTION, G-071-C-COMPAT, G-081-C-JOURNEY, G-090-C-RAG |
 | Truthful work register and release state | OW-071-01, OW-071-02 | G-071-A-TRUTH |
 | Local HTTP control-plane truth and safe exposure boundary | OW-071-13, OW-100-02 | G-071-A-TRUTH, G-100-A-HARDENING |
@@ -67,4 +70,5 @@ edges: []
 | Benchmark integrity and cross-profile RAG proof | OW-071-03, OW-080-07, OW-090-08, OW-100-04 | G-071-A-TRUTH, G-080-B-CONTEXT, G-090-C-RAG, G-100-B-PRODUCT |
 | Semantic MCP threat boundary | OW-090-04, OW-100-02 | G-090-B-WRITES, G-100-A-HARDENING |
 | Mandatory user alignment after every version | OW-071-09, OW-080-11, OW-081-11, OW-090-11, OW-100-10 | G-071-ALIGNMENT, G-080-ALIGNMENT, G-081-ALIGNMENT, G-090-ALIGNMENT, G-100-ALIGNMENT |
+| Complete implementation finding/decision log and next-version plan reflection after every version | OW-071-09, OW-080-11, OW-081-11, OW-090-11, OW-100-10 | G-071-ALIGNMENT, G-080-ALIGNMENT, G-081-ALIGNMENT, G-090-ALIGNMENT, G-100-ALIGNMENT |
 | PI.dev is non-critical post-v1 concept | no v1 ticket | explicitly deferred |

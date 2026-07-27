@@ -47,7 +47,9 @@ Every gate starts from the tested integration commit and controlled environment 
 ### G-071-A-TRUTH - Truth and baseline
 
 - Tickets: `OW-071-01`, `OW-071-02`, `OW-071-03`, `OW-071-13`.
-- Commands: `python tools/validate_v1_delivery_plan.py`; roadmap/state validator;
+- Commands: `python tools/validate_v1_delivery_plan.py`;
+  `python tools/validate_live_work_register.py --project-root .`;
+  `python -m pytest tests/unit/test_validate_live_work_register.py -q`;
   focused FB-019/020/021 tests; public docs; Benchmark Kit CI and held-out
   comparison; local HTTP auth, Endpoint x Role x Tenant authorization matrix,
   health-disclosure, remote-bind, body-size, timeout, concurrency, rate, and
@@ -105,7 +107,7 @@ Every gate starts from the tested integration commit and controlled environment 
 
 - Tickets: `OW-071-09`.
 - Commands: `python tools/validate_v1_delivery_plan.py`; required-heading check for `release-updates/v0.7.1.md`; evidence and source-link review.
-- Thresholds: `G-071-RC` green; update has all eight protocol headings; every claim links evidence; every unresolved topic is a numbered question or `None`; user decision is explicit and recorded.
+- Thresholds: `G-071-RC` green; update has all eleven protocol headings; every claim and finding links evidence; finding/decision/question registers and v0.8.0 plan reflection are complete or explicitly `None`; user decision is explicit and recorded.
 - Demonstrable increment: the product owner can assess v0.7.1 benefits, compatibility, proof, limitations, and exact v0.8.0 implications without chat reconstruction.
 - User alignment: agent stops in `awaiting_user_alignment`; only user `approve` unlocks v0.8.0 and optional publication, while `adjust`/`defer` remain blocked.
 - Promotion: user-approved alignment authorizes recorded publication constraints and v0.8.0 execution.
@@ -148,7 +150,7 @@ Every gate starts from the tested integration commit and controlled environment 
 
 - Tickets: `OW-080-11`.
 - Commands: `python tools/validate_v1_delivery_plan.py`; required-heading check for `release-updates/v0.8.0.md`; evidence and source-link review.
-- Thresholds: `G-080-RC` green; update has all eight protocol headings; contract, migration, small-model, and retrieval claims link evidence; every unresolved topic is a numbered question or `None`; user decision is explicit and recorded.
+- Thresholds: `G-080-RC` green; update has all eleven protocol headings; contract, migration, small-model, retrieval, and finding claims link evidence; finding/decision/question registers and v0.8.1 plan reflection are complete or explicitly `None`; user decision is explicit and recorded.
 - Demonstrable increment: the product owner can assess v0.8.0 adoption impact and v0.8.1 scope without reopening planning history.
 - User alignment: agent stops in `awaiting_user_alignment`; only user `approve` unlocks v0.8.1 and optional publication, while `adjust`/`defer` remain blocked.
 - Promotion: user-approved alignment authorizes recorded publication constraints and v0.8.1 execution.
@@ -191,7 +193,7 @@ Every gate starts from the tested integration commit and controlled environment 
 
 - Tickets: `OW-081-11`.
 - Commands: `python tools/validate_v1_delivery_plan.py`; required-heading check for `release-updates/v0.8.1.md`; evidence and source-link review.
-- Thresholds: `G-081-RC` green; update has all eight protocol headings; Tier-1 claims, Hermes boundary, degradation, and golden-journey claims link evidence; every unresolved topic is a numbered question or `None`; user decision is explicit and recorded.
+- Thresholds: `G-081-RC` green; update has all eleven protocol headings; Tier-1 claims, Hermes boundary, degradation, golden-journey findings link evidence; finding/decision/question registers and v0.9.0 plan reflection are complete or explicitly `None`; user decision is explicit and recorded.
 - Demonstrable increment: the product owner can assess agentic-coding readiness and v0.9.0 risk without reopening planning history.
 - User alignment: agent stops in `awaiting_user_alignment`; only user `approve` unlocks v0.9.0 and optional publication, while `adjust`/`defer` remain blocked.
 - Promotion: user-approved alignment authorizes recorded publication constraints and v0.9.0 execution.
@@ -234,7 +236,7 @@ Every gate starts from the tested integration commit and controlled environment 
 
 - Tickets: `OW-090-11`.
 - Commands: `python tools/validate_v1_delivery_plan.py`; required-heading check for `release-updates/v0.9.0.md`; evidence and source-link review.
-- Thresholds: `G-090-RC` green; update has all eight protocol headings; privacy, semantic-write, RAG, and Owlib claims link evidence; every unresolved topic is a numbered question or `None`; user decision is explicit and recorded.
+- Thresholds: `G-090-RC` green; update has all eleven protocol headings; privacy, semantic-write, RAG, Owlib, and finding claims link evidence; finding/decision/question registers and v1.0 plan reflection are complete or explicitly `None`; user decision is explicit and recorded.
 - Demonstrable increment: the product owner can assess trusted-write boundaries and final-v1 scope without reopening planning history.
 - User alignment: agent stops in `awaiting_user_alignment`; only user `approve` unlocks v1.0 and optional publication, while `adjust`/`defer` remain blocked.
 - Promotion: user-approved alignment authorizes recorded publication constraints and v1.0 execution.
@@ -277,7 +279,7 @@ Every gate starts from the tested integration commit and controlled environment 
 
 - Tickets: `OW-100-10`.
 - Commands: `python tools/validate_v1_delivery_plan.py`; required-heading check for `release-updates/v1.0.md`; final evidence and source-link review.
-- Thresholds: `G-100-GA` green; update has all eight protocol headings; shipped scope, support, quality, compatibility, and post-v1 claims link evidence; every unresolved topic is a numbered question or `None`; user decision is explicit and recorded.
+- Thresholds: `G-100-GA` green; update has all eleven protocol headings; shipped scope, support, quality, compatibility, findings, and post-v1 claims link evidence; finding/decision/question registers and post-v1 plan reflection are complete or explicitly `None`; user decision is explicit and recorded.
 - Demonstrable increment: the product owner can approve or adjust v1.0 GA with a complete evidence-backed product handover.
 - User alignment: agent stops in `awaiting_user_alignment`; only explicit user `approve` authorizes publication/tag and v1 closeout; `adjust`/`defer` remain blocked.
 - Promotion: user-approved alignment authorizes recorded v1.0 GA publication constraints; agents still never publish autonomously.

@@ -57,8 +57,11 @@ REQUIRED_ALIGNMENT_HEADINGS = [
     "## Feature Update",
     "## User Benefits and Adoption Impact",
     "## Gate and Evidence Summary",
+    "## Implementation Findings: Problems, Gaps, and Deviations",
+    "## Decision Log",
     "## Compatibility, Migration, and Operations",
     "## Known Limitations and Deferred Work",
+    "## Next-Version Plan Reflection",
     "## Questions and Decisions Required",
     "## Recommendation and Safe Default",
     "## Recorded User Decision",
@@ -66,7 +69,8 @@ REQUIRED_ALIGNMENT_HEADINGS = [
 
 REQUIRED_ALIGNMENT_PROTOCOL_SECTIONS = [
     "## Hard Stop",
-    "## Question Capture During a Version",
+    "## Finding, Decision, and Question Capture During a Version",
+    "## Next-Version Plan Reflection",
     "## Copy-Ready `/goal` Resume Prompt",
     "## Version Update Template",
 ]
@@ -87,9 +91,26 @@ EXECUTION_ROW = re.compile(
     re.MULTILINE,
 )
 
+EXECUTION_WAVE_ROW = re.compile(
+    r"^  - \{id: (?P<id>W-[^,]+), release: (?P<release>[^,]+), "
+    r"tickets: \[(?P<tickets>[^\]]*)\], policy: (?P<policy>[^,}]+)\}$",
+    re.MULTILINE,
+)
+
 
 def parse_execution_rows(text: str) -> list[dict[str, str]]:
     return [match.groupdict() for match in EXECUTION_ROW.finditer(text)]
+
+
+def parse_execution_waves(text: str) -> list[dict[str, Any]]:
+    waves: list[dict[str, Any]] = []
+    for match in EXECUTION_WAVE_ROW.finditer(text):
+        wave = match.groupdict()
+        wave["tickets"] = split_csv(wave["tickets"])
+        waves.append(wave)
+    return waves
+
+
 def read(path: pathlib.Path) -> str:
     return path.read_text(encoding="utf-8")
 
@@ -132,6 +153,7 @@ def validate_frontmatter(errors: list[str]) -> None:
 
     paths = [
         REPO_ROOT / "internal" / "owledge" / "plans" / "owledge-v1-autonomous-delivery-master-plan.md",
+        REPO_ROOT / "internal" / "owledge" / "decisions" / "v0.7.1-v1-version-reflection-contract-2026-07-27.md",
         REPO_ROOT / "internal" / "owledge" / "workpackages" / "owledge-v1-autonomous-delivery-checklist.md",
         REPO_ROOT / "internal" / "owledge" / "reports" / "owledge-v1-roadmap-blindspot-analysis.md",
         CONTROL_ROOT / "GOAL.md",
@@ -306,7 +328,15 @@ def validate() -> dict[str, Any]:
             alignment_section = section(ticket_text, ticket_id)
         except ValueError:
             alignment_section = ""
-        for phrase in ["awaiting_user_alignment", "approve", "adjust", "defer"]:
+        for phrase in [
+            "awaiting_user_alignment",
+            "approve",
+            "adjust",
+            "defer",
+            "finding",
+            "decision",
+            "plan reflection",
+        ]:
             if phrase not in alignment_section:
                 errors.append(f"{ticket_id}: missing alignment action {phrase}")
         if next_release != "null":
@@ -326,8 +356,12 @@ def validate() -> dict[str, Any]:
         errors.append("ORCHESTRATION-PROTOCOL.md: missing classification or consent protocol")
     if not (REPO_ROOT / "skills" / "owledge-autonomous-delivery" / "SKILL.md").is_file():
         errors.append("skills/owledge-autonomous-delivery/SKILL.md: missing")
-    if "## Version Alignment and User Authority" not in policy_text or "## Phase Question Register" not in policy_text:
-        errors.append("CONTROL-PLANE-POLICY.md: missing version-alignment or phase-question policy")
+    if (
+        "## Version Alignment and User Authority" not in policy_text
+        or "## Version Finding, Decision, and Question Registers" not in policy_text
+        or "## Next-Version Reflection" not in policy_text
+    ):
+        errors.append("CONTROL-PLANE-POLICY.md: missing version-alignment, register, or next-version-reflection policy")
     if "## `/goal` Version-Stop Protocol" not in goal_text or "awaiting_user_alignment" not in goal_text:
         errors.append("GOAL.md: missing /goal version-stop contract")
 
@@ -355,17 +389,123 @@ def validate() -> dict[str, Any]:
         if missing_gate_refs:
             errors.append(f"{gate}: Tickets line omits {sorted(missing_gate_refs)}")
 
-    wave_tickets: list[str] = []
-    for raw in re.findall(r"^  - \{id: W-[^}]+tickets: \[([^\]]*)\]", backlog_text, re.MULTILINE):
-        wave_tickets.extend(split_csv(raw))
+    execution_waves = parse_execution_waves(backlog_text)
+    wave_tickets = [
+        ticket_id
+        for wave in execution_waves
+        for ticket_id in wave["tickets"]
+    ]
     if set(wave_tickets) != known:
         errors.append(f"Execution-wave coverage mismatch: missing={sorted(known-set(wave_tickets))} extra={sorted(set(wave_tickets)-known)}")
     duplicates = sorted({item for item in wave_tickets if wave_tickets.count(item) > 1})
     if duplicates:
         errors.append(f"Tickets occur in multiple execution waves: {duplicates}")
 
+    wave_by_ticket: dict[str, tuple[int, dict[str, Any]]] = {}
+    previous_release_rank = -1
+    for wave_index, wave in enumerate(execution_waves):
+        wave_release = wave["release"]
+        current_release_rank = release_rank.get(wave_release)
+        if current_release_rank is None:
+            errors.append(f"{wave['id']}: unknown execution-wave release {wave_release}")
+        else:
+            if current_release_rank < previous_release_rank:
+                errors.append(
+                    f"{wave['id']}: execution waves must follow release_order"
+                )
+            previous_release_rank = max(previous_release_rank, current_release_rank)
+        for ticket_id in wave["tickets"]:
+            if ticket_id in wave_by_ticket:
+                continue
+            wave_by_ticket[ticket_id] = (wave_index, wave)
+            ticket_release = release_by_id.get(ticket_id)
+            if ticket_release is not None and ticket_release != wave_release:
+                errors.append(
+                    f"{wave['id']}: ticket {ticket_id} belongs to {ticket_release}, not {wave_release}"
+                )
+
+    for ticket_id, ticket_dependencies in dependencies.items():
+        dependent_location = wave_by_ticket.get(ticket_id)
+        if dependent_location is None:
+            continue
+        dependent_index, dependent_wave = dependent_location
+        for dependency_id in ticket_dependencies:
+            dependency_location = wave_by_ticket.get(dependency_id)
+            if dependency_location is None:
+                continue
+            dependency_index, dependency_wave = dependency_location
+            if dependency_index == dependent_index:
+                wave_kind = (
+                    "parallel wave"
+                    if dependent_wave["policy"] == "parallel_non_overlapping"
+                    else "execution wave"
+                )
+                errors.append(
+                    f"{ticket_id}: dependency {dependency_id} cannot share {wave_kind} "
+                    f"{dependent_wave['id']}; dependencies must be in an earlier wave"
+                )
+            elif dependency_index > dependent_index:
+                errors.append(
+                    f"{ticket_id}: dependency {dependency_id} is scheduled in later wave "
+                    f"{dependency_wave['id']}; it must precede {dependent_wave['id']}"
+                )
+
+    alignment_by_release = {
+        alignment["release"]: alignment["ticket"]
+        for alignment in alignment_rows
+    }
+    for wave_index, wave in enumerate(execution_waves):
+        alignment_ticket = alignment_by_release.get(wave["release"])
+        if wave["policy"] == "user_alignment_stop":
+            if alignment_ticket is None or wave["tickets"] != [alignment_ticket]:
+                errors.append(
+                    f"{wave['id']}: user_alignment_stop must contain only the "
+                    f"alignment ticket for {wave['release']}"
+                )
+        if alignment_ticket not in wave["tickets"]:
+            continue
+        if wave["policy"] != "user_alignment_stop":
+            errors.append(
+                f"{wave['id']}: alignment ticket {alignment_ticket} requires "
+                "policy=user_alignment_stop"
+            )
+        later_same_release = [
+            later_wave["id"]
+            for later_wave in execution_waves[wave_index + 1 :]
+            if later_wave["release"] == wave["release"]
+        ]
+        if later_same_release:
+            errors.append(
+                f"{wave['id']}: alignment stop must be the final wave for "
+                f"{wave['release']}; later={later_same_release}"
+            )
+
     ready = [row["id"] for row in rows if row["status"] == "ready"]
     run_state_text = read(RUN_STATE)
+    for key in [
+        "schema_version",
+        "project",
+        "plan",
+        "objective",
+        "status",
+        "current_release",
+        "current_phase",
+        "active_ticket",
+        "alignment",
+        "execution_mode",
+        "orchestration",
+        "workspace",
+        "blockers",
+        "last_completed_actions",
+        "next_actions",
+        "last_commands",
+        "updated_at",
+        "updated_by",
+    ]:
+        if not re.search(rf"^{re.escape(key)}:", run_state_text, re.MULTILINE):
+            errors.append(f"RUN-STATE.yaml: missing top-level key {key}")
+    if "nullworkspace:" in run_state_text:
+        errors.append("RUN-STATE.yaml: malformed merged orchestration/workspace key")
     active_match = re.search(r"^active_ticket:\s*(.+)$", run_state_text, re.MULTILINE)
     active = active_match.group(1).strip() if active_match else ""
     if active in {"", "null", "None"} and ready != ["OW-071-01"]:
@@ -374,21 +514,40 @@ def validate() -> dict[str, Any]:
         errors.append(f"RUN-STATE.yaml: unknown active_ticket={active}")
     if active in {"", "null", "None"} and ready and ready[0] not in run_state_text:
         errors.append(f"RUN-STATE.yaml: next action does not identify ready ticket {ready[0]}")
-    for key in ["alignment:", "state:", "awaiting_release:", "active_alignment_ticket:", "user_decision:", "open_questions:", "update_path:"]:
-        if key not in run_state_text:
+    for key in [
+        "state",
+        "awaiting_release",
+        "active_alignment_ticket",
+        "user_decision",
+        "open_questions",
+        "findings",
+        "decisions",
+        "next_plan_reflection",
+        "update_path",
+    ]:
+        if not re.search(rf"^  {re.escape(key)}:", run_state_text, re.MULTILINE):
             errors.append(f"RUN-STATE.yaml: missing alignment field {key}")
+    for key in ["status", "target_release", "items"]:
+        if not re.search(rf"^    {re.escape(key)}:", run_state_text, re.MULTILINE):
+            errors.append(f"RUN-STATE.yaml: missing next_plan_reflection field {key}")
 
     validate_frontmatter(errors)
 
     for row in rows:
         if row["estimated_turns"] == 3:
-            warnings.append(f"{row['id']}: three-turn ticket requires an internal checkpoint after each atomic result")
+            try:
+                ticket_section = section(ticket_text, row["id"])
+            except ValueError:
+                continue
+            checkpoint_line = re.search(r"^- Execution checkpoints:\s*(.+)$", ticket_section, re.MULTILINE)
+            if not checkpoint_line:
+                warnings.append(f"{row['id']}: three-turn ticket requires an internal checkpoint after each atomic result")
 
     return {
         "passed": not errors,
         "tickets": len(rows),
         "gates": len(gate_map),
-        "execution_waves": len(re.findall(r"^  - \{id: W-", backlog_text, re.MULTILINE)),
+        "execution_waves": len(execution_waves),
         "errors": errors,
         "warnings": warnings,
     }

@@ -19,7 +19,7 @@ confidence: 0.94
 review_status: "reviewed"
 sanitization_status: "not_required"
 created_at: "2026-07-16T00:00:00Z"
-updated_at: "2026-07-18T00:00:00Z"
+updated_at: "2026-07-27T00:00:00Z"
 source_hash: ""
 reusable_lessons:
   - "Planning detail should improve resumability without becoming default prompt context."
@@ -54,7 +54,6 @@ Use `python tools/validate_v1_delivery_plan.py --ticket-id <ID>` and `--gate-id 
 - Semantic MCP writes, privacy/export decisions, security changes, release cuts, and canonical promotion may not use author-only QA.
 - Every evidence manifest records the concrete actor/runtime and QA mode, not only the abstract role.
 
-## Evidence Retention and Privacy
 ## Optional Autonomous Delivery
 
 - Default execution is single-agent. Use `owledge-autonomous-delivery` only to assess and propose an optional delivery workflow.
@@ -64,6 +63,7 @@ Use `python tools/validate_v1_delivery_plan.py --ticket-id <ID>` and `--gate-id 
 - User consent records lanes, model profiles, allowed paths, Git/worktree plan, write/network/cost risk, evidence retention, rollback, and safe fallback. It expires at the next alignment stop.
 - Worker, QA, and Red Team contexts are isolated. One Worker may write per ticket; only the integration owner may merge an evidenced manifest to the integration branch.
 
+## Evidence Retention and Privacy
 
 - Commit compact manifests, reports required for reproducibility, and stable hashes—not raw model transcripts or unrestricted command logs.
 - Redact secrets, credentials, personal paths, customer data, and private prompts before persistence.
@@ -106,13 +106,20 @@ Each version is independently releasable. Downstream v0.9/v1 functionality may e
 ## Version Alignment and User Authority
 
 - A passed RC/GA gate proves technical release readiness only. It does not authorize a publish/tag, the next release, a scope change, or closure of open product questions.
-- Each release has one alignment ticket and gate. The ticket compiles a factual feature update from committed evidence, lists all design/product/release questions, and creates `release-updates/<version>.md` using `ALIGNMENT-PROTOCOL.md`.
+- Each release has one alignment ticket and gate. The ticket compiles a factual feature update from committed evidence, lists all findings, decisions, and design/product/release questions, reflects the next-version plan, and creates `release-updates/<version>.md` using `ALIGNMENT-PROTOCOL.md`.
 - After the update is presented, the agent sets the run state to `awaiting_user_alignment` and the alignment ticket to `blocked` with the exact questions and safe default. This is an intentional pause, not a failure.
 - Until an explicit user response is recorded, no next-release ticket may become `ready`, and no publish/tag occurs. Agents may answer questions or repair evidence only within the active release.
 - `approve`, `adjust`, and `defer` are the only valid outcomes. `adjust` requires the smallest ticket/gate update and a fresh validation run; `defer` records impact, limitation, and the user decision before further work.
 
-## Phase Question Register
+## Version Finding, Decision, and Question Registers
 
-- During every ticket and gate, capture non-blocking product, architecture, UX/DX, integration, performance, security, privacy, and scope questions in `RUN-STATE.yaml` under `alignment.open_questions`. Each entry states the source ticket/gate, the question, impact, recommendation, and safe default.
-- Do not interrupt a version for ordinary alignment questions. Carry them into the next mandatory version update, where every entry must be answered, explicitly deferred, or marked `None` when the register is empty.
+- During every ticket and gate, capture non-blocking product, architecture, UX/DX, integration, performance, security, privacy, and scope questions in `RUN-STATE.yaml` under `alignment.open_questions`. Capture problems, gaps, deviations, regressions, and new risks under `alignment.findings`; capture decisions made or requested under `alignment.decisions`.
+- Every finding and decision uses a stable version-scoped ID and records its source, evidence, impact, status, recommendation, safe default, authority, and affected artifacts as applicable.
+- Do not interrupt a version for ordinary alignment items. Carry every entry into the next mandatory version update, where it must be resolved, explicitly deferred, or marked `None` when the register is empty.
 - Escalate immediately instead of waiting for the version stop when a question affects safety, privacy, credentials/cost, data loss, external commitments, or an irreversible architecture decision.
+
+## Next-Version Reflection
+
+- After the release gate passes, evaluate the next version against current evidence before asking the owner to unlock it.
+- Record affected tickets and gates under `alignment.next_plan_reflection` with one disposition per item: `keep`, `amend`, `defer`, or `drop`.
+- Validate every proposed plan/ticket/gate amendment before presenting the review. The owner remains the authority for scope and acceptance changes.

@@ -1,7 +1,7 @@
 ---
 memory_id: "mem:owledge:global:owledge:workpackage:add-on-decision-layer-discovery"
 doc_type: "workpackage"
-status: "ready"
+status: "accepted"
 visibility: "private"
 data_class: "internal"
 semantic_title: "Add-on Decision Layer discovery checklist"
@@ -15,29 +15,49 @@ plan: "../plans/add-on-decision-layer-discovery-plan.md"
 
 ## Resume state
 
-Current phase: Phase 1. Next action: receive and classify the private-system
-improvement handout as candidate evidence.
+Current phase: complete. Next action: resume v0.7.1 delivery from the release
+runbook and use the final bridge decision as the constraint source for
+feedback-derived hardening.
 
 ## Phase 1 - Feedback intake and metric contract
 
-- [ ] private handout source and privacy boundary recorded
-- [ ] intake card and rubric drafted
-- [ ] QA classification review complete
+- [x] private handout source and privacy boundary recorded
+- [x] intake card and rubric drafted
+- [x] QA classification review complete
 
 ## Phase 2 - Independent plan sparring
 
-- [ ] plan candidates and provenance recorded
-- [ ] rubric comparison and disagreement review complete
-- [ ] user sparring decision recorded
+- [x] plan candidates and provenance recorded
+- [x] rubric comparison and disagreement review complete
+- [x] user sparring decision recorded
 
 ## Phase 3 - Project Hardening decision bridge
 
-- [ ] accepted, deferred, and rejected findings mapped
-- [ ] plan/ticket/roadmap deltas reviewed
-- [ ] handoff and recovery state complete
+- [x] accepted, deferred, and rejected findings mapped
+- [x] plan/ticket/roadmap deltas reviewed
+- [x] handoff and recovery state complete
 
 ## Guardrails
 
-- [ ] no raw private content promoted into public docs or shared retrieval
-- [ ] no model score treated as an owner decision
-- [ ] v0.7.1 scope remains unchanged unless the user approves a required change
+- [x] no raw private content promoted into public docs or shared retrieval
+- [x] no model score treated as an owner decision
+- [x] v0.7.1 scope remains unchanged unless the user approves a required change
+
+## Evidence
+
+- `internal/owledge/reports/add-on-decision-layer-keos-handout-red-team-2026-07-27.md`
+  records the private handout and Hermes feedback as candidate evidence by
+  source hash, scope summary, approved rubric, red-team classification, v0.7.1
+  scope impact, and owner questions. Raw source content was not copied into the
+  repo.
+- Owner approved the rubric and the narrow v0.7.1 documentation-truth
+  amendments on 2026-07-27.
+- Owner approved the separated audience/transferability/privacy model on
+  2026-07-27. `OW-080-02` now carries the schema implementation candidate;
+  v0.7.1 may explain the distinction but does not implement the schema.
+- `internal/owledge/decisions/add-on-decision-layer-final-bridge-2026-07-27.md`
+  is the accepted implementation bridge. It maps KEOS/Hermes feedback to
+  v0.7.1 amendments, existing roadmap tickets, deferred work, and rejected
+  shapes.
+- `python tools/validate_v1_delivery_plan.py` passed after the final bridge and
+  ticket amendments.

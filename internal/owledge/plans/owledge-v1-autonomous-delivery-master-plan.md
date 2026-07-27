@@ -19,12 +19,12 @@ confidence: 0.94
 review_status: "reviewed"
 sanitization_status: "not_required"
 created_at: "2026-07-16T00:00:00Z"
-updated_at: "2026-07-18T00:00:00Z"
+updated_at: "2026-07-27T00:00:00Z"
 source_hash: ""
 reusable_lessons: []
 edges:
   - type: "supersedes"
-    target: "mem:owledge:global:owledge:plan:strategic-roadmap-2026-2027"
+    target: "docs/strategic-roadmap-2026-2027.md"
     confidence: 0.9
     reason: "This plan converts the approved strategic direction into an executable release and ticket control plane."
 ---
@@ -118,7 +118,33 @@ Every RC/GA is a technical promotion candidate, not permission to continue auton
 
 The next version's tickets are dependency-blocked by the prior alignment ticket. The agent may prepare evidence and answer questions, but it must not publish/tag, begin the next version, or mark the alignment ticket `done` until the user explicitly chooses `approve`, `adjust`, or `defer`.
 
-`GOAL.md`, `ALIGNMENT-PROTOCOL.md`, `RUN-STATE.yaml`, and the active alignment ticket form the copy-ready `/goal` handoff. Each update covers shipped features, user benefits, evidence/gates, migrations, known limitations, deferred work, proposed next-version scope, and a complete decision/question register.
+`GOAL.md`, `ALIGNMENT-PROTOCOL.md`, `RUN-STATE.yaml`, and the active alignment ticket form the copy-ready `/goal` handoff. Each update covers shipped features, user benefits, evidence/gates, migrations, known limitations, deferred work, implementation findings, decisions, proposed next-version scope, and complete finding/decision/question registers.
+
+## Version Reflection and Steering Contract
+
+For delivery control, one owner-facing phase equals one version bump:
+v0.7.1, v0.8.0, v0.8.1, v0.9.0, v1.0. Internal A/B/C phases remain
+technical gates inside that version.
+
+Every ticket and gate records material problems, gaps, deviations, regressions,
+new risks, and decisions in `RUN-STATE.yaml`. The version alignment ticket must
+then:
+
+1. reconcile planned versus actually shipped scope;
+2. present the complete implementation finding and decision logs;
+3. distinguish resolved items from owner decisions still required;
+4. reflect the next version ticket-by-ticket as `keep`, `amend`, `defer`, or
+   `drop`, including gate and dependency impact;
+5. recommend a safe default for every unresolved item;
+6. stop until the owner records `approve`, `adjust`, or `defer`.
+
+No material finding may disappear between ticket evidence, gate evidence, and
+the release update. Safety, privacy, credentials/cost, data-loss, external
+commitment, acceptance-boundary, and irreversible-architecture findings
+escalate immediately rather than waiting for the version stop.
+
+Decision source:
+`internal/owledge/decisions/v0.7.1-v1-version-reflection-contract-2026-07-27.md`.
 
 ## Version v0.7.1 - Adoption, Truth, and Compatibility
 

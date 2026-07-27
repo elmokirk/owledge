@@ -53,7 +53,7 @@ For every ticket:
 - Checkpoint: record last completed action, changed files, passed/failed commands, workspace/commit state, next exact action, assumptions, blockers, and prohibited shortcuts.
 - Rollback: revert the cohesive ticket commit or disable the additive capability; migrations must retain a reversible preview or backup path.
 - QA handoff: include attack/failure cases, residual risks, and the smallest cumulative gate affected.
-- Alignment tickets: after a release RC/GA, create the required version update from `ALIGNMENT-PROTOCOL.md`, set the run state to `awaiting_user_alignment`, and stop. Only an explicit recorded user `approve`, `adjust`, or `defer` decision may resolve the ticket.
+- Alignment tickets: after a release RC/GA, create the required version update from `ALIGNMENT-PROTOCOL.md`, including complete finding/decision/question registers and next-version plan reflection; set the run state to `awaiting_user_alignment`, and stop. Only an explicit recorded user `approve`, `adjust`, or `defer` decision may resolve the ticket.
 
 ## v0.7.1 - Adoption, Truth, and Compatibility
 
@@ -61,10 +61,33 @@ For every ticket:
 
 - Priority/dependencies: P0; none.
 - Outcome: one live register accurately distinguishes shipped, open, superseded, and deferred work.
-- Allowed paths: `ROADMAP.md`, `docs/strategic-roadmap-2026-2027.md`, `internal/owledge/plans/`, this control plane.
-- Implement: reconcile FB-001 through FB-021, v0.7 checklists, Owlib status, adapter claims, and version evidence; archive or supersede stale active claims without deleting history.
-- Accept: every open item has state, source, acceptance gap, target release, owner role, and evidence link; no active document contradicts `VERSION` or `pyproject.toml`.
-- Verify/evidence: `python tools/validate_v1_delivery_plan.py`, roadmap status validator, plus `python tools/owledge.py test public-docs --project-root .`; `evidence/OW-071-01/`.
+- Allowed paths: worker may edit `ROADMAP.md`, `docs/feedback-round-2026-06.md`,
+  `docs/roadmap-ideas-2026-06.md`, `docs/v0.6.0-implementation-plan.md`,
+  `docs/strategic-roadmap-2026-2027.md`,
+  `internal/owledge/workpackages/owledge-v1-autonomous-delivery/LIVE-WORK-REGISTER.yaml`,
+  `tools/validate_live_work_register.py`,
+  `tests/unit/test_validate_live_work_register.py`,
+  `tests/fixtures/live-work-register/`, and `evidence/OW-071-01/`.
+  `BACKLOG.yaml`, `RUN-STATE.yaml`, central checklists, and release updates are
+  orchestrator-only integration paths.
+- Source set: the five named roadmap/feedback/legacy-plan documents above,
+  `VERSION`, `pyproject.toml`, `CHANGELOG.md`, and the v0.7/v0.7.1 checklists
+  referenced by those documents. New sources require an orchestrator decision.
+- Implement: compile `LIVE-WORK-REGISTER.yaml` with exactly
+  `shipped|open|superseded|deferred`; reconcile FB-001 through FB-021, v0.7
+  checklists, Owlib status, adapter claims, and version evidence. Preserve
+  history: `superseded` requires a replacement reference; `deferred` requires
+  target release and reason; unchecked historical boxes are source evidence,
+  not active work.
+- Accept: every item has state, source, acceptance gap or shipped evidence,
+  target release, owner role, and evidence link; every FB-001..FB-021 item
+  appears exactly once; no active document contradicts `VERSION` or
+  `pyproject.toml`; no historical unchecked box re-enters active scope.
+- Verify/evidence: `python tools/validate_live_work_register.py --project-root .`;
+  `python tools/validate_v1_delivery_plan.py`;
+  `python -m pytest tests/unit/test_validate_live_work_register.py -q`;
+  `python tools/owledge.py test public-docs --project-root .`;
+  `evidence/OW-071-01/`.
 - Negative QA: deliberately stale fixture state is detected; historical unchecked boxes do not re-enter the live backlog.
 
 ### OW-071-02 - Close v0.7 release-trust gaps
@@ -112,6 +135,10 @@ For every ticket:
   regression fixtures; security review; `evidence/OW-071-13/`.
 - Negative QA: the existence of an admin token alone cannot authorize remote
   exposure; no docs call this a hosted, production, or team-sync service.
+- Execution checkpoints: (1) capability/threat contract and failing fixtures;
+  (2) loopback, health, tenant authorization, payload, timeout/concurrency/rate
+  bounds, and stable errors; (3) docs, full negative matrix, independent
+  security QA, and evidence manifest.
 
 ### OW-071-04 - Rewrite adoption-first English documentation
 
@@ -127,10 +154,13 @@ For every ticket:
   within two navigation clicks; establish `contracts/public-capabilities.json`
   as the versioned capability registry with schema and release-owner review;
   publish maturity as available, local experimental, preview, planned, or
-  post-v1 with evidence.
+  post-v1 with evidence; require external current-capability claims to record
+  source date or retrieval date in the evidence record; preserve an explicit
+  pre-install information budget so adoption docs cannot become a context dump.
 - Accept: a five-second fixture identifies audience, problem, outcome,
   boundary, and next action; no install command precedes the mental model;
-  every claim is current or explicitly labelled roadmap.
+  every claim is current or explicitly labelled roadmap; Hermes-specific
+  performance claims are not treated as current until fixture evidence exists.
 - Verify/evidence: comprehension, claim-map, navigation, link, and lint checks;
   `evidence/OW-071-04/`.
 - Negative QA: artifact inventory, repo layout, benchmark detail, or install
@@ -194,9 +224,17 @@ For every ticket:
   skill invocation and reviewed-promotion diagram; official happy-path skill
   order and explicit small-task, multi-agent, KB, and advanced variants; make
   the runtime-independent `owledge-contract` the Principles-only default and
-  exclude skills that would require runtime-dependent rewrites.
+  exclude skills that would require runtime-dependent rewrites; state that the
+  v0.7.1 MCP integration profile is read-only and that agents must not assume a
+  write path; ship `owledge-long-horizon-delivery` with bounded
+  `mvp-sparring`, `version-steering`, ticket, gate, and recovery modes; install
+  Codex repository mirrors under `.agents/skills/`, keep root `skills/` as the
+  Owledge source/vendor tree, use plugin-local `skills/` roots where declared,
+  and state explicitly that `.owledge/skills/` is not automatic discovery.
 - Accept: fixture agents select the correct path and prove it in the host
-  project; manual and experimental steps are bounded explicitly.
+  project; a fresh init contains hash-matching root and `.agents/skills`
+  copies; missing/drifting mirrors are diagnosed; manual and experimental
+  steps are bounded explicitly.
 - Verify/evidence: agent-choice scenarios, host integration smoke, runtime
   conformance review; `evidence/OW-071-12/`.
 - Negative QA: implied plugin folders, maintainer-repo checks as host proof,
@@ -262,8 +300,8 @@ For every ticket:
 - Outcome: Hermes proves the minimal required Tier-1 read-only Owledge MCP
   profile locally or on a VPS without implying unsupported write authority.
 - Allowed paths: `tools/owledge_mcp.py`, Hermes adapter/skill paths, runtime conformance fixtures, English integration docs/tests.
-- Implement: installation/routing skill, project-root binding, tool allowlist, MCP reload/test instructions, memory-boundary guidance, compact tool descriptions.
-- Accept: Hermes can read entrypoint, search, build context pack, list tasks/reviews; no write tool exists; repository path errors are clear.
+- Implement: installation/routing skill, project-root binding, tool allowlist, MCP reload/test instructions, memory-boundary guidance, compact tool descriptions; allow an initial entrypoint/search/context-pack smoke to reduce tool-choice risk, but do not treat that starter mode as the full ticket proof.
+- Accept: Hermes can read entrypoint, search, build context pack, list tasks/reviews; no write tool exists; repository path errors are clear; Hermes memory/compression remains separate from Owledge project artifacts; Hermes-specific token/performance claims remain candidate until fixture evidence exists.
 - Verify/evidence: protocol smoke plus Hermes fixture transcript; `evidence/OW-071-07/`.
 - Negative QA: unbound project, path escape, disabled tool, and unavailable MCP server fail explicitly.
 
@@ -282,10 +320,10 @@ For every ticket:
 - Priority/dependencies: P0; `OW-071-08`.
 - Outcome: the product owner receives an evidence-linked v0.7.1 feature update, all unresolved questions, and an explicit choice before publishing or beginning v0.8.0.
 - Allowed paths: `internal/owledge/workpackages/owledge-v1-autonomous-delivery/release-updates/`, `RUN-STATE.yaml`, `BACKLOG.yaml`, `TRACEABILITY.md`, release evidence/manifests.
-- Implement: create `release-updates/v0.7.1.md` from `ALIGNMENT-PROTOCOL.md`; summarize features, user benefit, gates/evidence, compatibility, limitations, deferred work, and every question; present it in chat and set the run state to `awaiting_user_alignment`.
-- Accept: `G-071-RC` is green; the update contains every required heading and no untracked claim; user `approve`, `adjust`, or `defer` is recorded with scope/constraints; only `approve` unlocks v0.8.0.
+- Implement: create `release-updates/v0.7.1.md` from `ALIGNMENT-PROTOCOL.md`; reconcile planned versus shipped scope, include complete implementation finding/decision/question registers, reflect affected v0.8.0 tickets and gates as keep/amend/defer/drop, present the review in chat, and set the run state to `awaiting_user_alignment`.
+- Accept: `G-071-RC` is green; the update contains all eleven required headings and no untracked claim, finding, or decision; proposed plan amendments validate; user `approve`, `adjust`, or `defer` is recorded with scope/constraints; only `approve` unlocks v0.8.0.
 - Verify/evidence: `python tools/validate_v1_delivery_plan.py`; required-heading check; update, decision, and evidence links under `evidence/OW-071-09/`.
-- Negative QA: missing question, absent decision, automatic next-ticket selection, or autonomous publish/tag leaves the ticket blocked.
+- Negative QA: omitted finding/question/decision, absent next-plan reflection, automatic next-ticket selection, or autonomous publish/tag leaves the ticket blocked.
 
 ## v0.8.0 - Portable Control Plane and Retrieval Foundation
 
@@ -304,18 +342,18 @@ For every ticket:
 - Priority/dependencies: P0; `OW-080-01`.
 - Outcome: project identity, modes, privacy, adapters, gates, artifact lifecycle, provenance, and typed edges validate consistently.
 - Allowed paths: `templates/`, `internal/owledge/templates/`, `skills/`, schema/tool/test/docs paths.
-- Implement: JSON Schemas, defaults, examples, upgrade mapping, extension-field preservation.
-- Accept: round-trip preserves stable IDs, typed edges, unknown extensions, visibility, and data class.
+- Implement: JSON Schemas, defaults, examples, upgrade mapping, extension-field preservation; add the owner-approved transferability model as separate fields from audience and privacy: `audience_ids` for target roles/lenses, `transferability: universal|partial|local` for reuse outside the origin context, optional `applies_to` for partial scope, and existing `visibility`/`data_class` for privacy.
+- Accept: round-trip preserves stable IDs, typed edges, unknown extensions, visibility, data class, audience IDs, transferability, and applies-to scope.
 - Verify/evidence: schema positive/negative and migration tests; `evidence/OW-080-02/`.
-- Negative QA: invalid lifecycle, missing identity, unsafe visibility/data-class combination, and ID mutation fail.
+- Negative QA: invalid lifecycle, missing identity, unsafe visibility/data-class combination, overloaded audience/privacy fields, invalid transferability value, and ID mutation fail.
 
 ### OW-080-03 - Implement WorkContract, Backlog, and RunState v1
 
 - Priority/dependencies: P0; `OW-080-01`.
 - Outcome: intent becomes a machine-readable dependency DAG with scopes, evidence, gates, handoff, and live state.
 - Allowed paths: planning templates/skills, schemas, `tools/owledge_core.py`, CLI/tests/docs.
-- Implement: ticket compiler/validator, status transitions, dependency readiness, WIP rules, atomic state updates.
-- Accept: task cannot reach accepted/done without required gate/evidence refs; cyclic or missing dependencies fail.
+- Implement: ticket compiler/validator, status transitions, dependency readiness, WIP rules, atomic state updates; encode goal, target user, smallest useful outcome, observable success signal, MVP cutline, definition of done, QA gates, out-of-scope, evidence, handoff, unresolved questions, and explicit roadmap/idea dispositions as first-class WorkContract fields.
+- Accept: task cannot reach accepted/done without required gate/evidence refs; prose-only completion is rejected; cyclic or missing dependencies fail.
 - Verify/evidence: state-machine, DAG, WIP, and atomic-write tests; `evidence/OW-080-03/`.
 - Negative QA: prose-only completion, cycle, double claim, and partial state update fail.
 
@@ -343,8 +381,8 @@ For every ticket:
 - Priority/dependencies: P0; `OW-080-02`, `OW-080-03`, `OW-080-04`, `OW-080-12`.
 - Outcome: bootstrap, task, reviewer, handoff, and release packs explain inclusion/exclusion and respect budgets.
 - Allowed paths: context-pack core/CLI, schemas, fixtures, tests, docs.
-- Implement: deterministic ordering/digest, typed selection reasons, privacy/staleness filters, dropped-source list, pack version.
-- Accept: identical inputs produce identical pack and digest; every included/excluded source has a reason.
+- Implement: deterministic ordering/digest, typed selection reasons, privacy/staleness filters, dropped-source list, pack version; add a bounded pre-plan capsule that inspects relevant idea, concept, decision, pattern, lesson, and roadmap metadata before plan creation and expands only candidates that can change the MVP cutline; distinguish source freshness from review freshness and enforce explicit context budgets without silent omission.
+- Accept: identical inputs produce identical pack and digest; every included/excluded source has a reason; the pre-plan capsule records required-now, dependency, roadmap, idea-candidate, or reject/defer disposition without auto-promoting candidates; stale source, stale review, privacy exclusion, and over-budget exclusion are distinguishable.
 - Verify/evidence: golden pack tests and v0.7 regression fixture; `evidence/OW-080-05/`.
 - Negative QA: private, stale, unrelated, or over-budget source cannot enter silently.
 
@@ -403,10 +441,10 @@ For every ticket:
 - Priority/dependencies: P0; `OW-080-10`.
 - Outcome: the product owner receives an evidence-linked v0.8.0 feature update and decides whether the portable control plane and retrieval foundation may publish and unlock v0.8.1.
 - Allowed paths: `internal/owledge/workpackages/owledge-v1-autonomous-delivery/release-updates/`, `RUN-STATE.yaml`, `BACKLOG.yaml`, `TRACEABILITY.md`, release evidence/manifests.
-- Implement: create `release-updates/v0.8.0.md` from `ALIGNMENT-PROTOCOL.md`; include contract/migration impact, small-model and retrieval evidence, limitations, deferred work, and all questions; present it in chat and set the run state to `awaiting_user_alignment`.
-- Accept: `G-080-RC` is green; the update contains every required heading and no untracked claim; user `approve`, `adjust`, or `defer` is recorded with scope/constraints; only `approve` unlocks v0.8.1.
+- Implement: create `release-updates/v0.8.0.md` from `ALIGNMENT-PROTOCOL.md`; reconcile planned versus shipped scope, include contract/migration impact, small-model and retrieval evidence, complete finding/decision/question registers, and a keep/amend/defer/drop reflection for affected v0.8.1 tickets and gates; present it in chat and set the run state to `awaiting_user_alignment`.
+- Accept: `G-080-RC` is green; the update contains all eleven required headings and no untracked claim, finding, or decision; proposed plan amendments validate; user `approve`, `adjust`, or `defer` is recorded with scope/constraints; only `approve` unlocks v0.8.1.
 - Verify/evidence: `python tools/validate_v1_delivery_plan.py`; required-heading check; update, decision, and evidence links under `evidence/OW-080-11/`.
-- Negative QA: omitted migration limitation, absent decision, automatic next-ticket selection, or autonomous publish/tag leaves the ticket blocked.
+- Negative QA: omitted migration limitation or finding, absent next-plan reflection/decision, automatic next-ticket selection, or autonomous publish/tag leaves the ticket blocked.
 
 ## v0.8.1 - Tier-1 Agentic Coding
 
@@ -415,8 +453,8 @@ For every ticket:
 - Priority/dependencies: P0; `OW-080-11`.
 - Outcome: adapters declare detect/install/inject/capture/execute/resume/health/cleanup, versions, permissions, limits, and degradation.
 - Allowed paths: runtime conformance add-on, schemas, adapter templates, tests/docs.
-- Implement: capability schema, negotiation result, fixture protocol, support-tier rules.
-- Accept: undeclared capability cannot run; unsupported feature returns explicit structured result.
+- Implement: capability schema, negotiation result, fixture protocol, support-tier rules; define optional pre-plan lifecycle capabilities for scoped idea/concept lookup, MVP-cutline handoff, roadmap/idea capture, and explicit unsupported degradation without requiring background writes.
+- Accept: undeclared capability cannot run; unsupported feature returns explicit structured result; adapters cannot claim automatic pre-plan inspection or durable routing unless they pass the shared fixtures.
 - Verify/evidence: manifest and negative compatibility suite; `evidence/OW-081-01/`.
 - Negative QA: version mismatch, missing permission, or false capability claim fails.
 
@@ -425,7 +463,7 @@ For every ticket:
 - Priority/dependencies: P1; `OW-081-01`.
 - Outcome: Codex bootstrap, context, task, checkpoint, handoff, hooks where available, and cleanup pass conformance.
 - Allowed paths: `.codex/`, Codex plugin/skill/fixtures, runtime docs/tests.
-- Implement: compact AGENTS/skill bridge, MCP/CLI routing, permission mapping, fixture transcript.
+- Implement: compact AGENTS/skill bridge, `.agents/skills/` discovery verification, MCP/CLI routing, permission mapping, bounded pre-plan capsule handoff, and fixture transcript.
 - Accept: Codex completes common conformance fixture with source-linked outputs.
 - Verify/evidence: Tier-1 suite; `evidence/OW-081-02/`.
 - Negative QA: missing hook is declared unsupported rather than silently skipped.
@@ -435,7 +473,7 @@ For every ticket:
 - Priority/dependencies: P1; `OW-081-01`.
 - Outcome: Claude Code plugin hooks and skills pass the common contract.
 - Allowed paths: `plugins/owledge-cowork/`, Claude fixtures, runtime docs/tests.
-- Implement: lifecycle validation, compact routing, tool/scoped write mapping, fixture transcript.
+- Implement: lifecycle validation, compact routing, plugin skill discovery, tool/scoped write mapping, bounded pre-plan capsule handoff, and fixture transcript.
 - Accept: same artifacts and lifecycle semantics as other Tier-1 profiles.
 - Verify/evidence: Tier-1 suite; `evidence/OW-081-03/`.
 - Negative QA: hook failure surfaces at session close and cannot mark ticket done.
@@ -447,7 +485,8 @@ For every ticket:
   hooks, and cleanup pass the common contract.
 - Allowed paths: OpenCode adapter/skill/fixtures, runtime docs/tests.
 - Implement: pinned install/setup, capability manifest, compact instruction
-  layer, context and resume wiring, health/cleanup, and explicit degradation.
+  layer, context and resume wiring, bounded pre-plan capsule handoff,
+  health/cleanup, and explicit degradation.
 - Accept: OpenCode completes the common conformance fixture with source-linked
   outputs and no hidden canonical writes.
 - Verify/evidence: pinned OpenCode fixture/conformance transcript;
@@ -460,7 +499,7 @@ For every ticket:
 - Priority/dependencies: P1; `OW-081-01`.
 - Outcome: any capable harness can use the same versioned read/control contract without runtime-specific files.
 - Allowed paths: MCP/CLI server, generic adapter fixtures, docs/tests.
-- Implement: protocol-compliant surface, capability discovery, JSON output, stdio lifecycle, project binding.
+- Implement: protocol-compliant surface, capability discovery, JSON output, stdio lifecycle, project binding, and a read-only pre-plan capsule endpoint with explicit promotion/write boundaries.
 - Accept: reference client passes common conformance suite.
 - Verify/evidence: protocol and CLI fixtures; `evidence/OW-081-05/`.
 - Negative QA: malformed JSON-RPC, unknown project, and tool mismatch fail without server crash.
@@ -470,8 +509,8 @@ For every ticket:
 - Priority/dependencies: P0; `OW-080-03`, `OW-081-01`.
 - Outcome: independent work receives explicit claim, branch/worktree, allowed paths, base SHA, merge order, and TTL.
 - Allowed paths: workpackage/claim schemas, Git helper core/CLI, tests/docs.
-- Implement: dry-run worktree plan, overlap detection, advisory lease, ownership journal, no direct integration-branch worker writes.
-- Accept: eight non-overlapping fixture workers plan cleanly; overlap requires owner decision.
+- Implement: dry-run worktree plan, overlap detection, advisory lease, ownership journal, no direct integration-branch worker writes; treat single-writer/write-claim policy as a claims-and-scope protocol before any MCP write lock.
+- Accept: eight non-overlapping fixture workers plan cleanly; overlap requires owner decision; no worker receives write authority without explicit claim, allowed paths, base SHA, TTL, and merge order.
 - Verify/evidence: Git fixture suite; `evidence/OW-081-06/`.
 - Negative QA: overlapping glob, stale base, dirty target, invalid branch, and expired claim block dispatch.
 
@@ -512,8 +551,8 @@ For every ticket:
   consume the approved delivery plan without making any runtime a Core
   dependency.
 - Allowed paths: runtime adapters, integration manifests, CLI/tests/docs, adapter fixtures.
-- Implement: read-only `execution plan` dry-run, model-profile resolution, consent verification, worktree/branch/merge manifests, explicit capability/degradation results, and `/goal` mapping as a Codex adapter.
-- Accept: adapters never launch externally while planning; approved non-overlapping lanes can be proposed; unsupported features degrade visibly and safely; integration writes remain owned by the integration role.
+- Implement: read-only `execution plan` dry-run, model-profile resolution, consent verification, worktree/branch/merge manifests, explicit capability/degradation results, `/goal` mapping as a Codex adapter, and harness-specific pre-plan hooks that request the deterministic idea/concept capsule before new feature planning and return roadmap/idea dispositions for owner approval.
+- Accept: adapters never launch externally while planning; pre-plan hooks are scoped, observable, and fail visibly without inventing context or writing automatically; approved non-overlapping lanes can be proposed; unsupported features degrade visibly and safely; integration writes remain owned by the integration role.
 - Verify/evidence: cross-runtime dry-run, consent, worktree, merge-manifest, and degradation fixtures; `evidence/OW-081-13/`.
 - Negative QA: no consent, overlap, direct integration write, unsupported model/runtime, or hidden external launch blocks dispatch.
 
@@ -551,10 +590,10 @@ For every ticket:
 - Priority/dependencies: P0; `OW-081-10`.
 - Outcome: the product owner receives an evidence-linked Tier-1 agentic-coding update and decides whether the adapter release may publish and unlock v0.9.0.
 - Allowed paths: `internal/owledge/workpackages/owledge-v1-autonomous-delivery/release-updates/`, `RUN-STATE.yaml`, `BACKLOG.yaml`, `TRACEABILITY.md`, release evidence/manifests.
-- Implement: create `release-updates/v0.8.1.md` from `ALIGNMENT-PROTOCOL.md`; include profile conformance, Hermes boundary, multi-agent journey, known degradation, limitations, deferred work, and all questions; present it in chat and set the run state to `awaiting_user_alignment`.
-- Accept: `G-081-RC` is green; the update contains every required heading and no untracked claim; user `approve`, `adjust`, or `defer` is recorded with scope/constraints; only `approve` unlocks v0.9.0.
+- Implement: create `release-updates/v0.8.1.md` from `ALIGNMENT-PROTOCOL.md`; reconcile planned versus shipped scope, include profile conformance, Hermes boundary, multi-agent journey, known degradation, complete finding/decision/question registers, and a keep/amend/defer/drop reflection for affected v0.9.0 tickets and gates; present it in chat and set the run state to `awaiting_user_alignment`.
+- Accept: `G-081-RC` is green; the update contains all eleven required headings and no untracked claim, finding, or decision; proposed plan amendments validate; user `approve`, `adjust`, or `defer` is recorded with scope/constraints; only `approve` unlocks v0.9.0.
 - Verify/evidence: `python tools/validate_v1_delivery_plan.py`; required-heading check; update, decision, and evidence links under `evidence/OW-081-11/`.
-- Negative QA: untested Tier-1 claim, absent decision, automatic next-ticket selection, or autonomous publish/tag leaves the ticket blocked.
+- Negative QA: untested Tier-1 claim, omitted degradation/finding, absent next-plan reflection/decision, automatic next-ticket selection, or autonomous publish/tag leaves the ticket blocked.
 
 ## v0.9.0 - Trusted Writes and Knowledge Lifecycle
 
@@ -593,8 +632,8 @@ For every ticket:
 - Priority/dependencies: P0; `OW-090-02`, `OW-090-03`.
 - Outcome: MCP supports create candidate, append evidence, claim/release work, checkpoint, handoff, and promotion request under policy.
 - Allowed paths: MCP server, semantic write service, schemas, tests/docs.
-- Implement: capability scopes, project binding, locks/idempotency, dry run, audit event, structured result; no arbitrary write tool.
-- Accept: every write maps to a contract transition and evidence event; read-only remains default profile.
+- Implement: capability scopes, project binding, locks/idempotency, dry run, audit event, structured result; no arbitrary write tool; support candidate creation and experience/evidence append only as semantic contract operations with target identity and provenance.
+- Accept: every write maps to a contract transition and evidence event; read-only remains default profile; generic `log()`-style writes and direct canonical mutation are unavailable.
 - Verify/evidence: protocol/security/idempotency suite; `evidence/OW-090-04/`.
 - Negative QA: traversal, symlink escape, confused-deputy project ID, undeclared scope, replay, oversized payload, lock theft/expiry race, injected retrieved instruction, and direct canonical edit fail.
 
@@ -663,10 +702,10 @@ For every ticket:
 - Priority/dependencies: P0; `OW-090-10`.
 - Outcome: the product owner receives an evidence-linked trusted-knowledge update and decides whether scoped semantic writes and RAG/Owlib workflows may publish and unlock v1.0.
 - Allowed paths: `internal/owledge/workpackages/owledge-v1-autonomous-delivery/release-updates/`, `RUN-STATE.yaml`, `BACKLOG.yaml`, `TRACEABILITY.md`, release evidence/manifests.
-- Implement: create `release-updates/v0.9.0.md` from `ALIGNMENT-PROTOCOL.md`; include write-policy boundaries, privacy/RAG evidence, compatibility, limitations, deferred work, and all questions; present it in chat and set the run state to `awaiting_user_alignment`.
-- Accept: `G-090-RC` is green; the update contains every required heading and no untracked claim; user `approve`, `adjust`, or `defer` is recorded with scope/constraints; only `approve` unlocks v1.0.
+- Implement: create `release-updates/v0.9.0.md` from `ALIGNMENT-PROTOCOL.md`; reconcile planned versus shipped scope, include write-policy boundaries, privacy/RAG evidence, complete finding/decision/question registers, and a keep/amend/defer/drop reflection for affected v1.0 tickets and gates; present it in chat and set the run state to `awaiting_user_alignment`.
+- Accept: `G-090-RC` is green; the update contains all eleven required headings and no untracked claim, finding, or decision; proposed plan amendments validate; user `approve`, `adjust`, or `defer` is recorded with scope/constraints; only `approve` unlocks v1.0.
 - Verify/evidence: `python tools/validate_v1_delivery_plan.py`; required-heading check; update, decision, and evidence links under `evidence/OW-090-11/`.
-- Negative QA: unsafe write claim, absent decision, automatic next-ticket selection, or autonomous publish/tag leaves the ticket blocked.
+- Negative QA: unsafe write claim, omitted privacy/finding, absent next-plan reflection/decision, automatic next-ticket selection, or autonomous publish/tag leaves the ticket blocked.
 
 ## v1.0 - Product Hardening and Release
 
@@ -715,8 +754,8 @@ For every ticket:
 - Priority/dependencies: P1; `OW-080-09`, `OW-100-01`.
 - Outcome: install/init/doctor/plan/context/why/status/resume/validate/promote/export/upgrade/uninstall are discoverable, dry-run capable where mutating, and machine-readable.
 - Allowed paths: CLI/core, packaging, tests, command/reference/troubleshooting docs.
-- Implement: short commands, JSON errors, actionable recovery, idempotency, uninstall preview, no orphaned canonical data.
-- Accept: beginner and automation journeys both work; every mutation explains writes before apply.
+- Implement: short commands, JSON errors, actionable recovery, idempotency, uninstall preview, no orphaned canonical data; text output includes title or compact description when rendering IDs, while machine-readable JSON remains stable.
+- Accept: beginner and automation journeys both work; every mutation explains writes before apply; no text-mode command emits naked IDs unless an explicit machine-oriented option requests IDs only.
 - Verify/evidence: command matrix and fresh/dirty/broken fixtures; `evidence/OW-100-05/`.
 - Negative QA: interrupted upgrade/uninstall is recoverable and never deletes user-authored knowledge.
 
@@ -765,7 +804,7 @@ For every ticket:
 - Priority/dependencies: P0; `OW-100-09`.
 - Outcome: the product owner receives the final evidence-linked v1.0 feature update, post-v1 questions, and explicitly authorizes or adjusts GA publication and post-v1 work.
 - Allowed paths: `internal/owledge/workpackages/owledge-v1-autonomous-delivery/release-updates/`, `RUN-STATE.yaml`, `BACKLOG.yaml`, `TRACEABILITY.md`, release evidence/manifests, post-v1 backlog.
-- Implement: create `release-updates/v1.0.md` from `ALIGNMENT-PROTOCOL.md`; include shipped v1 scope, support/compatibility position, final quality evidence, limitations, post-v1 candidates, and all questions; present it in chat and set the run state to `awaiting_user_alignment`.
-- Accept: `G-100-GA` is green; the update contains every required heading and no untracked claim; user `approve`, `adjust`, or `defer` is recorded with scope/constraints; only `approve` authorizes GA publication and v1 closeout.
+- Implement: create `release-updates/v1.0.md` from `ALIGNMENT-PROTOCOL.md`; reconcile the complete v1 plan against shipped scope, include support/compatibility position, final quality evidence, complete finding/decision/question registers, and a keep/amend/defer/drop post-v1 plan reflection; present it in chat and set the run state to `awaiting_user_alignment`.
+- Accept: `G-100-GA` is green; the update contains all eleven required headings and no untracked claim, finding, or decision; post-v1 amendments validate; user `approve`, `adjust`, or `defer` is recorded with scope/constraints; only `approve` authorizes GA publication and v1 closeout.
 - Verify/evidence: `python tools/validate_v1_delivery_plan.py`; required-heading check; update, decision, and evidence links under `evidence/OW-100-10/`.
-- Negative QA: false GA claim, absent decision, autonomous publish/tag, or unrecorded post-v1 question leaves the ticket blocked.
+- Negative QA: false GA claim, omitted finding/post-v1 item, absent plan reflection/decision, or autonomous publish/tag leaves the ticket blocked.
