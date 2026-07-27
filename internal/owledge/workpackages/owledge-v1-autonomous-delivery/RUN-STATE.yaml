@@ -4,9 +4,9 @@ plan: internal/owledge/plans/owledge-v1-autonomous-delivery-master-plan.md
 objective: Deliver Owledge v0.7.1 through v1.0 through gated autonomous execution.
 status: in_progress
 current_release: v0.7.1
-current_phase: 071-FOUNDATION
+current_phase: 071-FOUNDATION-FINAL-REPLAY
 active_ticket: null
-last_green_gate: null
+last_green_gate: PHASE0-FOUNDATION-38-OF-38
 alignment:
   state: none
   awaiting_release: null
@@ -181,27 +181,27 @@ orchestration:
   approved_by: product-owner
   approved_at: "2026-07-27T14:25:00Z"
   expires_at_alignment: true
-  active_dispatch: phase0_foundation_fix_lanes
-  pending_risk_brief: "OW-071-13 security scope remains a dedicated sequential W-071-A4 lane after OW-071-02 and OW-071-03."
+  active_dispatch: phase0_reflection_commit_and_final_replay
+  pending_risk_brief: "OW-071-01 is the only next implementation lane; OW-071-13 remains a dedicated sequential W-071-A4 security lane."
 workspace:
   code_root: .
   planning_root: internal/owledge/workpackages/owledge-v1-autonomous-delivery
   planning_branch: codex/owledge-v1-autonomous-roadmap
-  release_integration_branch: pending_phase0_clean_commit
-  base_commit: e1476ee
+  release_integration_branch: codex/v071-integration
+  base_commit: 5d6c4339432b4ccc4b4eec09004b6f80c7846f44
 blockers:
-  - "Phase-0 source commits and clean-SHA finalization evidence remain required before OW-071-01 dispatch."
+  - "One final 38/38 replay and evidence-only commit are required after the durable Phase-0 reflection commit."
 last_completed_actions:
   - Approved product decisions captured in the v1 autonomous delivery plan.
   - Handoff Decision Bridge mapped KEOS/Hermes findings into the existing v0.7.1-v1 ticket train.
   - Version reflection, finding/decision logging, and next-plan steering contract implemented and validated.
   - Bounded long-horizon modes, durable MVP/roadmap routing, and reliable project/plugin skill discovery implemented and regression-tested.
 next_actions:
-  - Repair Phase-0 findings F-071-04 through F-071-08 and rerun focused negative tests.
-  - Create cohesive source commits without generated evidence.
-  - Run non-vacuous finalization gates from the clean source SHA and commit sanitized evidence separately.
-  - Create codex/v071-integration, record its base SHA, then dispatch OW-071-01.
+  - Commit this Phase-0 reflection on codex/v071-integration.
+  - Replay 38/38 finalization gates from that clean reflected SHA and commit sanitized evidence separately.
+  - Dispatch only OW-071-01 in an isolated ticket lane with fresh-context QA.
 last_commands:
+  - "python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports (exit 0; 38/38 passed on 5d6c433; quality ratchet all 100)"
   - "python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports (exit 1; 36/38 passed; F-071-10 and F-071-11 logged)"
   - "uv run --no-project --with pytest --with pyyaml pytest tests/unit/test_dogfood_memory_root.py -q (exit 0; 6 tests passed)"
   - "uv run --no-project --with pytest --with pyyaml pytest tests/unit -q (exit 0; 52 tests passed)"
@@ -213,7 +213,7 @@ last_commands:
   - "uv run --no-project --with pytest --with pyyaml python -m pytest targeted suites (exit 0; 24 tests passed)"
   - "python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports (exit 0; 35 gates passed; all quality-ratchet dimensions 100)"
 checkpoint:
-  last_completed_action: "Completed three independent Phase-0 reviews and started the validated runtime, packaging, privacy, and DAG contract repairs."
+  last_completed_action: "Promoted Phase 0 after independent re-review and a clean-SHA 38/38 finalization run; created codex/v071-integration."
   changed_files:
     - "skills/owledge-long-horizon-delivery/"
     - "skills/owledge-planning-layer/"
@@ -247,8 +247,8 @@ checkpoint:
     - "Initial skill/test QA under bare system Python: PyYAML and pytest missing; rerun in isolated uv environment passed."
     - "First discovery regression run: tree_hash helper was missing in owledge_core.py; added helper and rerun passed."
     - "One sandboxed pytest run could not create its default temp directory; rerun with a workspace-local basetemp passed."
-  workspace_state: "Dirty planning branch under Phase-0 repair; existing generated exports are stale and excluded from source commits."
-  next_exact_action: "Complete and test F-071-04 through F-071-08 fixes, then create cohesive source commits before regenerating evidence."
+  workspace_state: "Integration branch with only the durable Phase-0 reflection and generated 5d6c433 evidence pending; evidence must be replayed after the reflection commit."
+  next_exact_action: "Commit the Phase-0 reflection, replay 38/38 on the new clean SHA, then commit only sanitized evidence."
   open_assumptions:
     - "The product owner wants the existing five-release train retained unless a later version reflection changes it."
     - "Local subagent execution is authorized through the v0.7.1 alignment stop within recorded non-destructive scope."
@@ -256,5 +256,5 @@ checkpoint:
     - "Do not start v0.8.0 before G-071-ALIGNMENT and an explicit owner approve decision."
     - "Do not silently normalize legacy planning metadata outside OW-071-01."
     - "Do not cite the current generated finalization exports as release evidence until the non-vacuous scan and path sanitization fixes pass."
-updated_at: "2026-07-27T14:45:00Z"
+updated_at: "2026-07-27T15:35:00Z"
 updated_by: codex
