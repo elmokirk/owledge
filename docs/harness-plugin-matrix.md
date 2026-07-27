@@ -8,8 +8,8 @@ certification for every runtime.
 | Harness | Status | Install path | Notes |
 | --- | --- | --- | --- |
 | Principles-only coding agents | First-class support | Instructions or `owledge-principles` skill | No plugin, generated kit, wrapper, or OS-specific setup required. |
-| Codex | Local adapter support | `.codex-plugin` plus local CLI | Repo-installable; verify with local gates. |
-| Claude Code | Local adapter support | `.claude-plugin` or skills copy path | Start from project root when possible. |
+| Codex | Local adapter support | `.agents/skills/`, or `.codex-plugin` plus local CLI | `init-project` materializes repo-scoped skills; verify with `doctor`. |
+| Claude Code | Local adapter support | `.claude-plugin` or configured skills copy path | Start from project root when possible; plugin skills are mirrored under the plugin root. |
 | Cowork / Claude-compatible | Local adapter support | `plugins/owledge-cowork/` | Private runtime capture and durable summaries. |
 | OpenCode-style agents | Instruction-based support | Repo link plus local instructions | No marketplace dependency required. |
 | Generic agents | Instruction-based support | `AGENTS.md` plus local scripts | Good fit for repo-link onboarding. |
@@ -25,5 +25,7 @@ certification for every runtime.
   scenario gates.
 - Marketplace listing is not required for this release.
 - The Markdown source-of-truth model does not change across harnesses.
+- Project-root `skills/` is a shipped source/vendor bundle, not a universal
+  automatic discovery path. `.owledge/skills/` is not used for discovery.
 - Harness benchmarks for Claude Code, Codex, OpenCode, Cursor, and Zed are roadmap work, not a v0.7.0 claim.
 - Write-enabled MCP is roadmap work. v0.7.0 intentionally ships read-only MCP first.

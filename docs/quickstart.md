@@ -86,6 +86,8 @@ python tools/owledge_core.py --project-root . render-memory-report --report-type
 | `OWLEDGE.md` | Project-level durable context and agent entrypoint |
 | `AGENTS.md` and `CLAUDE.md` | Runtime instructions |
 | `.owledge/` | Plans, tasks, workpackages, evidence, reviews, handoffs, research, indexes, sessions |
+| `skills/` | Owledge skill source/vendor bundle and generic-agent fallback |
+| `.agents/skills/` | Project-local Codex skill discovery mirror |
 | `tools/` | Local Python CLI |
 | `plugins/owledge-cowork/` | Optional Python-hook runtime adapter |
 

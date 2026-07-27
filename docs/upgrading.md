@@ -72,15 +72,15 @@ a patch, inspect it, and adapt your project before applying.
 
 ## Skills and the manifest
 
-`init-project` installs the kit's skills (`skills/owledge-principles`,
-`skills/owledge-runtime-bridge`, `skills/review-evaluation-workflow`,
-`skills/render-memory-report`, `skills/concept-blindspot-audit`) into your
-project and records each skill file in `kit-manifest.json`. This means `doctor`
-detects skill drift and `upgrade --apply --mode=safe` updates skill files you
-have not edited. The `concept-blindspot-audit` skill was added in v0.6.1; if you
-installed owledge before v0.6.1, re-running `init-project` on your existing
-project will install the new skill (it uses `copy_file_if_missing`, so it will
-not overwrite files you already have).
+`init-project` installs the kit's source/vendor skills under `skills/` and
+matching Codex repository-discovery mirrors under `.agents/skills/`. Both are
+recorded in `kit-manifest.json`. `doctor` reports missing or drifting mirrors,
+and `upgrade --apply --mode=safe` updates only pristine files; user-edited
+skills remain protected.
+
+For older installations, re-run `init-project` or use a reviewed safe upgrade
+to materialize `.agents/skills/`. Do not relocate skills into
+`.owledge/skills/`; that path is not an automatic harness discovery root.
 
 ## Global layer and upgrades
 

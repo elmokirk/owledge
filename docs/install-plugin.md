@@ -35,6 +35,10 @@ The hooks discover:
 - `.owledge/`
 - `tools/owledge_core.py`
 
+Standard initialization also materializes project-local Codex skills under
+`.agents/skills/`. The project-root `skills/` tree remains the Owledge
+source/vendor bundle. `.owledge/skills/` is not an automatic discovery path.
+
 ## Codex
 
 Install shape:
@@ -48,6 +52,10 @@ plugins/owledge-cowork/commands/
 Use the Codex plugin flow when available. For manual setup, copy the full
 `plugins/owledge-cowork/` directory into the plugin area that your Codex
 runtime reads from, then start Codex from the initialized project root.
+
+Without the plugin, Codex can still discover the initialized project skills
+from `.agents/skills/`. Do not copy project skills into a user-global directory
+unless the user explicitly wants cross-project installation.
 
 Verify:
 
@@ -154,6 +162,7 @@ python tools/owledge.py test runtime-adapters --project-root .
 | Runtime starts outside the project root | Start from the initialized project root or copy `tools/owledge_core.py` into the host project. |
 | Session logs grow too large | Close/compact sessions and keep raw event files private. |
 | Agent cannot find commands | Confirm the runtime loaded `plugins/owledge-cowork/commands/`. |
+| Agent cannot find project skills | Confirm `.agents/skills/<skill>/SKILL.md` exists and run `doctor`; do not move skills into `.owledge/skills/`. |
 
 ## Uninstall
 

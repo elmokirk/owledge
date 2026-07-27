@@ -45,6 +45,12 @@ Out of scope:
 - The handoff states status, decisions, unresolved questions, and next action.
 - Review status is recorded before promotion or shared export.
 
+## Roadmap And Idea Routing
+
+- Accepted future work: `ROADMAP.md`
+- Useful but unresolved concepts: `.owledge/ideas/`
+- Rejected/deferred concepts: decision record with reason
+
 ## Next Actions
 
 1. Create the smallest working task.
@@ -52,3 +58,8 @@ Out of scope:
 3. Write a handoff with evidence paths.
 4. Ask for review before expanding scope.
 ```
+
+Stop planning when the goal, target user, success signal, cutline, non-goals,
+first task, QA gate, and routing for future ideas are explicit. Present
+`lock`, `adjust`, or `defer`; do not generate another plan variant unless the
+user chooses `adjust`.

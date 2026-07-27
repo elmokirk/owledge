@@ -51,11 +51,15 @@ python tools/owledge_core.py --project-root /work/customer-app build-memory-inde
    - placeholders the user must fill in, especially `OWLEDGE.md`
    - optional runtime steps below
 
+`init-project` installs the Owledge skill source bundle under `skills/` and a
+Codex-discoverable project mirror under `.agents/skills/`. It does not install
+anything into the user's global home directory.
+
 ## Manual Runtime Steps To Report
 
 | Runtime | Manual Step |
 | --- | --- |
-| Codex | Install or copy the `skills/` folder into the configured Codex skills directory when global skills are desired. |
+| Codex | Project-local skills are available from `.agents/skills/`. Copy a skill into `$HOME/.agents/skills/` only when the user explicitly wants a global install. |
 | Claude/Cowork | Run `python tools/owledge.py init-project --target /work/customer-app --include-plugin-adapter`, then install or copy `plugins/owledge-cowork/` into the runtime's plugin folder if the runtime does not have a plugin installer. |
 | Claude/Cowork hooks | Launch from the initialized project root when possible. |
 | Shared machine | Keep tenant/customer/project IDs filled in before exports or customer reports. |
@@ -63,6 +67,10 @@ python tools/owledge_core.py --project-root /work/customer-app build-memory-inde
 
 For an initialized project, the plugin should use local
 `tools/owledge_core.py`.
+
+Neither a plain project-root `skills/` directory nor `.owledge/skills/` is a
+guaranteed Codex discovery path. The former remains the Owledge source/vendor
+bundle; the latter is reserved for project memory and is not used for skills.
 
 ## Smoke Test Prompt
 

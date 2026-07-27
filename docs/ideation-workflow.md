@@ -21,7 +21,8 @@ captured -> triaged -> linked -> elaborated -> accepted | rejected | promoted
 
 ## Planning Rule
 
-Before creating a new plan, agents must check:
+Before creating a new plan, agents use the bounded `mvp-sparring` mode and
+check:
 
 1. `OWLEDGE.md`
 2. `.owledge/indexes/memory-index.jsonl`
@@ -29,6 +30,20 @@ Before creating a new plan, agents must check:
 4. `.owledge/patterns/`
 5. `.owledge/lessons/`
 6. relevant ADRs and compiled summaries
+
+Read metadata and indexes first. Expand only candidates that can change the
+current target user, success signal, required dependency, risk, or MVP
+cutline. Classify every relevant candidate as:
+
+- required now;
+- enabling dependency;
+- roadmap;
+- idea candidate;
+- reject/defer with reason.
+
+Stop planning once one smallest useful increment has measurable acceptance,
+explicit non-goals, a first executable task, and a QA gate. Do not create
+another plan variant unless the owner chooses `adjust`.
 
 The agent should look for matching:
 
@@ -48,6 +63,10 @@ The agent should look for matching:
 | "This is a new agent workflow" | Idea card with architecture pattern |
 | "This customer need appears again" | Idea card with problem pattern |
 | "This does not belong in current scope" | Idea card with future-project fit |
+
+Accepted, sufficiently understood future scope belongs in `ROADMAP.md` or the
+release backlog. Unresolved but useful material stays in `.owledge/ideas/`.
+Neither route changes current scope without owner approval.
 
 ## Promotion Paths
 

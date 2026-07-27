@@ -380,6 +380,7 @@ installing the full project memory kit.
 | `owledge-blindspot-audit` | Stress-test a concept, repo, plan, or launch surface for hidden gaps. |
 | `owledge-agentic-review` | Run evidence-linked red-team and expert review workflows. |
 | `owledge-brainstorm` | Generate candidate options without mutating canonical memory. |
+| `owledge-long-horizon-delivery` | Keep planning bounded to an MVP, reflect after every version, and route future ideas durably. |
 | `owledge-planning-layer` | Apply Owledge planning, handoff, and QA rules in an existing agent setup. |
 
 See [standalone-skills/README.md](standalone-skills/README.md).

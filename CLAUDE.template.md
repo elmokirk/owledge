@@ -36,6 +36,25 @@ This file is intentionally mirrored with the sibling runtime instruction file. K
 8. Use `.owledge/pi-agent/red-team/` scorecards when PI findings or agent outputs need quality challenge.
 9. Use `README.md` and `docs/` for user-facing setup details.
 
+## Skill Discovery and Planning Focus
+
+- Codex discovers initialized project skills under `.agents/skills/`.
+- Project-root `skills/` is the Owledge source/vendor bundle and a manual
+  fallback for generic agents; do not assume Codex loads it automatically.
+- Plugin-capable runtimes load skills from the installed plugin's `skills/`
+  root.
+- `.owledge/skills/` is not an automatic discovery path.
+- For new plans, broad feature requests, or scope negotiation, use
+  `owledge-long-horizon-delivery` in `mvp-sparring` mode.
+- Before drafting scope, inspect `.owledge/ideas/`,
+  `.owledge/pi-agent/concepts/`, the active roadmap/backlog, decisions,
+  patterns, and lessons.
+- Stop planning once one smallest useful increment has a target user, success
+  signal, explicit non-goals, first executable task, and QA gate. Route useful
+  extra concepts to the roadmap or idea layer instead of expanding the MVP.
+- After each release/version gate, use `version-steering` and stop for the
+  owner's `approve`, `adjust`, or `defer` decision.
+
 ## Memory Layers
 
 | Layer | Path | Tracked | Purpose |
