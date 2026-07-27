@@ -2,7 +2,14 @@
 
 ## Current Release Goal
 
-Publish v0.7.0 as an international, package-first Owledge release for power users, AI creators, agent builders, and teams.
+Prepare v0.7.1 as the adoption, truth, and compatibility release while
+preserving v0.7.0 as the currently shipped package baseline.
+
+The machine-readable
+[`LIVE-WORK-REGISTER.yaml`](internal/owledge/workpackages/owledge-v1-autonomous-delivery/LIVE-WORK-REGISTER.yaml)
+is the only live status source for feedback items FB-001 through FB-021.
+Historical plans, feedback records, idea logs, and unchecked checkboxes remain
+evidence; they do not create active work.
 
 Public contract:
 
@@ -25,8 +32,8 @@ Public contract:
 | Done | REL-007 | Benchmark Kit Add-on | Optional `benchmark-kit` add-on supports `small`, `mid`, and `large` real Markdown fixture simulations, retrieval challenge scenarios, sequential Ollama local runs, single-run reports, and multi-model comparison proof reports. | v0.7.0 |
 | Done | REL-008 | Standalone skills | `standalone-skills/` ships independently usable blindspot audit, agentic review, brainstorm, and planning-layer skills with manifest and install notes. | v0.7.0 |
 | Done | REL-009 | Release gates and CI | CI and local gates check naming, public docs, release trust, launch readiness, MCP read-only, Wikilinks, Benchmark Kit CI, standalone skills, contracts, and publish readiness. | v0.7.0 |
-| In progress | REL-010 | Final publishing docs | README, docs index, quickstart, command reference, roadmap, changelog, troubleshooting, Mermaid workflows, plugin docs, and benchmark docs match the implemented v0.7 surface. | v0.7.0 |
-| Planned | POST-001 | Final release artifact cut | Run build, wheel/sdist checks, uvx smoke, final release notes, tag discipline, and artifact inspection before publishing. | v0.7.0 final |
+| Done | REL-010 | Final publishing docs | README, docs index, quickstart, command reference, roadmap, changelog, troubleshooting, Mermaid workflows, plugin docs, and benchmark docs match the implemented v0.7 surface. | v0.7.0 |
+| Done | POST-001 | Final release artifact cut | v0.7.0 package publication is retained as release evidence; future cuts use the active release control plane. | v0.7.0 final |
 | Planned | POST-002 | CLI UX simplification | Add short commands such as `owledge init`, `owledge add benchmark-kit`, and `owledge benchmark local` while preserving explicit script paths. | v0.7.1 |
 | Planned | POST-003 | Agent-native runtime contract | Define a compact runtime contract for session start, context-pack loading, task/handoff discovery, hook events, and token-aware read order across harnesses. | v0.8.0 |
 | Planned | POST-004 | PI Agent runtime adapter | Evaluate and implement PI Agent as a lightweight Owledge runtime lane only if it can preserve `.owledge/` as source of truth and pass conformance gates. | v0.8.0 |
@@ -102,7 +109,9 @@ Public contract:
 Collected from a structured feedback round covering integration, privacy,
 planning discipline, cross-project intelligence, and publish readiness. See
 `docs/feedback-round-2026-06.md` for the full ticket and `docs/roadmap-ideas-2026-06.md`
-for idea log entries.
+for idea log entries. This table records the original proposals and is not an
+active backlog. Current state, replacement, target, and evidence are defined
+only in the live work register linked above.
 
 | Priority | Area | Outcome | Source question |
 | --- | --- | --- | --- |

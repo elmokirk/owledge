@@ -4,8 +4,13 @@
 > release context. For current release guidance, use [README.md](README.md).
 
 Date: 2026-06-23
-Status: active
+Status: historical
 Type: idea-log
+
+> **Live status:** `captured` values below describe the June 2026 idea-log
+> snapshot, not current delivery state. Current dispositions for FB-001 through
+> FB-021 live only in
+> [`LIVE-WORK-REGISTER.yaml`](../internal/owledge/workpackages/owledge-v1-autonomous-delivery/LIVE-WORK-REGISTER.yaml).
 
 ## Purpose
 
@@ -155,8 +160,9 @@ accepted | rejected | promoted`.
 
 ## Triage Status
 
-All ideas are `captured`. Next triage step: review each against current scope
-and either `elaborate` (accept into near-term roadmap) or `reject` with reason.
+At capture time all ideas were `captured`. That historical next step has been
+superseded by the live work register; agents must not re-triage this file as an
+active queue.
 
 ## Round 2 Ideas (Feature Ideas)
 

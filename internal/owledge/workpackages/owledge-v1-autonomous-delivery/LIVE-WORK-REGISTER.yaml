@@ -1,0 +1,380 @@
+{
+  "schema_version": 1,
+  "register_id": "owledge-feedback-live-work-v1",
+  "current_product_version": "0.7.0",
+  "active_delivery_release": "v0.7.1",
+  "allowed_states": [
+    "shipped",
+    "open",
+    "superseded",
+    "deferred"
+  ],
+  "authority": {
+    "live_status_sources": [
+      "ROADMAP.md",
+      "docs/strategic-roadmap-2026-2027.md"
+    ],
+    "historical_sources": [
+      "docs/feedback-round-2026-06.md",
+      "docs/roadmap-ideas-2026-06.md",
+      "docs/v0.6.0-implementation-plan.md"
+    ],
+    "historical_unchecked_boxes_are_active": false,
+    "policy": "Historical prose and checkboxes are evidence only. This register is the sole live disposition source for FB-001 through FB-021."
+  },
+  "source_documents": [
+    "ROADMAP.md",
+    "docs/feedback-round-2026-06.md",
+    "docs/roadmap-ideas-2026-06.md",
+    "docs/v0.6.0-implementation-plan.md",
+    "docs/strategic-roadmap-2026-2027.md",
+    "VERSION",
+    "pyproject.toml",
+    "CHANGELOG.md",
+    "internal/owledge/workpackages/v0.7.1-release-execution-orchestration-checklist.md",
+    "internal/owledge/workpackages/v0.7.1-public-docs-adoption-checklist.md",
+    "internal/owledge/workpackages/v0.7.1-docs-merge-runbook.md",
+    "internal/owledge/workpackages/v0.7.0-post-release-documentation-integrity-checklist.md",
+    "internal/owledge/workpackages/owledge-v0.7.0-pre-release-agent-tasklist.md",
+    "internal/owledge/workpackages/owledge-v0.7.0-final-publishing-quality-checklist.md",
+    "internal/owledge/workpackages/owledge-v0.7.0-final-publishing-95-release-checklist.md",
+    "internal/owledge/workpackages/owledge-v0.7.0-benchmark-kit-addon-real-fixtures-checklist.md",
+    "internal/owledge/workpackages/owledge-v0.7.0-benchmark-comparison-publishing-proof-checklist.md"
+  ],
+  "items": [
+    {
+      "id": "FB-001",
+      "title": "PyPI publishing",
+      "state": "shipped",
+      "source": "docs/feedback-round-2026-06.md",
+      "shipped_evidence": [
+        "ROADMAP.md",
+        "internal/owledge/workpackages/v0.7.0-post-release-documentation-integrity-checklist.md"
+      ],
+      "acceptance_gap": null,
+      "target_release": "v0.7.0",
+      "owner_role": "release-engineer",
+      "evidence_links": [
+        "CHANGELOG.md"
+      ],
+      "replacement_reference": null,
+      "deferred_reason": null
+    },
+    {
+      "id": "FB-002",
+      "title": "Agent instruction copy-paste integration",
+      "state": "shipped",
+      "source": "docs/feedback-round-2026-06.md",
+      "shipped_evidence": [
+        "ROADMAP.md"
+      ],
+      "acceptance_gap": null,
+      "target_release": "v0.6.0",
+      "owner_role": "docs-engineer",
+      "evidence_links": [
+        "docs/strategic-roadmap-2026-2027.md"
+      ],
+      "replacement_reference": null,
+      "deferred_reason": null
+    },
+    {
+      "id": "FB-003",
+      "title": "Tokenizer benchmark baseline",
+      "state": "open",
+      "source": "docs/feedback-round-2026-06.md",
+      "shipped_evidence": [],
+      "acceptance_gap": "The exact four-scenario tokenizer comparison and held-out non-regression proof are not yet frozen as a reproducible public baseline.",
+      "target_release": "v0.7.1",
+      "owner_role": "benchmark-engineer",
+      "work_reference": "ticket:OW-071-03",
+      "evidence_links": [
+        "docs/strategic-roadmap-2026-2027.md",
+        "internal/owledge/workpackages/v0.7.1-release-execution-orchestration-checklist.md"
+      ],
+      "replacement_reference": null,
+      "deferred_reason": null
+    },
+    {
+      "id": "FB-004",
+      "title": "Global scan allowlist and consent",
+      "state": "open",
+      "source": "docs/feedback-round-2026-06.md",
+      "shipped_evidence": [],
+      "acceptance_gap": "Deny-by-default cross-project scan scope, explicit registration consent, and negative privacy fixtures are not implemented end to end.",
+      "target_release": "v0.9.0",
+      "owner_role": "privacy-engineer",
+      "work_reference": "ticket:OW-090-03",
+      "evidence_links": [
+        "docs/strategic-roadmap-2026-2027.md"
+      ],
+      "replacement_reference": null,
+      "deferred_reason": null
+    },
+    {
+      "id": "FB-005",
+      "title": "Project abstract and project modes",
+      "state": "superseded",
+      "source": "docs/feedback-round-2026-06.md",
+      "shipped_evidence": [],
+      "acceptance_gap": "The original template-only proposal does not provide a versioned, validated project contract.",
+      "target_release": "v0.8.0",
+      "owner_role": "contract-architect",
+      "evidence_links": [
+        "docs/strategic-roadmap-2026-2027.md"
+      ],
+      "replacement_reference": "ticket:OW-080-01",
+      "deferred_reason": null
+    },
+    {
+      "id": "FB-006",
+      "title": "Cross-project parallel notification",
+      "state": "superseded",
+      "source": "docs/feedback-round-2026-06.md",
+      "shipped_evidence": [],
+      "acceptance_gap": "A notice file alone cannot prove project scope, consent, freshness, or why a cross-project source was selected.",
+      "target_release": "v0.8.1",
+      "owner_role": "owlib-engineer",
+      "evidence_links": [
+        "docs/strategic-roadmap-2026-2027.md"
+      ],
+      "replacement_reference": "ticket:OW-081-09",
+      "deferred_reason": null
+    },
+    {
+      "id": "FB-007",
+      "title": "PI Agent setup guide",
+      "state": "shipped",
+      "source": "docs/feedback-round-2026-06.md",
+      "shipped_evidence": [
+        "docs/strategic-roadmap-2026-2027.md"
+      ],
+      "acceptance_gap": null,
+      "target_release": "v0.6.0",
+      "owner_role": "docs-engineer",
+      "evidence_links": [
+        "ROADMAP.md"
+      ],
+      "replacement_reference": null,
+      "deferred_reason": null
+    },
+    {
+      "id": "FB-008",
+      "title": "Plan completion detection contract",
+      "state": "superseded",
+      "source": "docs/feedback-round-2026-06.md",
+      "shipped_evidence": [],
+      "acceptance_gap": "Three fields cannot represent portable dependencies, permissions, evidence, checkpoint, and state-transition integrity.",
+      "target_release": "v0.8.0",
+      "owner_role": "contract-architect",
+      "evidence_links": [
+        "docs/strategic-roadmap-2026-2027.md"
+      ],
+      "replacement_reference": "ticket:OW-080-01",
+      "deferred_reason": null
+    },
+    {
+      "id": "FB-009",
+      "title": "Planning permission modes",
+      "state": "superseded",
+      "source": "docs/feedback-round-2026-06.md",
+      "shipped_evidence": [],
+      "acceptance_gap": "The original prose enum does not bind consent, risk, dispatch authority, or promotion behavior.",
+      "target_release": "v0.8.0",
+      "owner_role": "orchestration-contract-engineer",
+      "evidence_links": [
+        "docs/strategic-roadmap-2026-2027.md"
+      ],
+      "replacement_reference": "ticket:OW-080-12",
+      "deferred_reason": null
+    },
+    {
+      "id": "FB-010",
+      "title": "MVP success metrics",
+      "state": "superseded",
+      "source": "docs/feedback-round-2026-06.md",
+      "shipped_evidence": [],
+      "acceptance_gap": "A template section alone cannot version outcome criteria or bind them to evidence and decisions.",
+      "target_release": "v0.8.0",
+      "owner_role": "contract-architect",
+      "evidence_links": [
+        "docs/strategic-roadmap-2026-2027.md"
+      ],
+      "replacement_reference": "ticket:OW-080-01",
+      "deferred_reason": null
+    },
+    {
+      "id": "FB-011",
+      "title": "Idea-to-project pipeline",
+      "state": "deferred",
+      "source": "docs/feedback-round-2026-06.md",
+      "shipped_evidence": [],
+      "acceptance_gap": "No governed portfolio promotion pipeline exists.",
+      "target_release": "v1.1.0",
+      "owner_role": "portfolio-workflow-owner",
+      "evidence_links": [
+        "docs/strategic-roadmap-2026-2027.md"
+      ],
+      "replacement_reference": null,
+      "deferred_reason": "Optional portfolio automation is outside the v1 core cutline and follows trusted local work, provenance, and promotion contracts."
+    },
+    {
+      "id": "FB-012",
+      "title": "Recurring feedback round",
+      "state": "superseded",
+      "source": "docs/feedback-round-2026-06.md",
+      "shipped_evidence": [],
+      "acceptance_gap": "A calendar-driven template does not guarantee evidence-linked findings, decisions, plan reflection, or an explicit owner stop.",
+      "target_release": "v0.7.1",
+      "owner_role": "release-orchestrator",
+      "evidence_links": [
+        "internal/owledge/workpackages/v0.7.1-release-execution-orchestration-checklist.md"
+      ],
+      "replacement_reference": "ticket:OW-071-09",
+      "deferred_reason": null
+    },
+    {
+      "id": "FB-013",
+      "title": "Minimal ticket board",
+      "state": "superseded",
+      "source": "docs/feedback-round-2026-06.md",
+      "shipped_evidence": [],
+      "acceptance_gap": "A rendered board and implicit status sync are insufficient without a validated DAG and state machine.",
+      "target_release": "v0.8.0",
+      "owner_role": "planning-engineer",
+      "evidence_links": [
+        "docs/strategic-roadmap-2026-2027.md"
+      ],
+      "replacement_reference": "ticket:OW-080-03",
+      "deferred_reason": null
+    },
+    {
+      "id": "FB-014",
+      "title": "Harness hook validation",
+      "state": "superseded",
+      "source": "docs/feedback-round-2026-06.md",
+      "shipped_evidence": [],
+      "acceptance_gap": "Hook presence does not prove equivalent capabilities, fail-closed degradation, or recovery across harnesses.",
+      "target_release": "v0.8.1",
+      "owner_role": "adapter-architect",
+      "evidence_links": [
+        "docs/strategic-roadmap-2026-2027.md"
+      ],
+      "replacement_reference": "ticket:OW-081-01",
+      "deferred_reason": null
+    },
+    {
+      "id": "FB-015",
+      "title": "Supervised ticket summary",
+      "state": "superseded",
+      "source": "docs/feedback-round-2026-06.md",
+      "shipped_evidence": [],
+      "acceptance_gap": "A five-line rendering is not trustworthy until the underlying work record and planning state are validated.",
+      "target_release": "v0.8.0",
+      "owner_role": "planning-engineer",
+      "evidence_links": [
+        "docs/strategic-roadmap-2026-2027.md"
+      ],
+      "replacement_reference": "ticket:OW-080-03",
+      "deferred_reason": null
+    },
+    {
+      "id": "FB-016",
+      "title": "Quick-read ticket synopsis",
+      "state": "superseded",
+      "source": "docs/feedback-round-2026-06.md",
+      "shipped_evidence": [],
+      "acceptance_gap": "Word overlap does not establish deterministic freshness, source selection, exclusions, or a context budget.",
+      "target_release": "v0.8.0",
+      "owner_role": "context-engineer",
+      "evidence_links": [
+        "docs/strategic-roadmap-2026-2027.md"
+      ],
+      "replacement_reference": "ticket:OW-080-05",
+      "deferred_reason": null
+    },
+    {
+      "id": "FB-017",
+      "title": "Defined project modes",
+      "state": "superseded",
+      "source": "docs/feedback-round-2026-06.md",
+      "shipped_evidence": [],
+      "acceptance_gap": "Mode definitions remain incomplete without a schema-validated project identity and gate policy.",
+      "target_release": "v0.8.0",
+      "owner_role": "contract-architect",
+      "evidence_links": [
+        "docs/strategic-roadmap-2026-2027.md"
+      ],
+      "replacement_reference": "ticket:OW-080-01",
+      "deferred_reason": null
+    },
+    {
+      "id": "FB-018",
+      "title": "Session-continuity checklists",
+      "state": "shipped",
+      "source": "docs/feedback-round-2026-06.md",
+      "shipped_evidence": [
+        "ROADMAP.md",
+        "internal/owledge/workpackages/v0.7.1-release-execution-orchestration-checklist.md"
+      ],
+      "acceptance_gap": null,
+      "target_release": "v0.6.1",
+      "owner_role": "planning-maintainer",
+      "evidence_links": [
+        "docs/strategic-roadmap-2026-2027.md"
+      ],
+      "replacement_reference": null,
+      "deferred_reason": null
+    },
+    {
+      "id": "FB-019",
+      "title": "Deferred release-polish batch",
+      "state": "open",
+      "source": "docs/feedback-round-2026-06.md",
+      "shipped_evidence": [],
+      "acceptance_gap": "Every retained P2/P3 correctness item still needs executable proof or an explicit retraction.",
+      "target_release": "v0.7.1",
+      "owner_role": "release-engineer",
+      "work_reference": "ticket:OW-071-02",
+      "evidence_links": [
+        "docs/strategic-roadmap-2026-2027.md",
+        "internal/owledge/workpackages/v0.7.1-release-execution-orchestration-checklist.md"
+      ],
+      "replacement_reference": null,
+      "deferred_reason": null
+    },
+    {
+      "id": "FB-020",
+      "title": "Concept-audit since filter",
+      "state": "open",
+      "source": "docs/feedback-round-2026-06.md",
+      "shipped_evidence": [],
+      "acceptance_gap": "The removed dead flag must stay removed or return only with dispatch and boundary tests.",
+      "target_release": "v0.7.1",
+      "owner_role": "release-engineer",
+      "work_reference": "ticket:OW-071-02",
+      "evidence_links": [
+        "docs/strategic-roadmap-2026-2027.md",
+        "internal/owledge/workpackages/v0.7.1-release-execution-orchestration-checklist.md"
+      ],
+      "replacement_reference": null,
+      "deferred_reason": null
+    },
+    {
+      "id": "FB-021",
+      "title": "Upgrade-notes release contract",
+      "state": "open",
+      "source": "docs/feedback-round-2026-06.md",
+      "shipped_evidence": [],
+      "acceptance_gap": "Malformed upgrade metadata is not yet rejected by a structured release contract.",
+      "target_release": "v0.7.1",
+      "owner_role": "release-engineer",
+      "work_reference": "ticket:OW-071-02",
+      "evidence_links": [
+        "docs/strategic-roadmap-2026-2027.md",
+        "internal/owledge/workpackages/v0.7.1-release-execution-orchestration-checklist.md"
+      ],
+      "replacement_reference": null,
+      "deferred_reason": null
+    }
+  ]
+}

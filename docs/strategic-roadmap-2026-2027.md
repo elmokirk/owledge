@@ -10,6 +10,12 @@ summary: "A status-normalized, evidence-linked roadmap that positions Owledge as
 
 # Owledge Strategic Roadmap 2026–2027
 
+> **Execution authority:** This document defines strategy and preserves
+> historical phase checklists. The machine-readable
+> [`LIVE-WORK-REGISTER.yaml`](../internal/owledge/workpackages/owledge-v1-autonomous-delivery/LIVE-WORK-REGISTER.yaml)
+> is the live status source for FB-001 through FB-021. Unchecked boxes below
+> are navigation evidence only and never create active work.
+
 ## Decision Summary
 
 Owledge should not compete as another agent runtime, generic task manager, vector database, or prompt-based planning method. Its defensible category is:

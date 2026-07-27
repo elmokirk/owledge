@@ -1,0 +1,103 @@
+schema_version: 1
+ticket: OW-071-01
+gate: G-071-A-TRUTH
+status: worker_complete_pending_independent_qa
+branch: codex/ow07101-live-work-register
+base_commit: c7f4bd2a796e72de9e6c9c1f25105c41be1f52e3
+content_commit_placeholder: PENDING_COHESIVE_WORKER_COMMIT
+final_worker_commit_sha: PENDING_COHESIVE_WORKER_COMMIT
+commit_binding_note: >-
+  A commit cannot contain its own SHA. The worker creates one cohesive commit
+  containing this manifest; the integration owner records that returned commit
+  SHA in central QA/integration evidence or amends this placeholder after
+  independent QA without changing ticket source semantics.
+source_contract:
+  current_product_version: 0.7.0
+  active_delivery_release: v0.7.1
+  feedback_coverage: FB-001..FB-021 exactly once
+  allowed_states:
+    - shipped
+    - open
+    - superseded
+    - deferred
+  state_counts:
+    shipped: 4
+    open: 5
+    superseded: 11
+    deferred: 1
+artifacts:
+  - ROADMAP.md
+  - docs/feedback-round-2026-06.md
+  - docs/roadmap-ideas-2026-06.md
+  - docs/v0.6.0-implementation-plan.md
+  - docs/strategic-roadmap-2026-2027.md
+  - internal/owledge/workpackages/owledge-v1-autonomous-delivery/LIVE-WORK-REGISTER.yaml
+  - tools/validate_live_work_register.py
+  - tests/unit/test_validate_live_work_register.py
+  - tests/fixtures/live-work-register/README.md
+  - tests/fixtures/live-work-register/stale-register-mutations.json
+  - evidence/OW-071-01/manifest.yaml
+commands:
+  - command: python tools/validate_live_work_register.py --project-root .
+    exit_code: 0
+    result: 21 items; 17 finite sources; zero errors
+  - command: python -m unittest tests.unit.test_validate_live_work_register -v
+    exit_code: 0
+    result: 13 tests passed
+  - command: python tools/validate_v1_delivery_plan.py
+    exit_code: 0
+    result: 61 tickets; 25 gates; 42 waves; zero errors and warnings
+  - command: python tools/owledge.py test public-docs --project-root .
+    exit_code: 0
+    result: 233 checks passed; zero failed
+  - command: python tools/owledge.py test private-path-clean --project-root .
+    exit_code: 0
+    result: 2081 files scanned; zero findings
+  - command: >-
+      python -c "from pathlib import Path; [compile(Path(p).read_text(
+      encoding='utf-8'), p, 'exec') for p in
+      ['tools/validate_live_work_register.py',
+      'tests/unit/test_validate_live_work_register.py']]"
+    exit_code: 0
+    result: source syntax compiled in memory without writing bytecode
+  - command: git diff --check
+    exit_code: 0
+    result: no whitespace errors
+negative_qa:
+  - missing, duplicate, and extra FB identifiers
+  - invalid state values and case changes
+  - missing and nonexistent shipped evidence
+  - self-referential and cyclic supersession
+  - invalid deferred target and absent reason
+  - path traversal, absolute, unapproved, and missing paths
+  - VERSION, pyproject.toml, and register mismatch
+  - historical status or checkbox reactivation
+  - open work without a resolvable control-plane ticket
+  - deterministic diagnostic ordering
+limitations:
+  - >-
+    This worker does not update BACKLOG.yaml, RUN-STATE.yaml, central
+    checklists, or gate status; those are integration-owner paths.
+  - >-
+    G-071-A-TRUTH remains blocked until OW-071-02, OW-071-03, and OW-071-13
+    independently pass.
+  - >-
+    The existing v0.7.0 PyPI shipped claim is reconciled from committed release
+    evidence and was not independently network-queried in this sandbox.
+  - >-
+    LIVE-WORK-REGISTER.yaml uses JSON-compatible YAML to preserve a
+    standard-library-only validator.
+qa_handoff:
+  reviewer_role: roadmap-auditor
+  required_replay:
+    - python tools/validate_live_work_register.py --project-root .
+    - python -m unittest tests.unit.test_validate_live_work_register -v
+    - python tools/validate_v1_delivery_plan.py
+    - python tools/owledge.py test public-docs --project-root .
+  attack_cases:
+    - Relabel FB-003 shipped without adding shipped evidence.
+    - Remove FB-021 or duplicate FB-001.
+    - Point FB-005 to itself or create an FB-005/FB-006 replacement cycle.
+    - Set FB-011 target to v0.7.1 or remove its deferred reason.
+    - Change an evidence link to ../CHANGELOG.md or an absolute Windows path.
+    - Restore Status active in a historical source and add an unchecked box.

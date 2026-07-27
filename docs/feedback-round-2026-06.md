@@ -5,9 +5,16 @@
 > guidance, use [README.md](README.md).
 
 Date: 2026-06-23
-Status: active
+Status: historical
 Owner: Kirk
 Type: feedback-triage
+
+> **Live status:** The feedback descriptions below are immutable source
+> evidence. Their current `shipped`, `open`, `superseded`, or `deferred`
+> disposition is maintained exactly once in
+> [`LIVE-WORK-REGISTER.yaml`](../internal/owledge/workpackages/owledge-v1-autonomous-delivery/LIVE-WORK-REGISTER.yaml).
+> No unchecked item or original action statement in this file re-enters the
+> active backlog.
 
 ## Purpose
 
