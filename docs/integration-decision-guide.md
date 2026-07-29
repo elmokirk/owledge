@@ -16,6 +16,9 @@ Use this order:
 
 The first working option is usually the right option.
 
+For the complete preset selector and current Global/Hub/Owlib maturity labels,
+see [Choose an Owledge adoption preset](adoption-presets.md).
+
 ## Choose A Path
 
 | Path | Use When | What It Adds | Avoid When |

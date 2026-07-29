@@ -7,6 +7,9 @@ Start by understanding the [product model, boundaries, and capability maturity](
 Then read [How Owledge works](how-owledge-works.md) for the canonical lifecycle,
 privacy boundary, and human authority model.
 
+Use [adoption presets](adoption-presets.md) to select the smallest supported
+setup and distinguish local/global/hub maturity before installing anything.
+
 For any installation, begin with the [Installation Hub](install/README.md): it
 separates no-install, package, source, adapter, and add-on paths.
 

@@ -95,6 +95,58 @@
       "evidence": "evidence/OW-071-13/manifest.yaml",
       "source_retrieved_at": "2026-07-29",
       "release_owner": "Owledge maintainers"
+    },
+    {
+      "id": "private-global-layer",
+      "name": "Private global user layer",
+      "maturity": "preview",
+      "availability": "explicit local opt-in",
+      "summary": "A private local context layer for one user's preferences, goals, and ideas across projects.",
+      "not": ["shared organization memory", "automatic project synchronization", "project truth authority"],
+      "contract": "docs/global-user-knowledge-layer.md",
+      "documentation": "docs/adoption-presets.md",
+      "evidence": "internal/owledge/reviews/ow-071-14-adoption-preset-evidence.md",
+      "source_retrieved_at": "2026-07-30",
+      "release_owner": "Owledge maintainers"
+    },
+    {
+      "id": "cross-project-hub-kit",
+      "name": "Cross-Project Hub Kit",
+      "maturity": "available",
+      "availability": "optional local source-checkout add-on",
+      "summary": "A local map of reviewed and sanitized learning records across projects.",
+      "not": ["Owlib", "hosted remote synchronization", "a multi-tenant Team Hub", "automatic promotion"],
+      "contract": "docs/cross-project-hub-kit.md",
+      "documentation": "docs/adoption-presets.md",
+      "evidence": "internal/owledge/reviews/ow-071-14-adoption-preset-evidence.md",
+      "source_retrieved_at": "2026-07-30",
+      "release_owner": "Owledge maintainers"
+    },
+    {
+      "id": "owlib-compatibility",
+      "name": "Owlib compatibility direction",
+      "maturity": "preview",
+      "availability": "separate legacy/evolving local layout; compatibility pending G-071-C-COMPAT",
+      "summary": "A future local direction for reviewed cross-project learning, parallel extraction, PI intelligence, and agent maintenance.",
+      "not": ["a current v0.7.1 host layout", "automatic global installation", "remote team synchronization"],
+      "contract": "internal/owledge/workpackages/owledge-v1-autonomous-delivery/tickets/ALL-TICKETS.md#ow-071-06",
+      "documentation": "docs/adoption-presets.md",
+      "evidence": "internal/owledge/reviews/ow-071-14-adoption-preset-evidence.md",
+      "source_retrieved_at": "2026-07-30",
+      "release_owner": "Owledge maintainers"
+    },
+    {
+      "id": "team-hub-and-sync",
+      "name": "Team Hub and Git/CI Sync Layer",
+      "maturity": "post-v1",
+      "availability": "not available in the current release train",
+      "summary": "Future multi-tenant collaboration and synchronization directions with no v1 dependency.",
+      "not": ["current hosted service", "current remote synchronization", "a local HTTP or MCP capability"],
+      "contract": "internal/owledge/workpackages/owledge-v1-autonomous-delivery/tickets/ALL-TICKETS.md#ow-071-14",
+      "documentation": "docs/adoption-presets.md",
+      "evidence": "internal/owledge/reviews/ow-071-14-adoption-preset-evidence.md",
+      "source_retrieved_at": "2026-07-30",
+      "release_owner": "Owledge maintainers"
     }
   ]
 }
