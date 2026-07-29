@@ -27,5 +27,8 @@ certification for every runtime.
 - The Markdown source-of-truth model does not change across harnesses.
 - Project-root `skills/` is a shipped source/vendor bundle, not a universal
   automatic discovery path. `.owledge/skills/` is not used for discovery.
+- The [skills and agent integrations guide](skills-and-agent-integrations.md)
+  defines skill selection, instruction/hook/CLI precedence, host proof, and
+  recovery for missing or drifting mirrors.
 - Harness benchmarks for Claude Code, Codex, OpenCode, Cursor, and Zed are roadmap work, not a v0.7.0 claim.
 - Write-enabled MCP is roadmap work. v0.7.0 intentionally ships read-only MCP first.

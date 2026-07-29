@@ -43,6 +43,7 @@ separates no-install, package, source, adapter, and add-on paths.
 
 - Read [install-plugin.md](install-plugin.md)
 - Then read [harness-plugin-matrix.md](harness-plugin-matrix.md)
+- Use the [skills and agent integrations guide](skills-and-agent-integrations.md) to select a verified policy, workflow, or adapter path
 - Read-only MCP is available through `tools/owledge_mcp.py`; write-enabled MCP and harness benchmarks are roadmap items
 
 ## I want an optional project cockpit
