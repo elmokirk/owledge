@@ -26,6 +26,9 @@ jobs:
       - name: Python compile
         run: python -m py_compile tools/owledge.py tools/owledge_mcp.py tools/owledge_core.py tools/build_kb_module.py tools/build_project_folder_kit.py benchmarks/run_benchmarks.py plugins/owledge-cowork/scripts/capture-claude-event.py plugins/owledge-cowork/scripts/close-runtime-session.py
 
+      - name: Wheel-only install smoke
+        run: python -m unittest tests.unit.test_ow07110_package_install_smoke
+
       - name: Public docs
         run: python tools/owledge.py test public-docs --project-root .
 
