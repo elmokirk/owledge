@@ -35,6 +35,10 @@ class AdoptionPresetContractTests(unittest.TestCase):
             "`transferability`",
             "`visibility`",
             "`data_class`",
+            "never overrides tenant/customer/project scope or grants access",
+            "not automatic export permission",
+            "When these fields disagree, keep the record private",
+            "ask the responsible owner to decide",
         ):
             self.assertIn(phrase, DOC)
 
