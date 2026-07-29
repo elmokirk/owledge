@@ -33,6 +33,7 @@ class AgentIntegrationContractTests(unittest.TestCase):
             "`.owledge/skills/` is **not** an automatic discovery root",
             "MCP profile is read-only",
             "does not authenticate that its caller is a human or owner",
+            "Treat a drifting mirror as user-edited",
             "```mermaid",
             "Human accepts promotion?",
             "Agent execution contract",

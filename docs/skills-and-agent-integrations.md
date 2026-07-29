@@ -135,6 +135,8 @@ or promotion model.
 
 If discovery or execution is uncertain, do not guess. Re-read host instructions
 and the active handoff, run `doctor`, verify the active phase's QA command, and
-resume from the first unchecked item. Repair a missing/drifting mirror with the
-documented initializer/upgrade path; if evidence fails, record the finding and
-repair the smallest affected unit.
+resume from the first unchecked item. Materialize a missing mirror through the
+documented initializer or safe upgrade. Treat a drifting mirror as user-edited:
+compare it with the root skill and require an explicit owner decision before any
+force-template overwrite. If evidence fails, record the finding and repair the
+smallest affected unit.
