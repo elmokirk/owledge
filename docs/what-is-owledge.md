@@ -19,6 +19,9 @@ intent -> project truth -> scoped context -> agent work -> evidence and handoff 
 
 Markdown is canonical. Indexes, reports, graphs, benchmarks, and runtime adapters are generated or optional views. Raw runtime capture is private by default; do not treat generated views as authority over reviewed project records.
 
+For the operational lifecycle, actor authority, privacy boundary, and daily
+workflow, see [How Owledge works](how-owledge-works.md).
+
 ## Benefits and boundaries
 
 | Owledge provides | Owledge does not provide |
