@@ -1,0 +1,95 @@
+schema_version: 1
+ticket: OW-071-04
+gate: G-071-B-ADOPTION
+status: implementation_complete_pending_phase_reflection
+branch: codex/v071-integration
+base_commit: c366b520a91b066ba5ea162881a97eebfec66d36
+implementation_commits:
+  - 16148ed
+  - da4a6fb
+execution_mode: local_serial_with_independent_beginner_qa
+outcome: >-
+  Give a beginner an adoption-first English narrative and navigation surface
+  before installation detail, with a bounded capability-claim registry.
+decisions:
+  - id: D-071-04-A
+    decision: >-
+      The first public screen leads with the category, user problem, durable
+      outcome, explicit boundary, and next action before any install command.
+    rationale: >-
+      A beginner must understand the product choice before command syntax,
+      repository layout, benchmark detail, or maintainer material consumes the
+      information budget.
+  - id: D-071-04-B
+    decision: >-
+      The registry governs feature-level public capability claims and records
+      maturity, evidence, documentation, release owner, non-goals, and a
+      source/retrieval date for every entry.
+    rationale: >-
+      Public adoption language must not be broader than its current release
+      evidence or silently turn local/roadmap capability into a current claim.
+artifacts:
+  - README.md
+  - docs/README.md
+  - docs/what-is-owledge.md
+  - contracts/public-capabilities.json
+  - tests/unit/test_ow07104_adoption_docs.py
+  - evidence/OW-071-04/manifest.yaml
+commands:
+  - command: python -m unittest tests.unit.test_ow07104_adoption_docs -q
+    exit_code: 0
+    result: 3 tests passed; first-screen comprehension, pre-install ordering, and registry fields verified.
+  - command: python tools/owledge.py test public-docs --project-root .
+    exit_code: 0
+    result: public-docs gate passed; zero failed.
+  - command: >-
+      python tools/owledge.py test docs-contract --project-root .
+      --changed-file contracts/public-capabilities.json --changed-file README.md
+      --changed-file docs/command-reference.md
+      --changed-file docs/security/local-http-control-plane.md
+    exit_code: 0
+    result: docs-contract gate passed; 288 checks, zero failed.
+  - command: git diff --check
+    exit_code: 0
+    result: no whitespace errors.
+independent_review:
+  reviewer_role: beginner-ux-reviewer
+  initial_verdict: pass_with_concerns
+  initial_findings:
+    - id: F-071-04-01
+      severity: medium
+      detail: >-
+        The registry initially covered only local HTTP while public feature-level
+        claims also covered the project kit, principles-only contract, read-only
+        MCP, and optional add-ons.
+    - id: F-071-04-02
+      severity: medium
+      detail: >-
+        The registry lacked a source/retrieval date per claim.
+  remediation_commit: da4a6fb
+  final_verdict: pass
+  final_result: >-
+    The registry now covers the named feature-level public claims with maturity,
+    evidence, documentation, owner, non-goals, and source/retrieval date;
+    local HTTP remains local-experimental and Team Hub remains post-v1.
+negative_qa:
+  - No bash installation block precedes the README mental model.
+  - Repository layout, benchmark detail, and maintainer material do not displace the first-screen product explanation.
+  - Hosted Team Hub, remote synchronization, and automatic promotion remain explicit non-goals.
+  - Local HTTP remains source-checkout, loopback-only, and local-experimental.
+limitations:
+  - >-
+    This ticket establishes the narrative and claim-governance surface only.
+    Executable install recipes, workflow diagrams, runtime/skill contracts,
+    adoption presets, and the golden journey remain owned by OW-071-10 through
+    OW-071-05.
+qa_handoff:
+  next_ticket_wave: W-071-B2
+  prerequisites_for_parallel_lanes:
+    - OW-071-04 acceptance evidence committed
+    - active ticket state advances only after controller reflection
+  required_replay:
+    - python -m unittest tests.unit.test_ow07104_adoption_docs -q
+    - python tools/owledge.py test public-docs --project-root .
+    - python tools/owledge.py test docs-contract --project-root .
+    - git diff --check
