@@ -32,7 +32,7 @@ The local HTTP control-plane adapter is **local experimental**, source-checkout 
 
 ## Capability maturity
 
-Every public capability is labelled as one of: **available**, **local experimental**, **preview**, **planned**, or **post-v1**. The versioned [public capability registry](../contracts/public-capabilities.json) names the evidence, documentation, and release owner for each claim. Current claims refer to repository release evidence retrieved on 2026-07-29; roadmap statements are explicitly labelled.
+Every public capability is labelled as one of: **available**, **local experimental**, **preview**, **planned**, or **post-v1**. The versioned [public capability registry](../contracts/public-capabilities.json) names the evidence, documentation, release owner, and source/retrieval date for each feature-level public capability claim. Roadmap statements are explicitly labelled.
 
 ## Choose the smallest next step
 

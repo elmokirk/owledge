@@ -43,6 +43,7 @@ class OW07104AdoptionDocsTests(unittest.TestCase):
         for capability in registry["capabilities"]:
             self.assertIn(capability["maturity"], registry["maturity_values"])
             self.assertTrue(capability["evidence"])
+            self.assertRegex(capability["source_retrieved_at"], r"^20\d{2}-\d{2}-\d{2}$")
             self.assertTrue(capability["release_owner"])
 
 

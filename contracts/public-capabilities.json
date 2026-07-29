@@ -11,6 +11,74 @@
   "release_owner_review": "required",
   "capabilities": [
     {
+      "id": "project-local-kit",
+      "name": "Project-local Markdown kit",
+      "maturity": "available",
+      "availability": "package and source checkout",
+      "summary": "An additive project layer for canonical Markdown plans, evidence, and handoffs.",
+      "not": [
+        "a migration of an existing repository",
+        "a hosted service",
+        "an automatic background worker"
+      ],
+      "contract": "contracts/release-surface.json",
+      "documentation": "docs/quickstart.md",
+      "evidence": "evidence/OW-071-02/manifest.yaml",
+      "source_retrieved_at": "2026-07-29",
+      "release_owner": "Owledge maintainers"
+    },
+    {
+      "id": "principles-only-contract",
+      "name": "Principles-only operating contract",
+      "maturity": "available",
+      "availability": "portable Markdown instructions",
+      "summary": "A runtime-independent, no-install operating rule set for existing agent workflows.",
+      "not": [
+        "local validation tooling",
+        "an installed runtime adapter",
+        "automatic memory promotion"
+      ],
+      "contract": "skills/owledge-principles/SKILL.md",
+      "documentation": "docs/integration-decision-guide.md",
+      "evidence": "evidence/OW-071-01/manifest.yaml",
+      "source_retrieved_at": "2026-07-29",
+      "release_owner": "Owledge maintainers"
+    },
+    {
+      "id": "read-only-mcp",
+      "name": "Read-only MCP adapter",
+      "maturity": "available",
+      "availability": "local source checkout",
+      "summary": "A local adapter that exposes read-only project context to compatible clients.",
+      "not": [
+        "a write-enabled MCP path",
+        "a hosted MCP service",
+        "a Team Hub"
+      ],
+      "contract": "contracts/release-surface.json",
+      "documentation": "docs/harness-plugin-matrix.md",
+      "evidence": "evidence/OW-071-02/manifest.yaml",
+      "source_retrieved_at": "2026-07-29",
+      "release_owner": "Owledge maintainers"
+    },
+    {
+      "id": "optional-addons",
+      "name": "Optional add-ons",
+      "maturity": "available",
+      "availability": "source checkout; selected add-ons may have additional prerequisites",
+      "summary": "Optional proof, validation, and generated-view capabilities that do not change the default project setup.",
+      "not": [
+        "required dependencies of the project-local kit",
+        "canonical project memory",
+        "hosted services"
+      ],
+      "contract": "contracts/release-surface.json",
+      "documentation": "docs/README.md",
+      "evidence": "evidence/OW-071-02/manifest.yaml",
+      "source_retrieved_at": "2026-07-29",
+      "release_owner": "Owledge maintainers"
+    },
+    {
       "id": "local-http-control-plane",
       "name": "Local HTTP control-plane adapter",
       "maturity": "local-experimental",
@@ -25,6 +93,7 @@
       "contract": "contracts/local-http-control-plane-v1.json",
       "documentation": "docs/security/local-http-control-plane.md",
       "evidence": "evidence/OW-071-13/manifest.yaml",
+      "source_retrieved_at": "2026-07-29",
       "release_owner": "Owledge maintainers"
     }
   ]
