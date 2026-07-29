@@ -259,9 +259,11 @@ class LocalHttpSecurityTests(unittest.TestCase):
             conn.close()
             self.assertEqual((response.status, payload["error"]), (429, "rate_limit_exceeded"))
             acquired = 0
-            while isolated._request_slots.acquire(blocking=False):
+            for _ in range(core.LOCAL_HTTP_BOUNDS["max_concurrent_requests"]):
+                self.assertTrue(isolated._request_slots.acquire(timeout=1))
                 acquired += 1
             self.assertEqual(acquired, core.LOCAL_HTTP_BOUNDS["max_concurrent_requests"])
+            self.assertFalse(isolated._request_slots.acquire(blocking=False))
             conn = http.client.HTTPConnection("127.0.0.1", isolated.server_port, timeout=3)
             conn.request("GET", "/health")
             response = conn.getresponse()
