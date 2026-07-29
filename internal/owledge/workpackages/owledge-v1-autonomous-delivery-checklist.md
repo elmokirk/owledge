@@ -72,6 +72,7 @@ Apply this checklist after v0.7.1, v0.8.0, v0.8.1, v0.9.0, and v1.0:
 
 ### Phase 071-B - Beginner adoption
 
+- [x] OW-071-04 narrative, capability-claim governance, and independent beginner review accepted (`evidence/OW-071-04/manifest.yaml`)
 - [ ] owner decision register in the public-docs adoption plan resolved
 - [ ] tickets OW-071-04, OW-071-10, OW-071-11, OW-071-12, OW-071-14, and OW-071-05 done
 - [ ] G-071-B-ADOPTION evidence passed

@@ -4,8 +4,8 @@ plan: internal/owledge/plans/owledge-v1-autonomous-delivery-master-plan.md
 objective: Deliver Owledge v0.7.1 through v1.0 through gated autonomous execution.
 status: in_progress
 current_release: v0.7.1
-current_phase: 071-B1
-active_ticket: OW-071-04
+current_phase: 071-B2
+active_ticket: OW-071-10
 last_green_gate: G-071-A-TRUTH
 alignment:
   state: none
@@ -349,8 +349,8 @@ orchestration:
   approved_by: product-owner
   approved_at: "2026-07-27T14:25:00Z"
   expires_at_alignment: true
-  active_dispatch: local_serial_ow07104
-  pending_risk_brief: "OW-071-04 is the only active lane. Preserve the accepted capability/security boundary, route expansion ideas to the roadmap, and prove a beginner understands audience, problem, outcome, boundary, and next action before installation detail."
+  active_dispatch: local_serial_ow07110_with_b2_ready
+  pending_risk_brief: "OW-071-10 is the sole active implementation lane; OW-071-11, OW-071-12, and OW-071-14 are ready but not dispatched. Preserve OW-071-04's adoption/claim boundaries, keep recipes executable and bounded, and do not broaden local HTTP, Team Hub, or benchmark claims."
 workspace:
   code_root: .
   planning_root: internal/owledge/workpackages/owledge-v1-autonomous-delivery
@@ -372,10 +372,11 @@ last_completed_actions:
   - OW-071-13 accepted through 597977f after independent security review; the local HTTP profile is loopback-only, bounded, scope-safe, and truthfully classified.
   - G-071-A-TRUTH promoted from evidence at 9fba2c0 after all four Phase 071-A tickets and cumulative thresholds passed.
   - The OW-071-13 semaphore fixture race was isolated and stabilized at a709101 after three consecutive green replays; runtime behavior was unchanged.
+  - OW-071-04 accepted through 092e306 after five-second comprehension, public-docs, and docs-contract checks passed; independent beginner review raised two P1 claim-governance gaps, both fixed at da4a6fb and re-reviewed as pass.
 next_actions:
-  - Preflight OW-071-04 against the accepted capability registry, adoption plan, current README/docs navigation, and routed F-071-22 dated-claim governance.
-  - Implement only the minimum adoption-first narrative and information architecture needed for the OW-071-04 acceptance fixtures.
-  - Run comprehension, claim-map, navigation, link, and lint checks, then one independent beginner-UX review before marking OW-071-04 done.
+  - Preflight OW-071-10 against the accepted OW-071-04 narrative, executable command truth, and clean package/source constraints.
+  - Keep OW-071-11, OW-071-12, and OW-071-14 ready until the orchestrator explicitly dispatches non-overlapping lanes.
+  - Record fixture evidence and a cross-platform install review before advancing the remaining Phase 071-B tickets.
 last_commands:
   - "python tools/validate_v1_delivery_plan.py (exit 0; 64 tickets, 25 gates, 44 waves, 0 errors; one allowed OW-080-13 checkpoint warning)"
   - "python tools/validate_live_work_register.py --project-root . (exit 0; 21/21 records)"
@@ -386,7 +387,7 @@ last_commands:
   - "python tools/owledge.py test public-docs --project-root . (exit 0; 235/235)"
   - "python tools/owledge.py test private-path-clean --project-root . (exit 0; zero findings)"
 checkpoint:
-  last_completed_action: "Accepted OW-071-13 through 597977f, recorded independent pass evidence at 9fba2c0, stabilized its timing-sensitive fixture at a709101, promoted G-071-A-TRUTH, and activated OW-071-04."
+  last_completed_action: "Accepted OW-071-04 through 092e306: beginner-first narrative, canonical concept page, feature-level capability registry, per-claim retrieval dates, and independent remediation re-review all passed; activated OW-071-10 and kept the remaining B2 lanes ready."
   changed_files:
     - "internal/owledge/workpackages/owledge-v1-autonomous-delivery/RUN-STATE.yaml"
     - "internal/owledge/workpackages/owledge-v1-autonomous-delivery/BACKLOG.yaml"
@@ -408,8 +409,8 @@ checkpoint:
   failed_commands:
     - "python -m unittest tests.unit.test_validate_v1_delivery_plan tests.unit.test_validate_live_work_register -q: one pre-existing downstream mismatch; test_current_control_plane_is_valid still expects zero warnings while accepted OW-080-13 intentionally emits one internal-checkpoint warning. The validator itself passed with zero errors."
     - "python tools/owledge_core.py --project-root . validate-memory --strict: 307 pre-existing legacy frontmatter failures across historical internal memory; the touched canonical plan/checklists pass the release-specific frontmatter validation inside validate_v1_delivery_plan.py."
-  workspace_state: "G-071-A-TRUTH is formally promoted from committed evidence; OW-071-04 is the sole active ticket on clean branch codex/v071-integration."
-  next_exact_action: "Resume the goal, load OW-071-04 plus its directly referenced adoption artifacts, and perform the bounded adoption-narrative preflight before editing public docs."
+  workspace_state: "G-071-A-TRUTH remains formally promoted; OW-071-04 is accepted with committed evidence, OW-071-10 is the sole active ticket, and the remaining W-071-B2 tickets are ready on clean branch codex/v071-integration."
+  next_exact_action: "Resume the goal, load OW-071-10 plus the accepted OW-071-04 narrative and executable-path evidence, then perform the bounded installation-hub preflight before editing public docs."
   open_assumptions:
     - "The product owner wants the existing five-release train retained unless a later version reflection changes it."
     - "Local serial execution is the default; subagents are exceptional and justified only by independent risk reduction."
