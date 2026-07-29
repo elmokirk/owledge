@@ -28,8 +28,11 @@ class AgentIntegrationContractTests(unittest.TestCase):
             "`owledge-long-horizon-delivery`",
             "`tools/owledge_mcp.py`",
             "`plugins/owledge-cowork/`",
+            "`concept-blindspot-audit`",
+            "`render-memory-report`",
             "`.owledge/skills/` is **not** an automatic discovery root",
             "MCP profile is read-only",
+            "does not authenticate that its caller is a human or owner",
             "```mermaid",
             "Human accepts promotion?",
             "Agent execution contract",
@@ -82,11 +85,27 @@ class AgentIntegrationContractTests(unittest.TestCase):
             self.assertFalse(discovery["passed"])
             self.assertIn("owledge-long-horizon-delivery", discovery["details"])
 
-    def test_mcp_tool_surface_has_no_write_or_promotion_operation(self) -> None:
-        mcp = (ROOT / "tools" / "owledge_mcp.py").read_text(encoding="utf-8")
-        self.assertIn("Read-only MCP-style stdio server", mcp)
-        self.assertNotIn('"name": "owledge_write', mcp)
-        self.assertNotIn('"name": "owledge_promote', mcp)
+    def test_running_mcp_tool_surface_has_only_the_read_only_allowlist(self) -> None:
+        process = subprocess.run(
+            [sys.executable, "tools/owledge_mcp.py"],
+            cwd=ROOT,
+            input='{"jsonrpc":"2.0","id":1,"method":"tools/list"}\n',
+            text=True,
+            capture_output=True,
+        )
+        self.assertEqual(process.returncode, 0, process.stderr)
+        tools = json.loads(process.stdout)["result"]["tools"]
+        names = {tool["name"] for tool in tools}
+        self.assertEqual(names, {
+            "owledge_read_entrypoint",
+            "owledge_doctor",
+            "owledge_search_memory",
+            "owledge_build_context_pack",
+            "owledge_list_tasks",
+            "owledge_list_reviews",
+        })
+        for tool in tools:
+            self.assertNotRegex(f"{tool['name']} {tool['description']}", r"(?i)write|promote|sync")
 
 
 if __name__ == "__main__":

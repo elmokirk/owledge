@@ -62,7 +62,7 @@ class WorkflowDocumentationContractTests(unittest.TestCase):
             "Raw session capture and private user context",
             "not shared project truth",
             "no write-enabled promotion tools",
-            "Only the designated curator can promote",
+            "Owner approval is required by workflow",
             "No hosted remote synchronization in v0.7.1",
             "No autonomous background scheduler",
         ):

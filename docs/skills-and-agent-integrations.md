@@ -27,6 +27,8 @@ guides a worker; it does not grant permission to mutate canonical truth.
 | `owledge-autonomous-delivery` | Consent-first delivery policy | User explicitly asks for delegation | Ticket, risk, dependencies, approved scope | Proposes lanes; never dispatches itself | Explicit user approval | Codex mirror and declared plugin roots | Available, consent-gated |
 | `owledge-runtime-bridge` | Runtime adapter guidance | Compact context, evidence, or handoff | Project Markdown and adapter capability | Guides bounded local artifact handling | Local kit for CLI use | Generic/Codex/Claude-compatible profiles | Available |
 | `review-evaluation-workflow` | Review workflow | Red team, QA, scorecard, promotion readiness | Subject and evidence | Review evidence and follow-up tasks | Review templates; optional local command | Codex mirror and declared plugin roots | Available |
+| `concept-blindspot-audit` | Conceptual red-team workflow | Kit foundations, distribution, or lifecycle need challenge | Scoped kit records and audit profile | Candidate findings and bounded feedback proposals | Concept-audit command for deterministic dimensions | Codex mirror; manual invocation elsewhere | Available, candidate-only |
+| `render-memory-report` | Generated-view workflow | A visual decision, handoff, or stakeholder report is requested | Reviewed Markdown/JSONL and optional design rules | Local HTML report linked to sources | Local report tooling; optional add-on for some report types | Codex mirror; manual invocation elsewhere | Available, generated output |
 | `tools/owledge_mcp.py` | Read-only MCP adapter | Explicit MCP client call | Project path and query/tool input | Reads entrypoint, doctor, search, context, tasks, reviews | Python standard library/local project data | MCP-compatible clients | Read-only P0; no write path |
 | `plugins/owledge-cowork/` | Optional local runtime adapter | User installs declared plugin | Runtime events and local project root | Private captures and draft summaries | Explicit plugin installation | Claude/Cowork-compatible plugin roots | Local adapter support |
 
@@ -44,9 +46,13 @@ Use this order when rules conflict or when deciding whether a component can act:
 For Codex host projects, `init-project` materializes matching skills under
 `.agents/skills/`. The root `skills/` tree is the Owledge source/vendor bundle;
 plugin-capable runtimes use the plugin's declared `skills/` root.
-`.owledge/skills/` is **not** an automatic discovery root. A missing or drifting
-mirror is diagnostic: run `doctor`, then safely rerun `init-project` or
-`upgrade` to restore the matching copy.
+`.owledge/skills/` is **not** an automatic discovery root. A missing mirror can
+be materialized by the documented initializer or safe upgrade. A drifting mirror
+is intentionally treated as user-edited: run `doctor`, compare it with the root
+skill, and have the project owner explicitly choose whether to preserve it or
+restore it. `upgrade --mode force-templates --apply --yes` can overwrite edited
+files and is therefore a reviewed, explicit recovery action - not an automatic
+repair path.
 
 ## Invocation and reviewed promotion
 
@@ -63,10 +69,11 @@ flowchart LR
 
 In prose: host instructions and reviewed project truth constrain the selected
 skill; the skill guides bounded work in approved paths; the worker records
-evidence and a handoff; independent review happens where required; only a
-responsible human can accept promotion. A rejected or revised proposal remains
-candidate material and never becomes truth merely because a skill, hook, CLI,
-or MCP client produced it.
+evidence and a handoff; independent review happens where required; a
+responsible owner's recorded approval accepts promotion in the workflow. The
+local CLI does not authenticate that its caller is a human or owner. A rejected
+or revised proposal remains candidate material and never becomes truth merely
+because a skill, hook, CLI, or MCP client produced it.
 
 ## Verified host workflow
 
@@ -97,7 +104,9 @@ During work, write only to approved paths and report changed files, commands,
 results, limitations, and the exact next action. Stop for direction when new
 authority is needed, the MVP cutline changes, a write-enabled MCP/remote service
 is required, or reviewed project truth conflicts. Review and promotion remain
-separate human-controlled steps.
+separate owner-controlled workflow steps. The local CLI records review/status
+preconditions but does not authenticate that its caller is a human or owner;
+teams must record owner approval in their reviewed workflow before promotion.
 
 ## Happy path and variants
 
