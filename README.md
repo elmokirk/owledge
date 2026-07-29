@@ -1,6 +1,6 @@
 # Owledge
 
-**Drop-in durable project memory for existing Markdown repos and Obsidian-style vaults: no migration, no vector DB, no wiki-link rewrite.**
+**An Agentic Engineering Context & Planning Layer for teams that want agents to ship durable work, not lose it in chat.**
 
 [![Version](https://img.shields.io/badge/version-0.7.0-blue)](VERSION)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
@@ -11,29 +11,35 @@
 
 Owledge gives agents durable local Markdown artifacts: plans, evidence, reviews, handoffs, and decisions that stay readable across sessions, tools, teams, and existing vaults.
 
-Use it when agents are losing project context, plans are stuck in chat, multiple runtimes need a shared handoff surface, or a mature knowledgebase needs traceable decisions without a migration.
+Use it when agents lose project context, plans get stuck in chat, or a Markdown repository needs a reviewable handoff surface. It is additive: existing files stay yours.
 
-Core idea: **Markdown is the source of truth; indexes, reports, graphs, benchmarks, and runtime adapters are generated or optional views.**
+## In five seconds
 
-**Release proof:** local release gates pass with additive writes by default, private runtime capture, metadata-first KB scan, and no required OS-wide setup. CI runs platform-neutral Python gates; broader runtime installs remain local adapter support, not marketplace certification.
+| If this is your problem | Owledge gives you |
+| --- | --- |
+| The next agent must rediscover decisions | A Markdown handoff with sources, decisions, and the next action. |
+| A plan needs to survive implementation and review | Evidence-linked plans, checks, and explicit stop points. |
+| You want structure without migrating a repo or vault | An additive local layer; Markdown remains canonical. |
 
-**Minimal by default:** start with principles and skills only. Add project files,
-runtime adapters, or add-ons only when the current project needs durable local
-artifacts, runtime capture, proof assets, or release evidence.
+**Boundary:** Owledge is not a hosted Team Hub, a background agent scheduler, or a replacement for your issue tracker. The current HTTP adapter is [local experimental and loopback-only](docs/security/local-http-control-plane.md).
 
-## Repo Layout
+**Next action:** [understand the model](docs/what-is-owledge.md), then choose a [smallest integration](docs/integration-decision-guide.md). Install only when that path calls for it.
 
-This repository ships product source from `templates/owledge/`. The
-`internal/owledge/` directory is the maintainers' dogfood workspace
-(generated artifacts, not shipped). The `tools/` directory holds the Python
-CLI. See [docs/distribution.md](docs/distribution.md) for the full
-Dogfooding vs. Product breakdown.
+## The mental model
+
+```text
+intent -> project truth -> scoped context -> agent work -> evidence and handoff -> reviewed promotion
+```
+
+Markdown is the source of truth. Indexes, reports, graphs, benchmarks, and runtime adapters are generated or optional views. A person remains responsible for project decisions and promotion.
+
+Read [What is Owledge?](docs/what-is-owledge.md) for privacy, non-goals, capability maturity, and the complete lifecycle.
 
 ## Table Of Contents
 
 - [Why It Exists](#why-it-exists)
 - [Problem To Solution](#problem-to-solution)
-- [Install Or Try](#install-or-try)
+- [Choose Your Path](#choose-your-path)
 - [Quickstart Paths](#quickstart-paths)
 - [Decision Guide](#decision-guide)
 - [Before / After](#before--after)
@@ -71,9 +77,19 @@ Owledge is for teams and power users who already work in Markdown, Obsidian, LLM
 | Users want one skill without the full kit | `standalone-skills/` provides independently installable Owledge skills for blindspot audit, agentic review, brainstorm, and planning layer use. |
 | Teams need review and research traceability | `.owledge/reviews/`, `.owledge/audiences/`, and `.owledge/research/` make red-team, audience, and research artifacts first-class. |
 
+## Choose Your Path
+
+Start with the smallest path that solves the current problem. Each route stays within two clicks of its canonical guide.
+
+- **Understand first:** [What is Owledge?](docs/what-is-owledge.md)
+- **Use the operating rules in an existing system:** [Integration Decision Guide](docs/integration-decision-guide.md)
+- **Add durable project artifacts:** [Project quickstart](docs/quickstart.md)
+- **Try a bounded demo:** [Try Owledge in 5 minutes](docs/try-owledge-in-5-minutes.md)
+- **Inspect current capability maturity:** [Public capability registry](contracts/public-capabilities.json)
+
 ## Install Or Try
 
-Owledge is uv-first for agents and harnesses:
+Once you chose a path, Owledge is uv-first for agents and harnesses:
 
 ```bash
 uvx owledge --help

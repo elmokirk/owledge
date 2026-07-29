@@ -1,15 +1,10 @@
-# Owledge Docs
+# Owledge documentation
 
-## Current release
+Owledge is an **Agentic Engineering Context & Planning Layer**: it keeps project decisions, plans, evidence, and handoffs durable in local Markdown so a person and the next agent can continue safely.
 
-**Owledge v0.7.0** is the current released package. The canonical release
-version is [../VERSION](../VERSION); use [quickstart.md](quickstart.md) for new
-installs and [upgrading.md](upgrading.md) for existing projects.
+Start by understanding the [product model, boundaries, and capability maturity](what-is-owledge.md). Owledge is additive and local by default; it is not a hosted Team Hub or an automatic background worker.
 
-Start with the path that matches your setup.
-
-Maintainers: distribution.md defines the release-branch, PyPI confirmation,
-main-promotion, and release-evidence contract.
+## Choose a learning path
 
 ## I only want the principles in an existing agent system
 
@@ -50,7 +45,16 @@ main-promotion, and release-evidence contract.
 - Read [project-snapshot-kit.md](project-snapshot-kit.md)
 - Generate snapshots or static HTML only when explicitly requested
 
-## I want to understand scale and quality
+## Reference, quality, and maintainer material
+
+**Owledge v0.7.0** is the current released package. The canonical release
+version is [../VERSION](../VERSION); use [quickstart.md](quickstart.md) for new
+installs and [upgrading.md](upgrading.md) for existing projects.
+
+Maintainers: [distribution.md](distribution.md) defines the release-branch,
+PyPI confirmation, main-promotion, and release-evidence contract.
+
+### I want to understand scale and quality
 
 - Read [performance-scale-notes.md](performance-scale-notes.md)
 - Read [benchmark-kit.md](benchmark-kit.md)
@@ -72,29 +76,29 @@ main-promotion, and release-evidence contract.
 - Read [team-long-running-project-guide.md](team-long-running-project-guide.md)
 - Run `python tools/owledge.py test quality-ratchet --project-root .`
 
-## I want category context
+### I want category context
 
 - Read [owledge-vs-agent-methods.md](owledge-vs-agent-methods.md)
 - Read [superpowers-integration.md](superpowers-integration.md) when comparing Owledge with execution frameworks
 - Read [okf-integration-plan.md](okf-integration-plan.md) for the planned OKF-compatible interchange profile
 
-## Advanced
+### Advanced
 
 - [project-folder-only-quickstart.md](project-folder-only-quickstart.md)
 - [cross-platform-lean-setup.md](cross-platform-lean-setup.md)
 - [agent-first-run-setup.md](agent-first-run-setup.md)
 
-## Integration And Setup Guides
+### Integration And Setup Guides
 
 - [agents-md-integration-block.md](agents-md-integration-block.md) - copy-paste Owledge rules into an existing AGENTS.md or CLAUDE.md
 - [pi-agent-setup.md](pi-agent-setup.md) - how to set up and run the PI Agent (deterministic mode, no auth needed)
 
-## Feedback And Roadmap
+### Feedback And Roadmap
 
 - [feedback-round-2026-06.md](feedback-round-2026-06.md) - structured feedback triage with tickets FB-001 through FB-017 (including Round 2 feature ideas FB-013 through FB-017)
 - [roadmap-ideas-2026-06.md](roadmap-ideas-2026-06.md) - idea log from the 2026-06 feedback round with 16 idea cards (including Round 2 feature ideas)
 - [strategic-roadmap-2026-2027.md](strategic-roadmap-2026-2027.md) - decision-ready product and execution roadmap after the v0.7.0 release
 
-## Maintainer And Historical Docs
+### Maintainer And Historical Docs
 
 - [archive/README.md](archive/README.md)
