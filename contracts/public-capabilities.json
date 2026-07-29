@@ -106,7 +106,7 @@
       "contract": "docs/global-user-knowledge-layer.md",
       "documentation": "docs/adoption-presets.md",
       "evidence": "internal/owledge/reviews/ow-071-14-adoption-preset-evidence.md",
-      "source_retrieved_at": "2026-07-30",
+      "source_retrieved_at": "2026-07-29",
       "release_owner": "Owledge maintainers"
     },
     {
@@ -119,7 +119,7 @@
       "contract": "docs/cross-project-hub-kit.md",
       "documentation": "docs/adoption-presets.md",
       "evidence": "internal/owledge/reviews/ow-071-14-adoption-preset-evidence.md",
-      "source_retrieved_at": "2026-07-30",
+      "source_retrieved_at": "2026-07-29",
       "release_owner": "Owledge maintainers"
     },
     {
@@ -132,7 +132,7 @@
       "contract": "internal/owledge/workpackages/owledge-v1-autonomous-delivery/tickets/ALL-TICKETS.md#ow-071-06",
       "documentation": "docs/adoption-presets.md",
       "evidence": "internal/owledge/reviews/ow-071-14-adoption-preset-evidence.md",
-      "source_retrieved_at": "2026-07-30",
+      "source_retrieved_at": "2026-07-29",
       "release_owner": "Owledge maintainers"
     },
     {
@@ -145,7 +145,7 @@
       "contract": "internal/owledge/workpackages/owledge-v1-autonomous-delivery/tickets/ALL-TICKETS.md#ow-071-14",
       "documentation": "docs/adoption-presets.md",
       "evidence": "internal/owledge/reviews/ow-071-14-adoption-preset-evidence.md",
-      "source_retrieved_at": "2026-07-30",
+      "source_retrieved_at": "2026-07-29",
       "release_owner": "Owledge maintainers"
     }
   ]

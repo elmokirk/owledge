@@ -30,6 +30,11 @@ class AdoptionPresetContractTests(unittest.TestCase):
             "Write-enabled MCP, remote MCP service, promotion API, or sync layer",
             "Post-v1",
             "Do not relabel a local adapter as hosted functionality",
+            "Reusable Hub-record boundary",
+            "`audience_ids`",
+            "`transferability`",
+            "`visibility`",
+            "`data_class`",
         ):
             self.assertIn(phrase, DOC)
 
@@ -39,9 +44,17 @@ class AdoptionPresetContractTests(unittest.TestCase):
         self.assertEqual(rows["cross-project-hub-kit"]["maturity"], "available")
         self.assertEqual(rows["owlib-compatibility"]["maturity"], "preview")
         self.assertEqual(rows["team-hub-and-sync"]["maturity"], "post-v1")
+        for capability_id in (
+            "private-global-layer",
+            "cross-project-hub-kit",
+            "owlib-compatibility",
+            "team-hub-and-sync",
+        ):
+            self.assertTrue((ROOT / rows[capability_id]["evidence"]).is_file())
         for row in rows.values():
             self.assertTrue(row.get("documentation"))
             self.assertTrue(row.get("evidence"))
+            self.assertLessEqual(row["source_retrieved_at"], "2026-07-29")
 
     def test_decision_examples_route_remote_team_need_to_roadmap(self) -> None:
         self.assertIn("A client wants a remote shared service", DOC)

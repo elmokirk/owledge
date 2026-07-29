@@ -29,6 +29,25 @@ background worker. Every preset keeps reviewed project Markdown authoritative.
 | Team Hub | Post-v1 | Future multi-tenant collaboration direction | A current capability or v1 dependency |
 | Git/CI Sync Layer | Post-v1 | Future synchronization direction | A current remote-sync path |
 
+## Reusable Hub-record boundary
+
+The Cross-Project Hub Kit consumes reviewed project records; it does not create
+a new canonical authority. Before a record is reusable beyond its source
+project, record these distinct properties:
+
+| Property | Meaning | Required boundary |
+| --- | --- | --- |
+| `audience_ids` | Optional identifiers for the intended receiving audience or project set | Consumer selection metadata only; it never overrides tenant/customer/project scope or grants access |
+| `transferability` | Human-reviewed statement of whether the lesson is reusable, context-bound, or not transferable | A candidate assessment, not automatic export permission |
+| `visibility` | Who may see the record (`private`, scoped, or `shared`) | Shared reuse requires the explicit shared visibility contract |
+| `data_class` | Sensitivity classification of the record | Shared reuse is limited to safe classes; confidential, personal, and special-category material stays out |
+| `review_status` and `sanitization_status` | Evidence that content and privacy treatment were accepted | Shared Hub input requires approved review and sanitization; raw sessions are excluded |
+
+`audience_ids` and `transferability` add context for a reusable record. They do
+not replace `visibility`, `data_class`, review, sanitization, or the source
+project's authority. When these fields disagree, keep the record private and
+ask the responsible owner to decide.
+
 ## Decision examples
 
 | Need | Select | Do not select merely because it sounds larger |
