@@ -41,7 +41,7 @@ edges: []
 | Requirement | Tickets | Gates |
 | --- | --- | --- |
 | English product narrative and beginner adoption | OW-071-04, OW-071-05, OW-100-07 | G-071-B-ADOPTION, G-100-C-PROOF |
-| Canonical installation and cross-platform command truth | OW-071-10, OW-071-05, OW-100-05 | G-071-B-ADOPTION, G-100-B-PRODUCT |
+| Canonical installation and cross-platform command truth | OW-071-10, OW-071-05, OW-100-05, OW-100-09 | G-071-B-ADOPTION, G-100-B-PRODUCT, G-100-GA |
 | End-to-end workflow and privacy-boundary explanation | OW-071-11, OW-090-06, OW-100-07 | G-071-B-ADOPTION, G-090-B-WRITES, G-100-C-PROOF |
 | Skills taxonomy and executable agent integration guidance | OW-071-12, OW-081-01 through OW-081-05 | G-071-B-ADOPTION, G-081-A-ADAPTERS |
 | Reliable skill discovery and bounded long-horizon planning modes | OW-071-12, OW-081-01 through OW-081-05 | G-071-B-ADOPTION, G-081-A-ADAPTERS |
