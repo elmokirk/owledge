@@ -182,9 +182,14 @@ For every ticket:
   canonical/private/generated ownership, rebuildability, and removal impact.
 - Accept: each command chain runs from its documented clean state and links
   from top navigation; Principles-only reports zero host writes and N/A install
-  footprint; command truth has one canonical owner.
-- Verify/evidence: extracted-command smoke on Windows, macOS, and Linux;
-  `evidence/OW-071-10/`.
+  footprint; command truth has one canonical owner. For v0.7.1 development,
+  the package chain must pass on supported Windows and the tracked three-OS
+  fixture must remain ready. Actual macOS/Linux execution is deferred by
+  `D-071-24` to the Stable/GA gate; no v0.7.1 cross-platform support claim is
+  permitted before then.
+- Verify/evidence: Windows extracted-command and wheel-only smoke, three-OS
+  fixture review, and independent install review; stable evidence in
+  `OW-100-09` must include executed Windows, macOS, and Linux artifact smoke.
 - Negative QA: package recipes cannot require a checkout/persistent binary;
   source recipes cannot leave checkout/target roots ambiguous; unsupported
   runtime wiring cannot be labelled supported.
@@ -804,9 +809,9 @@ For every ticket:
 - Priority/dependencies: P0; `OW-100-08`.
 - Outcome: clean, reproducible v1.0 wheel/sdist, release notes, support matrix, upgrade/uninstall proof, and final gate are ready for owner-controlled publication.
 - Allowed paths: `VERSION`, `pyproject.toml`, `CHANGELOG.md`, workflows, release docs/manifests, artifact configuration.
-- Implement: clean build, artifact inspection, fresh install, upgrades from supported versions, uninstall, offline smoke, provenance manifest.
+- Implement: clean build, artifact inspection, fresh install, upgrades from supported versions, uninstall, offline smoke, provenance manifest, and the deferred executed Windows/macOS/Linux wheel-only install smoke from `D-071-24`.
 - Accept: `G-100-GA` passes with no unresolved P0/P1, no private path/secret, and no dirty tracked source state.
-- Verify/evidence: full release commands and hashes; `evidence/OW-100-09/`.
+- Verify/evidence: full release commands and hashes plus clean Windows, macOS, and Linux wheel-only install transcripts; `evidence/OW-100-09/`.
 - Negative QA: publishing/tagging remains owner-controlled; failed artifact or dirty worktree blocks GA.
 
 ### OW-100-10 - Align v1.0 closeout with the product owner

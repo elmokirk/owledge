@@ -32,6 +32,9 @@ The fixture:
 
 Removing the build source before invoking the entrypoint prevents the test
 from treating an available checkout as proof of the package recipe.
+Each fixture subprocess also removes `PYTHONPATH` and `PYTHONHOME`, and the
+fixture proves that `tools.owledge` resolves beneath the fresh virtual
+environment before invoking the installed entrypoint.
 
 ## Local Windows evidence
 
@@ -59,9 +62,14 @@ python tools/validate_v1_delivery_plan.py
 ## Known limitation and next action
 
 The CI matrix has not run remotely for `0c86550`; therefore macOS and Linux
-are **configured test lanes, not execution evidence**. Do not mark
-OW-071-10 done or claim cross-platform acceptance until the corresponding CI
-job URLs/logs or equivalent clean runner transcripts are attached.
+are **configured test lanes, not execution evidence**. The current workflow
+does not trigger on this branch push alone; it runs on `main` pushes and pull
+requests.
+
+`D-071-24` records the product-owner decision to defer actual macOS/Linux
+execution to the Stable/GA gate. Do not claim cross-platform acceptance in
+v0.7.1; `OW-100-09` must attach the corresponding CI job URLs/logs or clean
+runner transcripts before `G-100-GA` can pass.
 
 The fixture originally copied the whole repository and exceeded the local
 timeout because it included the benchmark corpus. The final fixture copies
@@ -71,10 +79,16 @@ boundary.
 
 ## Decision log
 
-- Decision: keep the release ticket blocked rather than treating a configured
-  CI matrix as completed macOS/Linux evidence.
+- Decision: treat the configured CI matrix as incomplete evidence, never as a
+  completed macOS/Linux result.
 - Decision: use the standard-library test harness plus `pip`; no new runtime
   dependency is introduced.
-- Required next action: run the existing CI matrix for commit `0c86550`, then
-  record the three operating-system outcomes and request independent
-  cross-platform install QA before accepting OW-071-10.
+- Required next action: complete independent OW-071-10 install-fixture review;
+  retain actual cross-platform execution as a Stable/GA prerequisite.
+
+## Independent QA
+
+Independent review reported `pass_with_concerns` (91/100): no P0/P1 findings;
+the only P2 noted that a caller-supplied `PYTHONPATH` or `PYTHONHOME` could
+obscure the import origin. The fixture now clears both variables and asserts
+the installed module path before the acceptance transition.

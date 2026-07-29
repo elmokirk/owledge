@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import pathlib
 import shutil
 import subprocess
@@ -41,7 +42,17 @@ def copy_package_source(destination: pathlib.Path) -> None:
 
 
 def run(command: list[str], *, cwd: pathlib.Path) -> subprocess.CompletedProcess[str]:
-    result = subprocess.run(command, cwd=cwd, text=True, capture_output=True, check=False)
+    environment = os.environ.copy()
+    environment.pop("PYTHONHOME", None)
+    environment.pop("PYTHONPATH", None)
+    result = subprocess.run(
+        command,
+        cwd=cwd,
+        text=True,
+        capture_output=True,
+        check=False,
+        env=environment,
+    )
     if result.returncode != 0:
         raise AssertionError(
             f"Command failed ({result.returncode}): {' '.join(command)}\n"
@@ -81,12 +92,17 @@ class OW07110PackageInstallSmokeTests(unittest.TestCase):
             python = environment / ("Scripts/python.exe" if sys.platform == "win32" else "bin/python")
             cli = environment / ("Scripts/owledge.exe" if sys.platform == "win32" else "bin/owledge")
             run([str(python), "-m", "pip", "install", "--no-deps", str(wheels[0])], cwd=temporary_root)
+            module_path = run(
+                [str(python), "-c", "import pathlib, tools.owledge; print(pathlib.Path(tools.owledge.__file__).resolve())"],
+                cwd=temporary_root,
+            )
 
             quickstart = run([str(cli), "quickstart", "--target", str(target)], cwd=temporary_root)
             doctor = run([str(cli), "doctor", "--project-root", str(target), "--mode", "host"], cwd=temporary_root)
 
             self.assertTrue((target / "OWLEDGE.md").is_file())
             self.assertTrue((target / ".owledge").is_dir())
+            self.assertTrue(pathlib.Path(module_path.stdout.strip()).is_relative_to(environment.resolve()))
             self.assertTrue(json.loads(quickstart.stdout)["passed"])
             self.assertTrue(json.loads(doctor.stdout)["passed"])
 
