@@ -124,9 +124,9 @@ Every gate starts from the tested integration commit and controlled environment 
 
 ### G-080-B-CONTEXT - Context and small models
 
-- Tickets: `OW-080-05`, `OW-080-06`, `OW-080-07`.
-- Commands: deterministic pack fixtures; synopsis freshness; active-tool tests; 4k/8k/16k tool-choice and structured-output matrix; false-pass/retry fixtures; legacy benchmark regression.
-- Thresholds: identical digest for identical inputs; every selection/exclusion explained; Tier-1 4B/8k completion, tool-selection, contract-validity, retry, and false-pass thresholds pass; pack <= configured budget; legacy >=80% token/correct reduction; privacy/stale failures=0.
+- Tickets: `OW-080-05`, `OW-080-06`, `OW-080-07`, `OW-080-13`, `OW-080-14`, `OW-080-15`.
+- Commands: deterministic pack fixtures; synopsis freshness; active-tool tests; 4k/8k/16k tool-choice and structured-output matrix; false-pass/retry fixtures; legacy benchmark regression. Runtime-split for OW-080-13 evidence: under Codex `/goal` the worker runs and self-judges; under Claude Code `/goal` v2.1.139+ the worker runs every command and prints the command, stdout, exit code, and equality verdict to the transcript for the Haiku judge (which cannot run commands or open files). Commands: resume-context file-content token delta (`cold_resume_drain` + `warm_resume_drain`) with Codex `model_auto_compact_token_limit` ON; gate-result equality (both digests + diff to transcript); sidecar roundtrip (capped + reconstructed payloads to transcript); stale-handoff negative fixture (REJECT to transcript).
+- Thresholds: identical digest for identical inputs; every selection/exclusion explained; Tier-1 4B/8k completion, tool-selection, contract-validity, retry, and false-pass thresholds pass; pack <= configured budget; legacy >=80% token/correct reduction; privacy/stale failures=0; `/goal` resume loads strictly fewer file-content tokens than the pre-OW-080-13 baseline for identical active state, reported as `cold_resume_drain` and `warm_resume_drain` in both runtimes (Codex `/goal` v0.128+ warm-resume persisted docs count as 0 newly loaded; Claude Code `/goal` v2.1.139+ counts the full post-`--resume` reload); capped gate error payload reconstructs the full payload from the sidecar (transcript-visible under Claude Code); stable IDs/SHAs and the owner-alignment stop unchanged, the stop verified by a verifiable command not protocol assertion alone.
 - Demonstrable increment: a small local model plans, retrieves, and resumes using only the task pack.
 - Promotion: context profile may be used by adapters.
 

@@ -11,7 +11,7 @@ gates:
   G-071-RC: [OW-071-08]
   G-071-ALIGNMENT: [OW-071-09]
   G-080-A-CONTRACTS: [OW-080-01, OW-080-02, OW-080-03, OW-080-04, OW-080-12]
-  G-080-B-CONTEXT: [OW-080-05, OW-080-06, OW-080-07]
+  G-080-B-CONTEXT: [OW-080-05, OW-080-06, OW-080-07, OW-080-13, OW-080-14, OW-080-15]
   G-080-C-RETRIEVAL: [OW-080-08, OW-080-09]
   G-080-RC: [OW-080-10]
   G-080-ALIGNMENT: [OW-080-11]
@@ -53,6 +53,8 @@ execution_waves:
   - {id: W-080-B1, release: v0.8.0, tickets: [OW-080-05], policy: sequential}
   - {id: W-080-B2, release: v0.8.0, tickets: [OW-080-06, OW-080-08], policy: parallel_non_overlapping}
   - {id: W-080-B3, release: v0.8.0, tickets: [OW-080-07], policy: sequential}
+  - {id: W-080-B4, release: v0.8.0, tickets: [OW-080-13], policy: sequential}
+  - {id: W-080-B5, release: v0.8.0, tickets: [OW-080-14, OW-080-15], policy: parallel_non_overlapping}
   - {id: W-080-RC, release: v0.8.0, tickets: [OW-080-10], policy: sequential}
   - {id: W-080-ALIGNMENT, release: v0.8.0, tickets: [OW-080-11], policy: user_alignment_stop}
   - {id: W-081-A1, release: v0.8.1, tickets: [OW-081-01], policy: sequential}
@@ -106,6 +108,9 @@ tickets:
   - {id: OW-080-10, release: v0.8.0, phase: 080-RC, status: backlog, priority: P0, owner_role: release-engineer, qa_role: release-assurance, estimated_turns: 1, depends_on: [OW-080-07, OW-080-08, OW-080-09], gate: G-080-RC, path: "tickets/ALL-TICKETS.md#ow-080-10"}
   - {id: OW-080-11, release: v0.8.0, phase: 080-ALIGNMENT, status: backlog, priority: P0, owner_role: release-orchestrator, qa_role: alignment-auditor, estimated_turns: 1, depends_on: [OW-080-10], gate: G-080-ALIGNMENT, path: "tickets/ALL-TICKETS.md#ow-080-11"}
   - {id: OW-080-12, release: v0.8.0, phase: 080-A, status: backlog, priority: P0, owner_role: orchestration-contract-engineer, qa_role: autonomy-safety-reviewer, estimated_turns: 2, depends_on: [OW-080-02, OW-080-03, OW-080-04], gate: G-080-A-CONTRACTS, path: "tickets/ALL-TICKETS.md#ow-080-12"}
+  - {id: OW-080-13, release: v0.8.0, phase: 080-B, status: backlog, priority: P1, owner_role: context-engineer, qa_role: evaluation-reviewer, estimated_turns: 3, depends_on: [OW-071-09, OW-080-05], gate: G-080-B-CONTEXT, path: "tickets/ALL-TICKETS.md#ow-080-13"}
+  - {id: OW-080-14, release: v0.8.0, phase: 080-B, status: backlog, priority: P1, owner_role: context-engineer, qa_role: evaluation-reviewer, estimated_turns: 2, depends_on: [OW-071-09, OW-080-13], gate: G-080-B-CONTEXT, path: "tickets/ALL-TICKETS.md#ow-080-14"}
+  - {id: OW-080-15, release: v0.8.0, phase: 080-B, status: backlog, priority: P1, owner_role: plugin-adapter-engineer, qa_role: runtime-conformance-reviewer, estimated_turns: 2, depends_on: [OW-080-01], gate: G-080-B-CONTEXT, path: "tickets/ALL-TICKETS.md#ow-080-15"}
   - {id: OW-081-01, release: v0.8.1, phase: 081-A, status: backlog, priority: P0, owner_role: adapter-architect, qa_role: security-reviewer, estimated_turns: 2, depends_on: [OW-080-11], gate: G-081-A-ADAPTERS, path: "tickets/ALL-TICKETS.md#ow-081-01"}
   - {id: OW-081-02, release: v0.8.1, phase: 081-A, status: backlog, priority: P1, owner_role: codex-adapter-engineer, qa_role: runtime-conformance-reviewer, estimated_turns: 2, depends_on: [OW-081-01], gate: G-081-A-ADAPTERS, path: "tickets/ALL-TICKETS.md#ow-081-02"}
   - {id: OW-081-03, release: v0.8.1, phase: 081-A, status: backlog, priority: P1, owner_role: claude-adapter-engineer, qa_role: runtime-conformance-reviewer, estimated_turns: 2, depends_on: [OW-081-01], gate: G-081-A-ADAPTERS, path: "tickets/ALL-TICKETS.md#ow-081-03"}
