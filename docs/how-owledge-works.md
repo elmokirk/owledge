@@ -31,6 +31,19 @@ The important distinction is that **a file existing is not promotion**. Agent
 output, a hook capture, a PI suggestion, or a generated report is a candidate
 until a responsible reviewer accepts it into project truth.
 
+### Map the diagram to real project artifacts
+
+| Diagram step | Real artifact or current entry point | What to verify |
+| --- | --- | --- |
+| Intent and permitted scope | A task, issue, or a bounded plan under `.owledge/` or `internal/owledge/plans/` | The outcome, allowed paths, and stop condition are explicit |
+| Reviewed project truth | `OWLEDGE.md`, `AGENTS.md`, reviewed decisions, plans, and evidence | The record identifies its owner and review state |
+| Scoped context | `python tools/owledge.py build-context-pack --help` and the selected project records | The context contains only the current task's necessary truth |
+| Human or agent work | The task's permitted repository paths | The implementation stays within the agreed scope |
+| Evidence and handoff | Project-local evidence and handoff Markdown | Tests, limitations, changed paths, and next action are recorded |
+| Independent review | A named reviewer, ticket review, or release gate | Review findings distinguish accepted truth from open candidates |
+| Curator accepts promotion | A responsible human's recorded review decision | Promotion is explicit, traceable, and reversible in Git |
+| Rebuildable indexes and reports | Documented local report/index commands and their generated output | The view can be recreated from reviewed source records |
+
 ## What each layer means
 
 | Layer | Typical location or artifact | Authority | Handling |
@@ -75,6 +88,56 @@ This works for a small one-person task, an existing repository, a standalone
 Markdown vault, or explicit multi-agent lanes. Multi-agent work adds handoffs
 and review boundaries; it does not turn independent agents into automatic
 curators.
+
+## Common workflow variants
+
+### Set up or join an existing project
+
+Read its `AGENTS.md` and `OWLEDGE.md` first. Choose the smallest installation
+route in the [Installation Hub](install/README.md), then run the documented
+doctor command for that route. Setup adds local project structure only when you
+choose a project-local kit; principles-only use can remain file-light.
+
+### Plan, execute, and resume a task
+
+For work that lasts longer than one session, write a bounded plan, execute the
+current unchecked step, and leave evidence plus a handoff. The next worker
+starts by reading that reviewed plan and handoff, re-running the phase's stated
+QA gate if the prior session paused mid-phase, and continuing from the first
+unchecked step. A chat transcript is not the authoritative resume mechanism.
+
+### Use a Markdown knowledge base
+
+Keep the knowledge base additive. The `add-kb-module` command creates the
+documented project-local module; it does not make every note canonical, public,
+or automatically eligible for promotion. Select relevant reviewed records for a
+task and keep private material out of shared retrieval.
+
+### Coordinate several agents
+
+Give each implementation agent a non-overlapping path claim and one bounded
+ticket. Each agent supplies evidence and a handoff; a different reviewer checks
+the result where the ticket or gate requires it. The orchestrator integrates
+the accepted lanes and records any unresolved decision for the project owner.
+
+## Glossary
+
+**Canonical** — reviewed project record that is allowed to guide later work.
+
+**Candidate** — useful proposal or output that has not been accepted as project
+truth.
+
+**Context pack** — a deliberately scoped collection of records for one task;
+it is not a replacement for the canonical project record.
+
+**Evidence** — reproducible proof such as a test result, command output, or
+review finding attached to a change or decision.
+
+**Handoff** — the concise state a later worker needs: what changed, what was
+verified, what remains, and the exact next action.
+
+**Promotion** — an explicit human-curated decision to move accepted material
+into canonical project truth.
 
 ## Start from the right entry point
 

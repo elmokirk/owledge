@@ -24,6 +24,7 @@ class WorkflowDocumentationContractTests(unittest.TestCase):
             "Independent review",
             "human curator",
             "rebuilt",
+            "Map the diagram to real project artifacts",
         ):
             self.assertIn(phrase, self.text)
 
@@ -52,6 +53,16 @@ class WorkflowDocumentationContractTests(unittest.TestCase):
             "No autonomous background scheduler",
         ):
             self.assertIn(claim, self.text)
+
+    def test_ticket_workflow_variants_and_glossary_are_present(self) -> None:
+        for heading in (
+            "Set up or join an existing project",
+            "Plan, execute, and resume a task",
+            "Use a Markdown knowledge base",
+            "Coordinate several agents",
+            "## Glossary",
+        ):
+            self.assertIn(heading, self.text)
 
     def test_primary_docs_route_to_workflow_page(self) -> None:
         self.assertIn("how-owledge-works.md", (ROOT / "docs" / "what-is-owledge.md").read_text(encoding="utf-8"))
