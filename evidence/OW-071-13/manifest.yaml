@@ -4,7 +4,10 @@ gate: G-071-A-TRUTH
 status: local_implementation_complete_pending_cumulative_independent_gate
 branch: codex/v071-integration
 base_commit: eb4d8a859350192695c7fb8afa74003c6d0904d1
-implementation_commit: bd14555f9003b0452dc3a76ffda7af6d7e790031
+implementation_commits:
+  - bd14555f9003b0452dc3a76ffda7af6d7e790031
+  - 51df549d43b52f4104fa81654a16ef640d9ca478
+  - 597977f
 execution_mode: local_serial
 outcome: >-
   Classify the shipped HTTP adapter as local experimental, fail closed on

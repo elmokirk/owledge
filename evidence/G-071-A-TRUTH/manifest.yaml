@@ -1,0 +1,64 @@
+schema_version: 1
+gate: G-071-A-TRUTH
+release: v0.7.1
+technical_verdict: pass
+formal_promotion: pending_protected_state_reconciliation
+review_mode: independent_cumulative
+tested_commit: 597977f2359f0fea4d2267c59a9e4de647a67211
+tickets:
+  OW-071-01:
+    accepted_commit: 86871c63411607195dc6c4484f125eb16b0a04d5
+    manifest_blob: 3c5299043d07bc6a9de631d41a8b5f795cbacab9
+  OW-071-02:
+    accepted_commit: 7bda99691abd48bb3946b8fd2676b03a5c89e16f
+    manifest_blob: f68b4f39c3daf918b09f28c02bfef1ea2dc78d20
+  OW-071-03:
+    accepted_commit: 8fbf9caff3ac73d24c4e2200ee8a6f9a79f445ce
+    manifest_blob: a47e3cc7d7133a5a3e4c2b75c687f27098bdfd96
+  OW-071-13:
+    accepted_commit: 597977f2359f0fea4d2267c59a9e4de647a67211
+    manifest_blob: bafba1e9d7cd227bf45dbaefa1c654a88081f061
+thresholds:
+  delivery_plan_errors: 0
+  live_register_errors: 0
+  focused_tests_passed: 55
+  benchmark_kit_passed: 103
+  token_reduction_percent: 86.48
+  minimum_token_reduction_percent: 80
+  privacy_failures: 0
+  staleness_failures: 0
+  duplicate_task_claims: 0
+  unauthenticated_path_disclosures: 0
+  non_loopback_bind: rejected
+  endpoint_role_scope_contract_checks: 386
+independent_review:
+  initial_verdict: pass_with_concerns
+  initial_score: 91
+  blocking_findings: 0
+  resolved_before_final_verdict:
+    - F-071-25
+    - F-071-26
+  final_technical_verdict: pass
+  residual: >-
+    Positive allowed-role coverage is not fully table-driven; no current
+    contract/runtime mismatch was found.
+commands:
+  - python tools/validate_v1_delivery_plan.py
+  - python tools/validate_live_work_register.py --project-root .
+  - >-
+    python -m unittest tests.unit.test_validate_live_work_register
+    tests.unit.test_ow07102_release_trust
+    tests.unit.test_ow07103_benchmark_baseline
+    tests.unit.test_ow07113_local_http_security -q
+  - python tools/validate_benchmark_baseline.py --project-root .
+  - python tools/owledge.py test benchmark-kit-ci --project-root .
+  - python tools/owledge_core.py --project-root . run-evals
+  - python tools/owledge_core.py --project-root . test-contracts
+  - python tools/owledge.py test public-docs --project-root .
+  - python tools/owledge.py test private-path-clean --project-root .
+  - python tools/owledge.py test release-contract --project-root .
+promotion_note: >-
+  Technical thresholds are satisfied and independent QA passed. The gate is not
+  marked formally promoted here because the user explicitly protected
+  RUN-STATE.yaml and the v0.7.1 release execution plan from modification.
+  Their owner must reconcile ticket/gate state before OW-071-04 activation.

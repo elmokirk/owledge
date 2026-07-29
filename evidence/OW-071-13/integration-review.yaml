@@ -1,0 +1,61 @@
+schema_version: 1
+ticket: OW-071-13
+status: accepted_pending_protected_state_reconciliation
+integration_branch: codex/v071-integration
+accepted_source:
+  commits:
+    - bd14555f9003b0452dc3a76ffda7af6d7e790031
+    - 51df549d43b52f4104fa81654a16ef640d9ca478
+    - 597977f2359f0fea4d2267c59a9e4de647a67211
+  final_tree: bb7a14c36298e143a9ae08c1e4df21f9973ac737
+  manifest_blob: bafba1e9d7cd227bf45dbaefa1c654a88081f061
+independent_review:
+  reviewer_role: protocol-security-reviewer
+  initial_verdict: pass_with_concerns
+  initial_score: 91
+  initial_p0_findings: 0
+  initial_p1_findings: 0
+  followup_verdict: pass
+  resolved_findings:
+    - F-071-25
+    - F-071-26
+  residual:
+    - >-
+      Full positive-role dispatch coverage and the agent-registration deny case
+      are not table-driven. Static policy sync and current focused behavior are
+      correct; this is non-blocking test-depth debt.
+verification:
+  - command: python -m unittest tests.unit.test_ow07113_local_http_security -q
+    result: 9 passed
+  - command: python tools/owledge_core.py --project-root . run-evals
+    result: 50 agents; 200 unique claims; exact-scope isolation and QA gating passed
+  - command: python tools/owledge_core.py --project-root . test-contracts
+    result: 386 passed
+  - command: python tools/owledge.py test public-docs --project-root .
+    result: 235 passed
+  - command: python tools/owledge.py test docs-contract --project-root . --changed-file ...
+    result: 274 passed
+  - command: python tools/owledge.py test private-path-clean --project-root .
+    result: zero findings across 2950 files
+decisions:
+  local_profile: local-experimental
+  bind_policy: loopback-only
+  administrator_scope: identity_bootstrap_and_aggregate_metrics_only
+  authorization_scope: exact_tenant_customer_project
+  error_contract: fixed_codes_without_exception_details
+  bounds_contract: versioned_and_negative_tested
+phase_reflection: >-
+  The initial implementation closed the critical remote-bind and cross-scope
+  gaps, but independent review still found two medium truth/test-depth defects:
+  dynamic promotion errors could escape the declared error registry, and rate
+  plus role denials were not sufficiently proven at HTTP dispatch. Both were
+  fixed in 597977f and independently re-reviewed to pass. The next minimum
+  product increment is OW-071-04 only after the protected control-plane owner
+  reconciles OW-071-13 and G-071-A-TRUTH state.
+state_constraint:
+  protected_files_unchanged:
+    - internal/owledge/workpackages/owledge-v1-autonomous-delivery/RUN-STATE.yaml
+    - internal/owledge/plans/v0.7.1-release-execution-orchestration-plan.md
+  formal_promotion: pending_state_owner_reconciliation
+integration_policy:
+  no_push_tag_publish_or_main_merge: true
