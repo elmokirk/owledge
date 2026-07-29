@@ -110,16 +110,18 @@ Source checkout remains useful for contributors:
 python tools/owledge.py --help
 ```
 
-Fastest proof path:
+Source-checkout demo path (optional add-on):
 
 ```bash
-uvx owledge quickstart --target .agent-control/tmp/owledge-five-minute-demo
-owledge install-addon --project-root .agent-control/tmp/owledge-five-minute-demo --addon launch-demo-kit
-owledge doctor --project-root .agent-control/tmp/owledge-five-minute-demo
+python tools/owledge.py quickstart --target .agent-control/tmp/owledge-five-minute-demo
+python tools/owledge.py install-addon --project-root .agent-control/tmp/owledge-five-minute-demo --addon launch-demo-kit
+python tools/owledge.py doctor --project-root .agent-control/tmp/owledge-five-minute-demo
 ```
 
 Expected result: the demo project contains evidence, a next-agent handoff, and
-a static proof report. Full walk-through: [Try Owledge in 5 minutes](docs/try-owledge-in-5-minutes.md).
+a static proof report. This is not a package-only recipe; use the
+[Installation Hub](docs/install/README.md) for the package path. Full
+walk-through: [Try Owledge in 5 minutes](docs/try-owledge-in-5-minutes.md).
 
 Benchmark proof:
 

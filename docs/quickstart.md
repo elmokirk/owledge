@@ -24,7 +24,8 @@ events. It is source-checkout only; follow [Plugin installation](install-plugin.
 ## Path B: Generate A Project-Local Starter Kit
 
 Use this source-checkout-only option when you want a small local kit without
-copying the full repo layout into the host project:
+copying the full repo layout into the host project. Run it from the Owledge
+checkout; the output path is the target project:
 
 ```bash
 python tools/owledge.py build-project-kit --output-path /tmp/owledge-project-kit --verify

@@ -50,6 +50,14 @@ class OW07110InstallContractTests(unittest.TestCase):
         self.assertIn("python tools/owledge.py install-addon", source)
         self.assertIn("source checkout", source.lower())
 
+    def test_readme_demo_is_explicitly_source_only(self) -> None:
+        readme = (ROOT / "README.md").read_text(encoding="utf-8")
+        self.assertIn("Source-checkout demo path", readme)
+        demo = readme.split("Source-checkout demo path", 1)[1].split("Benchmark proof:", 1)[0]
+        self.assertIn("python tools/owledge.py install-addon", demo)
+        self.assertNotIn("uvx owledge quickstart --target .agent-control/tmp/owledge-five-minute-demo", demo)
+        self.assertNotIn("owledge install-addon", demo)
+
     def test_principles_only_has_no_host_install_commands(self) -> None:
         principles = (ROOT / "docs" / "install" / "principles-only.md").read_text(encoding="utf-8")
         self.assertIn("Host-project writes: **zero**", principles)
