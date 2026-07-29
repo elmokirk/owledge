@@ -42,6 +42,7 @@ until a responsible reviewer accepts it into project truth.
 | Evidence and handoff | Project-local evidence and handoff Markdown | Tests, limitations, changed paths, and next action are recorded |
 | Independent review | A named reviewer, ticket review, or release gate | Review findings distinguish accepted truth from open candidates |
 | Curator accepts promotion | A responsible human's recorded review decision | Promotion is explicit, traceable, and reversible in Git |
+| Keep as candidate or revise | Candidate record plus a review finding or requested revision | The material stays non-canonical until it is corrected and explicitly accepted |
 | Rebuildable indexes and reports | Documented local report/index commands and their generated output | The view can be recreated from reviewed source records |
 
 ## What each layer means
@@ -122,21 +123,21 @@ the accepted lanes and records any unresolved decision for the project owner.
 
 ## Glossary
 
-**Canonical** — reviewed project record that is allowed to guide later work.
+**Canonical** - reviewed project record that is allowed to guide later work.
 
-**Candidate** — useful proposal or output that has not been accepted as project
+**Candidate** - useful proposal or output that has not been accepted as project
 truth.
 
-**Context pack** — a deliberately scoped collection of records for one task;
+**Context pack** - a deliberately scoped collection of records for one task;
 it is not a replacement for the canonical project record.
 
-**Evidence** — reproducible proof such as a test result, command output, or
+**Evidence** - reproducible proof such as a test result, command output, or
 review finding attached to a change or decision.
 
-**Handoff** — the concise state a later worker needs: what changed, what was
+**Handoff** - the concise state a later worker needs: what changed, what was
 verified, what remains, and the exact next action.
 
-**Promotion** — an explicit human-curated decision to move accepted material
+**Promotion** - an explicit human-curated decision to move accepted material
 into canonical project truth.
 
 ## Start from the right entry point

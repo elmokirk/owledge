@@ -28,6 +28,20 @@ class WorkflowDocumentationContractTests(unittest.TestCase):
         ):
             self.assertIn(phrase, self.text)
 
+    def test_every_diagram_node_has_an_artifact_or_command_mapping(self) -> None:
+        for node in (
+            "Intent and permitted scope",
+            "Reviewed project truth",
+            "Scoped context",
+            "Human or agent work",
+            "Evidence and handoff",
+            "Independent review",
+            "Curator accepts promotion",
+            "Keep as candidate or revise",
+            "Rebuildable indexes and reports",
+        ):
+            self.assertIn(f"| {node} |", self.text)
+
     def test_authority_matrix_covers_required_actors_and_columns(self) -> None:
         header = "| Action | Actor | Trigger | Default | Side effect | Authority | Recovery |"
         self.assertIn(header, self.text)
