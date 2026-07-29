@@ -7,7 +7,7 @@ bootstrap on macOS, Linux, and Windows without installing dependencies. It provi
 - Markdown frontmatter validation, memory indexing, context packs, neutral RAG
   export, LightRAG export, GraphRAG export, parallel finding, and compaction.
 - SQLite WAL control-plane schema and lifecycle helpers.
-- A small HTTP API for LAN/remote agents.
+- A bounded loopback-only experimental HTTP adapter for local agents.
 - Legacy contract checks, promotion, metrics, and a 50-agent concurrency
   simulation for optional runtime adapters.
 """
@@ -15,6 +15,7 @@ bootstrap on macOS, Linux, and Windows without installing dependencies. It provi
 from __future__ import annotations
 
 import argparse
+import collections
 import concurrent.futures
 import contextlib
 import datetime as dt
@@ -28,6 +29,7 @@ import pathlib
 import re
 import secrets
 import shutil
+import socket
 import sqlite3
 import sys
 import tempfile
@@ -108,6 +110,39 @@ AGENT_ROLES = {
     "memory-curator",
     "observer",
 }
+
+LOCAL_HTTP_PROFILE = "local-experimental"
+LOCAL_HTTP_API_VERSION = "1.0"
+LOCAL_HTTP_LOOPBACK_HOSTS = frozenset({"127.0.0.1", "localhost", "::1"})
+LOCAL_HTTP_BOUNDS = {
+    "max_body_bytes": 1_048_576,
+    "request_timeout_seconds": 10,
+    "max_concurrent_requests": 8,
+    "rate_limit_requests": 120,
+    "rate_limit_window_seconds": 60,
+}
+LOCAL_HTTP_ENDPOINT_POLICY = (
+    ("GET", "/health", ("public",)),
+    ("GET", "/metrics", ("administrator",)),
+    ("POST", "/agents/register", ("administrator",)),
+    ("POST", "/tasks", ("orchestrator", "planner")),
+    ("POST", "/tasks/{task_id}/claim", ("orchestrator", "worker")),
+    ("POST", "/tasks/{task_id}/heartbeat", ("orchestrator", "worker")),
+    ("PATCH", "/tasks/{task_id}", ("orchestrator", "worker")),
+    ("POST", "/tasks/{task_id}/release", ("orchestrator", "worker")),
+    ("POST", "/tasks/{task_id}/evidence", ("orchestrator", "worker")),
+    ("POST", "/gates/{gate_id}/run", ("qa-agent",)),
+    ("POST", "/context-pack/build", ("orchestrator", "planner", "strategic-reviewer", "worker")),
+    ("POST", "/memory/promote", ("memory-curator",)),
+    ("POST", "/exports/lightrag/build", ("memory-curator",)),
+)
+
+
+class HttpRequestError(ValueError):
+    def __init__(self, status: int, code: str):
+        super().__init__(code)
+        self.status = status
+        self.code = code
 
 REQUIRED_DIRS = [
     ".owledge/templates",
@@ -1138,7 +1173,7 @@ def init_project(root: pathlib.Path) -> dict[str, Any]:
         (root / rel).mkdir(parents=True, exist_ok=True)
     ensure_runtime_dirs(root)
     token = ensure_admin_token(root)
-    with connect(root) as conn:
+    with contextlib.closing(connect(root)) as conn, conn:
         init_db(conn)
     return {
         "project": str(root),
@@ -1149,13 +1184,38 @@ def init_project(root: pathlib.Path) -> dict[str, Any]:
 
 
 def read_json_body(handler: http.server.BaseHTTPRequestHandler) -> dict[str, Any]:
-    length = int(handler.headers.get("Content-Length") or 0)
+    raw_length = handler.headers.get("Content-Length")
+    if raw_length is None:
+        length = 0
+    else:
+        try:
+            length = int(raw_length)
+        except (TypeError, ValueError) as exc:
+            raise HttpRequestError(400, "invalid_content_length") from exc
+    if length < 0:
+        raise HttpRequestError(400, "invalid_content_length")
+    if length > LOCAL_HTTP_BOUNDS["max_body_bytes"]:
+        if length == LOCAL_HTTP_BOUNDS["max_body_bytes"] + 1:
+            handler.rfile.read(length)
+        raise HttpRequestError(413, "payload_too_large")
     if length <= 0:
         return {}
-    raw = handler.rfile.read(length).decode("utf-8")
+    raw_bytes = handler.rfile.read(length)
+    if len(raw_bytes) != length:
+        raise HttpRequestError(400, "incomplete_request_body")
+    try:
+        raw = raw_bytes.decode("utf-8")
+    except UnicodeDecodeError as exc:
+        raise HttpRequestError(400, "invalid_utf8") from exc
     if not raw.strip():
         return {}
-    return json.loads(raw)
+    try:
+        payload = json.loads(raw)
+    except json.JSONDecodeError as exc:
+        raise HttpRequestError(400, "invalid_json") from exc
+    if not isinstance(payload, dict):
+        raise HttpRequestError(400, "json_object_required")
+    return payload
 
 
 def write_json(handler: http.server.BaseHTTPRequestHandler, status: int, payload: dict[str, Any]) -> None:
@@ -1163,6 +1223,8 @@ def write_json(handler: http.server.BaseHTTPRequestHandler, status: int, payload
     handler.send_response(status)
     handler.send_header("Content-Type", "application/json; charset=utf-8")
     handler.send_header("Content-Length", str(len(data)))
+    handler.send_header("Cache-Control", "no-store")
+    handler.send_header("X-Content-Type-Options", "nosniff")
     handler.end_headers()
     handler.wfile.write(data)
 
@@ -1190,7 +1252,14 @@ def require_auth(
     token = bearer(handler)
     if admin_ok:
         admin = admin_token_path(root)
-        if admin.exists() and token == admin.read_text(encoding="utf-8").strip():
+        if (
+            admin.exists()
+            and token
+            and secrets.compare_digest(
+                token,
+                admin.read_text(encoding="utf-8").strip(),
+            )
+        ):
             return "admin"
     agent = get_agent_by_token(conn, token)
     if agent:
@@ -1198,6 +1267,49 @@ def require_auth(
         return agent
     write_json(handler, 401, {"error": "missing_or_invalid_bearer_token"})
     return None
+
+
+def actor_id(actor: sqlite3.Row | str) -> str:
+    return str(actor["agent_id"]) if isinstance(actor, sqlite3.Row) else ""
+
+
+def actor_role(actor: sqlite3.Row | str) -> str:
+    return str(actor["role"]) if isinstance(actor, sqlite3.Row) else "administrator"
+
+
+def scope_tuple(record: sqlite3.Row | dict[str, Any]) -> tuple[str, str, str]:
+    return tuple(str(record[key] or "") for key in ("tenant_id", "customer_id", "project_id"))
+
+
+def require_agent_role(
+    handler: http.server.BaseHTTPRequestHandler,
+    actor: sqlite3.Row | str,
+    allowed_roles: set[str],
+) -> bool:
+    if not isinstance(actor, sqlite3.Row) or actor_role(actor) not in allowed_roles:
+        write_json(handler, 403, {"error": "role_not_authorized"})
+        return False
+    return True
+
+
+def scoped_body(actor: sqlite3.Row, body: dict[str, Any]) -> dict[str, Any]:
+    scoped = dict(body)
+    for key in ("tenant_id", "customer_id", "project_id"):
+        actor_value = str(actor[key] or "")
+        supplied = scoped.get(key)
+        if supplied not in (None, "", actor_value):
+            raise PermissionError("scope_boundary_violation")
+        scoped[key] = actor_value
+    supplied_agent = scoped.get("agent_id") or scoped.get("actor_agent_id")
+    if supplied_agent not in (None, "", actor["agent_id"]):
+        raise PermissionError("actor_identity_mismatch")
+    scoped["agent_id"] = actor["agent_id"]
+    scoped["actor_agent_id"] = actor["agent_id"]
+    return scoped
+
+
+def actor_can_access_task(actor: sqlite3.Row | str, task: sqlite3.Row) -> bool:
+    return isinstance(actor, sqlite3.Row) and scope_tuple(actor) == scope_tuple(task)
 
 
 def register_agent(conn: sqlite3.Connection, body: dict[str, Any]) -> dict[str, Any]:
@@ -1277,15 +1389,17 @@ def upsert_task(conn: sqlite3.Connection, body: dict[str, Any]) -> dict[str, Any
 
 
 def claim_task(conn: sqlite3.Connection, task_id: str, body: dict[str, Any], actor: sqlite3.Row | str) -> tuple[int, dict[str, Any]]:
-    agent_id = body.get("agent_id") or (actor["agent_id"] if isinstance(actor, sqlite3.Row) else None)
+    agent_id = actor_id(actor)
     if not agent_id:
-        return 400, {"error": "agent_id_required"}
+        return 400, {"error": "agent_identity_required"}
+    if body.get("agent_id") not in (None, "", agent_id):
+        return 403, {"error": "actor_identity_mismatch"}
     agent = conn.execute("SELECT * FROM agents WHERE agent_id = ? AND status = 'active'", (agent_id,)).fetchone()
     task = conn.execute("SELECT * FROM tasks WHERE task_id = ?", (task_id,)).fetchone()
     if not agent or not task:
         return 404, {"error": "agent_or_task_not_found"}
-    if agent["tenant_id"] != task["tenant_id"]:
-        return 403, {"error": "tenant_boundary_violation"}
+    if scope_tuple(agent) != scope_tuple(task):
+        return 403, {"error": "scope_boundary_violation"}
     now = utc_now()
     lease_expires = (
         dt.datetime.now(UTC) + dt.timedelta(seconds=int(body.get("lease_ttl_seconds", DEFAULTS["lease_ttl_seconds"])))
@@ -1305,13 +1419,23 @@ def claim_task(conn: sqlite3.Connection, task_id: str, body: dict[str, Any], act
             UPDATE tasks
             SET owner_agent_id = ?, status = 'claimed', lease_expires_at = ?, updated_at = ?
             WHERE task_id = ?
-              AND tenant_id = ?
+              AND tenant_id = ? AND customer_id = ? AND project_id = ?
               AND (
                 owner_agent_id IS NULL OR owner_agent_id = '' OR owner_agent_id = ?
                 OR lease_expires_at IS NULL OR lease_expires_at <= ?
               )
             """,
-            (agent_id, lease_expires, now, task_id, agent["tenant_id"], agent_id, now),
+            (
+                agent_id,
+                lease_expires,
+                now,
+                task_id,
+                agent["tenant_id"],
+                agent["customer_id"],
+                agent["project_id"],
+                agent_id,
+                now,
+            ),
         ).rowcount
         if updated != 1:
             conn.execute("ROLLBACK")
@@ -1330,10 +1454,14 @@ def claim_task(conn: sqlite3.Connection, task_id: str, body: dict[str, Any], act
 
 
 def heartbeat_task(conn: sqlite3.Connection, task_id: str, body: dict[str, Any], actor: sqlite3.Row | str) -> tuple[int, dict[str, Any]]:
-    agent_id = body.get("agent_id") or (actor["agent_id"] if isinstance(actor, sqlite3.Row) else "")
+    agent_id = actor_id(actor)
+    if body.get("agent_id") not in (None, "", agent_id):
+        return 403, {"error": "actor_identity_mismatch"}
     task = conn.execute("SELECT * FROM tasks WHERE task_id = ?", (task_id,)).fetchone()
     if not task:
         return 404, {"error": "task_not_found"}
+    if not actor_can_access_task(actor, task):
+        return 403, {"error": "scope_boundary_violation"}
     if task["owner_agent_id"] != agent_id:
         return 403, {"error": "not_task_owner"}
     lease_expires = (
@@ -1348,7 +1476,13 @@ def update_task(conn: sqlite3.Connection, task_id: str, body: dict[str, Any], ac
     task = conn.execute("SELECT * FROM tasks WHERE task_id = ?", (task_id,)).fetchone()
     if not task:
         return 404, {"error": "task_not_found"}
-    agent_id = body.get("agent_id") or (actor["agent_id"] if isinstance(actor, sqlite3.Row) else "")
+    agent_id = actor_id(actor)
+    if body.get("agent_id") not in (None, "", agent_id):
+        return 403, {"error": "actor_identity_mismatch"}
+    if not actor_can_access_task(actor, task):
+        return 403, {"error": "scope_boundary_violation"}
+    if task["owner_agent_id"] != agent_id:
+        return 403, {"error": "not_task_owner"}
     status = body.get("status", task["status"])
     if status not in TASK_STATUSES:
         return 400, {"error": "invalid_status"}
@@ -1373,10 +1507,16 @@ def release_task(conn: sqlite3.Connection, task_id: str, body: dict[str, Any], a
     task = conn.execute("SELECT * FROM tasks WHERE task_id = ?", (task_id,)).fetchone()
     if not task:
         return 404, {"error": "task_not_found"}
-    agent_id = body.get("agent_id") or (actor["agent_id"] if isinstance(actor, sqlite3.Row) else "")
-    if task["owner_agent_id"] != agent_id and actor != "admin":
+    agent_id = actor_id(actor)
+    if body.get("agent_id") not in (None, "", agent_id):
+        return 403, {"error": "actor_identity_mismatch"}
+    if not actor_can_access_task(actor, task):
+        return 403, {"error": "scope_boundary_violation"}
+    if task["owner_agent_id"] != agent_id:
         return 403, {"error": "not_task_owner"}
     next_status = body.get("status", "ready")
+    if next_status not in TASK_STATUSES:
+        return 400, {"error": "invalid_status"}
     conn.execute(
         "UPDATE tasks SET owner_agent_id = NULL, status = ?, lease_expires_at = NULL, updated_at = ? WHERE task_id = ?",
         (next_status, utc_now(), task_id),
@@ -1389,7 +1529,13 @@ def add_evidence(conn: sqlite3.Connection, task_id: str, body: dict[str, Any], a
     task = conn.execute("SELECT * FROM tasks WHERE task_id = ?", (task_id,)).fetchone()
     if not task:
         return 404, {"error": "task_not_found"}
-    agent_id = body.get("agent_id") or (actor["agent_id"] if isinstance(actor, sqlite3.Row) else "")
+    agent_id = actor_id(actor)
+    if body.get("agent_id") not in (None, "", agent_id):
+        return 403, {"error": "actor_identity_mismatch"}
+    if not actor_can_access_task(actor, task):
+        return 403, {"error": "scope_boundary_violation"}
+    if task["owner_agent_id"] != agent_id:
+        return 403, {"error": "not_task_owner"}
     evidence_id = body.get("evidence_id") or f"ev-{secrets.token_hex(8)}"
     content = body.get("summary", "") + body.get("path", "")
     conn.execute(
@@ -1418,7 +1564,23 @@ def add_gate_report(conn: sqlite3.Connection, gate_id: str, body: dict[str, Any]
     task = conn.execute("SELECT * FROM tasks WHERE task_id = ?", (task_id,)).fetchone()
     if not task:
         return 404, {"error": "task_not_found"}
-    agent_id = body.get("qa_agent_id") or (actor["agent_id"] if isinstance(actor, sqlite3.Row) else "")
+    agent_id = actor_id(actor)
+    if body.get("qa_agent_id") not in (None, "", agent_id):
+        return 403, {"error": "actor_identity_mismatch"}
+    if not actor_can_access_task(actor, task):
+        return 403, {"error": "scope_boundary_violation"}
+    existing_gate = conn.execute(
+        "SELECT task_id FROM gate_reports WHERE gate_id = ?",
+        (gate_id,),
+    ).fetchone()
+    if existing_gate and existing_gate["task_id"] != task_id:
+        existing_task = conn.execute(
+            "SELECT * FROM tasks WHERE task_id = ?",
+            (existing_gate["task_id"],),
+        ).fetchone()
+        if existing_task and not actor_can_access_task(actor, existing_task):
+            return 403, {"error": "scope_boundary_violation"}
+        return 409, {"error": "resource_conflict"}
     verdict = body.get("final_verdict", "fail")
     if verdict not in {"pass", "fail", "pass_with_concerns", "pending"}:
         return 400, {"error": "invalid_final_verdict"}
@@ -1665,6 +1827,16 @@ def build_context_pack_markdown(
 
 
 def promote_memory(conn: sqlite3.Connection, root: pathlib.Path, body: dict[str, Any]) -> dict[str, Any]:
+    promotion_id = body.get("promotion_id") or f"promo-{secrets.token_hex(8)}"
+    existing = conn.execute(
+        "SELECT tenant_id, customer_id, project_id FROM promotions WHERE promotion_id = ?",
+        (promotion_id,),
+    ).fetchone()
+    if existing:
+        requested_scope = tuple(str(body.get(key) or "") for key in ("tenant_id", "customer_id", "project_id"))
+        if scope_tuple(existing) != requested_scope:
+            raise PermissionError("scope_boundary_violation")
+        raise sqlite3.IntegrityError("promotion_id_exists")
     source = (root / body["source_path"]).resolve()
     target = (root / body["target_path"]).resolve()
     review = (root / body["review_path"]).resolve()
@@ -1718,7 +1890,6 @@ def promote_memory(conn: sqlite3.Connection, root: pathlib.Path, body: dict[str,
     )
     if not review_approves:
         raise PermissionError("review_does_not_approve_promotion")
-    promotion_id = body.get("promotion_id") or f"promo-{secrets.token_hex(8)}"
     target.parent.mkdir(parents=True, exist_ok=True)
     with file_lock(root / ".agent-control" / "locks" / f"{promotion_id}.lock", timeout_seconds=60):
         locked_atomic_write_text(target, source_text, timeout_seconds=60)
@@ -5193,86 +5364,215 @@ def metrics(conn: sqlite3.Connection) -> dict[str, Any]:
 class ThreadedHTTPServer(http.server.ThreadingHTTPServer):
     daemon_threads = True
 
+    def __init__(self, server_address: tuple[str, int], handler: type[http.server.BaseHTTPRequestHandler]):
+        if ":" in server_address[0]:
+            self.address_family = socket.AF_INET6
+        self.request_timeout = LOCAL_HTTP_BOUNDS["request_timeout_seconds"]
+        self._request_slots = threading.BoundedSemaphore(LOCAL_HTTP_BOUNDS["max_concurrent_requests"])
+        self._rate_lock = threading.Lock()
+        self._rate_events: dict[str, collections.deque[float]] = {}
+        super().__init__(server_address, handler)
+
+    def get_request(self) -> tuple[socket.socket, Any]:
+        request, address = super().get_request()
+        request.settimeout(self.request_timeout)
+        return request, address
+
+    def process_request(self, request: socket.socket, client_address: Any) -> None:
+        if not self._request_slots.acquire(blocking=False):
+            try:
+                request.settimeout(1)
+                request.recv(65_536)
+                body = json.dumps({"error": "concurrency_limit_exceeded"}).encode("utf-8")
+                response = (
+                    b"HTTP/1.0 503 Service Unavailable\r\n"
+                    b"Content-Type: application/json; charset=utf-8\r\n"
+                    b"Cache-Control: no-store\r\n"
+                    b"X-Content-Type-Options: nosniff\r\n"
+                    + f"Content-Length: {len(body)}\r\nConnection: close\r\n\r\n".encode("ascii")
+                    + body
+                )
+                request.sendall(response)
+            except OSError:
+                pass
+            finally:
+                self.shutdown_request(request)
+            return
+        try:
+            super().process_request(request, client_address)
+        except Exception:
+            self._request_slots.release()
+            raise
+
+    def process_request_thread(self, request: socket.socket, client_address: Any) -> None:
+        try:
+            super().process_request_thread(request, client_address)
+        finally:
+            self._request_slots.release()
+
+    def allow_client_request(self, client: str) -> bool:
+        now = time.monotonic()
+        window = LOCAL_HTTP_BOUNDS["rate_limit_window_seconds"]
+        with self._rate_lock:
+            events = self._rate_events.setdefault(client, collections.deque())
+            while events and events[0] <= now - window:
+                events.popleft()
+            if len(events) >= LOCAL_HTTP_BOUNDS["rate_limit_requests"]:
+                return False
+            events.append(now)
+            return True
+
 
 def make_handler(root: pathlib.Path):
     class Handler(http.server.BaseHTTPRequestHandler):
-        server_version = "AgentMemoryControlPlane/0.2"
+        server_version = "OwledgeLocalControlPlane/1.0"
+        sys_version = ""
 
         def log_message(self, fmt: str, *args: Any) -> None:
             sys.stderr.write("%s - %s\n" % (self.address_string(), fmt % args))
 
+        def send_error(
+            self,
+            code: int,
+            message: str | None = None,
+            explain: str | None = None,
+        ) -> None:
+            error = "method_not_allowed" if code == 501 else "invalid_request"
+            write_json(self, 405 if code == 501 else code, {"error": error})
+
+        def request_allowed(self) -> bool:
+            server = self.server
+            if isinstance(server, ThreadedHTTPServer) and server.allow_client_request(self.client_address[0]):
+                return True
+            write_json(self, 429, {"error": "rate_limit_exceeded"})
+            return False
+
         def do_GET(self) -> None:
+            if not self.request_allowed():
+                return
             parsed = urllib.parse.urlparse(self.path)
-            with connect(root) as conn:
+            if parsed.path == "/health":
+                write_json(
+                    self,
+                    200,
+                    {
+                        "status": "ok",
+                        "profile": LOCAL_HTTP_PROFILE,
+                        "api_version": LOCAL_HTTP_API_VERSION,
+                    },
+                )
+                return
+            with contextlib.closing(connect(root)) as conn, conn:
                 init_db(conn)
-                if parsed.path == "/health":
-                    journal = conn.execute("PRAGMA journal_mode").fetchone()[0]
-                    payload = {"status": "ok", "db": str(db_path(root)), "journal_mode": journal, **metrics(conn)}
-                    write_json(self, 200, payload)
-                    return
                 if parsed.path == "/metrics":
-                    if require_auth(self, conn, root) is None:
+                    actor = require_auth(self, conn, root)
+                    if actor is None:
+                        return
+                    if actor != "admin":
+                        write_json(self, 403, {"error": "administrator_required"})
                         return
                     write_json(self, 200, metrics(conn))
                     return
             write_json(self, 404, {"error": "not_found"})
 
         def do_POST(self) -> None:
-            self.handle_write("POST")
+            if self.request_allowed():
+                self.handle_write("POST")
 
         def do_PATCH(self) -> None:
-            self.handle_write("PATCH")
+            if self.request_allowed():
+                self.handle_write("PATCH")
 
         def handle_write(self, method: str) -> None:
             parsed = urllib.parse.urlparse(self.path)
             parts = [p for p in parsed.path.split("/") if p]
-            body = read_json_body(self)
-            with connect(root) as conn:
-                init_db(conn)
-                actor = require_auth(self, conn, root)
-                if actor is None:
-                    return
-                try:
+            try:
+                body = read_json_body(self)
+                with contextlib.closing(connect(root)) as conn, conn:
+                    init_db(conn)
+                    actor = require_auth(self, conn, root)
+                    if actor is None:
+                        return
                     if method == "POST" and parsed.path == "/agents/register":
                         if actor != "admin":
-                            write_json(self, 403, {"error": "admin_token_required"})
+                            write_json(self, 403, {"error": "administrator_required"})
                             return
                         write_json(self, 200, register_agent(conn, body))
                         return
+                    if actor == "admin":
+                        write_json(self, 403, {"error": "administrator_scope_forbidden"})
+                        return
                     if method == "POST" and parsed.path == "/tasks":
-                        write_json(self, 200, upsert_task(conn, body))
+                        if not require_agent_role(self, actor, {"orchestrator", "planner"}):
+                            return
+                        task_id = body.get("task_id")
+                        existing = conn.execute("SELECT * FROM tasks WHERE task_id = ?", (task_id,)).fetchone()
+                        if existing and not actor_can_access_task(actor, existing):
+                            write_json(self, 403, {"error": "scope_boundary_violation"})
+                            return
+                        write_json(self, 200, upsert_task(conn, scoped_body(actor, body)))
                         return
                     if len(parts) == 3 and parts[0] == "tasks" and parts[2] == "claim" and method == "POST":
+                        if not require_agent_role(self, actor, {"orchestrator", "worker"}):
+                            return
                         status, payload = claim_task(conn, parts[1], body, actor)
                         write_json(self, status, payload)
                         return
                     if len(parts) == 3 and parts[0] == "tasks" and parts[2] == "heartbeat" and method == "POST":
+                        if not require_agent_role(self, actor, {"orchestrator", "worker"}):
+                            return
                         status, payload = heartbeat_task(conn, parts[1], body, actor)
                         write_json(self, status, payload)
                         return
                     if len(parts) == 2 and parts[0] == "tasks" and method == "PATCH":
+                        if not require_agent_role(self, actor, {"orchestrator", "worker"}):
+                            return
                         status, payload = update_task(conn, parts[1], body, actor)
                         write_json(self, status, payload)
                         return
                     if len(parts) == 3 and parts[0] == "tasks" and parts[2] == "release" and method == "POST":
+                        if not require_agent_role(self, actor, {"orchestrator", "worker"}):
+                            return
                         status, payload = release_task(conn, parts[1], body, actor)
                         write_json(self, status, payload)
                         return
                     if len(parts) == 3 and parts[0] == "tasks" and parts[2] == "evidence" and method == "POST":
+                        if not require_agent_role(self, actor, {"orchestrator", "worker"}):
+                            return
                         status, payload = add_evidence(conn, parts[1], body, actor)
                         write_json(self, status, payload)
                         return
                     if len(parts) == 3 and parts[0] == "gates" and parts[2] == "run" and method == "POST":
+                        if not require_agent_role(self, actor, {"qa-agent"}):
+                            return
                         status, payload = add_gate_report(conn, parts[1], body, actor)
                         write_json(self, status, payload)
                         return
                     if parsed.path == "/context-pack/build" and method == "POST":
-                        write_json(self, 200, build_context_pack(conn, root, body))
+                        if not require_agent_role(
+                            self,
+                            actor,
+                            {"orchestrator", "planner", "strategic-reviewer", "worker"},
+                        ):
+                            return
+                        task = conn.execute("SELECT * FROM tasks WHERE task_id = ?", (body.get("task_id"),)).fetchone()
+                        if not task:
+                            write_json(self, 404, {"error": "task_not_found"})
+                            return
+                        if not actor_can_access_task(actor, task):
+                            write_json(self, 403, {"error": "scope_boundary_violation"})
+                            return
+                        write_json(self, 200, build_context_pack(conn, root, scoped_body(actor, body)))
                         return
                     if parsed.path == "/memory/promote" and method == "POST":
-                        write_json(self, 200, promote_memory(conn, root, body))
+                        if not require_agent_role(self, actor, {"memory-curator"}):
+                            return
+                        write_json(self, 200, promote_memory(conn, root, scoped_body(actor, body)))
                         return
                     if parsed.path == "/exports/lightrag/build" and method == "POST":
+                        if not require_agent_role(self, actor, {"memory-curator"}):
+                            return
+                        body = scoped_body(actor, body)
                         corpus_type = body.get("corpus_type", "private")
                         if corpus_type not in CORPUS_TYPES:
                             write_json(self, 400, {"error": "invalid_corpus_type", "allowed": sorted(CORPUS_TYPES)})
@@ -5290,23 +5590,48 @@ def make_handler(root: pathlib.Path):
                             ),
                         )
                         return
-                except PermissionError as exc:
-                    write_json(self, 403, {"error": str(exc)})
-                    return
-                except (KeyError, ValueError, FileNotFoundError, json.JSONDecodeError) as exc:
-                    write_json(self, 400, {"error": str(exc)})
-                    return
+            except HttpRequestError as exc:
+                write_json(self, exc.status, {"error": exc.code})
+                return
+            except (TimeoutError, socket.timeout):
+                write_json(self, 408, {"error": "request_timeout"})
+                return
+            except PermissionError as exc:
+                write_json(self, 403, {"error": str(exc)})
+                return
+            except sqlite3.IntegrityError:
+                write_json(self, 409, {"error": "resource_conflict"})
+                return
+            except (KeyError, ValueError, FileNotFoundError, json.JSONDecodeError):
+                write_json(self, 400, {"error": "invalid_request"})
+                return
             write_json(self, 404, {"error": "not_found"})
 
     return Handler
 
 
 def serve(root: pathlib.Path, host: str, port: int) -> None:
+    if host not in LOCAL_HTTP_LOOPBACK_HOSTS:
+        raise SystemExit(
+            "Refusing non-loopback bind: the local-experimental HTTP adapter supports "
+            "127.0.0.1, localhost, or ::1 only."
+        )
     init_project(root)
-    if host not in {"127.0.0.1", "localhost", "::1"} and not admin_token_path(root).exists():
-        raise SystemExit("Refusing remote bind without admin token. Run init-owledge first.")
     server = ThreadedHTTPServer((host, port), make_handler(root))
-    print(json.dumps({"status": "listening", "host": host, "port": port, "health": f"http://{host}:{port}/health"}, indent=2))
+    print(
+        json.dumps(
+            {
+                "status": "listening",
+                "profile": LOCAL_HTTP_PROFILE,
+                "api_version": LOCAL_HTTP_API_VERSION,
+                "host": host,
+                "port": port,
+                "health": f"http://{host}:{port}/health",
+                "bounds": LOCAL_HTTP_BOUNDS,
+            },
+            indent=2,
+        )
+    )
     server.serve_forever()
 
 
@@ -5429,6 +5754,17 @@ def run_evals(root: pathlib.Path) -> dict[str, Any]:
                     "runtime": "claude-code",
                 },
             )
+            register_agent(
+                conn,
+                {
+                    "agent_id": "qa-tenant-a",
+                    "tenant_id": "tenant_a",
+                    "customer_id": "customer_a",
+                    "project_id": "project_a",
+                    "role": "qa-agent",
+                    "runtime": "codex",
+                },
+            )
             for i in range(200):
                 upsert_task(
                     conn,
@@ -5471,9 +5807,29 @@ def run_evals(root: pathlib.Path) -> dict[str, Any]:
             duplicate_claims = len(claimed_task_ids) - len(set(claimed_task_ids))
             actor_b = conn.execute("SELECT * FROM agents WHERE agent_id = 'agent-other-tenant'").fetchone()
             status_b, tenant_payload = claim_task(conn, "task-000", {"agent_id": "agent-other-tenant"}, actor_b)
-            done_status, done_payload = update_task(conn, "task-000", {"agent_id": "agent-00", "status": "done"}, "admin")
-            add_gate_report(conn, "gate-required", {"task_id": "task-000", "final_verdict": "pass", "dimensions": {"tests": "pass"}}, "admin")
-            done_after_gate_status, _ = update_task(conn, "task-000", {"agent_id": "agent-00", "status": "done"}, "admin")
+            owner_id = conn.execute(
+                "SELECT owner_agent_id FROM tasks WHERE task_id = 'task-000'"
+            ).fetchone()["owner_agent_id"]
+            owner_actor = conn.execute("SELECT * FROM agents WHERE agent_id = ?", (owner_id,)).fetchone()
+            qa_actor = conn.execute("SELECT * FROM agents WHERE agent_id = 'qa-tenant-a'").fetchone()
+            done_status, done_payload = update_task(
+                conn,
+                "task-000",
+                {"agent_id": owner_id, "status": "done"},
+                owner_actor,
+            )
+            add_gate_report(
+                conn,
+                "gate-required",
+                {"task_id": "task-000", "final_verdict": "pass", "dimensions": {"tests": "pass"}},
+                qa_actor,
+            )
+            done_after_gate_status, _ = update_task(
+                conn,
+                "task-000",
+                {"agent_id": owner_id, "status": "done"},
+                owner_actor,
+            )
             summary = {
                 "mode": "50-agent-simulation",
                 "agents": 50,

@@ -1,0 +1,155 @@
+{
+  "schema_version": 1,
+  "contract_version": "1.0.0",
+  "maturity": "local-experimental",
+  "transport": {
+    "bind_policy": "loopback-only",
+    "allowed_hosts": [
+      "127.0.0.1",
+      "localhost",
+      "::1"
+    ],
+    "tls": false
+  },
+  "administrator": {
+    "allowed_operations": [
+      "register_agent_identities",
+      "read_aggregate_metrics"
+    ],
+    "forbidden_operations": [
+      "bind_non_loopback",
+      "claim_tasks",
+      "mutate_tasks",
+      "submit_task_evidence",
+      "run_qa_gates",
+      "build_context_packs",
+      "promote_memory",
+      "build_exports"
+    ]
+  },
+  "bounds": {
+    "max_body_bytes": 1048576,
+    "request_timeout_seconds": 10,
+    "max_concurrent_requests": 8,
+    "rate_limit_requests": 120,
+    "rate_limit_window_seconds": 60
+  },
+  "stable_error_codes": [
+    "agent_identity_required",
+    "agent_or_task_not_found",
+    "actor_identity_mismatch",
+    "administrator_required",
+    "administrator_scope_forbidden",
+    "concurrency_limit_exceeded",
+    "incomplete_request_body",
+    "invalid_content_length",
+    "invalid_corpus_type",
+    "invalid_final_verdict",
+    "invalid_json",
+    "invalid_request",
+    "invalid_status",
+    "invalid_utf8",
+    "json_object_required",
+    "method_not_allowed",
+    "missing_or_invalid_bearer_token",
+    "not_found",
+    "not_task_owner",
+    "operation_forbidden",
+    "payload_too_large",
+    "rate_limit_exceeded",
+    "request_timeout",
+    "required_qa_gates_missing",
+    "resource_conflict",
+    "role_not_authorized",
+    "scope_boundary_violation",
+    "status_not_claimable",
+    "task_already_claimed",
+    "task_not_found"
+  ],
+  "scope": {
+    "dimensions": [
+      "tenant_id",
+      "customer_id",
+      "project_id"
+    ],
+    "rule": "All scoped operations require exact equality across all dimensions.",
+    "identity_rule": "Authenticated agent identity is authoritative; request fields cannot override it."
+  },
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/health",
+      "roles": ["public"]
+    },
+    {
+      "method": "GET",
+      "path": "/metrics",
+      "roles": ["administrator"]
+    },
+    {
+      "method": "POST",
+      "path": "/agents/register",
+      "roles": ["administrator"]
+    },
+    {
+      "method": "POST",
+      "path": "/tasks",
+      "roles": ["orchestrator", "planner"]
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_id}/claim",
+      "roles": ["orchestrator", "worker"]
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_id}/heartbeat",
+      "roles": ["orchestrator", "worker"]
+    },
+    {
+      "method": "PATCH",
+      "path": "/tasks/{task_id}",
+      "roles": ["orchestrator", "worker"]
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_id}/release",
+      "roles": ["orchestrator", "worker"]
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_id}/evidence",
+      "roles": ["orchestrator", "worker"]
+    },
+    {
+      "method": "POST",
+      "path": "/gates/{gate_id}/run",
+      "roles": ["qa-agent"]
+    },
+    {
+      "method": "POST",
+      "path": "/context-pack/build",
+      "roles": ["orchestrator", "planner", "strategic-reviewer", "worker"]
+    },
+    {
+      "method": "POST",
+      "path": "/memory/promote",
+      "roles": ["memory-curator"]
+    },
+    {
+      "method": "POST",
+      "path": "/exports/lightrag/build",
+      "roles": ["memory-curator"]
+    }
+  ],
+  "unsupported": [
+    "non-loopback binding",
+    "TLS termination",
+    "hosted Team Hub",
+    "administrator token rotation or revocation",
+    "backup and restore",
+    "high availability",
+    "multi-process rate limiting"
+  ],
+  "change_policy": "Breaking endpoint, role, scope, error, or bound changes require a new contract version."
+}
