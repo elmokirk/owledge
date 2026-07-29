@@ -4,9 +4,9 @@ plan: internal/owledge/plans/owledge-v1-autonomous-delivery-master-plan.md
 objective: Deliver Owledge v0.7.1 through v1.0 through gated autonomous execution.
 status: in_progress
 current_release: v0.7.1
-current_phase: 071-A4
-active_ticket: OW-071-13
-last_green_gate: OW-071-03-LOCAL-BENCHMARK-103
+current_phase: 071-B1
+active_ticket: OW-071-04
+last_green_gate: G-071-A-TRUTH
 alignment:
   state: none
   awaiting_release: null
@@ -99,11 +99,11 @@ alignment:
       evidence: "HTTP non-loopback guard, unauthenticated health disclosure, and unbounded request body issues remain in tools/owledge_core.py."
       severity: critical
       user_impact: "Treating the local control plane as remotely safe could expose internal paths or enable abuse."
-      release_impact: "OW-071-13 and G-071-A-TRUTH remain release blockers."
+      release_impact: "OW-071-13 and G-071-A-TRUTH blocked release promotion until the hardened local-only boundary passed independent cumulative review."
       options: ["harden the local server contract", "remove or strictly label unsupported remote exposure"]
       recommendation: "Resolve under OW-071-13 with negative security fixtures before public capability claims."
       safe_default: "Local loopback-only prototype; no supported remote/team-server claim."
-      status: open
+      status: resolved
     - id: F-071-10
       source: phase0-clean-sha-finalization-attempt-1-2026-07-27
       evidence: "The sensitive-data gate treated the documented GitHub Actions permission id-token: write as a secret value."
@@ -323,6 +323,14 @@ alignment:
       constraints: "Any fixture, threshold, reference profile, or held-out boundary change requires a new baseline version and decision. F-071-22 remains routed to OW-071-04."
       affected_artifacts: ["benchmarks/v0.7.0/", "tools/validate_benchmark_baseline.py", "evidence/OW-071-03/", "OW-071-04"]
       verification_status: implemented_and_tested
+    - id: D-071-12
+      related: [OW-071-13, G-071-A-TRUTH, F-071-09, F-071-25, F-071-26]
+      authority: release-orchestrator
+      decision: "Accept OW-071-13 through commits bd14555, 51df549, and 597977f; stabilize its concurrency fixture at a709101; promote G-071-A-TRUTH from evidence committed at 9fba2c0; activate OW-071-04 as the sole Phase 071-B lane."
+      rationale: "The cumulative independent review finished pass after both medium review findings were fixed; 55 focused tests, 386 contract checks, 103 benchmark checks, 86.48 percent token reduction, and zero privacy or staleness failures satisfy the gate."
+      constraints: "The HTTP profile remains local-experimental and loopback-only. OW-071-04 may change adoption narrative and capability governance only; it must not broaden the remote, Team Hub, security, or benchmark claims accepted by G-071-A-TRUTH."
+      affected_artifacts: ["evidence/OW-071-13/", "evidence/G-071-A-TRUTH/", "BACKLOG.yaml", "RUN-STATE.yaml", "v0.7.1 release plan and checklists", "OW-071-04"]
+      verification_status: implemented_and_independently_accepted
   next_plan_reflection:
     status: not_started
     target_release: v0.8.0
@@ -341,8 +349,8 @@ orchestration:
   approved_by: product-owner
   approved_at: "2026-07-27T14:25:00Z"
   expires_at_alignment: true
-  active_dispatch: local_serial_ow07113
-  pending_risk_brief: "OW-071-13 is the only active lane. The local HTTP boundary must be loopback-only, fail-closed, size-limited, and free of sensitive unauthenticated health disclosure; F-071-09 remains critical until proven closed."
+  active_dispatch: local_serial_ow07104
+  pending_risk_brief: "OW-071-04 is the only active lane. Preserve the accepted capability/security boundary, route expansion ideas to the roadmap, and prove a beginner understands audience, problem, outcome, boundary, and next action before installation detail."
 workspace:
   code_root: .
   planning_root: internal/owledge/workpackages/owledge-v1-autonomous-delivery
@@ -361,51 +369,53 @@ last_completed_actions:
   - OW-071-02 accepted at 7bda996 after focused local red-team review, score-155 publish readiness, wheel inventory smoke, and clean-commit replay.
   - The OW-071-02 increment was reflected; FB-019 through FB-021 are closed and OW-071-03 is the sole active lane.
   - OW-071-03 accepted at 8fbf9ca with two complete model runs, baseline-contract v1, and 103/103 benchmark gates.
+  - OW-071-13 accepted through 597977f after independent security review; the local HTTP profile is loopback-only, bounded, scope-safe, and truthfully classified.
+  - G-071-A-TRUTH promoted from evidence at 9fba2c0 after all four Phase 071-A tickets and cumulative thresholds passed.
+  - The OW-071-13 semaphore fixture race was isolated and stabilized at a709101 after three consecutive green replays; runtime behavior was unchanged.
 next_actions:
-  - Preflight OW-071-13 against the current local HTTP implementation and define the threat contract plus negative fixtures.
-  - Implement and locally red-team all three OW-071-13 checkpoints serially.
-  - Integrate only after the security matrix passes, then run one independent cumulative review at G-071-A-TRUTH.
+  - Preflight OW-071-04 against the accepted capability registry, adoption plan, current README/docs navigation, and routed F-071-22 dated-claim governance.
+  - Implement only the minimum adoption-first narrative and information architecture needed for the OW-071-04 acceptance fixtures.
+  - Run comprehension, claim-map, navigation, link, and lint checks, then one independent beginner-UX review before marking OW-071-04 done.
 last_commands:
-  - "python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports (exit 0; 38/38 passed on 5d6c433; quality ratchet all 100)"
-  - "python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports (exit 1; 36/38 passed; F-071-10 and F-071-11 logged)"
-  - "uv run --no-project --with pytest --with pyyaml pytest tests/unit/test_dogfood_memory_root.py -q (exit 0; 6 tests passed)"
-  - "uv run --no-project --with pytest --with pyyaml pytest tests/unit -q (exit 0; 52 tests passed)"
-  - "python tools/validate_v1_delivery_plan.py (exit 0; 61 tickets, 25 gates, 42 waves, 0 warnings)"
-  - "python tools/owledge_core.py --project-root . validate-memory (exit 0; 142 checks passed)"
-  - "python tools/validate_v1_delivery_plan.py (exit 0 before Phase-0 review fixes; 61 tickets, 25 gates, 34 waves)"
-  - "python -m unittest tests.unit.test_validate_v1_delivery_plan -v (exit 0; 2 tests)"
-  - "python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports (exit 0; 35 gates passed)"
-  - "uv run --no-project --with pytest --with pyyaml python -m pytest targeted suites (exit 0; 24 tests passed)"
-  - "python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports (exit 0; 35 gates passed; all quality-ratchet dimensions 100)"
+  - "python tools/validate_v1_delivery_plan.py (exit 0; 64 tickets, 25 gates, 44 waves, 0 errors; one allowed OW-080-13 checkpoint warning)"
+  - "python tools/validate_live_work_register.py --project-root . (exit 0; 21/21 records)"
+  - "python -m unittest tests.unit.test_validate_live_work_register tests.unit.test_ow07102_release_trust tests.unit.test_ow07103_benchmark_baseline tests.unit.test_ow07113_local_http_security -q (exit 0; 55 tests)"
+  - "python tools/validate_benchmark_baseline.py --project-root . (exit 0; baseline 1.0.0, 86.48 percent token reduction)"
+  - "python tools/owledge.py test benchmark-kit-ci --project-root . (exit 0; 103/103)"
+  - "python tools/owledge_core.py --project-root . test-contracts (exit 0; 386/386)"
+  - "python tools/owledge.py test public-docs --project-root . (exit 0; 235/235)"
+  - "python tools/owledge.py test private-path-clean --project-root . (exit 0; zero findings)"
 checkpoint:
-  last_completed_action: "Integrated OW-071-03 commit 8fbf9ca, froze baseline-contract v1, preserved the excluded Qwen raw evidence, and activated OW-071-13."
+  last_completed_action: "Accepted OW-071-13 through 597977f, recorded independent pass evidence at 9fba2c0, stabilized its timing-sensitive fixture at a709101, promoted G-071-A-TRUTH, and activated OW-071-04."
   changed_files:
-    - "benchmarks/v0.7.0/baseline-contract-v1.json"
-    - "benchmarks/v0.7.0/held-out-journeys-v1.json"
-    - "benchmarks/v0.7.0/public-comparison.json"
-    - "benchmarks/v0.7.0/public-comparison.md"
-    - "tools/validate_benchmark_baseline.py"
-    - "tests/unit/test_ow07103_benchmark_baseline.py"
-    - "internal/owledge/workpackages/owledge-v1-autonomous-delivery/LIVE-WORK-REGISTER.yaml"
-    - "evidence/OW-071-03/"
+    - "internal/owledge/workpackages/owledge-v1-autonomous-delivery/RUN-STATE.yaml"
+    - "internal/owledge/workpackages/owledge-v1-autonomous-delivery/BACKLOG.yaml"
+    - "internal/owledge/workpackages/v0.7.1-release-execution-orchestration-checklist.md"
+    - "internal/owledge/workpackages/owledge-v1-autonomous-delivery-checklist.md"
+    - "internal/owledge/plans/v0.7.1-release-execution-orchestration-plan.md"
+    - "evidence/G-071-A-TRUTH/manifest.yaml"
+    - "evidence/OW-071-13/integration-review.yaml"
+    - "tests/unit/test_ow07113_local_http_security.py"
   passed_commands:
-    - "OW-071-03 focused unittest suite, 11/11 passed"
-    - "Benchmark baseline validator passed with raw average token reduction 86.48 percent"
-    - "Benchmark kit gate, 103/103 passed"
-    - "Public documentation gate, score 233"
-    - "Private-path scan, zero findings"
+    - "Phase 071-A cumulative focused unittest suite, 55/55 passed"
+    - "Delivery plan validator passed with 64 tickets, 25 gates, 44 waves, and zero errors"
+    - "Live work register validator passed with 21/21 records"
+    - "Benchmark baseline and Benchmark Kit gates passed at 86.48 percent and 103/103"
+    - "HTTP contract gate passed 386/386 and independent security re-review returned pass"
+    - "OW-071-13 security suite passed three consecutive replays after semaphore-fixture stabilization"
+    - "Public docs passed 235/235 and private-path scan found zero findings"
     - "git diff --check, exit 0"
   failed_commands:
-    - "The preflight rejected an incomplete Qwen report previously counted as release proof; F-071-20 records the corrected truth boundary."
-    - "Cross-platform replay exposed CRLF-sensitive hashes; F-071-21 records the byte-stable LF correction."
-  workspace_state: "OW-071-03 source is integrated; its central reflection is ready for validation on codex/v071-integration; OW-071-13 is the sole active ticket."
-  next_exact_action: "Validate and commit the OW-071-03 reflection, verify a clean tree, then preflight OW-071-13."
+    - "python -m unittest tests.unit.test_validate_v1_delivery_plan tests.unit.test_validate_live_work_register -q: one pre-existing downstream mismatch; test_current_control_plane_is_valid still expects zero warnings while accepted OW-080-13 intentionally emits one internal-checkpoint warning. The validator itself passed with zero errors."
+    - "python tools/owledge_core.py --project-root . validate-memory --strict: 307 pre-existing legacy frontmatter failures across historical internal memory; the touched canonical plan/checklists pass the release-specific frontmatter validation inside validate_v1_delivery_plan.py."
+  workspace_state: "G-071-A-TRUTH is formally promoted from committed evidence; OW-071-04 is the sole active ticket on clean branch codex/v071-integration."
+  next_exact_action: "Resume the goal, load OW-071-04 plus its directly referenced adoption artifacts, and perform the bounded adoption-narrative preflight before editing public docs."
   open_assumptions:
     - "The product owner wants the existing five-release train retained unless a later version reflection changes it."
     - "Local serial execution is the default; subagents are exceptional and justified only by independent risk reduction."
   prohibited_shortcuts:
     - "Do not start v0.8.0 before G-071-ALIGNMENT and an explicit owner approve decision."
     - "Do not trust or publish inherited dist artifacts; rebuild from committed source at RC."
-    - "Do not start cumulative G-071-A-TRUTH until OW-071-13 is integrated and reflected."
-updated_at: "2026-07-27T17:20:00+02:00"
+    - "Do not broaden the accepted local HTTP profile or benchmark claims while rewriting adoption documentation."
+updated_at: "2026-07-29T22:28:44+02:00"
 updated_by: codex

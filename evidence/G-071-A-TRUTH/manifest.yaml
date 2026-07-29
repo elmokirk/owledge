@@ -2,7 +2,7 @@ schema_version: 1
 gate: G-071-A-TRUTH
 release: v0.7.1
 technical_verdict: pass
-formal_promotion: pending_protected_state_reconciliation
+formal_promotion: passed
 review_mode: independent_cumulative
 tested_commit: 597977f2359f0fea4d2267c59a9e4de647a67211
 tickets:
@@ -58,7 +58,15 @@ commands:
   - python tools/owledge.py test private-path-clean --project-root .
   - python tools/owledge.py test release-contract --project-root .
 promotion_note: >-
-  Technical thresholds are satisfied and independent QA passed. The gate is not
-  marked formally promoted here because the user explicitly protected
-  RUN-STATE.yaml and the v0.7.1 release execution plan from modification.
-  Their owner must reconcile ticket/gate state before OW-071-04 activation.
+  Technical thresholds and independent QA passed. The product owner explicitly
+  authorized control-plane reconciliation on 2026-07-29; RUN-STATE, BACKLOG,
+  release plan, and checklists now promote this gate and activate OW-071-04.
+state_reconciliation:
+  authorized_at: "2026-07-29T20:28:44Z"
+  next_active_ticket: OW-071-04
+  next_phase: 071-B1
+  post_gate_test_stabilization_commit: a70910173c228876249e1e823422247e30b5d1d1
+  note: >-
+    The stabilization removes a timing race in the concurrency fixture without
+    changing the accepted HTTP runtime contract; the suite passed three
+    consecutive replays before commit.

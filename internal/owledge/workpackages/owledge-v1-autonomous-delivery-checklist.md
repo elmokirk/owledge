@@ -19,7 +19,7 @@ confidence: 0.94
 review_status: "reviewed"
 sanitization_status: "not_required"
 created_at: "2026-07-16T00:00:00Z"
-updated_at: "2026-07-27T00:00:00Z"
+updated_at: "2026-07-29T20:28:44Z"
 source_hash: ""
 reusable_lessons: []
 edges:
@@ -66,9 +66,9 @@ Apply this checklist after v0.7.1, v0.8.0, v0.8.1, v0.9.0, and v1.0:
 
 ### Phase 071-A - Truth and baseline
 
-- [ ] tickets OW-071-01 through OW-071-03 and OW-071-13 done
-- [ ] G-071-A-TRUTH evidence passed
-- [ ] independent quick review passed
+- [x] tickets OW-071-01 through OW-071-03 and OW-071-13 done
+- [x] G-071-A-TRUTH evidence passed
+- [x] independent quick review passed
 
 ### Phase 071-B - Beginner adoption
 

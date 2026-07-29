@@ -1,6 +1,6 @@
 schema_version: 1
 ticket: OW-071-13
-status: accepted_pending_protected_state_reconciliation
+status: accepted
 integration_branch: codex/v071-integration
 accepted_source:
   commits:
@@ -9,6 +9,11 @@ accepted_source:
     - 597977f2359f0fea4d2267c59a9e4de647a67211
   final_tree: bb7a14c36298e143a9ae08c1e4df21f9973ac737
   manifest_blob: bafba1e9d7cd227bf45dbaefa1c654a88081f061
+post_acceptance_test_stabilization:
+  commit: a70910173c228876249e1e823422247e30b5d1d1
+  scope: concurrency fixture timing only
+  runtime_contract_changed: false
+  verification: three consecutive 9/9 suite replays passed
 independent_review:
   reviewer_role: protocol-security-reviewer
   initial_verdict: pass_with_concerns
@@ -52,10 +57,14 @@ phase_reflection: >-
   fixed in 597977f and independently re-reviewed to pass. The next minimum
   product increment is OW-071-04 only after the protected control-plane owner
   reconciles OW-071-13 and G-071-A-TRUTH state.
-state_constraint:
-  protected_files_unchanged:
+state_reconciliation:
+  prior_protection_lifted_by_product_owner: "2026-07-29"
+  reconciled_files:
     - internal/owledge/workpackages/owledge-v1-autonomous-delivery/RUN-STATE.yaml
+    - internal/owledge/workpackages/owledge-v1-autonomous-delivery/BACKLOG.yaml
     - internal/owledge/plans/v0.7.1-release-execution-orchestration-plan.md
-  formal_promotion: pending_state_owner_reconciliation
+    - internal/owledge/workpackages/v0.7.1-release-execution-orchestration-checklist.md
+    - internal/owledge/workpackages/owledge-v1-autonomous-delivery-checklist.md
+  formal_promotion: passed
 integration_policy:
   no_push_tag_publish_or_main_merge: true
