@@ -5,7 +5,7 @@ objective: Deliver Owledge v0.7.1 through v1.0 through gated autonomous executio
 status: in_progress
 current_release: v0.7.1
 current_phase: 071-B2
-active_ticket: OW-071-10
+active_ticket: OW-071-11
 last_green_gate: G-071-A-TRUTH
 alignment:
   state: none
@@ -357,7 +357,16 @@ workspace:
   planning_branch: codex/owledge-v1-autonomous-roadmap
   release_integration_branch: codex/v071-integration
   base_commit: a25798958b3f1866c7e0e1bb6e2596adbe83bcbe
-blockers: []
+blockers:
+  - id: B-071-10-PACKAGE-SMOKE
+    ticket: OW-071-10
+    status: external_environment
+    detail: >-
+      Package-artifact and cross-platform extracted-command acceptance cannot be
+      completed in the current environment: only Python 3.14 is installed and
+      it lacks importable setuptools.build_meta; the inherited wheel is also
+      unreadable under sandbox permissions. Replay under Python 3.10-3.12 on
+      Windows, macOS, and Linux is required before OW-071-10 can be accepted.
 last_completed_actions:
   - Approved product decisions captured in the v1 autonomous delivery plan.
   - Handoff Decision Bridge mapped KEOS/Hermes findings into the existing v0.7.1-v1 ticket train.
@@ -376,7 +385,7 @@ last_completed_actions:
   - OW-071-10 installation-hub foundation committed at dd735c8: no-install, package, source-only add-on, and adapter boundaries are separated; a clean source init/doctor smoke passed and measured the source project footprint at 184 files / 894212 bytes.
   - Independent OW-071-10 installation QA initially failed: README still mixed a package quickstart with a source-only add-on. The P0 was fixed at 9e31392 and locked by the 4/4 focused install-contract suite; package-artifact and cross-platform evidence remain open.
 next_actions:
-  - Add extracted-command fixtures and record the source recipe result; rerun the package-artifact recipe in a supported Python 3.10-3.12 build environment before claiming package-path completion.
+  - Preflight OW-071-11 against the accepted lifecycle, privacy, template, CLI, and local-HTTP boundaries.
   - Keep OW-071-11, OW-071-12, and OW-071-14 ready until the orchestrator explicitly dispatches non-overlapping lanes.
   - Record fixture evidence and a cross-platform install review before advancing the remaining Phase 071-B tickets.
 last_commands:
@@ -389,7 +398,7 @@ last_commands:
   - "python tools/owledge.py test public-docs --project-root . (exit 0; 235/235)"
   - "python tools/owledge.py test private-path-clean --project-root . (exit 0; zero findings)"
 checkpoint:
-  last_completed_action: "Closed the independent OW-071-10 QA P0 at 9e31392: README demo is explicitly source-only, no package recipe transitions to add-ons, and 4 focused install-contract tests pass."
+  last_completed_action: "OW-071-10 documentation P0 was closed at 9e31392, then its remaining package-artifact/cross-platform acceptance was recorded as an external environment blocker; OW-071-11 is now the sole active non-overlapping B2 lane."
   changed_files:
     - "README.md"
     - "docs/README.md"
@@ -409,8 +418,8 @@ checkpoint:
     - "Package-artifact smoke was not completed in this Windows environment: the inherited dist wheel is unreadable by pip/copy under sandbox permissions, and a clean local wheel build fails because the only installed interpreter is Python 3.14 without importable setuptools.build_meta. This is environmental; do not treat the package recipe as verified until replayed under supported Python 3.10-3.12."
     - "python -m unittest tests.unit.test_validate_v1_delivery_plan tests.unit.test_validate_live_work_register -q: one pre-existing downstream mismatch; test_current_control_plane_is_valid still expects zero warnings while accepted OW-080-13 intentionally emits one internal-checkpoint warning. The validator itself passed with zero errors."
     - "python tools/owledge_core.py --project-root . validate-memory --strict: 307 pre-existing legacy frontmatter failures across historical internal memory; the touched canonical plan/checklists pass the release-specific frontmatter validation inside validate_v1_delivery_plan.py."
-  workspace_state: "G-071-A-TRUTH remains formally promoted; OW-071-04 is accepted; OW-071-10's local source and documentation boundaries are green but package-artifact and cross-platform acceptance evidence are still absent."
-  next_exact_action: "Replay the package-artifact recipe under supported Python 3.10-3.12, then record Windows/macOS/Linux extracted-command evidence and a final independent install QA before accepting OW-071-10."
+  workspace_state: "G-071-A-TRUTH remains formally promoted; OW-071-04 is accepted; OW-071-10 is externally blocked only on package/cross-platform evidence; OW-071-11 is the sole active non-overlapping B2 lane."
+  next_exact_action: "Load OW-071-11's direct concept/workflow references and implement the bounded lifecycle, privacy, and automation contract before independent architecture/privacy QA."
   open_assumptions:
     - "The product owner wants the existing five-release train retained unless a later version reflection changes it."
     - "Local serial execution is the default; subagents are exceptional and justified only by independent risk reduction."
