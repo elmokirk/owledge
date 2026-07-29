@@ -84,6 +84,7 @@ to main, creates the tag, and uploads release-evidence.json.
 
 | Command | Writes | Purpose |
 | --- | --- | --- |
+| `python tools/owledge_core.py --project-root . serve --host 127.0.0.1 --port 8765` | Yes, local runtime state | Start the [local-experimental, loopback-only control plane](security/local-http-control-plane.md); not a production or remote team server |
 | `python tools/owledge_core.py --project-root . validate-memory --strict` | No | Validate frontmatter, IDs, edges, and memory records |
 | `python tools/owledge_core.py --project-root . build-memory-index` | Yes | Generate full memory indexes |
 | `python tools/owledge_core.py --project-root . build-memory-index --incremental --track-tombstones` | Yes | Incremental index with tombstone tracking |

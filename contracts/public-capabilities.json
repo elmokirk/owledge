@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "registry_version": "1.0.0",
+  "maturity_values": [
+    "available",
+    "local-experimental",
+    "preview",
+    "planned",
+    "post-v1"
+  ],
+  "release_owner_review": "required",
+  "capabilities": [
+    {
+      "id": "local-http-control-plane",
+      "name": "Local HTTP control-plane adapter",
+      "maturity": "local-experimental",
+      "availability": "source checkout",
+      "summary": "A bounded loopback-only adapter for local agent experiments.",
+      "not": [
+        "hosted service",
+        "production Team Hub",
+        "remote team synchronization",
+        "enterprise authorization boundary"
+      ],
+      "contract": "contracts/local-http-control-plane-v1.json",
+      "documentation": "docs/security/local-http-control-plane.md",
+      "evidence": "evidence/OW-071-13/manifest.yaml",
+      "release_owner": "Owledge maintainers"
+    }
+  ]
+}

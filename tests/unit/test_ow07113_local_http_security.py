@@ -5,6 +5,7 @@ from __future__ import annotations
 import http.client
 import json
 import pathlib
+import socket
 import tempfile
 import threading
 import unittest
@@ -195,6 +196,17 @@ class LocalHttpSecurityTests(unittest.TestCase):
                 )
 
     def test_body_boundary_and_unsupported_method_are_stable_json(self) -> None:
+        max_body = core.LOCAL_HTTP_BOUNDS["max_body_bytes"]
+        boundary = b'{"x":"' + b" " * (max_body - 8) + b'"}'
+        self.assertEqual(len(boundary), max_body)
+        status, payload = self.request(
+            "POST",
+            "/does-not-exist",
+            boundary,
+            self.tokens["planner-a"],
+            {"Content-Length": str(len(boundary))},
+        )
+        self.assertEqual((status, payload["error"]), (404, "not_found"))
         oversized = b"{" + b" " * core.LOCAL_HTTP_BOUNDS["max_body_bytes"]
         status, payload = self.request(
             "POST",
@@ -209,6 +221,8 @@ class LocalHttpSecurityTests(unittest.TestCase):
 
     def test_rate_and_concurrency_limits_are_explicit(self) -> None:
         isolated = core.ThreadedHTTPServer(("127.0.0.1", 0), core.make_handler(self.root))
+        server_thread = threading.Thread(target=isolated.serve_forever, daemon=True)
+        server_thread.start()
         try:
             for _ in range(core.LOCAL_HTTP_BOUNDS["rate_limit_requests"]):
                 self.assertTrue(isolated.allow_client_request("fixture"))
@@ -217,11 +231,46 @@ class LocalHttpSecurityTests(unittest.TestCase):
             while isolated._request_slots.acquire(blocking=False):
                 acquired += 1
             self.assertEqual(acquired, core.LOCAL_HTTP_BOUNDS["max_concurrent_requests"])
+            conn = http.client.HTTPConnection("127.0.0.1", isolated.server_port, timeout=3)
+            conn.request("GET", "/health")
+            response = conn.getresponse()
+            payload = json.loads(response.read())
+            conn.close()
+            self.assertEqual((response.status, payload["error"]), (503, "concurrency_limit_exceeded"))
             for _ in range(acquired):
                 isolated._request_slots.release()
             self.assertEqual(isolated.request_timeout, core.LOCAL_HTTP_BOUNDS["request_timeout_seconds"])
         finally:
+            isolated.shutdown()
             isolated.server_close()
+            server_thread.join(timeout=3)
+
+        timeout_server = core.ThreadedHTTPServer(("127.0.0.1", 0), core.make_handler(self.root))
+        timeout_server.request_timeout = 0.05
+        timeout_thread = threading.Thread(target=timeout_server.serve_forever, daemon=True)
+        timeout_thread.start()
+        try:
+            raw = socket.create_connection(("127.0.0.1", timeout_server.server_port), timeout=3)
+            request = (
+                b"POST /tasks HTTP/1.1\r\n"
+                b"Host: localhost\r\n"
+                + f"Authorization: Bearer {self.tokens['planner-a']}\r\n".encode("ascii")
+                + b"Content-Length: 2\r\n\r\n{"
+            )
+            raw.sendall(request)
+            response = b""
+            while True:
+                chunk = raw.recv(4096)
+                if not chunk:
+                    break
+                response += chunk
+            raw.close()
+            self.assertIn(b"408 Request Timeout", response)
+            self.assertIn(b'"error": "request_timeout"', response)
+        finally:
+            timeout_server.shutdown()
+            timeout_server.server_close()
+            timeout_thread.join(timeout=3)
 
 
 if __name__ == "__main__":

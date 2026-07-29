@@ -1,0 +1,144 @@
+schema_version: 1
+ticket: OW-071-13
+gate: G-071-A-TRUTH
+status: local_implementation_complete_pending_cumulative_independent_gate
+branch: codex/v071-integration
+base_commit: eb4d8a859350192695c7fb8afa74003c6d0904d1
+implementation_commit: bd14555f9003b0452dc3a76ffda7af6d7e790031
+execution_mode: local_serial
+outcome: >-
+  Classify the shipped HTTP adapter as local experimental, fail closed on
+  non-loopback binding, and enforce a versioned endpoint, role, scope, error,
+  and resource-bound contract.
+decisions:
+  - id: D-071-13-A
+    decision: The serve profile is local-experimental and loopback-only.
+    rationale: >-
+      The repository has no reviewed remote deployment, TLS, identity lifecycle,
+      backup, high-availability, or multi-process abuse-control contract.
+  - id: D-071-13-B
+    decision: >-
+      The administrator token may register agents and read aggregate metrics,
+      but may not perform tenant-scoped operations.
+    rationale: >-
+      Administrative bootstrap authority must not silently become cross-tenant
+      data-plane authority.
+  - id: D-071-13-C
+    decision: >-
+      Authenticated agent identity and the exact tenant/customer/project tuple
+      are authoritative for every scoped endpoint.
+    rationale: >-
+      Tenant-only checks and caller-supplied agent identifiers allowed
+      cross-project access and identity spoofing.
+  - id: D-071-13-D
+    decision: >-
+      The v1 local profile fixes a 1 MiB body limit, 10 second request timeout,
+      8 concurrent requests, and 120 requests per client per 60 seconds.
+    rationale: >-
+      Explicit process-local bounds make the experimental surface testable and
+      prevent undocumented resource assumptions.
+artifacts:
+  - contracts/local-http-control-plane-v1.json
+  - contracts/public-capabilities.json
+  - contracts/release-surface.json
+  - docs/security/local-http-control-plane.md
+  - docs/command-reference.md
+  - README.md
+  - tools/owledge_core.py
+  - tests/unit/test_ow07113_local_http_security.py
+  - evidence/OW-071-13/manifest.yaml
+commands:
+  - command: python -m unittest tests.unit.test_ow07113_local_http_security -q
+    exit_code: 0
+    result: >-
+      9 tests passed, including boundary and over-limit body, timeout,
+      concurrency, and rate fixtures.
+  - command: python tools/owledge_core.py --project-root . run-evals
+    exit_code: 0
+    result: >-
+      50-agent simulation passed; 200 claims, zero duplicate claims, exact-scope
+      isolation returned 403, and QA-gated completion remained enforced.
+  - command: python tools/owledge_core.py --project-root . test-contracts
+    exit_code: 0
+    result: 386 checks passed; zero failed
+  - command: python tools/owledge.py test public-docs --project-root .
+    exit_code: 0
+    result: 235 checks passed; zero failed
+  - command: >-
+      python tools/owledge.py test docs-contract --project-root .
+      --changed-file tools/owledge_core.py
+      --changed-file contracts/local-http-control-plane-v1.json
+      --changed-file contracts/public-capabilities.json
+      --changed-file contracts/release-surface.json
+      --changed-file README.md
+      --changed-file docs/command-reference.md
+      --changed-file docs/security/local-http-control-plane.md
+      --changed-file tests/unit/test_ow07113_local_http_security.py
+    exit_code: 0
+    result: 274 checks passed; zero failed
+  - command: python tools/owledge.py test private-path-clean --project-root .
+    exit_code: 0
+    result: zero findings
+  - command: python tools/owledge.py test release-contract --project-root .
+    exit_code: 0
+    result: release contract passed
+  - command: python tools/validate_v1_delivery_plan.py
+    exit_code: 0
+    result: 64 tickets, 25 gates, 44 waves, zero errors
+negative_qa:
+  - A non-loopback bind fails before project initialization.
+  - An administrator token cannot enable remote binding.
+  - Unauthenticated health output contains no path, database, or metric data.
+  - Caller-supplied agent identity cannot override the authenticated identity.
+  - Same-tenant, different-customer or different-project access fails.
+  - Administrator access to scoped task, gate, context, promotion, and export operations fails.
+  - Task, gate, and promotion identifier collisions fail closed.
+  - A body one byte above the limit returns payload_too_large.
+  - The ninth concurrent request returns concurrency_limit_exceeded.
+  - A partial body exceeding the request timeout returns request_timeout.
+  - The request after the rate window allowance returns rate_limit_exceeded.
+findings:
+  - id: F-071-09
+    severity: critical
+    status: resolved
+    detail: >-
+      The prior admin-token presence check permitted a non-loopback bind.
+      Remote binding is now rejected before initialization regardless of token.
+  - id: F-071-23
+    severity: high
+    status: resolved
+    detail: >-
+      Tenant-only authorization and upsert-style identifier reuse permitted
+      cross-project access or resource reassignment. Exact three-part scope and
+      fail-closed collision checks now protect tasks, gates, and promotions.
+  - id: F-071-24
+    severity: medium
+    status: resolved
+    detail: >-
+      Handler-level concurrency admission could create unbounded worker
+      threads before rejecting traffic. Admission now occurs at server dispatch.
+limitations:
+  - >-
+    Rate state and concurrency admission are process-local; they are not a
+    distributed abuse-control system.
+  - >-
+    TLS, non-loopback deployment, token rotation/revocation, backup/restore,
+    high availability, and production Team Hub operation remain unsupported.
+  - >-
+    The broad dependency-free unittest discovery previously identified pytest
+    imports in ten pytest-authored modules when pytest was unavailable in the
+    environment. The focused standard-library OW-071-13 suite and applicable
+    product gates are green; this environment limitation is not hidden.
+review:
+  method: focused_local_security_red_team
+  result: pass
+  cumulative_independent_gate: G-071-A-TRUTH
+qa_handoff:
+  required_replay:
+    - python -m unittest tests.unit.test_ow07113_local_http_security -q
+    - python tools/owledge_core.py --project-root . run-evals
+    - python tools/owledge_core.py --project-root . test-contracts
+    - python tools/owledge.py test public-docs --project-root .
+    - python tools/owledge.py test private-path-clean --project-root .
+    - python tools/validate_v1_delivery_plan.py
+    - git diff --check

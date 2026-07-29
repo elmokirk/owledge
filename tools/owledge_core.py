@@ -5716,6 +5716,55 @@ def test_contracts(root: pathlib.Path) -> dict[str, Any]:
         if "tenant_id" not in text and "TENANT_ID" not in text:
             placeholders.append(rel)
     add("tenant-fields-present", not placeholders, "Files missing tenant fields: " + ", ".join(placeholders))
+    if is_source_repo:
+        try:
+            http_contract = json.loads(
+                (root / "contracts" / "local-http-control-plane-v1.json").read_text(encoding="utf-8")
+            )
+            contract_policy = [
+                (entry["method"], entry["path"], tuple(entry["roles"]))
+                for entry in http_contract["endpoints"]
+            ]
+            add(
+                "local-http-contract-runtime-sync",
+                http_contract.get("maturity") == LOCAL_HTTP_PROFILE
+                and http_contract.get("bounds") == LOCAL_HTTP_BOUNDS
+                and contract_policy == list(LOCAL_HTTP_ENDPOINT_POLICY),
+                "Local HTTP maturity, bounds, and endpoint policy match runtime constants.",
+            )
+        except (OSError, KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
+            add("local-http-contract-runtime-sync", False, str(exc))
+        try:
+            capabilities = json.loads(
+                (root / "contracts" / "public-capabilities.json").read_text(encoding="utf-8")
+            )
+            local_http = next(
+                item for item in capabilities["capabilities"] if item["id"] == "local-http-control-plane"
+            )
+            add(
+                "local-http-public-maturity",
+                local_http.get("maturity") == LOCAL_HTTP_PROFILE
+                and local_http.get("contract") == "contracts/local-http-control-plane-v1.json",
+                "Public registry labels the local HTTP adapter and links its versioned contract.",
+            )
+        except (OSError, KeyError, StopIteration, TypeError, ValueError, json.JSONDecodeError) as exc:
+            add("local-http-public-maturity", False, str(exc))
+        security_doc = root / "docs" / "security" / "local-http-control-plane.md"
+        security_text = security_doc.read_text(encoding="utf-8") if security_doc.is_file() else ""
+        add(
+            "local-http-security-boundary-doc",
+            all(
+                phrase in security_text
+                for phrase in (
+                    "local experimental",
+                    "loopback-only",
+                    "TLS termination",
+                    "token rotation or",
+                    "backup/restore",
+                )
+            ),
+            "Security documentation states maturity, bind policy, and unsupported remote controls.",
+        )
     failed = [r for r in results if not r["passed"]]
     return {"project": str(root), "passed": not failed, "totalChecks": len(results), "failedChecks": len(failed), "results": results}
 

@@ -412,6 +412,8 @@ flowchart LR
 Owledge is not:
 
 - a hosted platform
+- a production or remote team server; optional `serve` is
+  [local experimental and loopback-only](docs/security/local-http-control-plane.md)
 - a vector database
 - an RBAC or enterprise policy system
 - a replacement for Superpowers or Ponytail
