@@ -3,50 +3,28 @@
 Use this when you want Owledge inside a coding project and Markdown should stay
 the source of truth.
 
+> The [Installation Hub](install/README.md) is the canonical installation
+> contract. It separates no-install, package, source-only add-on, footprint,
+> recovery, upgrade, and removal paths. This page remains a project quickstart
+> reference; do not combine its package and source commands in one chain.
+
 ## Path A: Add Owledge To An Existing Project
 
-Recommended package path:
-
-```bash
-uvx owledge quickstart --target /path/to/your-project
-```
-
-For repeated use:
-
-```bash
-uv tool install owledge
-owledge doctor --project-root /path/to/your-project
-```
-
-Contributor source-checkout path:
-
-```bash
-python tools/owledge.py init-project --target /path/to/your-project
-```
-
-This is additive. It does not change the project's framework, package manager,
-build system, source tree, or existing agent workflow.
-
-Then verify inside the host project:
-
-```bash
-owledge doctor --project-root .
-python tools/owledge_core.py --project-root . validate-memory --strict
-```
+Use either the complete [package recipe](install/project.md#package-recipe) or
+the complete [source recipe](install/project.md#source-recipe). They use
+different delivery boundaries and must not be mixed. Both are additive: they do
+not change the project's framework, package manager, build system, source tree,
+or existing agent workflow.
 
 ## Optional: Add Runtime Hooks
 
 Use the plugin adapter only when a local runtime should capture private hook
-events:
-
-```bash
-python tools/owledge.py init-project --target /path/to/your-project --include-plugin-adapter
-```
+events. It is source-checkout only; follow [Plugin installation](install-plugin.md).
 
 ## Path B: Generate A Project-Local Starter Kit
 
-Use this when you want a small local kit without copying the full repo layout
-into the host project:
+Use this source-checkout-only option when you want a small local kit without
+copying the full repo layout into the host project:
 
 ```bash
 python tools/owledge.py build-project-kit --output-path /tmp/owledge-project-kit --verify

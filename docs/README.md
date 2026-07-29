@@ -4,6 +4,9 @@ Owledge is an **Agentic Engineering Context & Planning Layer**: it keeps project
 
 Start by understanding the [product model, boundaries, and capability maturity](what-is-owledge.md). Owledge is additive and local by default; it is not a hosted Team Hub or an automatic background worker.
 
+For any installation, begin with the [Installation Hub](install/README.md): it
+separates no-install, package, source, adapter, and add-on paths.
+
 ## Choose a learning path
 
 ## I only want the principles in an existing agent system

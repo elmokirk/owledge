@@ -83,7 +83,7 @@ Start with the smallest path that solves the current problem. Each route stays w
 
 - **Understand first:** [What is Owledge?](docs/what-is-owledge.md)
 - **Use the operating rules in an existing system:** [Integration Decision Guide](docs/integration-decision-guide.md)
-- **Add durable project artifacts:** [Project quickstart](docs/quickstart.md)
+- **Add durable project artifacts:** [Installation Hub](docs/install/README.md)
 - **Try a bounded demo:** [Try Owledge in 5 minutes](docs/try-owledge-in-5-minutes.md)
 - **Inspect current capability maturity:** [Public capability registry](contracts/public-capabilities.json)
 
