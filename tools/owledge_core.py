@@ -5597,7 +5597,10 @@ def make_handler(root: pathlib.Path):
                 write_json(self, 408, {"error": "request_timeout"})
                 return
             except PermissionError as exc:
-                write_json(self, 403, {"error": str(exc)})
+                exposed = str(exc)
+                if exposed not in {"actor_identity_mismatch", "scope_boundary_violation"}:
+                    exposed = "operation_forbidden"
+                write_json(self, 403, {"error": exposed})
                 return
             except sqlite3.IntegrityError:
                 write_json(self, 409, {"error": "resource_conflict"})

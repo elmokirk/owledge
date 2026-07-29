@@ -120,6 +120,32 @@ class LocalHttpSecurityTests(unittest.TestCase):
         self.assertEqual((status, payload["task_id"]), (200, "task-a"))
         status, payload = self.request("POST", "/tasks", {"task_id": "admin-task"}, self.admin_token)
         self.assertEqual((status, payload["error"]), (403, "administrator_scope_forbidden"))
+        denied_routes = [
+            ("POST", "/tasks/task-a/claim", {}, "planner-a"),
+            ("POST", "/tasks/task-a/heartbeat", {}, "planner-a"),
+            ("PATCH", "/tasks/task-a", {"status": "in_progress"}, "planner-a"),
+            ("POST", "/tasks/task-a/release", {}, "planner-a"),
+            ("POST", "/tasks/task-a/evidence", {}, "planner-a"),
+            ("POST", "/gates/gate-a/run", {"task_id": "task-a"}, "worker-a"),
+            ("POST", "/context-pack/build", {"task_id": "task-a"}, "qa-a"),
+            ("POST", "/memory/promote", {}, "worker-a"),
+            ("POST", "/exports/lightrag/build", {}, "worker-a"),
+        ]
+        for method, path, body, token_name in denied_routes:
+            with self.subTest(path=path, token=token_name):
+                status, payload = self.request(method, path, body, self.tokens[token_name])
+                self.assertEqual((status, payload["error"]), (403, "role_not_authorized"))
+        status, payload = self.request(
+            "POST",
+            "/memory/promote",
+            {
+                "source_path": "../outside.md",
+                "target_path": ".owledge/canonical/target.md",
+                "review_path": "../review.md",
+            },
+            self.tokens["curator-a"],
+        )
+        self.assertEqual((status, payload["error"]), (403, "operation_forbidden"))
 
     def test_authenticated_identity_cannot_be_spoofed(self) -> None:
         self.create_task()
@@ -225,8 +251,13 @@ class LocalHttpSecurityTests(unittest.TestCase):
         server_thread.start()
         try:
             for _ in range(core.LOCAL_HTTP_BOUNDS["rate_limit_requests"]):
-                self.assertTrue(isolated.allow_client_request("fixture"))
-            self.assertFalse(isolated.allow_client_request("fixture"))
+                self.assertTrue(isolated.allow_client_request("127.0.0.1"))
+            conn = http.client.HTTPConnection("127.0.0.1", isolated.server_port, timeout=3)
+            conn.request("GET", "/health")
+            response = conn.getresponse()
+            payload = json.loads(response.read())
+            conn.close()
+            self.assertEqual((response.status, payload["error"]), (429, "rate_limit_exceeded"))
             acquired = 0
             while isolated._request_slots.acquire(blocking=False):
                 acquired += 1

@@ -117,6 +117,24 @@ findings:
     detail: >-
       Handler-level concurrency admission could create unbounded worker
       threads before rejecting traffic. Admission now occurs at server dispatch.
+  - id: F-071-25
+    severity: medium
+    status: resolved
+    detail: >-
+      The first independent review found that promotion PermissionError text
+      could expose dynamic path or frontmatter details outside the published
+      stable-code registry. The HTTP boundary now exposes only the two scoped
+      authorization codes or operation_forbidden, and a curator-path negative
+      fixture locks the behavior.
+  - id: F-071-26
+    severity: medium
+    status: resolved
+    detail: >-
+      The first independent review found that the contract/runtime constant
+      comparison did not probe enough rejected dispatch combinations and that
+      the rate fixture stopped at the admission function. Dispatch-level role
+      denials now cover every scoped endpoint family and an actual over-limit
+      request asserts the HTTP 429 response.
 limitations:
   - >-
     Rate state and concurrency admission are process-local; they are not a
