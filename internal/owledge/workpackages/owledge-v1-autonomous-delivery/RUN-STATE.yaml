@@ -373,8 +373,9 @@ last_completed_actions:
   - G-071-A-TRUTH promoted from evidence at 9fba2c0 after all four Phase 071-A tickets and cumulative thresholds passed.
   - The OW-071-13 semaphore fixture race was isolated and stabilized at a709101 after three consecutive green replays; runtime behavior was unchanged.
   - OW-071-04 accepted through 092e306 after five-second comprehension, public-docs, and docs-contract checks passed; independent beginner review raised two P1 claim-governance gaps, both fixed at da4a6fb and re-reviewed as pass.
+  - OW-071-10 installation-hub foundation committed at dd735c8: no-install, package, source-only add-on, and adapter boundaries are separated; a clean source init/doctor smoke passed and measured the source project footprint at 184 files / 894212 bytes.
 next_actions:
-  - Preflight OW-071-10 against the accepted OW-071-04 narrative, executable command truth, and clean package/source constraints.
+  - Run the package-artifact recipe against an isolated local wheel and add extracted-command fixtures before claiming package-path completion.
   - Keep OW-071-11, OW-071-12, and OW-071-14 ready until the orchestrator explicitly dispatches non-overlapping lanes.
   - Record fixture evidence and a cross-platform install review before advancing the remaining Phase 071-B tickets.
 last_commands:
@@ -387,30 +388,25 @@ last_commands:
   - "python tools/owledge.py test public-docs --project-root . (exit 0; 235/235)"
   - "python tools/owledge.py test private-path-clean --project-root . (exit 0; zero findings)"
 checkpoint:
-  last_completed_action: "Accepted OW-071-04 through 092e306: beginner-first narrative, canonical concept page, feature-level capability registry, per-claim retrieval dates, and independent remediation re-review all passed; activated OW-071-10 and kept the remaining B2 lanes ready."
+  last_completed_action: "Committed the first OW-071-10 atomic result at dd735c8: canonical Installation Hub, separated no-install/package/source-only routes, measured source footprint, and a clean source init/doctor smoke passed."
   changed_files:
-    - "internal/owledge/workpackages/owledge-v1-autonomous-delivery/RUN-STATE.yaml"
-    - "internal/owledge/workpackages/owledge-v1-autonomous-delivery/BACKLOG.yaml"
-    - "internal/owledge/workpackages/v0.7.1-release-execution-orchestration-checklist.md"
-    - "internal/owledge/workpackages/owledge-v1-autonomous-delivery-checklist.md"
-    - "internal/owledge/plans/v0.7.1-release-execution-orchestration-plan.md"
-    - "evidence/G-071-A-TRUTH/manifest.yaml"
-    - "evidence/OW-071-13/integration-review.yaml"
-    - "tests/unit/test_ow07113_local_http_security.py"
+    - "README.md"
+    - "docs/README.md"
+    - "docs/quickstart.md"
+    - "docs/install/README.md"
+    - "docs/install/principles-only.md"
+    - "docs/install/project.md"
   passed_commands:
-    - "Phase 071-A cumulative focused unittest suite, 55/55 passed"
-    - "Delivery plan validator passed with 64 tickets, 25 gates, 44 waves, and zero errors"
-    - "Live work register validator passed with 21/21 records"
-    - "Benchmark baseline and Benchmark Kit gates passed at 86.48 percent and 103/103"
-    - "HTTP contract gate passed 386/386 and independent security re-review returned pass"
-    - "OW-071-13 security suite passed three consecutive replays after semaphore-fixture stabilization"
-    - "Public docs passed 235/235 and private-path scan found zero findings"
+    - "Public docs passed with zero failures after adding the Installation Hub"
+    - "Docs contract passed with zero failures after adding the Installation Hub"
+    - "Clean source init-project then doctor smoke passed with score 100"
+    - "Clean source footprint: 184 files / 894212 bytes; .owledge/: 115 files / 83798 bytes"
     - "git diff --check, exit 0"
   failed_commands:
     - "python -m unittest tests.unit.test_validate_v1_delivery_plan tests.unit.test_validate_live_work_register -q: one pre-existing downstream mismatch; test_current_control_plane_is_valid still expects zero warnings while accepted OW-080-13 intentionally emits one internal-checkpoint warning. The validator itself passed with zero errors."
     - "python tools/owledge_core.py --project-root . validate-memory --strict: 307 pre-existing legacy frontmatter failures across historical internal memory; the touched canonical plan/checklists pass the release-specific frontmatter validation inside validate_v1_delivery_plan.py."
-  workspace_state: "G-071-A-TRUTH remains formally promoted; OW-071-04 is accepted with committed evidence, OW-071-10 is the sole active ticket, and the remaining W-071-B2 tickets are ready on clean branch codex/v071-integration."
-  next_exact_action: "Resume the goal, load OW-071-10 plus the accepted OW-071-04 narrative and executable-path evidence, then perform the bounded installation-hub preflight before editing public docs."
+  workspace_state: "G-071-A-TRUTH remains formally promoted; OW-071-04 is accepted and OW-071-10 has one committed installation-hub foundation on branch codex/v071-integration."
+  next_exact_action: "Run the isolated wheel package recipe, then add extracted-command fixtures and independent installation QA before accepting OW-071-10."
   open_assumptions:
     - "The product owner wants the existing five-release train retained unless a later version reflection changes it."
     - "Local serial execution is the default; subagents are exceptional and justified only by independent risk reduction."
