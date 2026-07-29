@@ -5,7 +5,7 @@ objective: Deliver Owledge v0.7.1 through v1.0 through gated autonomous executio
 status: in_progress
 current_release: v0.7.1
 current_phase: 071-B2
-active_ticket: OW-071-11
+active_ticket: OW-071-12
 last_green_gate: G-071-A-TRUTH
 alignment:
   state: none
@@ -349,8 +349,8 @@ orchestration:
   approved_by: product-owner
   approved_at: "2026-07-27T14:25:00Z"
   expires_at_alignment: true
-  active_dispatch: local_serial_ow07110_with_b2_ready
-  pending_risk_brief: "OW-071-10 is the sole active implementation lane; OW-071-11, OW-071-12, and OW-071-14 are ready but not dispatched. Preserve OW-071-04's adoption/claim boundaries, keep recipes executable and bounded, and do not broaden local HTTP, Team Hub, or benchmark claims."
+  active_dispatch: local_serial_ow07112_with_b2_ready
+  pending_risk_brief: "OW-071-10 remains externally blocked on package/cross-platform evidence; OW-071-11 is accepted; OW-071-12 is the sole active implementation lane and OW-071-14 remains ready. Preserve accepted discovery, workflow, and claim boundaries; do not broaden local HTTP, Team Hub, remote sync, write-enabled MCP, or benchmark claims."
 workspace:
   code_root: .
   planning_root: internal/owledge/workpackages/owledge-v1-autonomous-delivery
@@ -384,10 +384,11 @@ last_completed_actions:
   - OW-071-04 accepted through 092e306 after five-second comprehension, public-docs, and docs-contract checks passed; independent beginner review raised two P1 claim-governance gaps, both fixed at da4a6fb and re-reviewed as pass.
   - OW-071-10 installation-hub foundation committed at dd735c8: no-install, package, source-only add-on, and adapter boundaries are separated; a clean source init/doctor smoke passed and measured the source project footprint at 184 files / 894212 bytes.
   - Independent OW-071-10 installation QA initially failed: README still mixed a package quickstart with a source-only add-on. The P0 was fixed at 9e31392 and locked by the 4/4 focused install-contract suite; package-artifact and cross-platform evidence remain open.
+  - OW-071-11 accepted at 175a737 after focused workflow-doc tests, public-docs/docs-contract gates, and independent architecture/privacy re-review at 97/100. The two initial P1 documentation gaps and final P2 encoding issue were fixed before promotion; evidence is internal/owledge/reviews/ow-071-11-workflow-architecture-privacy-evidence.md.
 next_actions:
-  - Preflight OW-071-11 against the accepted lifecycle, privacy, template, CLI, and local-HTTP boundaries.
-  - Keep OW-071-11, OW-071-12, and OW-071-14 ready until the orchestrator explicitly dispatches non-overlapping lanes.
-  - Record fixture evidence and a cross-platform install review before advancing the remaining Phase 071-B tickets.
+  - Preflight OW-071-12 against accepted skill discovery, instruction precedence, runtime, MCP, and hook boundaries.
+  - Keep OW-071-14 ready; do not restart the blocked OW-071-10 package/cross-platform lane without a supported Python 3.10-3.12 and platform evidence environment.
+  - Record OW-071-12 fixture evidence and independent runtime-conformance review before advancing Phase 071-B.
 last_commands:
   - "python tools/validate_v1_delivery_plan.py (exit 0; 64 tickets, 25 gates, 44 waves, 0 errors; one allowed OW-080-13 checkpoint warning)"
   - "python tools/validate_live_work_register.py --project-root . (exit 0; 21/21 records)"
@@ -397,8 +398,11 @@ last_commands:
   - "python tools/owledge_core.py --project-root . test-contracts (exit 0; 386/386)"
   - "python tools/owledge.py test public-docs --project-root . (exit 0; 235/235)"
   - "python tools/owledge.py test private-path-clean --project-root . (exit 0; zero findings)"
+  - "python -m unittest tests.unit.test_ow07111_workflow_docs -v (exit 0; 6 tests)"
+  - "python tools/owledge.py test public-docs --project-root . (exit 0; 252/252)"
+  - "python tools/owledge.py test docs-contract --project-root . (exit 0)"
 checkpoint:
-  last_completed_action: "OW-071-10 documentation P0 was closed at 9e31392, then its remaining package-artifact/cross-platform acceptance was recorded as an external environment blocker; OW-071-11 is now the sole active non-overlapping B2 lane."
+  last_completed_action: "OW-071-11 was accepted at 175a737 after a two-step independent architecture/privacy re-review; all lifecycle nodes map to checked artifacts, workflow/privacy/authority boundaries are explicit, and the final verdict is pass (97/100)."
   changed_files:
     - "README.md"
     - "docs/README.md"
@@ -407,19 +411,24 @@ checkpoint:
     - "docs/install/principles-only.md"
     - "docs/install/project.md"
     - "tests/unit/test_ow07110_install_contract.py"
+    - "docs/how-owledge-works.md"
+    - "tests/unit/test_ow07111_workflow_docs.py"
+    - "internal/owledge/reviews/ow-071-11-workflow-architecture-privacy-evidence.md"
   passed_commands:
     - "Public docs passed with zero failures after adding the Installation Hub"
     - "Docs contract passed with zero failures after adding the Installation Hub"
     - "Clean source init-project then doctor smoke passed with score 100"
     - "Clean source footprint: 184 files / 894212 bytes; .owledge/: 115 files / 83798 bytes"
     - "Focused OW-071-10 install-contract suite: 4/4 passed, including source init/doctor idempotency and source-only demo boundary"
+    - "Focused OW-071-11 workflow-doc suite: 6/6 passed; public-docs 252/252 and docs-contract passed"
+    - "Independent OW-071-11 architecture/privacy QA: final pass, 97/100, no open P0/P1/P2"
     - "git diff --check, exit 0"
   failed_commands:
     - "Package-artifact smoke was not completed in this Windows environment: the inherited dist wheel is unreadable by pip/copy under sandbox permissions, and a clean local wheel build fails because the only installed interpreter is Python 3.14 without importable setuptools.build_meta. This is environmental; do not treat the package recipe as verified until replayed under supported Python 3.10-3.12."
     - "python -m unittest tests.unit.test_validate_v1_delivery_plan tests.unit.test_validate_live_work_register -q: one pre-existing downstream mismatch; test_current_control_plane_is_valid still expects zero warnings while accepted OW-080-13 intentionally emits one internal-checkpoint warning. The validator itself passed with zero errors."
     - "python tools/owledge_core.py --project-root . validate-memory --strict: 307 pre-existing legacy frontmatter failures across historical internal memory; the touched canonical plan/checklists pass the release-specific frontmatter validation inside validate_v1_delivery_plan.py."
-  workspace_state: "G-071-A-TRUTH remains formally promoted; OW-071-04 is accepted; OW-071-10 is externally blocked only on package/cross-platform evidence; OW-071-11 is the sole active non-overlapping B2 lane."
-  next_exact_action: "Load OW-071-11's direct concept/workflow references and implement the bounded lifecycle, privacy, and automation contract before independent architecture/privacy QA."
+  workspace_state: "G-071-A-TRUTH remains formally promoted; OW-071-04 and OW-071-11 are accepted; OW-071-10 is externally blocked only on package/cross-platform evidence; OW-071-12 is the sole active non-overlapping B2 lane."
+  next_exact_action: "Load OW-071-12's direct skill, instruction, hook, MCP, and harness references; implement only the bounded discovery and executable-integration contract before independent runtime-conformance QA."
   open_assumptions:
     - "The product owner wants the existing five-release train retained unless a later version reflection changes it."
     - "Local serial execution is the default; subagents are exceptional and justified only by independent risk reduction."
@@ -427,5 +436,5 @@ checkpoint:
     - "Do not start v0.8.0 before G-071-ALIGNMENT and an explicit owner approve decision."
     - "Do not trust or publish inherited dist artifacts; rebuild from committed source at RC."
     - "Do not broaden the accepted local HTTP profile or benchmark claims while rewriting adoption documentation."
-updated_at: "2026-07-29T22:28:44+02:00"
+updated_at: "2026-07-29T23:00:00+02:00"
 updated_by: codex
