@@ -16,3 +16,10 @@ unchanged and generated Owledge files should live under
 `examples/demo-vault/owledge-module/`.
 
 Generated module files are local demo output and should not be committed.
+
+## Vibecoding Golden Demo
+
+[`vibecoding-golden-demo/`](vibecoding-golden-demo/) contains the read-only
+30-second proof and three linked seed artifacts used by the package-only
+[Golden Demo](../docs/vibecoding-golden-demo.md). The seed files are reference
+content; they are not automatically installed into a user project.

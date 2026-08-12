@@ -38,6 +38,7 @@ separates no-install, package, source, adapter, and add-on paths.
 ## I want Owledge inside a coding project
 
 - Read [quickstart.md](quickstart.md)
+- Try the bounded [vibecoding golden demo](vibecoding-golden-demo.md)
 - Then read [command-reference.md](command-reference.md)
 - Use `uvx owledge quickstart --target <path>` for the package-first path
 - Expect `OWLEDGE.md` and `.owledge/` in new v0.7.0 projects
