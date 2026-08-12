@@ -1,12 +1,12 @@
 schema_version: 1
-document_version: 10
+document_version: 11
 project: owledge
 plan: internal/owledge/plans/owledge-v1-autonomous-delivery-master-plan.md
 objective: Deliver Owledge v0.7.1 through a Standalone Core GA and bounded Single-Organization Hub Beta with recall-first Research Memory and portable agent adapters.
 status: in_progress
 current_release: v0.8.0
-current_phase: 080-A
-active_ticket: OW-080-04
+current_phase: 080-C
+active_ticket: OW-080-09
 last_green_gate: G-071-ALIGNMENT
 alignment:
   state: approved
@@ -488,8 +488,9 @@ last_completed_actions:
   - OW-071-06 accepted pending commit after Owlib current-contract migration, 10 focused tests (one Windows symlink integration skip), and independent privacy/migration re-review at 94/100 with no P0/P1 findings.
   - OW-080-02 accepted through 5f1cbe4 after a preview-only migration and fail-closed contract review loop. Independent re-review accepted 97/100 with no P0/P1; evidence is evidence/OW-080-02/manifest.yaml.
   - OW-080-03 accepted through 694f506 after independent state-machine QA at 95/100 with no P0/P1; evidence is evidence/OW-080-03/manifest.yaml.
+  - OW-080-04 accepted through 3e91770 after independent evidence/recovery QA at 96/100 with no P0/P1; evidence is evidence/OW-080-04/manifest.yaml.
 next_actions:
-  - Execute OW-080-04 only within its declared execution/evidence paths; do not activate later v0.8 tickets yet.
+  - Execute OW-080-09 only within its declared migration/recovery paths; W-080-A3 is the next dependency-ready wave.
   - Retain the three-OS wheel-only fixture and collect executed macOS/Linux evidence at OW-100-09; do not issue an earlier cross-platform support claim.
 last_commands:
   - "python tools/validate_v1_delivery_plan.py (exit 0; 64 tickets, 25 gates, 44 waves, 0 errors; one allowed OW-080-13 checkpoint warning)"
@@ -514,7 +515,7 @@ last_commands:
   - "python tools/owledge.py test public-docs --project-root .; python tools/owledge.py test docs-contract --project-root .; python tools/owledge.py test mcp-readonly --project-root .; python tools/owledge.py test runtime-adapters --project-root . (exit 0; public-docs 0 failures, docs-contract 473 checks)"
   - "PYTHONPATH=owlib/src python -m unittest discover -s owlib/tests -v (exit 0; 10 tests, one Windows symlink integration skip)"
 checkpoint:
-  last_completed_action: "OW-080-03 is accepted: WorkContract DAG validation, dependency readiness, WIP ownership, contract-bound completion proof, atomic CAS, public CLI, and independent QA are green."
+  last_completed_action: "OW-080-04 is accepted: Checkpoint, GateResult, and EvidenceManifest contracts bind exact commit/input, exit codes, side effects, idempotency, independent review, and stale-proof rejection."
   changed_files:
     - "README.md"
     - "docs/README.md"
@@ -571,8 +572,8 @@ checkpoint:
     - "python -m unittest tests.unit.test_validate_v1_delivery_plan tests.unit.test_validate_live_work_register -q: one pre-existing downstream mismatch; test_current_control_plane_is_valid still expects zero warnings while accepted OW-080-13 intentionally emits one internal-checkpoint warning. The validator itself passed with zero errors."
     - "python tools/owledge_core.py --project-root . validate-memory --strict: 307 pre-existing legacy frontmatter failures across historical internal memory; the touched canonical plan/checklists pass the release-specific frontmatter validation inside validate_v1_delivery_plan.py."
     - "python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports: completed 36/38 on 2026-08-12; source-identity correctly rejected the dirty planning tree and upgrade-drift exposed a host-project/Kit-mode regression. Routed to OW-071-08 under F-071-24."
-  workspace_state: "G-071-ALIGNMENT is promoted; OW-080-01 through OW-080-03 are accepted. OW-080-04 is the sole active v0.8 evidence/recovery lane. Publication, tagging, release, and push remain blocked."
-  next_exact_action: "Read only OW-080-04 and its gate context, then implement checkpoint/evidence integrity without activating later tickets."
+  workspace_state: "G-071-ALIGNMENT is promoted; OW-080-01 through OW-080-04 are accepted. OW-080-09 is the sole active v0.8 migration/recovery lane. Publication, tagging, release, and push remain blocked."
+  next_exact_action: "Read only OW-080-09 and its gate context, then implement preview/apply/recovery migration semantics without activating OW-080-16."
   open_assumptions:
     - "The product owner wants the existing five-release train retained unless a later version reflection changes it."
     - "Local serial execution is the default; subagents are exceptional and justified only by independent risk reduction."
@@ -580,5 +581,5 @@ checkpoint:
     - "Do not start v0.8.0 before G-071-ALIGNMENT and an explicit owner approve decision."
     - "Do not trust or publish inherited dist artifacts; rebuild from committed source at RC."
     - "Do not broaden the accepted local HTTP profile or benchmark claims while rewriting adoption documentation."
-updated_at: "2026-08-12T18:20:00+02:00"
+updated_at: "2026-08-12T19:20:00+02:00"
 updated_by: codex

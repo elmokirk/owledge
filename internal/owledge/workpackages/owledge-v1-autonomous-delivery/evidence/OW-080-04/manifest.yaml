@@ -1,0 +1,19 @@
+ticket: OW-080-04
+status: accepted
+accepted_at: "2026-08-12"
+source_commits: [1428dff, 3e91770]
+verification:
+  - "python -m unittest tests.unit.test_ow08004_evidence_contracts -v: 3 passed"
+  - "python -m py_compile tools/owledge.py tools/owledge_evidence_contracts.py: passed"
+  - "fresh build-project-kit --verify: passed; doctor score 100"
+  - "python tools/validate_v1_delivery_plan.py: 0 errors"
+independent_qa:
+  result: accepted
+  score: 96
+  resolved_p1:
+    - stale commit/input binding is mandatory at public CLI/runtime
+    - self-only QA is mandatory-fail-closed
+    - schema/runtime closed manifest structure
+residual_risks:
+  - "Evidence contract validates bindings and reproducibility metadata; concrete migration apply/recovery is OW-080-09."
+publication_authority: not_granted
