@@ -140,6 +140,7 @@ HOST_TOOL_FILES = [
     "owledge_research_memory.py",
     "owledge_context_compiler.py",
     "owledge_context_profiles.py",
+    "owledge_rag_projection.py",
     "validate_benchmark_baseline.py",
     "validate_upgrade_notes.py",
     "build_kb_module.py",
@@ -3883,6 +3884,7 @@ def main(argv: list[str] | None = None) -> int:
     migrate_p.add_argument("--output-plan")
     recall_p = sub.add_parser("research-recall", parents=[project_parent])
     recall_p.add_argument("--query", required=True)
+    sub.add_parser("rag-projection-v1", parents=[project_parent])
 
     test_p = sub.add_parser("test", parents=[project_parent])
     test_p.add_argument(
@@ -4113,6 +4115,9 @@ def main(argv: list[str] | None = None) -> int:
             return 0 if result.get("passed") else 1
         if args.command == "research-recall":
             print_json(owledge_research_memory.recall(owledge_research_memory.load_local_records(root), query=args.query, allowed_scopes={"project_user"}))
+            return 0
+        if args.command == "rag-projection-v1":
+            print_json(core.export_rag_projection_v1(root))
             return 0
         if args.command == "test":
             suites: dict[str, Callable[[], dict[str, Any]]] = {

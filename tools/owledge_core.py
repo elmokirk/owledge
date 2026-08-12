@@ -40,6 +40,7 @@ import uuid
 from typing import Any
 
 import owledge_context_compiler
+import owledge_rag_projection
 
 
 UTC = getattr(dt, "UTC", dt.timezone.utc)
@@ -3190,6 +3191,35 @@ def export_rag_documents(
         "generation_manifest": str(generation_manifest.relative_to(root)).replace("\\", "/"),
         "rejected_counts": rejected,
     }
+
+
+def export_rag_projection_v1(root: pathlib.Path) -> dict[str, Any]:
+    """Return a clean, deterministic projection beside the legacy RAG export."""
+    rows: list[dict[str, Any]] = []
+    rejected: dict[str, int] = {}
+    seen: set[str] = set()
+    source_seen: set[str] = set()
+    for record in load_memory_records(root, include_sessions=False):
+        source_hash = str(record.get("source_hash") or "")
+        if source_hash and source_hash in source_seen:
+            rejected["duplicate_source"] = rejected.get("duplicate_source", 0) + 1
+            continue
+        chunks = owledge_rag_projection.project(record)
+        if not chunks:
+            rejected["not_projectable"] = rejected.get("not_projectable", 0) + 1
+        elif source_hash:
+            source_seen.add(source_hash)
+        for chunk in chunks:
+            claim = chunk["metadata"]["claim_hash"]
+            if claim in seen:
+                rejected["duplicate_claim"] = rejected.get("duplicate_claim", 0) + 1
+                continue
+            seen.add(claim)
+            rows.append(chunk)
+    rows.sort(key=lambda row: row["chunk_id"])
+    return {"projection_version": "1.0", "chunks": rows,
+            "digest": sha256_text(json.dumps(rows, sort_keys=True, separators=(",", ":"))),
+            "rejected_counts": rejected}
 
 
 def export_lightrag(
