@@ -1,0 +1,1 @@
+{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"https://owledge.dev/schemas/evidence-manifest-v1.schema.json","title":"Owledge EvidenceManifest v1","type":"object","additionalProperties":false,"required":["checkpoint","gate_result","artifacts"],"properties":{"checkpoint":{"type":"object"},"gate_result":{"type":"object"},"artifacts":{"type":"array","minItems":1}}}

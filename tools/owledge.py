@@ -68,6 +68,7 @@ if str(SCRIPT_DIR) not in sys.path:
 
 import owledge_core as core  # noqa: E402
 import owledge_work_contract as work_contract  # noqa: E402
+import owledge_evidence_contracts as evidence_contracts  # noqa: E402
 import build_kb_module  # noqa: E402
 import build_project_folder_kit  # noqa: E402
 import validate_benchmark_baseline as benchmark_baseline  # noqa: E402
@@ -130,6 +131,7 @@ HOST_TOOL_FILES = [
     "owledge_core.py",
     "owledge_contracts.py",
     "owledge_work_contract.py",
+    "owledge_evidence_contracts.py",
     "build_kb_module.py",
     "build_project_folder_kit.py",
 ]
@@ -3853,6 +3855,12 @@ def main(argv: list[str] | None = None) -> int:
     work_p.add_argument("--gate-ref", action="append", default=[])
     work_p.add_argument("--evidence-ref", action="append", default=[])
 
+    evidence_p = sub.add_parser("evidence-manifest", parents=[project_parent])
+    evidence_p.add_argument("--manifest", required=True)
+    evidence_p.add_argument("--expected-commit")
+    evidence_p.add_argument("--expected-input-hash")
+    evidence_p.add_argument("--owner-actor")
+
     test_p = sub.add_parser("test", parents=[project_parent])
     test_p.add_argument(
         "suite",
@@ -4034,6 +4042,11 @@ def main(argv: list[str] | None = None) -> int:
                 contract = work_contract.atomic_transition(contract_path, args.expected_status, args.transition, actor=args.actor, dependency_statuses=dependency_statuses, gate_refs=args.gate_ref, evidence_refs=args.evidence_ref)
             print_json({"passed": True, "contract": contract})
             return 0
+        if args.command == "evidence-manifest":
+            value = json.loads(resolve_path(args.manifest).read_text(encoding="utf-8"))
+            errors = evidence_contracts.validate_evidence_manifest(value, expected_commit=args.expected_commit, expected_input_hash=args.expected_input_hash, owner_actor=args.owner_actor)
+            print_json({"passed": not errors, "errors": errors})
+            return 0 if not errors else 1
         if args.command == "test":
             suites: dict[str, Callable[[], dict[str, Any]]] = {
                 "public-docs": lambda: public_docs_gate(root),

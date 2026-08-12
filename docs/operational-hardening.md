@@ -63,6 +63,13 @@ ready --actor agent-a`. The update is atomic; a stale expected status, cycle,
 missing dependency, second claim, or attempt to accept/done without explicit
 gate and evidence references fails without a partial state update.
 
+An `EvidenceManifest` binds a checkpoint's exact next action, input hash,
+tested commit, command exit codes, side effects, and idempotency claim to an
+independently reviewed GateResult. `python tools/owledge.py evidence-manifest
+--manifest evidence.json --expected-commit <sha>` fails closed for stale commit
+or input digests, missing exit codes, mismatched checkpoint/gate inputs, and
+self-only QA.
+
 ## Red-Team Metrics During Work
 
 Use these gates during implementation:
