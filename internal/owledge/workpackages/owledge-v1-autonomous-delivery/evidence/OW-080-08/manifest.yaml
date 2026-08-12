@@ -1,0 +1,16 @@
+ticket: OW-080-08
+status: accepted
+accepted_at: "2026-08-12"
+source_commits: [658c4b3]
+verification:
+  - "python -m unittest tests.unit.test_ow08008_rag_projection: 5 passed"
+  - "python tools/owledge.py rag-projection-v1 --project-root .: deterministic projection output"
+  - "python tools/validate_v1_delivery_plan.py: 0 errors, 61 tickets"
+independent_qa:
+  result: accepted
+  score: 96
+coverage:
+  - "Heading-aware embedding chunks exclude raw frontmatter and governance fields."
+  - "Metadata retains source hash/version, freshness, tombstone, claim hash, and typed edges."
+  - "Private, secret, stale, unqualified research, CRLF-frontmatter, duplicate-source, and duplicate-claim cases fail closed."
+publication_authority: not_granted
