@@ -1,0 +1,18 @@
+ticket: OW-080-06
+status: accepted
+accepted_at: "2026-08-12"
+source_commits: [229034f]
+verification:
+  - "python -m unittest tests.unit.test_ow08006_progressive_disclosure tests.unit.test_ow07107_hermes_readonly: 6 passed"
+  - "python tools/validate_v1_delivery_plan.py: 0 errors, 61 tickets"
+  - "git diff --check: passed"
+independent_qa:
+  result: accepted
+  resolved_p1:
+    - "Retrieval profile activates the bounded synopsis tool."
+    - "MCP synopsis is bound to the computed source hash."
+coverage:
+  - "Non-canonical synopsis receipt with body-drift detection."
+  - "Task-class allowlists keep unused tools inactive and reject unknown classes."
+  - "Read-only MCP contract and generated-kit tool inventory remain consistent."
+publication_authority: not_granted
