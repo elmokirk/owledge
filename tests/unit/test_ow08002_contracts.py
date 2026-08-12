@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import json
 import pathlib
 import sys
 import unittest
@@ -92,6 +93,17 @@ class ContractEnvelopeTests(unittest.TestCase):
             document["knowledge_scope"] = scope
             document.pop("source_path", None)
             self.assertEqual(contracts.validate_artifact_envelope(document), [], scope)
+
+    def test_shipped_schema_profiles_have_examples_and_strict_core_boundaries(self):
+        schema_root = REPO_ROOT / "templates" / "owledge" / "schemas"
+        names = ["artifact-envelope-v1", "project-manifest-v1", "resource-ref-v1", "settings-v1", "capability-receipt-v1"]
+        schemas = {name: json.loads((schema_root / f"{name}.schema.json").read_text(encoding="utf-8")) for name in names}
+        self.assertFalse(schemas["artifact-envelope-v1"]["additionalProperties"])
+        self.assertFalse(schemas["resource-ref-v1"]["additionalProperties"])
+        self.assertFalse(schemas["capability-receipt-v1"]["additionalProperties"])
+        self.assertIn("profile", schemas["project-manifest-v1"]["required"])
+        for name, schema in schemas.items():
+            self.assertTrue(schema.get("examples"), name)
 
 
 if __name__ == "__main__":

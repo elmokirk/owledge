@@ -22,11 +22,12 @@
     "applies_to": {"type": "array", "items": {"type": "string"}},
     "edges": {"type": "array", "items": {"$ref": "edge.schema.json"}},
     "extensions": {"type": "object", "patternProperties": {"^[a-z0-9][a-z0-9_-]*(\\.[a-z0-9][a-z0-9_-]*)+$": {}}, "additionalProperties": false},
-    "resource_refs": {"type": "array", "items": {"$ref": "resource-ref-v1.schema.json"}},
-    "profile": {"type": "string"},
-    "title": {"type": "string"},
-    "summary": {"type": "string"},
+    "resource_refs": {"type": "array", "items": {"$ref": "resource-ref-v1.schema.json"}, "default": []},
+    "profile": {"type": "string", "default": "project_context"},
+    "title": {"type": "string", "default": ""},
+    "summary": {"type": "string", "default": ""},
     "created_at": {"type": "string"},
     "updated_at": {"type": "string"}
-  }
+  },
+  "examples": [{"memory_id": "mem:tenant:customer:project:canonical:example", "schema_version": "1.0", "profile_version": "1.0", "document_version": 1, "source_hash": "aaaaaaaaaaaaaaaa", "knowledge_scope": "project_user", "server_project_scope": "project-001", "owner_user_id": "user-001", "lifecycle": "candidate", "visibility": "private", "data_class": "internal", "audience_ids": [], "transferability": "project_only", "applies_to": ["project-001"], "edges": [], "extensions": {}}]
 }

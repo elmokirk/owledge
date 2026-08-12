@@ -27,6 +27,12 @@ for legacy frontmatter. It does not read caller-supplied paths as authority and
 does not apply a write; the server-resolved project scope, owner, source hash,
 preserved legacy fields, and `apply: false` receipt are explicit.
 
+Schema examples and defaults are descriptive only; they never fill in identity,
+scope, ownership, lifecycle, or source-integrity facts. A migration mapping
+always keeps `schema_version`, `profile_version`, `document_version`, and
+`source_hash` distinct: schema/profile changes use an explicit preview, while a
+material document change requires the next exact document revision.
+
 ## Scope and product boundary
 
 Scope (`project_user`, `user_global`, `enterprise`), knowledge abstraction, and

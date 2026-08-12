@@ -11,5 +11,6 @@
       "type": "array",
       "items": {"type": "object", "additionalProperties": false, "required": ["name", "values"], "properties": {"name": {"enum": ["core", "organization", "user", "project", "session"]}, "values": {"type": "object"}}}
     }
-  }
+  },
+  "examples": [{"schema_version": "1.0", "layers": [{"name": "core", "values": {"allow_cross_project": false, "allowed_scopes": ["project_user"]}}]}]
 }

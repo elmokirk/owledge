@@ -17,6 +17,7 @@
     "result": {"enum": ["supported", "unsupported", "denied"]},
     "reason_code": {"type": "string", "minLength": 1},
     "migration_hint": {"type": "string"},
-    "extensions": {"type": "object", "patternProperties": {"^[a-z0-9][a-z0-9_-]*(\\.[a-z0-9][a-z0-9_-]*)+$": {}}, "additionalProperties": false}
-  }
+    "extensions": {"type": "object", "patternProperties": {"^[a-z0-9][a-z0-9_-]*(\\.[a-z0-9][a-z0-9_-]*)+$": {}}, "additionalProperties": false, "default": {}}
+  },
+  "examples": [{"request_id": "request-001", "protocol_version": "1.0", "core_api_range": ">=1", "capability_id": "contract.validate", "operation_kind": "query", "requested_scopes": ["project_user"], "effective_permissions": ["read"], "data_class": "internal", "result": "supported", "reason_code": "ok"}]
 }

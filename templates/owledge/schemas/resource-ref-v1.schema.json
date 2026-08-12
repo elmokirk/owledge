@@ -16,5 +16,6 @@
     "availability": {"enum": ["available", "unavailable", "withdrawn", "unknown"]},
     "access_state": {"enum": ["authorized", "restricted", "revoked", "unknown"]},
     "extraction_provenance": {"type": "string", "minLength": 1}
-  }
+  },
+  "examples": [{"resource_id": "resource-001", "relation": "derived_from", "locator": "opaque://source/001", "media_type": "text/markdown", "content_hash": "aaaaaaaaaaaaaaaa", "size_bytes": 12, "data_class": "internal", "availability": "available", "access_state": "authorized", "extraction_provenance": "manual"}]
 }
