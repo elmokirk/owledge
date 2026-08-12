@@ -1,0 +1,21 @@
+ticket: OW-080-09
+status: accepted
+accepted_at: "2026-08-12"
+source_commits: [52076b2, 51182a5, 6550744]
+verification:
+  - "python -m unittest tests.unit.test_ow08009_health tests.unit.test_ow08009_migration -v: 8 passed"
+  - "python tools/owledge.py test docs-contract --project-root .: 350 checks passed"
+  - "python tools/validate_v1_delivery_plan.py: 0 errors"
+independent_qa:
+  result: accepted
+  score: 96
+  resolved_p1:
+    - metadata-only health allowlist and full required failure classes
+    - managed-surface ownership and path containment
+    - preview/apply source, target, Windows-drive, symlink, and junction containment
+    - 10/1000 deterministic health fixtures with bounded runtime
+    - idempotent apply and postflight recovery
+limitations:
+  - "Health reports metadata and stable IDs only; it deliberately excludes knowledge bodies and has no model call."
+  - "Legacy mapping remains preview-first; no user-managed/never-touch Markdown is rewritten."
+publication_authority: not_granted
