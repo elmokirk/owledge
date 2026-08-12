@@ -3876,7 +3876,6 @@ def main(argv: list[str] | None = None) -> int:
     migrate_p.add_argument("--output-plan")
     recall_p = sub.add_parser("research-recall", parents=[project_parent])
     recall_p.add_argument("--query", required=True)
-    recall_p.add_argument("--scope", action="append", default=["project_user"])
 
     test_p = sub.add_parser("test", parents=[project_parent])
     test_p.add_argument(
@@ -4097,11 +4096,7 @@ def main(argv: list[str] | None = None) -> int:
             print_json(result)
             return 0 if result.get("passed") else 1
         if args.command == "research-recall":
-            scopes = set(args.scope)
-            if not scopes.issubset(owledge_research_memory.SCOPES):
-                print_json({"passed": False, "error": "unknown research scope"})
-                return 2
-            print_json(owledge_research_memory.recall(owledge_research_memory.load_local_records(root), query=args.query, allowed_scopes=scopes))
+            print_json(owledge_research_memory.recall(owledge_research_memory.load_local_records(root), query=args.query, allowed_scopes={"project_user"}))
             return 0
         if args.command == "test":
             suites: dict[str, Callable[[], dict[str, Any]]] = {
