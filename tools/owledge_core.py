@@ -368,6 +368,7 @@ REQUIRED_FILES = [
     "tools/owledge_contracts.py",
     "tools/owledge_work_contract.py",
     "tools/owledge_evidence_contracts.py",
+    "tools/owledge_health.py",
     "tools/build_project_folder_kit.py",
     "tools/build_kb_module.py",
     "benchmarks/README.md",

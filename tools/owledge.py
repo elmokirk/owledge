@@ -69,6 +69,7 @@ if str(SCRIPT_DIR) not in sys.path:
 import owledge_core as core  # noqa: E402
 import owledge_work_contract as work_contract  # noqa: E402
 import owledge_evidence_contracts as evidence_contracts  # noqa: E402
+import owledge_health  # noqa: E402
 import build_kb_module  # noqa: E402
 import build_project_folder_kit  # noqa: E402
 import validate_benchmark_baseline as benchmark_baseline  # noqa: E402
@@ -132,6 +133,7 @@ HOST_TOOL_FILES = [
     "owledge_contracts.py",
     "owledge_work_contract.py",
     "owledge_evidence_contracts.py",
+    "owledge_health.py",
     "build_kb_module.py",
     "build_project_folder_kit.py",
 ]
@@ -3860,6 +3862,8 @@ def main(argv: list[str] | None = None) -> int:
     evidence_p.add_argument("--expected-commit")
     evidence_p.add_argument("--expected-input-hash", required=True)
     evidence_p.add_argument("--owner-actor", required=True)
+    health_p = sub.add_parser("knowledge-health", parents=[project_parent])
+    health_p.add_argument("--context-budget-chars", type=int, default=24000)
 
     test_p = sub.add_parser("test", parents=[project_parent])
     test_p.add_argument(
@@ -4054,6 +4058,10 @@ def main(argv: list[str] | None = None) -> int:
             errors = evidence_contracts.validate_evidence_manifest(value, expected_commit=expected_commit, expected_input_hash=args.expected_input_hash, owner_actor=args.owner_actor)
             print_json({"passed": not errors, "errors": errors})
             return 0 if not errors else 1
+        if args.command == "knowledge-health":
+            result = owledge_health.knowledge_health(root, context_budget_chars=args.context_budget_chars)
+            print_json(result)
+            return 0 if result["passed"] else 1
         if args.command == "test":
             suites: dict[str, Callable[[], dict[str, Any]]] = {
                 "public-docs": lambda: public_docs_gate(root),
