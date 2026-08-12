@@ -1,18 +1,22 @@
 schema_version: 1
-document_version: 4
+document_version: 5
 project: owledge
 plan: internal/owledge/plans/owledge-v1-autonomous-delivery-master-plan.md
 objective: Deliver Owledge v0.7.1 through a Standalone Core GA and bounded Single-Organization Hub Beta with recall-first Research Memory and portable agent adapters.
-status: awaiting_user_alignment
-current_release: v0.7.1
-current_phase: 071-ALIGNMENT
-active_ticket: OW-071-09
-last_green_gate: G-071-RC
+status: in_progress
+current_release: v0.8.0
+current_phase: 080-A
+active_ticket: OW-080-01
+last_green_gate: G-071-ALIGNMENT
 alignment:
-  state: awaiting_user_alignment
-  awaiting_release: v0.7.1
-  active_alignment_ticket: OW-071-09
-  user_decision: null
+  state: approved
+  awaiting_release: null
+  active_alignment_ticket: null
+  user_decision: "approve — execute v0.8; publication/tag remains blocked"
+  decided_by: product-owner
+  decided_at: "2026-08-12"
+  scope: "Unlock planned v0.8.0 execution beginning with OW-080-01."
+  constraints: "No publication, tag, release, or push authorization; D-071-24 macOS/Linux evidence remains deferred to OW-100-09; subsequent alignment stops remain mandatory."
   open_questions: []
   findings:
     - id: F-071-01
@@ -408,8 +412,16 @@ alignment:
       constraints: "No DSAR workflow, subject identity graph, universal connector suite, binary/media warehouse, transcription engine, public plugin SDK/marketplace, or full Owledge harness enters V1. The exact PII Masker package remains unresolved until the owner supplies a package or repository. Current OW-071-05 execution and G-071-ALIGNMENT remain unchanged."
       affected_artifacts: ["post-v1-erasure-extensibility-and-resource-link-decision-2026-08-12.md", "enterprise-agentic-knowledge-and-deterministic-erasure-architecture-2026-08-12.md", "ROADMAP.md", "owledge-v1-autonomous-delivery-master-plan.md", "owledge-v1-federated-research-memory-and-pi-adapter-reprioritization.md", "OW-080-01", "OW-080-02", "OW-080-09", "OW-081-01", "OW-100-03", "OW-100-05", "OW-100-09"]
       verification_status: owner_approved_recorded_in_future_plan
+    - id: D-071-32
+      related: [OW-071-09, G-071-ALIGNMENT, OW-080-01]
+      authority: product-owner
+      decision: "Approve v0.7.1 alignment and unlock planned v0.8.0 execution beginning with OW-080-01."
+      rationale: "The owner accepted the evidence-linked v0.7.1 technical candidate and its documented limitations."
+      constraints: "Publication, tagging, release, and push remain unauthorized. D-071-24 macOS/Linux evidence remains deferred to OW-100-09; every later version must stop for owner alignment."
+      affected_artifacts: ["release-updates/v0.7.1.md", "evidence/OW-071-09/", "RUN-STATE.yaml", "BACKLOG.yaml", "OW-080-01"]
+      verification_status: owner_approved
   next_plan_reflection:
-    status: drafted
+    status: approved_for_execution
     target_release: v0.8.0
     items:
       - "Add OW-080-16 Research Memory contracts and recall-first lookup as a v0.8.0 P0 contract dependency."
@@ -475,7 +487,7 @@ last_completed_actions:
   - G-071-B-ADOPTION promoted from cumulative evidence at cb741d3: 28 focused adoption tests, public-docs, docs-contract, read-only MCP, runtime-adapter, and control-plane checks passed without broadening the D-071-24 platform boundary.
   - OW-071-06 accepted pending commit after Owlib current-contract migration, 10 focused tests (one Windows symlink integration skip), and independent privacy/migration re-review at 94/100 with no P0/P1 findings.
 next_actions:
-  - Await an explicit v0.7.1 owner decision (approve, adjust, or defer) in release-updates/v0.7.1.md; do not activate another ticket.
+  - Execute OW-080-01 only within its declared contract and decision allowed paths; do not activate another v0.8 ticket until it is accepted.
   - Retain the three-OS wheel-only fixture and collect executed macOS/Linux evidence at OW-100-09; do not issue an earlier cross-platform support claim.
 last_commands:
   - "python tools/validate_v1_delivery_plan.py (exit 0; 64 tickets, 25 gates, 44 waves, 0 errors; one allowed OW-080-13 checkpoint warning)"
@@ -545,8 +557,8 @@ checkpoint:
     - "python -m unittest tests.unit.test_validate_v1_delivery_plan tests.unit.test_validate_live_work_register -q: one pre-existing downstream mismatch; test_current_control_plane_is_valid still expects zero warnings while accepted OW-080-13 intentionally emits one internal-checkpoint warning. The validator itself passed with zero errors."
     - "python tools/owledge_core.py --project-root . validate-memory --strict: 307 pre-existing legacy frontmatter failures across historical internal memory; the touched canonical plan/checklists pass the release-specific frontmatter validation inside validate_v1_delivery_plan.py."
     - "python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports: completed 36/38 on 2026-08-12; source-identity correctly rejected the dirty planning tree and upgrade-drift exposed a host-project/Kit-mode regression. Routed to OW-071-08 under F-071-24."
-  workspace_state: "G-071-RC passed on the clean v0.7.1 source commit (38/38 finalization checks). OW-071-09 is blocked in the required owner-alignment stop; D-071-24 platform limitations remain in force."
-  next_exact_action: "Obtain and record the owner's explicit v0.7.1 approve, adjust, or defer decision in release-updates/v0.7.1.md; do not start v0.8.0 until G-071-ALIGNMENT is formally promoted."
+  workspace_state: "G-071-ALIGNMENT is promoted after the owner approved v0.7.1 and unlocked planned v0.8.0 execution. Publication and tagging remain blocked; D-071-24 platform limitations remain in force."
+  next_exact_action: "Read OW-080-01 from ALL-TICKETS.md, its directly referenced decisions/contracts, and implement only its declared scope."
   open_assumptions:
     - "The product owner wants the existing five-release train retained unless a later version reflection changes it."
     - "Local serial execution is the default; subagents are exceptional and justified only by independent risk reduction."
