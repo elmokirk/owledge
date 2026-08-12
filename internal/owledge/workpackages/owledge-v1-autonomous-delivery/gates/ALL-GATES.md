@@ -70,7 +70,10 @@ Every gate starts from the tested integration commit and controlled environment 
 - Tickets: `OW-071-04`, `OW-071-10`, `OW-071-11`, `OW-071-12`, `OW-071-14`, `OW-071-05`.
 - Commands: docs link/lint and claim-map gates; Mermaid source validation;
   extracted-command smoke for every install route; host-project agent scenarios;
-  clean human and agent demo setup/run/reset on Windows/macOS/Linux fixtures.
+  clean human and agent demo setup/run/reset on the supported Windows fixture
+  plus the tracked Windows/macOS/Linux CI fixture contract. Under `D-071-24`,
+  executed macOS/Linux package transcripts remain mandatory Stable/GA evidence
+  in `OW-100-09`, not a v0.7.1 cross-platform support claim.
 - Thresholds: all public docs English; five-second fixture identifies audience,
   problem, outcome, boundary, and next action; no install command before the
   minimum mental model; no unexplained prerequisite or working directory;
@@ -79,8 +82,9 @@ Every gate starts from the tested integration commit and controlled environment 
   and host-project footprint plus ownership; Principles-only writes=0;
   automation/responsibility and capability maturity are complete; fixture
   agents select the supported path and report exact writes; 30-second,
-  no-write 30-second proof exposes its result and success signal; package-only
-  five-minute and cross-session proofs pass; rerun is idempotent; Owlib cannot
+  no-write 30-second proof exposes its result and success signal; the bounded
+  Windows package-only five-minute and cross-session proofs pass; rerun is
+  idempotent; Owlib cannot
   be labelled available/current before `G-071-C-COMPAT` is green;
   privacy, Hub-conflation, and unsupported-runtime overclaim failures=0.
 - Demonstrable increment: a vibecoder or coding agent understands
