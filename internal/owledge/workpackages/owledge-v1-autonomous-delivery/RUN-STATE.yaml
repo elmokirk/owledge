@@ -1,12 +1,12 @@
 schema_version: 1
-document_version: 5
+document_version: 6
 project: owledge
 plan: internal/owledge/plans/owledge-v1-autonomous-delivery-master-plan.md
 objective: Deliver Owledge v0.7.1 through a Standalone Core GA and bounded Single-Organization Hub Beta with recall-first Research Memory and portable agent adapters.
 status: in_progress
 current_release: v0.8.0
 current_phase: 080-A
-active_ticket: OW-080-01
+active_ticket: OW-080-02
 last_green_gate: G-071-ALIGNMENT
 alignment:
   state: approved
@@ -487,7 +487,7 @@ last_completed_actions:
   - G-071-B-ADOPTION promoted from cumulative evidence at cb741d3: 28 focused adoption tests, public-docs, docs-contract, read-only MCP, runtime-adapter, and control-plane checks passed without broadening the D-071-24 platform boundary.
   - OW-071-06 accepted pending commit after Owlib current-contract migration, 10 focused tests (one Windows symlink integration skip), and independent privacy/migration re-review at 94/100 with no P0/P1 findings.
 next_actions:
-  - Execute OW-080-01 only within its declared contract and decision allowed paths; do not activate another v0.8 ticket until it is accepted.
+  - Execute OW-080-02 only within its declared schema/tool/test/docs paths; do not activate another v0.8 ticket until it is accepted.
   - Retain the three-OS wheel-only fixture and collect executed macOS/Linux evidence at OW-100-09; do not issue an earlier cross-platform support claim.
 last_commands:
   - "python tools/validate_v1_delivery_plan.py (exit 0; 64 tickets, 25 gates, 44 waves, 0 errors; one allowed OW-080-13 checkpoint warning)"
@@ -557,8 +557,8 @@ checkpoint:
     - "python -m unittest tests.unit.test_validate_v1_delivery_plan tests.unit.test_validate_live_work_register -q: one pre-existing downstream mismatch; test_current_control_plane_is_valid still expects zero warnings while accepted OW-080-13 intentionally emits one internal-checkpoint warning. The validator itself passed with zero errors."
     - "python tools/owledge_core.py --project-root . validate-memory --strict: 307 pre-existing legacy frontmatter failures across historical internal memory; the touched canonical plan/checklists pass the release-specific frontmatter validation inside validate_v1_delivery_plan.py."
     - "python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports: completed 36/38 on 2026-08-12; source-identity correctly rejected the dirty planning tree and upgrade-drift exposed a host-project/Kit-mode regression. Routed to OW-071-08 under F-071-24."
-  workspace_state: "G-071-ALIGNMENT is promoted after the owner approved v0.7.1 and unlocked planned v0.8.0 execution. Publication and tagging remain blocked; D-071-24 platform limitations remain in force."
-  next_exact_action: "Read OW-080-01 from ALL-TICKETS.md, its directly referenced decisions/contracts, and implement only its declared scope."
+  workspace_state: "G-071-ALIGNMENT is promoted and OW-080-01 is accepted after independent architecture QA. OW-080-02 is the sole active v0.8 schema-contract lane; publication and tagging remain blocked."
+  next_exact_action: "Read OW-080-02 from ALL-TICKETS.md, ADR-080-01 through ADR-080-03, and implement only its declared schema/tool/test/docs scope."
   open_assumptions:
     - "The product owner wants the existing five-release train retained unless a later version reflection changes it."
     - "Local serial execution is the default; subagents are exceptional and justified only by independent risk reduction."
