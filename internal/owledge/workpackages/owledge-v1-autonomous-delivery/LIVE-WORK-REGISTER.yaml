@@ -1,5 +1,6 @@
 {
   "schema_version": 1,
+  "document_version": 1,
   "register_id": "owledge-feedback-live-work-v1",
   "current_product_version": "0.7.0",
   "active_delivery_release": "v0.7.1",
@@ -179,13 +180,13 @@
       "state": "superseded",
       "source": "docs/feedback-round-2026-06.md",
       "shipped_evidence": [],
-      "acceptance_gap": "The original prose enum does not bind consent, risk, dispatch authority, or promotion behavior.",
+      "acceptance_gap": "The original prose enum is replaced by versioned deterministic settings for knowledge authority and promotion; optional runtime-dispatch consent remains a separately documented post-V1 add-on.",
       "target_release": "v0.8.0",
       "owner_role": "orchestration-contract-engineer",
       "evidence_links": [
         "docs/strategic-roadmap-2026-2027.md"
       ],
-      "replacement_reference": "ticket:OW-080-12",
+      "replacement_reference": "ticket:OW-080-02",
       "deferred_reason": null
     },
     {

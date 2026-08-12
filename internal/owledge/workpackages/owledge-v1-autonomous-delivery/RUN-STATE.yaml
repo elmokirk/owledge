@@ -1,7 +1,8 @@
 schema_version: 1
+document_version: 4
 project: owledge
 plan: internal/owledge/plans/owledge-v1-autonomous-delivery-master-plan.md
-objective: Deliver Owledge v0.7.1 through v1.0 through gated autonomous execution.
+objective: Deliver Owledge v0.7.1 through a Standalone Core GA and bounded Single-Organization Hub Beta with recall-first Research Memory and portable agent adapters.
 status: in_progress
 current_release: v0.7.1
 current_phase: 071-B3
@@ -234,6 +235,26 @@ alignment:
       recommendation: "Route dated claim governance to OW-071-04 and keep pricing outside the baseline verdict."
       safe_default: "Treat undated prices as illustrative only."
       status: routed
+    - id: F-071-23
+      source: v1-architecture-sparring-session-start-audit-2026-08-11
+      evidence: "AGENTS.md requires the bootstrap-owledge skill when the root Owledge entrypoint/profile is missing, but no discoverable bootstrap-owledge SKILL.md exists in the repository skill surfaces; this maintainer checkout intentionally uses internal/owledge for dogfood and currently has no root OWLEDGE.md or .owledge directory."
+      severity: medium
+      user_impact: "An agent following the documented session-start rule cannot complete the prescribed recovery deterministically and may either stop or improvise an unsafe bootstrap."
+      release_impact: "Dogfood and installation instructions are inconsistent until the referenced skill is shipped/discoverable or the rule points to the canonical init/doctor command and explicitly recognizes the internal maintainer profile."
+      options: ["ship and test bootstrap-owledge skill", "replace the skill reference with the canonical init-project command", "define an explicit internal dogfood profile plus one of the prior two recovery paths"]
+      recommendation: "Define the internal dogfood profile explicitly and ship one canonical bootstrap interface used by both the session-start rule and installation docs."
+      safe_default: "Do not auto-bootstrap or rewrite the maintainer checkout; report the missing interface and continue through internal/owledge."
+      status: routed
+    - id: F-071-24
+      source: v1-session-final-plan-blind-spot-review-2026-08-12
+      evidence: "The complete finalization suite finished 36/38. source-identity failed on the intentionally dirty planning tree. upgrade-drift initialized a host project but called memory_doctor(mode=kit), so the nested version-drift row passed while the parent doctor failed."
+      severity: high
+      user_impact: "A release candidate cannot obtain truthful aggregate green evidence even when the installed kit version matches."
+      release_impact: "V0.7.1 RC and every later clean-source release gate remain blocked until the generated-surface mode regression has a non-mocked test and the full suite passes from committed source."
+      options: ["validate the generated host as host", "generate and validate a real source Kit surface", "ignore the parent doctor failure"]
+      recommendation: "Route the smallest correct host/Kit mode repair plus progress/terminal-manifest evidence into OW-071-08; reject ignoring or weakening the aggregate gate."
+      safe_default: "Keep G-071-RC blocked and do not treat the 36 passing sub-gates as release approval."
+      status: routed
   decisions:
     - id: D-071-01
       related: F-071-01
@@ -331,10 +352,80 @@ alignment:
       constraints: "The HTTP profile remains local-experimental and loopback-only. OW-071-04 may change adoption narrative and capability governance only; it must not broaden the remote, Team Hub, security, or benchmark claims accepted by G-071-A-TRUTH."
       affected_artifacts: ["evidence/OW-071-13/", "evidence/G-071-A-TRUTH/", "BACKLOG.yaml", "RUN-STATE.yaml", "v0.7.1 release plan and checklists", "OW-071-04"]
       verification_status: implemented_and_independently_accepted
+    - id: D-071-25
+      related: ["v1-reprioritization-2026-08-11", OW-080-16, OW-081-04, OW-100-11]
+      authority: product-owner-request
+      decision: "Target Standalone Core GA plus Single-Organization Hub Beta; keep Markdown/Git canonical; use an external OAuth/OIDC provider with human and service identities; model project_user, local-first private user_global, and centrally reviewed enterprise scopes; make Research recall-before-search and Pi a reference adapter; restrict agent writes to Candidate/Evidence; defer delivery orchestration, multi-tenant SaaS, SAML/SCIM, and HA from the v1 critical path."
+      rationale: "This concentrates v1 on reusable, governed knowledge and Research Memory while proving enterprise integration without turning Owledge into a runtime orchestrator or second canonical database."
+      constraints: "Current v0.7.1 execution remains at OW-071-05 and v0.8.0 stays locked behind G-071-ALIGNMENT; Hub claims remain Beta and one organization per deployment; private user_global data is not uploaded implicitly; Pi and MCP remain adapters over shared Core semantics."
+      affected_artifacts: ["ROADMAP.md", "owledge-v1-autonomous-delivery-master-plan.md", "BACKLOG.yaml", "AGENT-EXECUTION-MATRIX.yaml", "tickets/ALL-TICKETS.md", "gates/ALL-GATES.md", "TRACEABILITY.md", "OW-080-16", "OW-100-11"]
+      verification_status: recorded_in_future_plan
+    - id: D-071-26
+      related: ["v1-architecture-sparring-2026-08-11", OW-081-08, OW-090-02, OW-090-03]
+      authority: product-owner-request
+      decision: "Keep private user_global local-first in v1; govern autonomous recall/capture through deterministic user settings; add a private global raw-inbox -> reviewed promotion or reasoned rejection/archive lifecycle."
+      rationale: "These owner choices enable selective cross-project reuse without implicitly uploading or polluting private global knowledge."
+      constraints: "Raw inbox content is excluded from normal retrieval and RAG; rejected knowledge retains reason and receipt; settings may narrow but never widen safety or authorization; current v0.7.1 execution and the G-071-ALIGNMENT lock remain unchanged."
+      affected_artifacts: ["ROADMAP.md", "owledge-v1-autonomous-delivery-master-plan.md", "tickets/ALL-TICKETS.md", "gates/ALL-GATES.md", "TRACEABILITY.md", "GOAL.md"]
+      verification_status: recorded_in_future_plan
+    - id: D-071-27
+      related: ["v1-architecture-review-2026-08-11", OW-080-02, OW-100-03]
+      authority: architecture-review
+      decision: "Propose a versioned common-envelope plus artifact-profile Schema Registry and keep LangGraph, generic telemetry, multi-judge dispatch, full harness, scheduler, and frontend work outside the v1 Core."
+      rationale: "The proposal removes frontmatter guessing and protects the deep Core seam while avoiding framework, observability, and runtime bloat."
+      constraints: "Superseded by the owner-approved D-071-29 selection; compatibility migration must preserve user-authored Markdown."
+      affected_artifacts: ["owledge-v1-federated-research-memory-and-pi-adapter-reprioritization.md", "owledge-v1-autonomous-delivery-master-plan.md", "OW-080-02", "v1 architecture research note"]
+      verification_status: superseded_by_owner_approved_D-071-29
+    - id: D-071-28
+      related: ["v1-knowledge-levels-health-feedback-2026-08-12", OW-080-09, OW-081-09, OW-090-02, OW-090-06, OW-100-11]
+      authority: product-owner-request
+      decision: "Require an explicit version bump for every materially edited Owledge-managed document; make the promoted global layer a central Knowledge Base of reviewed Research essences, learnings, patterns, and transferable concepts; preserve authorized deep retrieval to project/source revisions; and add bounded Knowledge Health plus separate privacy-safe Hub operations health."
+      rationale: "Large personal and enterprise knowledge bases need compact global orientation without losing project detail, plus deterministic maintainability and scale signals."
+      constraints: "Global Raw remains an excluded private review queue rather than the global Knowledge Base; scope, abstraction, and lifecycle stay orthogonal; monitoring contains no raw prompts, outputs, or knowledge bodies; no dashboard or generic tracing backend enters the V1 critical path."
+      affected_artifacts: ["v1-schema-global-knowledge-health-decision-matrix-2026-08-12.md", "owledge-v1-federated-research-memory-and-pi-adapter-reprioritization.md", "OW-080-09", "OW-081-09", "OW-090-02", "OW-090-06", "OW-100-11"]
+      verification_status: recorded_in_future_plan
+    - id: D-071-29
+      related: ["v1-decision-matrix-2026-08-12", OW-080-02, OW-090-02, OW-100-11]
+      authority: product-owner
+      decision: "Owner-approved and locked selection 1B+ / 2C+ / 3B: common envelope plus artifact profiles and monotonic document revision; delta-capsule default plus policy snapshot exception, reviewed global essence, and authorized project drill-down; Standalone Core GA plus Single-Organization Hub Pilot/Beta."
+      rationale: "The revised combination has the highest Core fit and reversibility while satisfying the owner's revision, centralization, deep-retrieval, and health requirements."
+      constraints: "The full option matrix remains durable. This architecture approval does not unlock v0.8; compatibility proof, V0.7.1 RC/alignment, and the clean finalization gate remain required. The unnamed arXiv paper was not guessed; four plausible primary sources are linked in the research note."
+      affected_artifacts: ["v1-schema-global-knowledge-health-decision-matrix-2026-08-12.md", "hierarchical-memory-global-essence-source-drilldown-arxiv-2026-08-12.md", "OW-080-02", "OW-090-02", "OW-100-11"]
+      verification_status: owner_approved_locked
+    - id: D-071-30
+      related: [F-071-24, "v1-session-final-plan-blind-spot-review-2026-08-12", OW-071-08, OW-081-09, OW-090-04, OW-090-09, OW-100-11]
+      authority: architecture-review
+      decision: "Deepen existing tickets rather than add subsystems: repair and fully replay finalization in OW-071-08; prove a local multi-harness user_global composition in OW-081-09; make OW-090-04 the one semantic mutation Core interface; propagate source revocation through promoted and derived surfaces; publish bounded Hub-owned-state Beta recovery objectives."
+      rationale: "These close concrete release, concurrency, immediate-value, and lifecycle gaps while preserving Markdown/Git authority, the small Core interface, and the V1 bloat cutline."
+      constraints: "No remote private user_global sync, new scheduler, generic tracing backend, frontend, or hosted multi-tenant control plane enters V1. The 1B+ / 2C+ / 3B selection is locked; G-071-ALIGNMENT remains open."
+      affected_artifacts: ["v1-session-final-plan-blind-spot-review-2026-08-12.md", "owledge-v1-federated-research-memory-and-pi-adapter-reprioritization.md", "owledge-v1-autonomous-delivery-master-plan.md", "OW-071-08", "OW-081-09", "OW-090-02", "OW-090-04", "OW-090-09", "OW-100-02", "OW-100-11"]
+      verification_status: recorded_in_future_plan
+    - id: D-071-31
+      related: ["post-v1-erasure-extensibility-resource-link-2026-08-12", OW-080-01, OW-080-02, OW-080-09, OW-081-01, OW-100-03, OW-100-05, OW-100-09]
+      authority: product-owner
+      decision: "Keep the coverage-bounded personal-data erasure/DSAR control plane outside V1 as a relevant post-v1 enterprise module. Retain only general V1 source-withdrawal, revocation, tombstone, and derived-projection hygiene, and add the minimal managed-surface, transactional-upgrade, module-manifest, ResourceRef, and separated-health compatibility seams to existing tickets. Treat a PII Masker only as a future detection/redaction adapter, not deletion proof."
+      rationale: "The enterprise workflow has meaningful regulated-customer value but weak individual-user value and would expand V1 into identity resolution, legal policy, connector, backup, and compliance operations. The small compatibility seams prevent later breaking changes without adding a new V1 subsystem."
+      constraints: "No DSAR workflow, subject identity graph, universal connector suite, binary/media warehouse, transcription engine, public plugin SDK/marketplace, or full Owledge harness enters V1. The exact PII Masker package remains unresolved until the owner supplies a package or repository. Current OW-071-05 execution and G-071-ALIGNMENT remain unchanged."
+      affected_artifacts: ["post-v1-erasure-extensibility-and-resource-link-decision-2026-08-12.md", "enterprise-agentic-knowledge-and-deterministic-erasure-architecture-2026-08-12.md", "ROADMAP.md", "owledge-v1-autonomous-delivery-master-plan.md", "owledge-v1-federated-research-memory-and-pi-adapter-reprioritization.md", "OW-080-01", "OW-080-02", "OW-080-09", "OW-081-01", "OW-100-03", "OW-100-05", "OW-100-09"]
+      verification_status: owner_approved_recorded_in_future_plan
   next_plan_reflection:
-    status: not_started
+    status: drafted
     target_release: v0.8.0
-    items: []
+    items:
+      - "Add OW-080-16 Research Memory contracts and recall-first lookup as a v0.8.0 P0 contract dependency."
+      - "Use Codex, Claude Code, Pi, and generic MCP/CLI as v0.8.1 reference profiles; prove Hermes/OpenCode through the generic seam first."
+      - "Remove autonomous delivery/worktree/orchestration/edge delivery tickets from the active v1 critical path and preserve them as post-v1 add-ons."
+      - "Add OW-100-11 for a one-organization OAuth/OIDC Hub Beta while preserving Standalone Core GA and Markdown/Git authority."
+      - "Deepen OW-080-02 into the versioned Schema Registry and layered deterministic settings contract instead of adding a parallel configuration subsystem."
+      - "Deepen OW-090-02 into a private global raw-inbox review lifecycle; raw candidates never enter normal retrieval and rejected items retain reasons/receipts."
+      - "Deepen OW-080-09, OW-090-06/09, and OW-100-01/11 into deterministic Knowledge Health and privacy-safe Hub operations health without adding a V1 dashboard or generic trace backend."
+      - "Model reviewed global essences as a provenance-preserving abstraction DAG with authorized deep retrieval to project/source revisions; keep Global Raw as the excluded review queue."
+      - "Require material document-version increments separately from schema/profile migrations and content hashes in OW-080-01/02/09 and OW-090-01."
+      - "Keep bounded personal-data erasure/DSAR orchestration post-v1; preserve only general V1 lifecycle cleanup and add managed-surface, transactional-upgrade, module-manifest, ResourceRef, and separated-health compatibility seams."
+      - "Repair the host/Kit upgrade-drift aggregate-gate regression and require a clean 38/38 finalization replay in OW-071-08 before V0.7.1 RC."
+      - "Prove a local multi-harness user_global reference composition in OW-081-09 without remote synchronization or implicit Hub upload."
+      - "Concentrate all semantic mutations behind the OW-090-04 Core interface and propagate policy-driven source withdrawal through every promoted and derived surface."
+      - "Publish tested Hub-owned-state Beta RPO/RTO bounds while leaving project Markdown/Git backup explicitly customer-owned."
   update_path: null
 execution_mode:
   initial_run: root_agent_sequential
@@ -354,7 +445,7 @@ orchestration:
 workspace:
   code_root: .
   planning_root: internal/owledge/workpackages/owledge-v1-autonomous-delivery
-  planning_branch: codex/owledge-v1-autonomous-roadmap
+  planning_branch: codex/v071-integration
   release_integration_branch: codex/v071-integration
   base_commit: a25798958b3f1866c7e0e1bb6e2596adbe83bcbe
 blockers: []
@@ -432,6 +523,7 @@ checkpoint:
     - "Actual macOS/Linux wheel execution is intentionally deferred by D-071-24 to OW-100-09 Stable/GA; the configured CI fixture is not execution evidence and must not support a v0.7.1 cross-platform claim."
     - "python -m unittest tests.unit.test_validate_v1_delivery_plan tests.unit.test_validate_live_work_register -q: one pre-existing downstream mismatch; test_current_control_plane_is_valid still expects zero warnings while accepted OW-080-13 intentionally emits one internal-checkpoint warning. The validator itself passed with zero errors."
     - "python tools/owledge_core.py --project-root . validate-memory --strict: 307 pre-existing legacy frontmatter failures across historical internal memory; the touched canonical plan/checklists pass the release-specific frontmatter validation inside validate_v1_delivery_plan.py."
+    - "python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports: completed 36/38 on 2026-08-12; source-identity correctly rejected the dirty planning tree and upgrade-drift exposed a host-project/Kit-mode regression. Routed to OW-071-08 under F-071-24."
   workspace_state: "G-071-A-TRUTH remains formally promoted. Wave 071-B2 is reflected and accepted for bounded v0.7.1 development; G-071-B-ADOPTION remains open pending OW-071-05."
   next_exact_action: "Read OW-071-05 from ALL-TICKETS.md and implement the declared golden-demo proof without broadening installation, runtime, or cross-platform claims."
   open_assumptions:
@@ -441,5 +533,5 @@ checkpoint:
     - "Do not start v0.8.0 before G-071-ALIGNMENT and an explicit owner approve decision."
     - "Do not trust or publish inherited dist artifacts; rebuild from committed source at RC."
     - "Do not broaden the accepted local HTTP profile or benchmark claims while rewriting adoption documentation."
-updated_at: "2026-07-30T00:25:00+02:00"
+updated_at: "2026-08-12T14:32:51+02:00"
 updated_by: codex

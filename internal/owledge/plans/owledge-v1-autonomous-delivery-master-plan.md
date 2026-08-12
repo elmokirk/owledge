@@ -9,7 +9,7 @@ status: "active"
 visibility: "private"
 data_class: "internal"
 semantic_title: "Owledge autonomous delivery master plan through v1.0"
-summary: "Gate-driven release and ticket plan for delivering Owledge v0.7.1 through v1.0 with adoption, portable work contracts, Tier-1 agent adapters, trusted knowledge workflows, RAG quality, small-model support, and product hardening."
+summary: "Gate-driven release and ticket plan for delivering Owledge v0.7.1 through v1.0 with a local Standalone Core GA, bounded Single-Organization Hub Beta, reusable Research Memory, portable capability contracts, reference runtime adapters, trusted knowledge workflows, and product hardening."
 concept_tags: ["v1-roadmap", "autonomous-delivery", "long-horizon", "agentic-coding"]
 stack_tags: ["python", "markdown", "yaml", "mcp", "git"]
 problem_patterns: ["roadmap-drift", "context-bloat", "unsafe-agent-writes", "adapter-drift"]
@@ -19,7 +19,9 @@ confidence: 0.94
 review_status: "reviewed"
 sanitization_status: "not_required"
 created_at: "2026-07-16T00:00:00Z"
-updated_at: "2026-07-27T00:00:00Z"
+updated_at: "2026-08-12T14:32:51+02:00"
+plan_version: "2.5.0"
+document_version: 4
 source_hash: ""
 reusable_lessons: []
 edges:
@@ -33,10 +35,19 @@ edges:
 
 ## Outcome
 
-Deliver Owledge v1.0 as a local-first, Git-native project knowledge and agentic
-delivery control plane that a solo power user can install and understand quickly,
-while Codex, Claude Code, OpenCode, Hermes, and generic MCP/CLI agents can execute the same
-portable work contracts safely and efficiently.
+Deliver Owledge v1.0 as a local-first, Git-native Knowledge Lifecycle and
+Context control plane with two truthfully separated product surfaces:
+
+- **Standalone Core GA** for solo power users and AI-first local workflows;
+- **Single-Organization Hub Beta** for one organization per deployment, with
+  OAuth/OIDC-backed remote MCP, scoped project discovery, centrally reviewed
+  enterprise knowledge, audit receipts, and read/propose operations. Private
+  `user_global` memory stays local-first in v1 and is not uploaded implicitly.
+
+Codex, Claude Code, Pi, Hermes, OpenCode, and generic MCP/CLI consumers must use
+the same portable capability and artifact semantics. Owledge recalls existing
+Research Memory before recommending external research and preserves source,
+reason, context, freshness, contradictions, and promotion state for reuse.
 
 The v1.0 promotion boundary requires the full golden journey to work without chat
 history: install, initialize, plan, compile scoped context, execute with interruption,
@@ -46,45 +57,108 @@ evidence bundle.
 
 ## Locked Product Decisions
 
-- Primary ICP through v1.0: solo power users, including beginner AI users and
-  vibecoders. OSS teams are a secondary design target; multi-user service features
-  remain post-v1 unless required for on-disk interoperability.
+- Primary ICP through v1.0: solo power users and AI-first builders, including
+  beginner AI users and vibecoders. A bounded Single-Organization Hub Beta is a
+  secondary v1 product surface for small teams and enterprise architecture proof;
+  a hosted multi-tenant SaaS remains post-v1.
 - All public product documentation is English.
 - Canonical promotion is explicit and gate-controlled. Agents may create candidates,
   evidence, handoffs, and checkpoints automatically within declared paths.
-- Tier-1 runtime profiles through v1: Codex, Claude Code, OpenCode, and Hermes,
-  with generic MCP/CLI as the portable baseline. Hermes begins as a required
-  read-only profile and must gain explicit conformance evidence; it is not an
-  optional path.
-- Docker is a lower-priority optional hub/runtime distribution after v1.0.
+- Required reference profiles through v1: Codex, Claude Code, Pi, and generic
+  MCP/CLI. Hermes and OpenCode must consume the same generic contract and may
+  gain dedicated adapters only when they add measurable value beyond MCP/CLI.
+- Docker remains an optional deployment adapter rather than the Standalone
+  installation model. The Single-Organization Hub Beta may ship one bounded
+  single-node deployment recipe if its security and recovery gates pass.
 - Owlib remains a technically separate optional package behind coherent Owledge
-  UX. Its long-term role is the central synchronization and intelligence
-  interface for reviewed cross-project agent learnings, parallel extraction,
-  PI intelligence, and agent-maintenance knowledge. It writes central
-  candidates, never project truth.
-- Owlib retrieval defaults to the current project plus an explicit project allowlist.
+  UX. It provides user-global and Hub-derived cross-project recall, freshness,
+  Research Memory discovery, PI intelligence, and candidate synthesis. It writes
+  central candidates, never project truth.
+- Owlib and Hub retrieval default to the current project. Additional projects and
+  `user_global` or `enterprise` scopes require explicit grants and allowlists.
+- The three knowledge scopes are `project_user`, `user_global`, and `enterprise`.
+  `user_global` is a private local federation across explicitly linked projects;
+  personal global memory and organization-shared knowledge never share a default
+  scope or implicit synchronization path.
+- V1 must prove one local `user_global` reference composition used by at least
+  two harnesses. Remote synchronization of private user-global memory remains a
+  separate post-V1 product decision.
+- Cross-project promotion uses a private raw inbox excluded from normal
+  retrieval: `project candidate -> global raw -> reviewed/promoted or
+  rejected/archived`. Rejection retains reason, retention, and receipt.
+- Autonomous recall, capture, and model/provider use are governed by versioned
+  deterministic settings. Later settings layers may narrow authority but may
+  never weaken Core or organization safety invariants.
 - Existing-project migration is opt-in, preview-first, dry-run capable, and must not
   overwrite user-owned Markdown silently.
 - MCP writes are semantic operations, never a general arbitrary-file-write API.
+- Every semantic write crosses one Core mutation interface with target identity,
+  expected document revision/base hash, idempotency, authorized transition,
+  atomic result, and conflict/reconciliation receipt; transports remain adapters.
 - Small-model Tier 1 targets a 4B-class model with at least an 8k context window; v0.8.1 claims require deterministic fixtures plus one real local-model smoke run.
 - The existing v0.7 benchmark fixture must retain at least 80% reduction in tokens per
   correct answer against its naive baseline, with no quality, privacy, or stale-source
   regression. New harder fixtures use separate thresholds.
 - RAG v1 begins with a generic JSONL retrieval projection and a LightRAG reference
   adapter. Raw frontmatter is metadata, not embedding text.
-- A Pi.dev planning/documentation adapter is post-v1 concept work and is not on
-  the v1.0 critical path.
-- A hosted Team Hub is post-v1 multi-tenant vision work. Remote Git/CI sync and
-  a Sync Layer have no v1 priority; local single-user value must be proven first.
+- Research v1 uses the existing `.owledge/research/` and `global-memory/research/`
+  layers. Recall, deduplication, source mutability, freshness, and delta-only
+  refresh are Core semantics; web search and model routing remain Skill/adapter behavior.
+- Scope, knowledge abstraction, and lifecycle are orthogonal contracts. The
+  promoted global Knowledge Base stores reviewed Research essences, learnings,
+  patterns, and transferable concepts; its private raw inbox remains excluded
+  from retrieval and is not itself the global Knowledge Base.
+- Reviewed global essences retain stable, permission-checked drill-down
+  relations to project canonical detail and source Evidence. Deep retrieval is
+  explicit, budgeted, source-aware, and never implemented by copying every
+  project file into the global layer.
+- Source withdrawal, access revocation, and policy-driven deletion propagate
+  through global essences, drill-down refs, exports, and derived indexes without
+  leaving retrievable shadow content.
+- Every material Owledge-managed artifact edit increments a deterministic
+  document revision distinct from schema/profile versions and the content hash.
+- Deterministic Knowledge Health is a V1 product capability. Hub readiness and
+  privacy-safe operational metrics are a separate adapter surface; Owledge does
+  not store raw prompts/outputs or become a generic observability backend.
+- Hub Beta recovery covers only Hub-owned state under published tested bounds;
+  canonical project Markdown/Git backup remains an explicit customer responsibility.
+- Pi is a v1 reference runtime adapter. `@owledge/pi` owns lifecycle/tool wiring
+  only and may not duplicate Core search, context, artifact, or promotion logic.
+- A hosted multi-tenant Team Hub, remote Git/CI synchronization, SAML/SCIM,
+  Kubernetes/HA, and multi-region operation remain post-v1. The v1 Hub Beta is
+  one organization per deployment and must not be marketed as hosted SaaS.
+
+## Locked V1 Architecture Decision
+
+- The product owner approved `1B+ / 2C+ / 3B` on 2026-08-12. Replace the current
+  broad frontmatter required-field list with a versioned
+  Schema Registry: a small common envelope plus artifact-specific profiles.
+  Custom fields remain namespaced, preserved, inert by default, and unable to
+  override Core policy. The recommendation now includes required
+  `document_version` bumping for material edits and explicit separation from
+  `schema_version`, `profile_version`, and `source_hash`.
+- Use bounded delta capsules by default, allow snapshots only by explicit policy,
+  orient recall through reviewed global essences, and retain permission-checked
+  project/Evidence drill-down.
+- Ship Standalone Core as GA and the one-organization Hub only as Pilot/Beta.
+  The locked selection removes the architecture-choice blocker; compatibility
+  migration proof and the existing release gates remain mandatory.
 
 ## Non-Goals Through v1.0
 
-- No hosted Owledge SaaS, account system, billing, or mandatory cloud backend.
+- No hosted multi-tenant Owledge SaaS, billing, mandatory cloud backend, or
+  Owledge-owned password database.
 - No replacement for agent runtimes, vector databases, graph databases, issue
   trackers, or IDEs.
 - No automatic canonical promotion, autonomous conflict resolution, hidden writes, or implicit subagent dispatch.
 - No claim that the synthetic benchmark percentages generalize to every repository.
-- No Docker-first installation or remote multi-tenant MCP service before v1.0.
+- No Pi-only Core, automatic raw-transcript promotion, mandatory vector/graph
+  database, or unconditional external research before checking existing memory.
+- No remote multi-tenant MCP service, SAML/SCIM, HA, or multi-region promise in v1.
+- No generic tracing backend, full Owledge agent harness, scheduler, knowledge
+  frontend, multi-model judge dispatcher, or LangGraph-owned memory in v1.
+  Knowledge Health and Hub operations metrics remain bounded report/adapter
+  interfaces and do not reopen these non-goals.
 
 ## Canonical Control Plane
 
@@ -107,10 +181,10 @@ Run `python tools/validate_v1_delivery_plan.py` before claiming or promoting wor
 | Release | User-visible increment | Technical promotion boundary | Mandatory alignment stop |
 | --- | --- | --- | --- |
 | v0.7.1 | A beginner can understand, install, try, and verify Owledge; Owlib and the required Hermes read-only profile match the v0.7 project contract. | Adoption journey and release truth are green on Windows, macOS, and Linux fixtures. | Feature update, open questions, and explicit user alignment before publishing or v0.8.0. |
-| v0.8.0 | Human intent becomes a validated, token-budgeted, resumable work contract and clean retrieval projection. | Contract round-trip, context determinism, small-model, RAG, and migration gates are green. | Feature update, open questions, and explicit user alignment before publishing or v0.8.1. |
-| v0.8.1 | Four Tier-1 harness profiles can execute and resume isolated work without silent capability degradation. | Conformance, worktree/claim safety, cross-harness resume, and multi-agent demo gates are green. | Feature update, open questions, and explicit user alignment before publishing or v0.9.0. |
-| v0.9.0 | Reviewed knowledge can be written, promoted, compiled, exported, and refreshed with provenance and privacy controls. | Semantic-write, promotion, privacy, drift, RAG round-trip, and Owlib freshness gates are green. | Feature update, open questions, and explicit user alignment before publishing or v1.0. |
-| v1.0 | Owledge is measurable, secure by default, supportable, and release-ready at realistic scale. | Security, scale, portability, CLI lifecycle, docs, evidence reconstruction, and final artifact gates are green. | Final feature update, post-v1 question register, and explicit user closeout before GA publication. |
+| v0.8.0 | Human intent and prior Research Memory become validated, scope-aware, token-budgeted contracts and clean retrieval projections. | Artifact/scope/capability contracts, Research recall, context determinism, RAG projection, and migration gates are green. | Feature update, open questions, and explicit user alignment before publishing or v0.8.1. |
+| v0.8.1 | Codex, Claude, Pi, and generic MCP/CLI reuse the same capabilities, share one private local user-global federation, create structured session recaps, and resume without chat history. | Adapter conformance, local multi-harness user-global recall, Session Recap, and cross-harness resume gates are green; optional autonomous delivery does not block Knowledge-Librarian value. | Feature update, open questions, and explicit user alignment before publishing or v0.9.0. |
+| v0.9.0 | Reviewed operational and Research knowledge can be evidenced, promoted, superseded, compiled, exported, delta-refreshed, and policy-revoked across authorized scopes. | Single-interface semantic writes, promotion, privacy, revocation propagation, research drift, RAG round-trip, and Owlib freshness gates are green. | Feature update, open questions, and explicit user alignment before publishing or v1.0. |
+| v1.0 | Standalone Core is GA and a bounded Single-Organization Hub is Beta, measurable and secure by default. | OAuth/OIDC remote MCP, project registry, scope isolation, audit, three golden flows, portability, CLI lifecycle, docs, evidence reconstruction, and final artifact gates are green. | Final feature update, post-v1 question register, and explicit user closeout before GA/Beta publication. |
 
 ## Version Alignment and `/goal` Handoff
 
@@ -187,10 +261,14 @@ Gate: `G-071-C-COMPAT` and release gate `G-071-RC`.
 
 ### Phase 080-A - Versioned contract foundation
 
-Tickets: `OW-080-01`, `OW-080-02`, `OW-080-03`, `OW-080-04`, `OW-080-12`.
+Tickets: `OW-080-01`, `OW-080-02`, `OW-080-03`, `OW-080-04`, `OW-080-16`.
 
 Outcome: ProjectManifest, ArtifactEnvelope, WorkContract, Backlog, RunState,
-Checkpoint, GateResult, EvidenceManifest, and a default-off Autonomous Delivery Profile are versioned, validated, and migratable.
+Checkpoint, GateResult, EvidenceManifest, knowledge scopes, capability envelopes,
+a common-envelope plus artifact-profile Schema Registry, layered policy settings,
+document revisions, orthogonal scope/abstraction/lifecycle axes, and Research
+Brief/Source/Finding/Synthesis contracts are versioned, validated, and
+migratable. Autonomous Delivery remains a post-v1 add-on rather than a Core dependency.
 
 Gate: `G-080-A-CONTRACTS`.
 
@@ -198,9 +276,9 @@ Gate: `G-080-A-CONTRACTS`.
 
 Tickets: `OW-080-05`, `OW-080-06`, `OW-080-07`.
 
-Outcome: deterministic pack types, progressive disclosure, active-tool filtering,
-and 4k/8k/16k budgets keep stored control-plane detail outside prompt context unless
-needed.
+Outcome: deterministic pack types, recall-before-research, progressive disclosure,
+active-tool filtering, and bounded context budgets keep existing knowledge reusable
+without loading full histories or repeating external research unnecessarily.
 
 Gate: `G-080-B-CONTEXT`.
 
@@ -208,37 +286,45 @@ Gate: `G-080-B-CONTEXT`.
 
 Tickets: `OW-080-08`, `OW-080-09`, `OW-080-10`.
 
-Outcome: clean-body retrieval projections, a read-only status view, and safe preview
-migration are available to real users.
+Outcome: clean-body retrieval projections, a deterministic Knowledge Health
+status view, and safe preview migration are available to real users. Health
+detects schema/revision, edge, source, freshness, duplication, context-budget,
+and projection failures without an LLM or knowledge-body telemetry.
 
 Gate: `G-080-C-RETRIEVAL` and release gate `G-080-RC`.
 
 ## Version v0.8.1 - Tier-1 Agentic Coding
 
-### Phase 081-A - Capability contract and Tier-1 adapters
+### Phase 081-A - Capability contract and reference adapters
 
 Tickets: `OW-081-01`, `OW-081-02`, `OW-081-03`, `OW-081-04`, `OW-081-05`.
 
-Outcome: Codex, Claude Code, OpenCode, Hermes, and generic MCP/CLI declare and
-prove the same portable capability contract without pretending unsupported
-hooks exist. Hermes' read-only capability proof begins in `OW-071-07` and its
-full runtime orchestration conformance is completed in `OW-081-13`.
+Outcome: Codex, Claude Code, Pi, and generic MCP/CLI declare and prove the same
+portable capability contract without pretending unsupported hooks exist. Hermes
+and OpenCode compatibility is proven through the generic contract before any
+dedicated adapter scope is accepted.
 
 Gate: `G-081-A-ADAPTERS`.
 
-### Phase 081-B - Git-safe concurrency and recovery
+### Phase 081-B - Session continuity and recovery
 
-Tickets: `OW-081-06`, `OW-081-07`, `OW-081-08`, `OW-081-12`, `OW-081-13`.
+Tickets: `OW-081-07`, `OW-081-08`.
 
-Outcome: the optional autonomous-delivery skill, consent checks, claims, path scopes, worktrees, checkpoints, hooks, runtime adapters, and integration manifests support safe parallel execution and cross-harness resume.
+Outcome: structured Session Recap Candidates, checkpoints, hooks, and handoffs
+support cross-harness resume without chat history. Claims, worktrees, and
+autonomous-delivery behavior remain post-v1 add-on capabilities and do not
+expand the Knowledge-Librarian Core interface.
 
 Gate: `G-081-B-CONCURRENCY`.
 
-### Phase 081-C - Scoped hub context and golden multi-agent journey
+### Phase 081-C - Scoped context and golden cross-harness journey
 
-Tickets: `OW-081-09`, `OW-081-14`, `OW-081-10`.
+Tickets: `OW-081-09`, `OW-081-10`.
 
-Outcome: Owlib can compile explicitly scoped cross-project context; edge/local models receive constrained task capsules; and the golden journey proves interrupted work can resume in another Tier-1 harness.
+Outcome: Owlib can compile explicitly authorized `project_user`, `user_global`,
+and `enterprise` context, start with reviewed global essences, drill down through
+stable project/source revisions on explicit request, and prove Research recall
+plus interrupted work can resume in another reference harness.
 
 Gate: `G-081-C-JOURNEY` and release gate `G-081-RC`.
 
@@ -248,8 +334,12 @@ Gate: `G-081-C-JOURNEY` and release gate `G-081-RC`.
 
 Tickets: `OW-090-01`, `OW-090-02`, `OW-090-03`.
 
-Outcome: evidence is append-only, contradictions are visible, authority is explicit,
-and canonical promotion requires policy and gate evidence.
+Outcome: operational and Research evidence is append-only; claims trace to search
+reason, context, source version, retrieval state, reviewer, and authority;
+contradictions remain visible; private global raw candidates are excluded from
+normal retrieval; promoted user-global/enterprise essences form the central
+Knowledge Base with project/Evidence drill-down; and promote/reject/archive
+transitions require policy, reason, retention, and gate evidence.
 
 Gate: `G-090-A-TRUST`.
 
@@ -257,8 +347,10 @@ Gate: `G-090-A-TRUST`.
 
 Tickets: `OW-090-04`, `OW-090-05`, `OW-090-06`.
 
-Outcome: scoped semantic writes, source-linked compiled documentation, and drift/impact
-analysis are available without general filesystem mutation.
+Outcome: scoped semantic writes, source-linked compiled documentation,
+Research/source drift, promotion debt, unresolved drill-down sources, and
+knowledge-health impact analysis are available without general filesystem
+mutation. Refresh work is delta-only.
 
 Gate: `G-090-B-WRITES`.
 
@@ -267,18 +359,21 @@ Gate: `G-090-B-WRITES`.
 Tickets: `OW-090-07`, `OW-090-08`, `OW-090-09`.
 
 Outcome: generic JSONL and LightRAG adapters improve retrieval quality, while
-incremental Owlib sync, tombstones, and project scopes prevent stale or mixed context.
+incremental Owlib sync, Research freshness, tombstones, project-source
+availability, and the three knowledge scopes prevent stale or mixed context.
 
 Gate: `G-090-C-RAG` and release gate `G-090-RC`.
 
 ## Version v1.0 - Product Hardening and Release
 
-### Phase 100-A - Security and scale
+### Phase 100-A - Security, scale, and Single-Organization Hub Beta
 
-Tickets: `OW-100-01`, `OW-100-02`, `OW-100-03`.
+Tickets: `OW-100-01`, `OW-100-02`, `OW-100-03`, `OW-100-11`.
 
-Outcome: secret/PII handling, prompt-injection labels, permission manifests, and
-10/1k/10k scale targets are published and enforced.
+Outcome: secret/PII handling, prompt-injection labels, permission manifests,
+OAuth/OIDC remote identity, server-side scope resolution, project registry,
+audit receipts, and 10/1k/10k scale targets are published and enforced for the
+truthfully labelled Hub Beta.
 
 Gate: `G-100-A-HARDENING`.
 
@@ -286,8 +381,9 @@ Gate: `G-100-A-HARDENING`.
 
 Tickets: `OW-100-04`, `OW-100-05`, `OW-100-06`.
 
-Outcome: portability, resume, false-pass, rework, install, upgrade, uninstall,
-support, migration, and deprecation behavior are measurable and documented.
+Outcome: portability, Research recall, scope isolation, session resume,
+false-pass, rework, install, upgrade, uninstall, support, migration, and
+deprecation behavior are measurable and documented.
 
 Gate: `G-100-B-PRODUCT`.
 
@@ -295,8 +391,9 @@ Gate: `G-100-B-PRODUCT`.
 
 Tickets: `OW-100-07`, `OW-100-08`, `OW-100-09`.
 
-Outcome: English docs, case studies, final conformance, artifact installation, and an
-evidence-only reconstruction prove the v1 promise.
+Outcome: English docs, case studies, final conformance, artifact installation,
+and evidence-only reconstructions prove Standalone Core GA plus the three bounded
+Hub Beta golden flows without conflating their maturity claims.
 
 Gate: `G-100-C-PROOF` and final gate `G-100-GA`.
 
@@ -364,15 +461,32 @@ second source of truth.
 
 ## Definition of v1.0 Done
 
-- All tickets through `OW-100-10` are `done` with independent QA evidence and every version alignment decision is recorded.
+- All v1 critical tickets, including `OW-080-16` and `OW-100-11`, are `done`
+  with independent QA evidence and every version alignment decision is recorded.
 - All version and final gates are green from documented clean states.
-- Four Tier-1 runtime profiles achieve at least 95% declared contract equivalence on
-  the same fixture; unsupported capabilities fail explicitly.
+- Codex, Claude, Pi, and generic MCP/CLI achieve at least 95% declared contract
+  equivalence on the same fixture; Hermes/OpenCode generic compatibility and all
+  unsupported capabilities fail explicitly.
 - Existing v0.7 benchmark fixture retains at least 80% token reduction per correct
   answer, zero privacy/stale failures, and no answer-quality regression.
 - The 4B/8k profile completes the defined small-model golden tasks within budget.
 - Raw frontmatter is excluded from embedding text; retrieval projections improve or
   preserve the published recall/ranking thresholds against the raw-Markdown baseline.
+- Existing Research Memory is checked before external refresh; fresh coverage is
+  reused, stale or incomplete coverage produces a bounded delta brief, and every
+  answer exposes source version and freshness.
+- Project-user, user-global, and enterprise fixtures produce zero unauthorized
+  cross-scope results before and after lexical, semantic, and graph projection.
+- The Single-Organization Hub Beta validates OAuth/OIDC audience binding,
+  server-side project authorization, audit receipts, backup/restore of Hub state,
+  privacy-safe operations health, and read/propose MCP while direct canonical
+  writes remain unavailable.
+- A global essence answers a bounded query first and an authorized explicit
+  deep dive resolves the exact project artifact and Evidence revision; missing,
+  stale, and unauthorized sources are explicit.
+- Knowledge Health detects seeded stale, duplicate, orphaned, unresolved,
+  over-budget, raw-backlog, missed document-revision, and projection-drift
+  failures at 10, 1k, and 10k artifact profiles without exposing knowledge bodies.
 - A new user completes the vibecoding demo without maintainer help on supported OS
   fixtures.
 - The evidence bundle reconstructs the complete golden journey without chat history.
@@ -381,15 +495,31 @@ second source of truth.
 
 ## Post-v1 Deferred Concepts
 
-- PI.dev runtime concept and optional long-running knowledge guardian.
+- Optional long-running PI intelligence/daily Research guardian after deterministic
+  Recall and Research lifecycle metrics prove value.
+- Coverage-bounded personal-data erasure/DSAR control plane with subject
+  resolution, connector inventory, policy actions, restore guards, and receipts.
+  V1 retains only general source-withdrawal, revocation, tombstone, and derived
+  projection hygiene; a PII Masker is an optional detector/redactor, not proof
+  of deletion.
+- Media/file ingestion and voice-transcription adapters over the V1 `ResourceRef`
+  seam. Owledge stores the text artifact, provenance, and controlled source link
+  by default rather than becoming a binary-file warehouse or transcription engine.
+- Public third-party plugin SDK and marketplace after Core compatibility,
+  permission, migration, health, cleanup, and uninstall manifests have V1 proof.
 - Add-on Decision Layer: provenance-preserving ingestion of external feedback,
   agent evaluations, and plan comparisons; independent model sparring and
   Project Hardening use shared metrics and owner-approved conclusions rather
   than automatic plan rewrites. Discovery plan:
   `internal/owledge/plans/add-on-decision-layer-discovery-plan.md`.
-- Docker-first hub distribution and authenticated remote MCP.
-- Hosted team sync, multi-tenant service, marketplace certification, and commercial
-  features.
+- Docker-first distribution, hosted multi-tenant service, SAML/SCIM, Kubernetes/HA,
+  multi-region operation, marketplace certification, and commercial features.
+
+The V1 compatibility foundation for those extensions is deliberately small:
+a managed-surface manifest, transactional upgrade protocol, generic module
+manifest, media-neutral `ResourceRef`, and distinct `system.doctor`,
+`knowledge.health`, and `hub.health` profiles. These deepen existing tickets and
+do not create new V1 product modules.
 
 ## Resume Rule
 

@@ -1,7 +1,8 @@
 ---
 title: "Owledge v1 Ticket Contracts"
 date: "2026-07-16"
-version: "1.0.0"
+version: "2.3.0"
+document_version: 3
 memory_id: "mem:owledge:global:owledge:task:v1-delivery-ticket-catalog"
 tenant_id: "owledge"
 customer_id: "global"
@@ -24,7 +25,7 @@ confidence: 0.95
 review_status: "reviewed"
 sanitization_status: "not_required"
 created_at: "2026-07-16T00:00:00Z"
-updated_at: "2026-07-18T00:00:00Z"
+updated_at: "2026-08-12T14:32:51+02:00"
 source_hash: ""
 owners:
   - "release-orchestrator"
@@ -314,11 +315,21 @@ For every ticket:
 
 - Priority/dependencies: P0; `OW-071-03`, `OW-071-05`, `OW-071-06`, `OW-071-07`.
 - Outcome: clean wheel/sdist and release notes prove adoption, compatibility, and regression gates.
-- Allowed paths: `VERSION`, `pyproject.toml`, `CHANGELOG.md`, release workflows/docs, package manifests.
-- Implement: version bump, migration notes, artifact build, wheel-based `uvx` smoke, install/upgrade smoke, clean-state evidence.
-- Accept: `G-071-RC` passes from a clean integration branch; no generated private path enters artifacts.
-- Verify/evidence: build, twine, wheel/sdist inspection, `uvx` quickstart/doctor; `evidence/OW-071-08/`.
-- Negative QA: dirty source state or mismatched version blocks promotion.
+- Allowed paths: `VERSION`, `pyproject.toml`, `CHANGELOG.md`, release workflows/docs,
+  package manifests, finalization-gate runner, and focused release-gate tests.
+- Implement: repair the `upgrade-drift` generated-surface mode regression with a
+  non-mocked fixture; stream/flush aggregate gate completion and durations;
+  version bump, migration notes, artifact build, wheel-based `uvx` smoke,
+  install/upgrade smoke, and clean-state evidence.
+- Accept: the full 38-gate finalization suite, including `upgrade-drift`, passes
+  from a clean committed integration branch and writes a terminal JSON manifest;
+  no generated private path enters artifacts.
+- Verify/evidence: focused host/Kit generated-surface regression, full
+  `finalization-gates --include-compliance --include-exports`, build, twine,
+  wheel/sdist inspection, `uvx` quickstart/doctor; `evidence/OW-071-08/`.
+- Negative QA: a green nested version row cannot mask a failed parent doctor;
+  source-only imports, stale build artifacts, version mismatch, missing terminal
+  manifest, and dirty tracked source fail.
 
 ### OW-071-09 - Align v0.7.1 with the product owner
 
@@ -335,22 +346,57 @@ For every ticket:
 ### OW-080-01 - Accept contract architecture and migrations
 
 - Priority/dependencies: P0; `OW-071-09`.
-- Outcome: accepted ADRs fix source-of-truth, schema versioning, lifecycle, extension, authority, and migration rules.
+- Outcome: accepted ADRs fix source-of-truth, schema/profile/document versioning, lifecycle,
+  extension, authority, migration, the transport-neutral Core seam, and the
+  separation of Standalone Core GA from Single-Organization Hub Beta.
 - Allowed paths: `docs/architecture*`, `internal/owledge/decisions/`, schemas overview, plan references.
-- Implement: ADRs for contract set, Markdown/YAML boundary, unknown-field preservation, ID stability, status machine, compatibility window.
+- Implement: ADRs for contract set, Markdown/YAML boundary, unknown-field
+  preservation, ID stability, status machine, compatibility window,
+  Query/Command plus capability envelopes, orthogonal authority-scope,
+  knowledge-abstraction, and lifecycle axes, and adapter authority limits. Add
+  the generic contracts for a Managed Surface Manifest, transactional upgrade,
+  module compatibility/permission/health lifecycle, media-neutral `ResourceRef`,
+  and separate `system.doctor|knowledge.health|hub.health` profiles. Keep a
+  public plugin SDK, binary/media store, transcription pipeline, and
+  subject-rights erasure orchestrator outside V1.
 - Accept: no later schema ticket requires an unresolved product decision; reversible local details stay outside ADRs.
 - Verify/evidence: architecture review and contract decision matrix; `evidence/OW-080-01/`.
 - Negative QA: database-as-canonical, automatic promotion, and destructive migration designs are rejected.
 
-### OW-080-02 - Implement ProjectManifest and ArtifactEnvelope v1
+### OW-080-02 - Implement ProjectManifest, ArtifactEnvelope, Schema Registry, and Settings v1
 
 - Priority/dependencies: P0; `OW-080-01`.
-- Outcome: project identity, modes, privacy, adapters, gates, artifact lifecycle, provenance, and typed edges validate consistently.
+- Outcome: project identity, `project_user|user_global|enterprise` knowledge
+  scopes, modes, privacy, adapters, gates, artifact lifecycle, provenance,
+  typed edges, frontmatter profiles, and effective settings validate consistently.
 - Allowed paths: `templates/`, `internal/owledge/templates/`, `skills/`, schema/tool/test/docs paths.
-- Implement: JSON Schemas, defaults, examples, upgrade mapping, extension-field preservation; add the owner-approved transferability model as separate fields from audience and privacy: `audience_ids` for target roles/lenses, `transferability: universal|partial|local` for reuse outside the origin context, optional `applies_to` for partial scope, and existing `visibility`/`data_class` for privacy.
-- Accept: round-trip preserves stable IDs, typed edges, unknown extensions, visibility, data class, audience IDs, transferability, and applies-to scope.
+- Implement: a small versioned common envelope plus artifact-specific JSON
+  Schema profiles, required/optional fields, defaults, examples, upgrade mapping,
+  `additionalProperties: false` for Core objects, and a namespaced inert
+  `extensions` object; replace the single broad required-field contract without
+  rewriting user-authored Markdown. Define `schema_version` for contract shape,
+  `profile_version` for artifact rules, monotonic `document_version` for each
+  material edit under a stable ID, and `source_hash` for byte/content integrity;
+  reject missed, duplicate, or non-monotonic revision bumps. Add layered settings for immutable Core
+  invariants, deployment/organization policy, private user preferences, project
+  preferences, and bounded session overrides; denies win and later layers may
+  narrow but never widen authority. Preserve extension fields; add the
+  owner-approved transferability model as separate fields
+  from audience and privacy; define `knowledge_scope`, `owner_user_id`,
+  server-resolved project scope, and stable capability Request/Result receipts.
+  Define optional `ResourceRef` with stable ID/relation, URI or opaque locator,
+  media type, hash, size, data class, access/availability state, and extraction
+  provenance; resolving a reference remains a separately authorized capability.
+- Accept: round-trip preserves stable IDs, typed edges, namespaced unknown
+  extensions, schema/profile/document versions, effective-settings explanation receipt,
+  visibility, data class, audience IDs, transferability, applies-to scope, and
+  all three knowledge scopes without treating caller-supplied paths as authority.
 - Verify/evidence: schema positive/negative and migration tests; `evidence/OW-080-02/`.
-- Negative QA: invalid lifecycle, missing identity, unsafe visibility/data-class combination, overloaded audience/privacy fields, invalid transferability value, and ID mutation fail.
+- Negative QA: invalid lifecycle, missing identity, unknown Core key, unnamespaced
+  extension, policy-widening override, unsafe visibility/data-class combination,
+  overloaded audience/privacy fields, invalid transferability value, material
+  edit without exactly one document-version increment, unverified resource
+  locator, and ID mutation fail.
 
 ### OW-080-03 - Implement WorkContract, Backlog, and RunState v1
 
@@ -372,24 +418,64 @@ For every ticket:
 - Verify/evidence: recovery and evidence-integrity fixtures; `evidence/OW-080-04/`.
 - Negative QA: mismatched input hash, missing exit code, self-only QA, and stale tested commit fail.
 
-### OW-080-12 - Define the optional Autonomous Delivery Profile v1
+#### Deferred OW-080-12 - Optional Autonomous Delivery Profile (post-v1 add-on)
 
-- Priority/dependencies: P0; `OW-080-02`, `OW-080-03`, `OW-080-04`.
+Deferred from the required v1 train because runtime orchestration policy is not
+needed to prove Owledge's Core, Research Memory, adapter, or Hub value. The
+concept remains available for a separately versioned add-on after the four
+reference profiles and capability contracts are stable.
+
+- Former priority/dependencies: P0; `OW-080-02`, `OW-080-03`, `OW-080-04`.
 - Outcome: small work stays single-agent by default, while larger work can use a runtime-neutral, consent-first delivery profile.
 - Allowed paths: execution schemas/templates, planning tools/CLI/tests/docs, `internal/owledge/workpackages/`.
 - Implement: default-off profile fields for blockers, subagent eligibility, orchestrator, model profile, QA, Red Team, approval mode, Git lane, and parallelism; render dependency links from the canonical backlog; record a risk brief and consent state without dispatching a runtime.
 - Accept: parsing or dry-run planning cannot spawn an agent or create a worktree; `subagent: true` is eligibility only; unknown model, missing consent, overlapping lane, or raw credential fails closed.
 - Verify/evidence: profile round-trip, default-off, consent, dependency-link, and negative fixtures; `evidence/OW-080-12/`.
 - Negative QA: implicit spawn, generic write fallback, same-context QA, unsupported profile, or unapproved high-risk ticket is rejected.
+### OW-080-16 - Implement Research Memory contracts and recall-first lookup
+
+- Priority/dependencies: P0; `OW-080-02`.
+- Outcome: Owledge reuses prior source-linked Research Memory before recommending
+  external research and emits bounded freshness/gap results across authorized scopes.
+- Allowed paths: research schemas/templates/skills, Core recall/index code,
+  fixtures/tests, command and architecture docs.
+- Implement: versioned Research Brief, Source Record, Atomic Finding, Synthesis,
+  and Research Task Index contracts; source mutability classes; research reason,
+  context, publication/version, search/retrieval/verification timestamps, source
+  hash, lifecycle, relations, and deterministic recall results for
+  `sufficient_current|stale|partial|missing|conflicted`; reuse the existing
+  `.owledge/research/` and `global-memory/research/` layouts; no web or LLM call
+  in the recall primitive.
+- Accept: an immutable paper, versioned tool release, and mutable documentation
+  fixture receive distinct freshness behavior; fresh coverage prevents an
+  unnecessary refresh recommendation; stale or incomplete coverage produces a
+  delta brief; every result exposes source revision, scope, freshness, reasons,
+  contradictions, and gaps.
+- Verify/evidence: schema round-trip, recall/dedup/freshness, scope-isolation,
+  rename-stability, and delta-brief fixtures; `evidence/OW-080-16/`.
+- Negative QA: duplicate stable ID, unknown source mutability, caller path escape,
+  cross-scope finding, missing research reason/source, and silent external search fail.
+
 ### OW-080-05 - Build deterministic Context Compiler v1
 
-- Priority/dependencies: P0; `OW-080-02`, `OW-080-03`, `OW-080-04`, `OW-080-12`.
+- Priority/dependencies: P0; `OW-080-02`, `OW-080-03`, `OW-080-04`, `OW-080-16`.
 - Outcome: bootstrap, task, reviewer, handoff, and release packs explain inclusion/exclusion and respect budgets.
 - Allowed paths: context-pack core/CLI, schemas, fixtures, tests, docs.
-- Implement: deterministic ordering/digest, typed selection reasons, privacy/staleness filters, dropped-source list, pack version; add a bounded pre-plan capsule that inspects relevant idea, concept, decision, pattern, lesson, and roadmap metadata before plan creation and expands only candidates that can change the MVP cutline; distinguish source freshness from review freshness and enforce explicit context budgets without silent omission.
-- Accept: identical inputs produce identical pack and digest; every included/excluded source has a reason; the pre-plan capsule records required-now, dependency, roadmap, idea-candidate, or reject/defer disposition without auto-promoting candidates; stale source, stale review, privacy exclusion, and over-budget exclusion are distinguishable.
+- Implement: deterministic ordering/digest, typed selection reasons,
+  privacy/staleness filters, dropped-source list, pack version; add bounded
+  pre-plan and pre-research capsules that inspect relevant idea, concept,
+  decision, pattern, lesson, research synthesis/finding, and roadmap metadata;
+  distinguish source, research, and review freshness; retrieve reviewed global
+  essences first where allowed, then expose `explain|deep_dive|refresh`
+  expansion over stable project/source revisions; expand only material
+  candidates and enforce explicit context budgets without silent omission.
+- Accept: identical inputs produce identical pack and digest; every
+  included/excluded source has a reason; fresh Research Memory is reused before
+  a refresh is proposed; stale source, stale research, stale review, scope,
+  privacy, conflict, and over-budget exclusions are distinguishable.
 - Verify/evidence: golden pack tests and v0.7 regression fixture; `evidence/OW-080-05/`.
-- Negative QA: private, stale, unrelated, or over-budget source cannot enter silently.
+- Negative QA: private, stale, unrelated, unauthorized deep-dive, unavailable
+  project source, or over-budget source cannot enter silently.
 
 ### OW-080-06 - Add progressive disclosure and active-tool profiles
 
@@ -423,23 +509,40 @@ For every ticket:
 
 ### OW-080-08 - Build clean RAG Retrieval Projection v1
 
-- Priority/dependencies: P0; `OW-080-02`, `OW-080-05`.
+- Priority/dependencies: P0; `OW-080-02`, `OW-080-05`, `OW-080-16`.
 - Outcome: embedding text contains semantic title, summary, and clean section body while governance metadata stays separate.
 - Allowed paths: RAG/export core, schemas, fixtures, benchmark/docs/tests.
-- Implement: heading-aware chunks, boilerplate/frontmatter removal, dedupe, source hash/version/tombstone metadata, typed-edge hints.
+- Implement: heading-aware chunks, boilerplate/frontmatter removal, source- and
+  claim-level dedupe, source hash/version/freshness/tombstone metadata, research
+  reason/context filters, and typed-edge hints.
 - Accept: raw frontmatter tokens are absent from embedding text; IDs, policy, source, freshness, and edges remain metadata.
 - Verify/evidence: raw-vs-projection retrieval evaluation; `evidence/OW-080-08/`.
 - Negative QA: duplicate compiled/source chunks, private chunk, stale hash, and template boilerplate fail.
 
-### OW-080-09 - Add status view and preview migration
+### OW-080-09 - Add Knowledge Health status and preview migration
 
 - Priority/dependencies: P1; `OW-080-03`, `OW-080-04`.
-- Outcome: users inspect work state and preview legacy migration without mutation.
+- Outcome: users inspect deterministic project/knowledge health and preview
+  legacy migration without mutation or an LLM.
 - Allowed paths: CLI/core, templates, migration tools, tests/docs.
-- Implement: `status`/board read view, `migrate --dry-run`, patch/manifest output, collision report, explicit apply mode.
-- Accept: read view does not mutate; preview lists every proposed write and never-touch file; apply is idempotent.
-- Verify/evidence: 1k-ticket performance plus migration fixtures; `evidence/OW-080-09/`.
-- Negative QA: edited template collision, ambiguous legacy layout, and second apply do not overwrite silently.
+- Implement: `status`/board and `knowledge.health` read views for schema/profile/
+  document revisions, duplicate IDs/claims, broken/orphaned edges, unresolved
+  source refs, Research freshness, context-pack budget/pollution, and projection
+  watermark; `migrate --dry-run`, patch/manifest output, collision report, and
+  explicit apply mode. Define a Managed Surface Manifest that classifies files
+  as Core-managed, user-managed, generated, or extension-managed and records
+  installed version, delivery hash, and current hash. Preview uses a
+  transactional protocol: preflight `system.doctor`, dry-run/diff, recoverable
+  checkpoint, apply, postflight health, and receipt. Reports contain metadata
+  and stable IDs, not knowledge bodies.
+- Accept: read view does not mutate or call a model; seeded health failures are
+  classified with reason and remediation; preview lists every proposed write
+  and never-touch file; apply is idempotent and a failed postflight has an
+  explicit recovery path.
+- Verify/evidence: 10/1k artifact health performance plus migration fixtures; `evidence/OW-080-09/`.
+- Negative QA: missed revision bump, broken edge, stale source, over-budget pack,
+  edited template collision, ambiguous ownership, ambiguous legacy layout,
+  failed postflight, and second apply do not pass silently.
 
 ### OW-080-10 - Cut v0.8.0 release candidate
 
@@ -466,12 +569,20 @@ For every ticket:
 ### OW-081-01 - Define AdapterManifest and conformance protocol
 
 - Priority/dependencies: P0; `OW-080-11`.
-- Outcome: adapters declare detect/install/inject/capture/execute/resume/health/cleanup, versions, permissions, limits, and degradation.
+- Outcome: adapters and modules declare detect/install/inject/capture/execute/
+  resume/health/cleanup/uninstall, versions, Core compatibility, permissions,
+  profiles, migrations, limits, and degradation.
 - Allowed paths: runtime conformance add-on, schemas, adapter templates, tests/docs.
-- Implement: capability schema, negotiation result, fixture protocol, support-tier rules; define optional pre-plan lifecycle capabilities for scoped idea/concept lookup, MVP-cutline handoff, roadmap/idea capture, and explicit unsupported degradation without requiring background writes.
+- Implement: capability schema, negotiation result, fixture protocol,
+  support-tier rules, module kind, compatibility range, declared artifact
+  profiles/migrations, and health contract; define optional pre-plan lifecycle
+  capabilities for scoped idea/concept lookup, MVP-cutline handoff,
+  roadmap/idea capture, and explicit unsupported degradation without requiring
+  background writes or access to Core storage internals.
 - Accept: undeclared capability cannot run; unsupported feature returns explicit structured result; adapters cannot claim automatic pre-plan inspection or durable routing unless they pass the shared fixtures.
 - Verify/evidence: manifest and negative compatibility suite; `evidence/OW-081-01/`.
-- Negative QA: version mismatch, missing permission, or false capability claim fails.
+- Negative QA: version mismatch, missing permission, undeclared profile or
+  migration, Core-internal storage access, or false capability claim fails.
 
 ### OW-081-02 - Codex Tier-1 adapter
 
@@ -493,21 +604,26 @@ For every ticket:
 - Verify/evidence: Tier-1 suite; `evidence/OW-081-03/`.
 - Negative QA: hook failure surfaces at session close and cannot mark ticket done.
 
-### OW-081-04 - OpenCode Tier-1 adapter
+### OW-081-04 - Pi reference adapter
 
 - Priority/dependencies: P0; `OW-081-01`.
-- Outcome: OpenCode bootstrap, context, task, checkpoint, handoff, supported
-  hooks, and cleanup pass the common contract.
-- Allowed paths: OpenCode adapter/skill/fixtures, runtime docs/tests.
-- Implement: pinned install/setup, capability manifest, compact instruction
-  layer, context and resume wiring, bounded pre-plan capsule handoff,
-  health/cleanup, and explicit degradation.
-- Accept: OpenCode completes the common conformance fixture with source-linked
-  outputs and no hidden canonical writes.
-- Verify/evidence: pinned OpenCode fixture/conformance transcript;
+- Outcome: `@owledge/pi` proves that a custom agent runtime can use Owledge for
+  durable memory, scoped context, Research recall, and continuity without
+  duplicating Core semantics.
+- Allowed paths: Pi extension/package adapter, skills/fixtures, runtime docs/tests.
+- Implement: detect local project or Hub configuration; register thin
+  read/search/context/artifact/task/review/handoff tools; inject only minimal
+  bootstrap context; map Pi session lifecycle to structured Candidate handoff;
+  declare permissions and explicit degradation; depend on Owledge capability
+  contracts rather than direct internal file/database calls.
+- Accept: a new Pi session retrieves prior scoped state without chat history,
+  only task-relevant context enters the model, SessionEnd creates a private
+  Candidate handoff, and durable Markdown remains Core-owned.
+- Verify/evidence: pinned Pi fixture/conformance transcript;
   `evidence/OW-081-04/`.
-- Negative QA: instruction-path mismatch, disabled capability, unsupported hook,
-  and unavailable integration fail clearly.
+- Negative QA: raw transcript promotion, Pi-specific Core branch, direct
+  database/filesystem bypass, undeclared write, disabled capability, and
+  unavailable integration fail clearly.
 
 ### OW-081-05 - Generic MCP/CLI portable baseline adapter
 
@@ -519,7 +635,11 @@ For every ticket:
 - Verify/evidence: protocol and CLI fixtures; `evidence/OW-081-05/`.
 - Negative QA: malformed JSON-RPC, unknown project, and tool mismatch fail without server crash.
 
-### OW-081-06 - Implement claims, path scopes, and worktree planner
+#### Deferred OW-081-06 - Claims and worktree planner (post-v1 add-on)
+
+Deferred because eight-worker planning is a delivery-orchestration feature, not
+a prerequisite for cross-harness memory continuity. The required v1 path keeps
+checkpoint idempotency and explicit adapter permissions without owning worktrees.
 
 - Priority/dependencies: P0; `OW-080-03`, `OW-081-01`.
 - Outcome: independent work receives explicit claim, branch/worktree, allowed paths, base SHA, merge order, and TTL.
@@ -531,8 +651,9 @@ For every ticket:
 
 ### OW-081-07 - Implement checkpoint reconciliation and cross-harness resume
 
-- Priority/dependencies: P0; `OW-080-04`, `OW-081-06`.
-- Outcome: kill/retry at every checkpoint avoids duplicate canonical records and side effects.
+- Priority/dependencies: P0; `OW-080-04`, `OW-081-01`.
+- Outcome: kill/retry at every checkpoint avoids duplicate canonical records
+  and side effects while a second supported harness resumes without chat history.
 - Allowed paths: checkpoint/resume core, adapter fixtures, tests/docs.
 - Implement: input/output hashes, idempotency keys, side-effect journal, reconciliation status, resume pack.
 - Accept: second Tier-1 harness resumes exact work from checkpoint without chat history.
@@ -542,14 +663,26 @@ For every ticket:
 ### OW-081-08 - Add runtime hooks and integration manifest
 
 - Priority/dependencies: P1; `OW-081-02`, `OW-081-03`, `OW-081-04`, `OW-081-05`, `OW-081-07`.
-- Outcome: supported hooks validate mutations and an integration manifest records commits, scopes, gates, reviews, conflicts, and risks.
+- Outcome: supported hooks validate mutations, create structured Session Recap
+  Candidates, and record scopes, gates, reviews, conflicts, risks, and resumable deltas.
 - Allowed paths: adapter hooks, integration schemas, CLI/tests/docs.
-- Implement: post-tool validation, stop/session summary, explicit unsupported warnings, deterministic merge manifest.
-- Accept: invalid ticket edit cannot pass session close; integration order is reproducible.
+- Implement: settings-controlled pre-research recall, post-research delta
+  proposal, post-tool validation, and Stop/SessionEnd recap with Outcomes,
+  Decisions, Learnings, Gotchas, open questions, Evidence, affected artifacts,
+  Research Candidates, and Promotion Candidates; no raw transcript promotion;
+  explicit unsupported warnings and deterministic integration manifest.
+- Accept: invalid ticket edit cannot pass session close; the recap is private,
+  source-linked, schema-valid, resumable from another harness, and remains a
+  Candidate until review; integration order is reproducible.
 - Verify/evidence: hook and merge fixtures; `evidence/OW-081-08/`.
-- Negative QA: missing evidence, failed hook, scope conflict, or unreachable commit blocks integration.
+- Negative QA: missing recall receipt, autonomous capture disabled by settings,
+  missing evidence, failed hook, scope conflict, or unreachable commit blocks integration.
 
-### OW-081-12 - Ship the optional autonomous-delivery skill
+#### Deferred OW-081-12 - Optional autonomous-delivery skill (post-v1 add-on)
+
+Deferred until the runtime-neutral Core and adapter capability surface are
+proven. Shipping it in v1 would make Owledge look like an agent orchestrator
+rather than the durable knowledge and project-memory layer it is meant to be.
 
 - Priority/dependencies: P1; `OW-080-12`, `OW-081-01`, `OW-081-06`, `OW-081-08`.
 - Outcome: one portable skill assesses ticket risk, proposes lanes and models, explains risks, and requests user consent before a runtime is allowed to act.
@@ -559,7 +692,11 @@ For every ticket:
 - Verify/evidence: classifier, consent, capability-degradation, and lane-isolation fixtures; `evidence/OW-081-12/`.
 - Negative QA: implicit invocation, automatic spawn, omitted risk, same-context QA, or claimed unsupported runtime capability fails.
 
-### OW-081-13 - Add optional runtime orchestration adapters
+#### Deferred OW-081-13 - Optional runtime orchestration adapters (post-v1 add-on)
+
+Deferred with the delivery skill. Codex `/goal` mapping and harness-specific
+worker dispatch stay outside the v1 Core; generic MCP/CLI remains the portable
+integration seam.
 
 - Priority/dependencies: P1; `OW-081-12`.
 - Outcome: Codex, Claude Code, OpenCode, Hermes, and generic MCP/CLI can
@@ -571,7 +708,10 @@ For every ticket:
 - Verify/evidence: cross-runtime dry-run, consent, worktree, merge-manifest, and degradation fixtures; `evidence/OW-081-13/`.
 - Negative QA: no consent, overlap, direct integration write, unsupported model/runtime, or hidden external launch blocks dispatch.
 
-### OW-081-14 - Add the edge/local-model delivery profile
+#### Deferred OW-081-14 - Edge/local-model delivery profile (post-v1 add-on)
+
+Deferred because the deterministic Core should first prove small context packs
+and machine-readable errors independently of a model-specific delivery profile.
 
 - Priority/dependencies: P0; `OW-080-07`, `OW-081-12`, `OW-081-13`.
 - Outcome: constrained local models receive compact task capsules and deterministic guardrails instead of excessive context or unsafe authority.
@@ -583,20 +723,40 @@ For every ticket:
 ### OW-081-09 - Add scoped Owlib retrieval and hub context packs
 
 - Priority/dependencies: P1; `OW-071-06`, `OW-080-05`, `OW-080-11`.
-- Outcome: Owlib queries current project plus explicit allowlisted projects and explains source selection.
+- Outcome: Owlib queries `project_user`, private `user_global`, or approved
+  `enterprise` knowledge across explicit allowlisted projects and explains every
+  scope and source selection.
 - Allowed paths: `owlib/`, hub skills/MCP/docs/tests.
-- Implement: `--projects`, exclusions, scope profiles, project-filter-first retrieval, context-pack budget/digest, source reasons.
-- Accept: default never scans all projects; output identifies project, source, freshness, review, and exclusion reasons.
+- Implement: `--projects`, exclusions, three knowledge-scope profiles,
+  principal/owner binding, orthogonal abstraction/lifecycle filters,
+  project-filter-first Research and general retrieval, reviewed-global-essence
+  first recall, explicit permission-checked project `deep_dive`, context-pack
+  budget/digest, source reasons, and separate personal-global versus enterprise
+  indexes or namespaces; add one local `user_global` reference composition that
+  at least two harnesses can query through the generic Core/MCP seam without Hub
+  upload or remote user-global synchronization.
+- Accept: default never scans all projects; project-user data never enters
+  another user's global or enterprise result; output identifies scope, owner,
+  project, abstraction level, lifecycle, source revision, freshness, review,
+  and exclusion reasons; an unavailable or unauthorized drill-down is explicit.
 - Verify/evidence: cross-project privacy/relevance fixtures; `evidence/OW-081-09/`.
-- Negative QA: unauthorized project ID, empty scope, and mixed private/shared context fail safely.
+- Negative QA: unauthorized project ID, deep-dive permission bypass, missing
+  source presented as current, empty scope, mixed private/shared context, and
+  implicit Hub upload fail safely.
 
-### OW-081-10 - Prove multi-agent golden journey and cut v0.8.1
+### OW-081-10 - Prove Research-to-resume golden journey and cut v0.8.1
 
-- Priority/dependencies: P0; `OW-081-08`, `OW-081-09`, `OW-081-12`, `OW-081-13`, `OW-081-14`.
-- Outcome: plan, parallel dispatch, deliberate interruption, cross-harness resume, failed review, correction, integration, and source-linked report run end to end.
+- Priority/dependencies: P0; `OW-081-08`, `OW-081-09`.
+- Outcome: Research recall, scoped context, deliberate interruption, structured
+  Session Recap, cross-harness resume, failed review, correction, and source-linked
+  report run end to end; optional autonomous delivery is measured separately.
 - Allowed paths: golden fixtures/demo, conformance kit, release/version/docs/workflows.
-- Implement: deterministic journey using all Tier-1 profiles, clean artifact build, public support matrix.
-- Accept: no clobbered files, silent degradation, duplicate writes, or chat dependency; `G-081-RC` passes.
+- Implement: deterministic journey using Codex, Claude, Pi, and generic MCP/CLI;
+  prove Hermes/OpenCode generic compatibility without requiring bespoke adapters;
+  clean artifact build and public support matrix.
+- Accept: fresh research is reused, stale research creates a delta brief, recap
+  resumes without chat, and no scope leak, silent degradation, duplicate write,
+  or Core runtime coupling occurs; `G-081-RC` passes.
 - Verify/evidence: full journey and release artifact matrix; `evidence/OW-081-10/`.
 - Negative QA: overlap and missing test evidence deliberately fail before recovery.
 
@@ -615,9 +775,13 @@ For every ticket:
 ### OW-090-01 - Implement append-only Evidence Ledger and authority policy
 
 - Priority/dependencies: P0; `OW-081-11`.
-- Outcome: claims trace to source, run, commit, test, reviewer, and explicit authority/supersession rules.
+- Outcome: claims and Research findings trace to source revision, research
+  reason/context, retrieval/verification time, run, commit, test, reviewer, and
+  explicit authority/supersession rules.
 - Allowed paths: evidence/authority schemas, core/CLI/tests/docs.
-- Implement: append-only events, stable refs, code/ADR/issue/memory conflict policy, tamper/digest checks.
+- Implement: append-only events, stable refs, code/ADR/issue/memory/research
+  conflict policy, document-version events distinct from schema migration,
+  source mutability and revision facts, tamper/digest checks.
 - Accept: public claim can be reconstructed and contradictions remain visible.
 - Verify/evidence: ledger and authority fixtures; `evidence/OW-090-01/`.
 - Negative QA: event mutation, broken source ref, and ambiguous authority block current status.
@@ -625,19 +789,37 @@ For every ticket:
 ### OW-090-02 - Implement reviewed promotion lifecycle
 
 - Priority/dependencies: P0; `OW-090-01`.
-- Outcome: candidate, reviewed, canonical, superseded/rejected transitions are explicit, reversible, and evidenced.
+- Outcome: candidate, raw-inbox, reviewed, canonical, superseded,
+  rejected/archived transitions are
+  explicit, reversible, evidenced, and valid across project-user, user-global,
+  and enterprise scopes.
 - Allowed paths: promotion core/schemas/CLI/templates/tests/docs.
-- Implement: promotion request, reviewer separation, contradiction link, supersession, policy profile, rollback.
-- Accept: no agent or full-access profile promotes without required gate and audit record.
+- Implement: promotion request, a private `user_global` raw inbox excluded from
+  ordinary retrieval/RAG, stable claim/source dedupe, source-linked reusable
+  delta capsules rather than pointer-only records or full project plans/transcripts,
+  policy-controlled TTL snapshots only for volatile/non-reproducible sources,
+  reviewed global-essence compilation with stable project/Evidence drill-down,
+  reviewer separation,
+  contradiction link, supersession, policy profile, rollback, retention, and
+  explicit research finding or synthesis promotion without copying raw research
+  dumps; define policy-driven withdrawal/revocation transitions for already
+  promoted essences and their drill-down refs.
+- Accept: no agent or full-access profile promotes without required gate and
+  audit record; every promote/reject/archive result retains source revision,
+  reason, target, retention, and receipt.
 - Verify/evidence: lifecycle matrix; `evidence/OW-090-02/`.
-- Negative QA: self-approval, missing sanitization, private-to-shared transition, and stale evidence fail.
+- Negative QA: raw candidate returned by normal search, self-approval, missing
+  sanitization, private-to-shared transition, silent discard, stale evidence,
+  and withdrawn source remaining retrievable fail.
 
 ### OW-090-03 - Enforce end-to-end privacy ingestion policy
 
 - Priority/dependencies: P0; `OW-090-01`.
 - Outcome: consent, scan allowlist, data class, redaction, retention, and export policies apply before retrieval or sharing.
 - Allowed paths: privacy/config schemas, ingest/export core, fixtures/tests/docs.
-- Implement: deny-by-default external scope, per-project consent, redaction results, negative corpus.
+- Implement: deny-by-default external scope, per-project consent, layered
+  settings with deny-wins semantics, provider/model/region/data-class allowlists
+  using secret references rather than credentials, redaction results, negative corpus.
 - Accept: private, confidential, unsanitized, unreviewed, and disallowed-project records never enter shared output.
 - Verify/evidence: privacy attack corpus; `evidence/OW-090-03/`.
 - Negative QA: prompt relevance cannot override privacy policy.
@@ -645,9 +827,16 @@ For every ticket:
 ### OW-090-04 - Add semantic write-enabled MCP
 
 - Priority/dependencies: P0; `OW-090-02`, `OW-090-03`.
-- Outcome: MCP supports create candidate, append evidence, claim/release work, checkpoint, handoff, and promotion request under policy.
+- Outcome: MCP supports create candidate, append evidence, checkpoint, handoff,
+  Research Candidate/delta brief, and promotion request under policy.
 - Allowed paths: MCP server, semantic write service, schemas, tests/docs.
-- Implement: capability scopes, project binding, locks/idempotency, dry run, audit event, structured result; no arbitrary write tool; support candidate creation and experience/evidence append only as semantic contract operations with target identity and provenance.
+- Implement: capability scopes, principal/project/scope binding, one
+  transport-neutral semantic mutation Core interface, target identity,
+  expected `document_version` and base hash, locks/idempotency, dry run,
+  authorized lifecycle transition, atomic file/Git result, conflict and
+  reconciliation receipt, audit event, and structured result; no arbitrary
+  write tool; support Candidate, Research Candidate, experience/evidence append,
+  and refresh proposal only as semantic contract operations with provenance.
 - Accept: every write maps to a contract transition and evidence event; read-only remains default profile; generic `log()`-style writes and direct canonical mutation are unavailable.
 - Verify/evidence: protocol/security/idempotency suite; `evidence/OW-090-04/`.
 - Negative QA: traversal, symlink escape, confused-deputy project ID, undeclared scope, replay, oversized payload, lock theft/expiry race, injected retrieved instruction, and direct canonical edit fail.
@@ -665,9 +854,13 @@ For every ticket:
 ### OW-090-06 - Add drift and impact analysis
 
 - Priority/dependencies: P1; `OW-090-05`.
-- Outcome: changed sources identify stale decisions, missing acceptance evidence, and affected documents/contracts.
+- Outcome: changed sources identify stale decisions, Research Memory, missing
+  acceptance evidence, promotion/review debt, unresolved drill-down sources,
+  and affected documents/contracts.
 - Allowed paths: drift/index core/CLI, reports, tests/docs.
-- Implement: source hash graph, freshness classes, impact reasons, remediation tickets.
+- Implement: source hash graph, source-mutability-aware freshness classes,
+  impact reasons, raw-inbox age/TTL, global-essence source coverage, health
+  aggregation, delta-only research refresh proposals, remediation tickets.
 - Accept: deliberate code/ADR/contract changes mark only justified dependent artifacts stale.
 - Verify/evidence: drift precision fixture; `evidence/OW-090-06/`.
 - Negative QA: rebuilt view without source resolution remains stale.
@@ -695,9 +888,16 @@ For every ticket:
 ### OW-090-09 - Add incremental Owlib sync, tombstones, and freshness
 
 - Priority/dependencies: P1; `OW-081-09`, `OW-090-03`.
-- Outcome: hub indexes update changed records, remove deleted projections, and expose freshness without full rebuild.
+- Outcome: project-user, user-global, and enterprise indexes update changed
+  records, remove deleted projections, and expose general and Research
+  freshness plus project-source availability without full rebuild.
 - Allowed paths: `owlib/`, sync/index schemas, tests/docs.
-- Implement: manifests, hashes, tombstones, atomic swap, interrupted-sync recovery, scoped cache.
+- Implement: manifests, hashes, tombstones, atomic swap, interrupted-sync
+  recovery, distinct scope namespaces, source-version/freshness metadata, and
+  project-filter-first caches, essence-to-project source resolution, and
+  content-free health watermarks/backlog metrics; propagate policy-driven source
+  withdrawal, access revocation, and deletion through global essences,
+  drill-down availability, exports, and every derived namespace.
 - Accept: add/change/delete and interrupted sync reconcile deterministically; unavailable sources are explicitly stale, never current; de-registration tombstones every derived projection; source projects remain read-only.
 - Verify/evidence: incremental/failure/scale fixtures; `evidence/OW-090-09/`.
 - Negative QA: stale cache, missing source, partial write, and project de-registration do not leak old context.
@@ -727,9 +927,12 @@ For every ticket:
 ### OW-100-01 - Establish scale and performance SLOs
 
 - Priority/dependencies: P0; `OW-090-11`.
-- Outcome: 10, 1k, and 10k artifact profiles publish index, context, drift, sync, and status latency/resource targets.
+- Outcome: 10, 1k, and 10k artifact profiles publish index, context, drift,
+  sync, deep-retrieval, and Knowledge Health latency/resource targets.
 - Allowed paths: benchmark kits/results methodology, performance core/tests/docs.
-- Implement: controlled fixtures, a hardware-independent deterministic correctness suite, cold/warm runs, p50/p95, memory/disk, and Windows/macOS/Linux performance profiles.
+- Implement: controlled fixtures, a hardware-independent deterministic
+  correctness suite, cold/warm runs, p50/p95, memory/disk, Knowledge Health
+  issue cardinality/backlog and source-resolution metrics, and Windows/macOS/Linux performance profiles.
 - Accept: correctness passes independently of runner availability; performance targets are reproducible, evidence-bounded, and met or transparently limited without waiving correctness.
 - Verify/evidence: scale matrix; `evidence/OW-100-01/`.
 - Negative QA: cache-hidden cold result or unreported hardware limitation invalidates claim.
@@ -740,26 +943,73 @@ For every ticket:
 - Outcome: ingestion and export identify secrets/PII, label untrusted external instructions, and block unsafe sharing.
 - Allowed paths: security/privacy core, trust add-on, threat model, fixtures/tests/docs.
 - Implement: detectors with explicit limitations, injection provenance labels, safe preview, audit events, retention classes, redaction before persistence, committed-artifact size limits, ignore rules, and hash-linked external evidence.
-- Accept: negative corpus yields zero unsafe shared exports; raw model transcripts are not committed by default; retention/deletion/tombstone behavior and false-positive handling remain reviewable.
+- Accept: negative corpus yields zero unsafe shared exports; raw model
+  transcripts are not committed by default; retention/deletion/tombstone and
+  source-withdrawal propagation through promoted and derived surfaces remain
+  reviewable and leave no retrievable shadow content.
 - Verify/evidence: security attack suite; `evidence/OW-100-02/`.
 - Negative QA: encoded secret, instruction-like retrieved content, and cross-project PII cannot bypass policy.
 
 ### OW-100-03 - Add skill/plugin permission and supply-chain manifests
 
 - Priority/dependencies: P1; `OW-081-01`, `OW-100-02`.
-- Outcome: extensions declare version, provenance, read/write/network/credential scopes, updates, and compatibility tests.
+- Outcome: extensions, model/provider adapters, and agent/service identities
+  declare version, provenance, read/write/network/credential and knowledge
+  scopes, permitted data classes/regions, updates, and compatibility tests.
 - Allowed paths: skills/plugins/add-ons manifests, installer, conformance/security tests/docs.
-- Implement: permission diff on update, undeclared-scope rejection, checksums/signature-ready fields, registry policy.
+- Implement: permission diff on update, undeclared-scope rejection,
+  principal/capability binding, provider/deployment policy metadata, external
+  secret references, checksums/signature-ready fields, registry policy, Core
+  compatibility range, owned schema/profile and migration declarations,
+  bounded health checks, cleanup, and uninstall contract. Installed extension
+  files are `extension-managed` in the Managed Surface Manifest.
 - Accept: third-party adapter cannot request or exercise undeclared write scope.
 - Verify/evidence: malicious extension fixtures; `evidence/OW-100-03/`.
-- Negative QA: tampered manifest and permission expansion without approval fail install/update.
+- Negative QA: raw credential, unapproved provider/region/data class, tampered
+  manifest, undeclared migration, overwrite of user-managed content, and
+  permission expansion without approval fail install/update.
+
+### OW-100-11 - Ship Single-Organization Hub Beta with external identity
+
+- Priority/dependencies: P0; `OW-090-04`, `OW-090-09`, `OW-100-02`, `OW-100-03`.
+- Outcome: one organization can run Owledge centrally, authenticate developers
+  and agent/service identities through an existing OAuth/OIDC provider, and use
+  scoped MCP/HTTP access without changing Markdown/Git source-of-truth semantics.
+- Allowed paths: Hub server package, identity/capability configuration,
+  deployment examples, MCP/HTTP transport, security/conformance tests/docs.
+- Implement: one-organization-per-deployment configuration; issuer/audience/JWKS
+  validation; human and service principal mapping; project allowlists; explicit
+  registered-project and `enterprise` capabilities; explicit rejection of
+  implicit `user_global` ingestion or synchronization; read-only default;
+  Candidate/Evidence-only agent writes; reviewed promotion; audit receipts;
+  Docker reference deployment; content-free readiness/latency/error/auth/storage/
+  backup-age/index-lag metrics with an external monitoring adapter; and
+  backup/restore runbook with tested Beta RPO/RTO bounds for Hub-owned state and
+  an explicit customer-owned project Markdown/Git backup boundary. Raw prompts,
+  outputs, and knowledge bodies are forbidden telemetry.
+- Accept: two users and two service identities can access only permitted
+  projects/scopes; revoked/expired tokens fail closed; canonical changes remain
+  Markdown/Git commits; no local password database exists; local standalone mode
+  works without the Hub package; the capability is labeled Beta in every claim.
+- Verify/evidence: OIDC fixture provider, token and confused-deputy attack
+  corpus, scope-isolation matrix, MCP/HTTP conformance, restart/recovery and
+  standalone-regression and health-export privacy tests; `evidence/OW-100-11/`.
+- Negative QA: caller-supplied filesystem path, wrong issuer/audience, unknown
+  principal, cross-project token replay, agent canonical promotion, audit gap,
+  raw-content metric label, unproven recovery claim, or Hub outage may not leak
+  or corrupt canonical data.
 
 ### OW-100-04 - Build portable outcome evaluation suite
 
-- Priority/dependencies: P0; `OW-071-03`, `OW-080-07`, `OW-081-10`, `OW-090-10`, `OW-100-01`.
-- Outcome: provenance accuracy, relevance, resume, portability, stale-doc detection, false gate passes, merge conflict, rework, and small-model quality are measured together.
+- Priority/dependencies: P0; `OW-071-03`, `OW-080-07`, `OW-081-10`, `OW-090-10`, `OW-100-01`, `OW-100-11`.
+- Outcome: provenance accuracy, Research recall/reuse, freshness, scope
+  isolation, resume, portability, stale-doc detection, false gate passes,
+  rework, hierarchical essence-to-project retrieval, Knowledge Health, and Hub authorization are measured together.
 - Allowed paths: evaluation/benchmark kits, fixtures, reports, tests/docs.
-- Implement: versioned development and sealed held-out scenarios, oracle sources, quality thresholds, small-model tool-choice/contract metrics, RAG projection/retrieval/embedding/language strata, and no universal ROI claim.
+- Implement: versioned development and sealed held-out scenarios, oracle
+  sources, quality thresholds, research recall-before-search and stale/delta
+  metrics, cross-scope leak tests, adapter contract metrics, RAG
+  projection/retrieval/embedding/language strata, and no universal ROI claim.
 - Accept: legacy token, held-out correctness, small-model, retrieval-quality, and lifecycle outcome gates pass and are reported independently.
 - Verify/evidence: full evaluation matrix with fixture version, environment, commands, limitations, and per-metric verdicts; `evidence/OW-100-04/`.
 - Negative QA: token savings with lower correctness cannot pass.
@@ -769,10 +1019,16 @@ For every ticket:
 - Priority/dependencies: P1; `OW-080-09`, `OW-100-01`.
 - Outcome: install/init/doctor/plan/context/why/status/resume/validate/promote/export/upgrade/uninstall are discoverable, dry-run capable where mutating, and machine-readable.
 - Allowed paths: CLI/core, packaging, tests, command/reference/troubleshooting docs.
-- Implement: short commands, JSON errors, actionable recovery, idempotency, uninstall preview, no orphaned canonical data; text output includes title or compact description when rendering IDs, while machine-readable JSON remains stable.
+- Implement: short commands, JSON errors, actionable recovery, idempotency,
+  uninstall preview, no orphaned canonical data, and one visible upgrade
+  transaction across Standalone, user-global, and Hub-owned surfaces:
+  preflight doctor -> dry-run/diff -> checkpoint -> apply -> postflight health
+  -> receipt/recovery. Text output includes title or compact description when
+  rendering IDs, while machine-readable JSON remains stable.
 - Accept: beginner and automation journeys both work; every mutation explains writes before apply; no text-mode command emits naked IDs unless an explicit machine-oriented option requests IDs only.
 - Verify/evidence: command matrix and fresh/dirty/broken fixtures; `evidence/OW-100-05/`.
-- Negative QA: interrupted upgrade/uninstall is recoverable and never deletes user-authored knowledge.
+- Negative QA: interrupted or failed-postflight upgrade/uninstall is recoverable
+  and never deletes user-authored knowledge or mistakes it for managed content.
 
 ### OW-100-06 - Publish support, migration, and deprecation policy
 
@@ -787,9 +1043,13 @@ For every ticket:
 ### OW-100-07 - Complete English v1 documentation and case studies
 
 - Priority/dependencies: P0; `OW-100-04`, `OW-100-05`, `OW-100-06`.
-- Outcome: beginner, power-user, adapter-author, and maintainer paths are complete and source-linked.
+- Outcome: beginner standalone, user-global power-user, Hub administrator,
+  adapter-author, and maintainer paths are complete and source-linked.
 - Allowed paths: `README.md`, `docs/`, `examples/`, docs reports/assets.
-- Implement: benefits/use cases, easy install, architecture, contracts, adapters, Hermes/VPS, Owlib scopes, RAG, privacy, migrations, troubleshooting, three real or controlled case studies.
+- Implement: benefits/use cases, easy standalone install, Core GA versus Hub
+  Beta architecture, Research recall, Codex/Claude/Pi/generic MCP profiles,
+  generic Hermes/OpenCode compatibility, three scopes, OIDC deployment, RAG,
+  privacy, migrations, troubleshooting, three real or controlled case studies.
 - Accept: docs match shipped commands and support tiers; user testing reaches first value and advanced setup.
 - Verify/evidence: docs gates, command extraction tests, moderated journeys; `evidence/OW-100-07/`.
 - Negative QA: stale command, missing limitation, inaccessible diagram, or unexplained term fails.
@@ -797,9 +1057,14 @@ For every ticket:
 ### OW-100-08 - Prove final Tier-1 and evidence-only golden journey
 
 - Priority/dependencies: P0; `OW-100-04`, `OW-100-07`.
-- Outcome: all four profiles reach at least 95% declared contract equivalence and evidence reconstructs the full journey without chat.
+- Outcome: Codex, Claude Code, Pi, and generic MCP/CLI reach at least 95%
+  declared contract equivalence and evidence reconstructs the full scoped
+  Research-to-resume journey without chat.
 - Allowed paths: conformance/golden fixtures, reports, release evidence/tests/docs.
-- Implement: clean cross-platform run, harness switch, failure/recovery, semantic writes, promotion, docs, RAG, hub scope.
+- Implement: clean cross-platform run, recall-before-research, harness switch,
+  structured Session Recap, failure/recovery, Candidate/Evidence writes,
+  reviewed promotion, docs, RAG, project-user/user-global/enterprise isolation,
+  and the Single-Org Hub Beta flow.
 - Accept: every result links artifact, commit, gate, reviewer, and limitation; unsupported capabilities are explicit.
 - Verify/evidence: final conformance and reconstruction suite; `evidence/OW-100-08/`.
 - Negative QA: remove chat/session state and one evidence item; reconstruction must work in the first case and fail clearly in the second.
@@ -807,9 +1072,15 @@ For every ticket:
 ### OW-100-09 - Cut and verify v1.0 general availability artifacts
 
 - Priority/dependencies: P0; `OW-100-08`.
-- Outcome: clean, reproducible v1.0 wheel/sdist, release notes, support matrix, upgrade/uninstall proof, and final gate are ready for owner-controlled publication.
+- Outcome: clean, reproducible Core GA wheel/sdist plus explicitly labeled
+  Single-Org Hub Beta artifact, release notes, support matrix,
+  upgrade/uninstall proof, and final gate are ready for owner-controlled publication.
 - Allowed paths: `VERSION`, `pyproject.toml`, `CHANGELOG.md`, workflows, release docs/manifests, artifact configuration.
-- Implement: clean build, artifact inspection, fresh install, upgrades from supported versions, uninstall, offline smoke, provenance manifest, and the deferred executed Windows/macOS/Linux wheel-only install smoke from `D-071-24`.
+- Implement: clean build, artifact inspection, fresh install, upgrades from
+  supported versions, uninstall, offline smoke, provenance manifest, the
+  transactional upgrade matrix for Standalone/user-global/Hub surfaces, and
+  the deferred executed Windows/macOS/Linux wheel-only install smoke from
+  `D-071-24`.
 - Accept: `G-100-GA` passes with no unresolved P0/P1, no private path/secret, and no dirty tracked source state.
 - Verify/evidence: full release commands and hashes plus clean Windows, macOS, and Linux wheel-only install transcripts; `evidence/OW-100-09/`.
 - Negative QA: publishing/tagging remains owner-controlled; failed artifact or dirty worktree blocks GA.

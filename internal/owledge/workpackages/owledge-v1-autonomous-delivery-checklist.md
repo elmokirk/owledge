@@ -19,7 +19,9 @@ confidence: 0.94
 review_status: "reviewed"
 sanitization_status: "not_required"
 created_at: "2026-07-16T00:00:00Z"
-updated_at: "2026-07-29T20:28:44Z"
+updated_at: "2026-08-12T16:15:00+02:00"
+workpackage_version: "2.0.0"
+document_version: 1
 source_hash: ""
 reusable_lessons: []
 edges:
@@ -94,7 +96,7 @@ Apply this checklist after v0.7.1, v0.8.0, v0.8.1, v0.9.0, and v1.0:
 
 ### Phase 080-A - Contracts
 
-- [ ] tickets OW-080-01 through OW-080-04 and OW-080-12 done
+- [ ] tickets OW-080-01 through OW-080-04 and OW-080-16 done
 - [ ] G-080-A-CONTRACTS evidence passed
 - [ ] independent contract/migration review passed
 
@@ -124,17 +126,17 @@ Apply this checklist after v0.7.1, v0.8.0, v0.8.1, v0.9.0, and v1.0:
 - [ ] G-081-A-ADAPTERS evidence passed
 - [ ] independent adapter review passed
 
-### Phase 081-B - Concurrency and recovery
+### Phase 081-B - Session continuity and recovery
 
-- [ ] tickets OW-081-06 through OW-081-08, OW-081-12, and OW-081-13 done
+- [ ] tickets OW-081-07 and OW-081-08 done
 - [ ] G-081-B-CONCURRENCY evidence passed
-- [ ] independent Git/recovery/autonomy review passed
+- [ ] independent recovery and cross-harness review passed
 
-### Phase 081-C - Hub journey and release
+### Phase 081-C - Scoped context journey and release
 
-- [ ] tickets OW-081-09, OW-081-14, and OW-081-10 done
+- [ ] tickets OW-081-09 and OW-081-10 done
 - [ ] G-081-C-JOURNEY and G-081-RC evidence passed
-- [ ] independent edge-model and release review passed
+- [ ] independent scope-isolation and release review passed
 
 ### Version alignment stop
 
@@ -172,7 +174,7 @@ Apply this checklist after v0.7.1, v0.8.0, v0.8.1, v0.9.0, and v1.0:
 
 ### Phase 100-A - Security and scale
 
-- [ ] tickets OW-100-01 through OW-100-03 done
+- [ ] tickets OW-100-01 through OW-100-03 and OW-100-11 done
 - [ ] G-100-A-HARDENING evidence passed
 - [ ] independent security/performance review passed
 

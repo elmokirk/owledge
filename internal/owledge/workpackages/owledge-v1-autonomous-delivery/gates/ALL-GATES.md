@@ -1,7 +1,8 @@
 ---
 title: "Owledge v1 Promotion Gates"
-date: "2026-07-16"
-version: "1.0.0"
+date: "2026-08-11"
+version: "2.3.0"
+document_version: 3
 memory_id: "mem:owledge:global:owledge:qa:v1-delivery-gate-catalog"
 tenant_id: "owledge"
 customer_id: "global"
@@ -24,7 +25,7 @@ confidence: 0.96
 review_status: "reviewed"
 sanitization_status: "not_required"
 created_at: "2026-07-16T00:00:00Z"
-updated_at: "2026-07-18T00:00:00Z"
+updated_at: "2026-08-12T14:32:51+02:00"
 source_hash: ""
 owners:
   - "release-assurance"
@@ -98,8 +99,14 @@ Every gate starts from the tested integration commit and controlled environment 
 ### G-071-RC - v0.7.1 release candidate
 
 - Tickets: `OW-071-08` plus all earlier v0.7.1 gates.
-- Commands: kit doctor; strict validation; public docs; quality ratchet; build; twine check; wheel/sdist inspection; wheel-based `uvx` help/quickstart/doctor.
-- Thresholds: clean tracked source state; version alignment; all prior gates green; no private path/secret; artifacts install on supported fixtures.
+- Commands: focused generated-host/Kit `upgrade-drift` regression; full
+  `python tools/owledge.py finalization-gates --project-root .
+  --include-compliance --include-exports`; build; twine check; wheel/sdist
+  inspection; wheel-based `uvx` help/quickstart/doctor.
+- Thresholds: clean committed tracked source state; aggregate finalization
+  38/38 including `upgrade-drift`; terminal JSON manifest present; bounded gate
+  progress/durations observable; version alignment; all prior gates green; no
+  private path/secret; artifacts install on supported fixtures.
 - Demonstrable increment: fresh user installs v0.7.1 and completes the golden demo.
 - Promotion: technical candidate only; execute `G-071-ALIGNMENT` before publication/tag or v0.8.0 work.
 
@@ -114,28 +121,67 @@ Every gate starts from the tested integration commit and controlled environment 
 
 ## v0.8.0 Gates
 
-### G-080-A-CONTRACTS - Portable contracts
+### G-080-A-CONTRACTS - Portable contracts and Research Memory
 
-- Tickets: `OW-080-01` through `OW-080-04`, `OW-080-12`.
-- Commands: schema suites; migration round-trip; DAG/state-machine tests; checkpoint/evidence integrity tests; autonomous-profile default-off, consent, dependency-link, and no-dispatch fixtures.
-- Thresholds: stable IDs/typed edges/unknown extensions preserved; cycles rejected; no done/accepted without gates/evidence; stale evidence rejected; atomic state consistency=100%; profile disabled means zero spawned lanes; unknown profile, missing consent, and overlapping lane fail closed.
-- Demonstrable increment: human intent compiles into a ready ticket DAG and resumable state without prose-only completion; optional delivery planning produces a risk brief but cannot dispatch.
+- Tickets: `OW-080-01` through `OW-080-04`, `OW-080-16`.
+- Commands: common-envelope and artifact-profile schema suites; layered-settings
+  and policy-widening fixtures; migration round-trip; DAG/state-machine tests;
+  checkpoint/evidence integrity tests; Research contract round-trip,
+  recall/dedup/freshness, scope-isolation, rename-stability, delta-brief,
+  `ResourceRef`, Managed Surface Manifest, module-contract, and health-profile
+  boundary fixtures.
+- Thresholds: stable IDs/typed edges/namespaced inert extensions preserved;
+  material edit without exactly one monotonic document-version bump accepted=0;
+  schema/profile migrations remain distinguishable from document revisions;
+  unknown Core keys and authority-widening settings accepted=0; effective policy
+  has an explanation receipt; cycles
+  rejected; no done/accepted without gates/evidence; stale evidence rejected;
+  atomic state consistency=100%; current immutable, versioned, and mutable
+  sources receive correct freshness results; authorized fresh coverage returns
+  `sufficient_current`; external search calls from deterministic recall=0;
+  cross-scope findings=0; arbitrary resource-path authority=0; extensions
+  bypassing Core policy or storage seams=0.
+- Demonstrable increment: human intent compiles into a ready ticket DAG and an
+  agent can determine whether prior Research Memory is current, stale, partial,
+  missing, or conflicted before opening the web.
 - Promotion: contract version is frozen for v0.8 implementation.
 
 ### G-080-B-CONTEXT - Context and small models
 
 - Tickets: `OW-080-05`, `OW-080-06`, `OW-080-07`, `OW-080-13`, `OW-080-14`, `OW-080-15`.
-- Commands: deterministic pack fixtures; synopsis freshness; active-tool tests; 4k/8k/16k tool-choice and structured-output matrix; false-pass/retry fixtures; legacy benchmark regression. Runtime-split for OW-080-13 evidence: under Codex `/goal` the worker runs and self-judges; under Claude Code `/goal` v2.1.139+ the worker runs every command and prints the command, stdout, exit code, and equality verdict to the transcript for the Haiku judge (which cannot run commands or open files). Commands: resume-context file-content token delta (`cold_resume_drain` + `warm_resume_drain`) with Codex `model_auto_compact_token_limit` ON; gate-result equality (both digests + diff to transcript); sidecar roundtrip (capped + reconstructed payloads to transcript); stale-handoff negative fixture (REJECT to transcript).
+- Commands: deterministic pack fixtures; Research recall-before-context and
+  recall-before-external-research fixtures; synopsis freshness; active-tool
+  tests; 4k/8k/16k tool-choice and structured-output matrix; false-pass/retry
+  fixtures; legacy benchmark regression. Runtime-split for OW-080-13 evidence:
+  under Codex `/goal` the worker runs and self-judges; under Claude Code `/goal`
+  v2.1.139+ the worker runs every command and prints the command, stdout, exit
+  code, and equality verdict to the transcript for the Haiku judge (which cannot
+  run commands or open files). Commands: resume-context file-content token delta
+  (`cold_resume_drain` + `warm_resume_drain`) with Codex
+  `model_auto_compact_token_limit` ON; gate-result equality (both digests + diff
+  to transcript); sidecar roundtrip (capped + reconstructed payloads to
+  transcript); stale-handoff negative fixture (REJECT to transcript).
 - Thresholds: identical digest for identical inputs; every selection/exclusion explained; Tier-1 4B/8k completion, tool-selection, contract-validity, retry, and false-pass thresholds pass; pack <= configured budget; legacy >=80% token/correct reduction; privacy/stale failures=0; `/goal` resume loads strictly fewer file-content tokens than the pre-OW-080-13 baseline for identical active state, reported as `cold_resume_drain` and `warm_resume_drain` in both runtimes (Codex `/goal` v0.128+ warm-resume persisted docs count as 0 newly loaded; Claude Code `/goal` v2.1.139+ counts the full post-`--resume` reload); capped gate error payload reconstructs the full payload from the sidecar (transcript-visible under Claude Code); stable IDs/SHAs and the owner-alignment stop unchanged, the stop verified by a verifiable command not protocol assertion alone.
-- Demonstrable increment: a small local model plans, retrieves, and resumes using only the task pack.
+- Demonstrable increment: a small local model plans, reuses current Research
+  Memory, retrieves, and resumes using only the task pack.
 - Promotion: context profile may be used by adapters.
 
 ### G-080-C-RETRIEVAL - Projection and safe migration
 
 - Tickets: `OW-080-08`, `OW-080-09`.
-- Commands: raw-vs-projection retrieval eval; chunk contract tests; 1k status benchmark; migration dry-run/apply/idempotency fixtures.
-- Thresholds: raw frontmatter absent from embedding text; recall/ranking meets or improves baseline; privacy leak=0; duplicate chunk=0; status meets agreed p95; migration never silently overwrites user edits.
-- Demonstrable increment: user previews migration, inspects status, and exports clean retrieval chunks.
+- Commands: raw-vs-projection retrieval eval; Research source/finding/synthesis
+  dedupe and freshness projection; chunk contract tests; 10/1k deterministic
+  Knowledge Health fixtures with seeded revision, duplicate, edge, source,
+  freshness, budget, and projection faults; managed-surface ownership plus
+  migration preflight/dry-run/checkpoint/apply/postflight/receipt/recovery fixtures.
+- Thresholds: raw frontmatter absent from embedding text; recall/ranking meets
+  or improves baseline; source revision and freshness survive projection;
+  privacy leak=0; duplicate chunk=0; seeded health issue detection=100%; model
+  calls from health=0; knowledge bodies in health output=0; status meets agreed
+  p95; migration never silently overwrites user edits; failed postflight has a
+  verified recovery path.
+- Demonstrable increment: user previews migration, inspects actionable
+  Knowledge Health, and exports clean retrieval chunks.
 - Promotion: retrieval projection and migration become supported v0.8 surfaces.
 
 ### G-080-RC - v0.8.0 release candidate
@@ -160,33 +206,50 @@ Every gate starts from the tested integration commit and controlled environment 
 ### G-081-A-ADAPTERS - Tier-1 conformance
 
 - Tickets: `OW-081-01` through `OW-081-05`.
-- Commands: common capability/manifest suite against Codex, Claude/Cowork, Hermes, generic MCP/CLI.
+- Commands: common capability/manifest suite against Codex, Claude Code, Pi,
+  and generic MCP/CLI; generic compatibility smoke for Hermes and OpenCode.
 - Thresholds: 100% required read/control capabilities; unsupported optional capability explicitly reported; undeclared scope calls=0; artifact semantics equivalent.
 - Demonstrable increment: same fixture can bootstrap and produce a task context/handoff in every profile.
 - Promotion: profiles may be labelled Tier 1 for declared capabilities.
 
-### G-081-B-CONCURRENCY - Git safety and recovery
+### G-081-B-CONCURRENCY - Session continuity and recovery
 
-- Tickets: `OW-081-06`, `OW-081-07`, `OW-081-08`, `OW-081-12`, `OW-081-13`.
-- Commands: eight-worker non-overlap simulation; overlap/dirty/stale-base negatives; kill/retry matrix; hook and integration-manifest fixtures; skill classifier, consent, runtime dry-run, and capability-degradation fixtures.
-- Thresholds: clobbered files=0; duplicate canonical writes=0; uncertain side effects block; overlaps require decision; every merged commit/evidence reachable; default-off profiles spawn zero lanes; high-risk dispatch has fresh approval; QA context is independent; Red Team is risk-triggered; unsupported runtime never launches silently.
-- Demonstrable increment: after the user approves a displayed dry-run plan, parallel work is integrated after one worker is killed and resumed in another harness.
-- Promotion: autonomous parallel execution may be enabled within declared lanes.
+- Tickets: `OW-081-07`, `OW-081-08`.
+- Commands: kill/retry and harness-switch matrix; hook and integration-manifest
+  fixtures; structured Session Recap schema, evidence-link, privacy, idempotency,
+  and no-raw-transcript fixtures.
+- Thresholds: duplicate canonical writes=0; uncertain side effects block;
+  checkpoint input/output hashes reconcile; Session Recap Candidates include
+  outcomes, decisions, learnings, gotchas, open questions, Evidence, affected
+  artifacts, and Research/Promotion Candidates; canonical auto-promotion=0;
+  unsupported hooks fail visibly.
+- Demonstrable increment: a stopped session creates a compact private recap and
+  another harness resumes exact work without chat history.
+- Promotion: structured continuity and recovery may be enabled by declared adapters.
 
-### G-081-C-JOURNEY - Scoped hub journey
+### G-081-C-JOURNEY - Scoped context journey
 
-- Tickets: `OW-081-09`, `OW-081-14`.
-- Commands: Owlib project-filter/privacy fixtures; hub context determinism and relevance eval; edge-small task-capsule, budget, structured-output, fallback, and real local-model smoke fixtures.
-- Thresholds: default all-project scan=never; unauthorized project results=0; every selected/excluded project and source explained; context budget honored; edge-small model receives no full-plan injection; unsupported authority actions=0; real local-model smoke evidence=present.
-- Demonstrable increment: task context uses current project plus one explicit related project, while an edge-small model completes one declared bounded task from its capsule.
+- Tickets: `OW-081-09`.
+- Commands: Owlib project-filter/privacy fixtures; `project_user`,
+  `user_global`, and `enterprise` namespace isolation; Research and general
+  context determinism, freshness, and relevance evaluation; two-harness local
+  `user_global` reference composition with Hub upload disabled.
+- Thresholds: default all-project scan=never; unauthorized project/scope
+  results=0; every selected/excluded project, scope, source revision, and
+  freshness state is explained; context budget honored; caller paths grant no authority.
+- Demonstrable increment: two harnesses use the same private local user-global
+  federation for the current project plus one explicitly authorized related
+  project while enterprise knowledge remains distinguishable and no Hub upload occurs.
 - Promotion: scoped cross-project context becomes supported preview.
 
-### G-081-RC - v0.8.1 multi-agent release
+### G-081-RC - v0.8.1 reference-adapter release
 
 - Tickets: `OW-081-10` plus all earlier v0.8.1 gates.
-- Commands: complete golden multi-agent journey; cumulative conformance; release artifact and upgrade smoke.
+- Commands: Research-to-resume cross-harness journey; cumulative conformance;
+  release artifact and upgrade smoke.
 - Thresholds: no chat dependency, silent degradation, clobber, or duplicate write; deliberate evidence failure blocks and recovers; all support claims evidence-linked.
-- Demonstrable increment: plan-to-merge journey switches harness mid-ticket.
+- Demonstrable increment: research recall, task work, recap, and resume switch
+  from one reference harness to another mid-ticket.
 - Promotion: technical candidate only; execute `G-081-ALIGNMENT` before publication/tag or v0.9.0 work.
 
 ### G-081-ALIGNMENT - v0.8.1 user alignment
@@ -203,24 +266,49 @@ Every gate starts from the tested integration commit and controlled environment 
 ### G-090-A-TRUST - Evidence, authority, promotion, privacy
 
 - Tickets: `OW-090-01`, `OW-090-02`, `OW-090-03`.
-- Commands: ledger integrity; authority conflict; lifecycle matrix; privacy attack corpus.
-- Thresholds: mutable/tampered event accepted=0; self-only approval=0; automatic canonical promotion=0; unsafe shared records=0; contradictions preserved=100%.
-- Demonstrable increment: candidate with conflict is reviewed, rejected or promoted with complete evidence.
+- Commands: ledger integrity; source-revision and research-reason traceability;
+  authority conflict; three-scope lifecycle matrix; private global raw-inbox
+  retrieval exclusion, bounded delta-capsule and policy-snapshot fixtures,
+  reviewed global-essence/project-drill-down relations, promote/reject/archive
+  receipts; privacy attack corpus.
+- Thresholds: mutable/tampered event accepted=0; research finding without source
+  and reason accepted=0; self-only approval=0; automatic canonical promotion=0;
+  pointer-only promotable delta accepted=0; raw-inbox records in normal
+  retrieval=0; full snapshot without purpose/scope/TTL accepted=0; reasonless
+  discard=0; unsafe shared records=0; contradictions preserved=100%.
+- Demonstrable increment: a source-linked Research Candidate with conflict is
+  reviewed, rejected, or promoted to an authorized scope with complete evidence.
 - Promotion: semantic write surfaces may be implemented.
 
 ### G-090-B-WRITES - Semantic writes and living docs
 
 - Tickets: `OW-090-04`, `OW-090-05`, `OW-090-06`.
-- Commands: MCP protocol/security/idempotency plus traversal, symlink, confused-deputy, oversized-payload, lock-theft, and prompt-injection attack corpus; docs compiler golden fixture; drift/impact precision.
-- Thresholds: arbitrary write tool absent; replay/escape/symlink/confused-deputy/undeclared-scope/oversized/injected-instruction accepted=0; lock theft accepted=0; generated factual sections source-linked=100%; stale sources cannot be current.
-- Demonstrable increment: agent appends evidence, requests promotion, compiles docs, then source change triggers targeted drift.
+- Commands: MCP protocol/security/idempotency plus traversal, symlink,
+  confused-deputy, oversized-payload, lock-theft, and prompt-injection attack
+  corpus; expected-document-revision/base-hash conflict and replay matrix;
+  Research Candidate and delta-refresh contracts; docs compiler golden
+  fixture; source-mutability-aware drift/impact and Knowledge Health precision,
+  including raw-inbox debt and unresolved drill-down sources.
+- Thresholds: arbitrary write tool absent; replay/escape/symlink/confused-deputy/undeclared-scope/oversized/injected-instruction accepted=0; lock theft accepted=0; lost accepted revisions=0; every write returns idempotent success or explicit conflict/reconciliation receipt; generated factual sections source-linked=100%; stale sources cannot be current.
+- Demonstrable increment: agent appends evidence, requests promotion, compiles
+  docs, then a mutable source change triggers a targeted Research delta brief.
 - Promotion: reviewed semantic writes may ship as opt-in profile.
 
 ### G-090-C-RAG - RAG and hub freshness
 
 - Tickets: `OW-090-07`, `OW-090-08`, `OW-090-09`.
-- Commands: JSONL round-trip; body-only vs title+summary+body vs semantic-tag evaluation over keyword/vector/hybrid modes, two embedding profiles, and multilingual terms; LightRAG reference; Owlib incremental/add-change-delete/interruption/source-unavailable fixtures.
-- Thresholds: privacy leaks=0; raw frontmatter embedding=0; dedupe/tombstone accuracy=100%; unavailable source current-results=0; retrieval quality meets declared per-stratum thresholds; interrupted sync recovers atomically.
+- Commands: JSONL round-trip; body-only vs title+summary+body vs semantic-tag
+  evaluation over keyword/vector/hybrid modes, two embedding profiles, and
+  multilingual terms; LightRAG reference; three-scope Owlib Research/general
+  incremental add/change/delete/interruption/source-unavailable fixtures;
+  reviewed-global-essence-first recall plus authorized/denied/missing/stale
+  project deep-dive matrix; source-withdrawal/access-revocation propagation
+  across essences, drill-down refs, exports, and derived namespaces.
+- Thresholds: privacy leaks=0; raw frontmatter embedding=0; withdrawn-source
+  retrievable shadows=0; dedupe/tombstone
+  accuracy=100%; unavailable source current-results=0; unauthorized deep-dive
+  results=0; essence answers retain exact source revision refs=100%; retrieval
+  quality meets declared per-stratum thresholds; interrupted sync recovers atomically.
 - Demonstrable increment: reviewed change flows through projection and LightRAG, then deletion removes it without changing canonical Markdown.
 - Promotion: generic RAG contract stable; LightRAG remains optional adapter.
 
@@ -245,26 +333,60 @@ Every gate starts from the tested integration commit and controlled environment 
 
 ### G-100-A-HARDENING - Security and scale
 
-- Tickets: `OW-100-01`, `OW-100-02`, `OW-100-03`.
-- Commands: hardware-independent deterministic correctness suite; 10/1k/10k cold/warm benchmark with environment profile; security attack corpus; evidence retention/redaction/size checks; malicious extension/update fixtures.
-- Thresholds: deterministic correctness always passes; published p95/resource targets met or explicit non-promotable limitation; unsafe shared export=0; raw transcripts committed=0; oversized committed evidence=0; undeclared extension scope=0; permission expansion requires approval.
-- Demonstrable increment: 10k project compiles scoped context and rejects malicious content/extension.
+- Tickets: `OW-100-01`, `OW-100-02`, `OW-100-03`, `OW-100-11`.
+- Commands: hardware-independent deterministic correctness suite; 10/1k/10k
+  cold/warm benchmark with environment profile; security attack corpus; evidence
+  retention/redaction/size checks; malicious extension/update fixtures; OIDC
+  issuer/audience/JWKS, expiry/revocation, human/service principal,
+  confused-deputy, MCP/HTTP, scope-isolation, restart, backup/restore, Knowledge
+  Health scale, content-free operations-health export fixtures, and tested Hub
+  Beta RPO/RTO with the project-backup responsibility boundary; module
+  compatibility/profile/migration/health/uninstall fixtures and Managed Surface
+  Manifest permission/ownership checks.
+- Thresholds: deterministic correctness always passes; published p95/resource
+  targets met or explicit non-promotable limitation; unsafe shared export=0;
+  raw transcripts committed=0; oversized committed evidence=0; undeclared
+  extension or knowledge scope=0; permission expansion requires approval;
+  wrong/expired/revoked token accepted=0; cross-project/scope result=0; agent
+  direct canonical promotion=0; local password database=absent; standalone
+  regression=green; private `user_global` upload without a separate explicit
+  future capability=0; seeded health faults missed=0; raw prompt/output/
+  knowledge body in metric labels or operational-health payloads=0; module
+  writes to undeclared or user-managed surfaces=0.
+- Demonstrable increment: a 10k-artifact project compiles scoped context, rejects
+  malicious content/extension, and serves two developers plus two agent/service
+  identities from one Single-Org Hub Beta deployment.
 - Promotion: v1 security and performance claims may be drafted.
 
 ### G-100-B-PRODUCT - Outcomes and lifecycle
 
 - Tickets: `OW-100-04`, `OW-100-05`, `OW-100-06`.
-- Commands: versioned development and sealed held-out outcome evaluation; small-model tool-choice/structured-output/false-pass matrix; stratified RAG retrieval evaluation; CLI command matrix; install/upgrade/interruption/uninstall fixtures; claim-to-proof audit.
-- Thresholds: token savings cannot mask quality loss; legacy >=80%; held-out correctness non-regressing; Tier-1 small-model completion/tool-selection/contract-validity thresholds pass; RAG per-stratum thresholds pass; mutations support preview/JSON; user knowledge survives uninstall; every claim has tier/version/evidence/limitation.
+- Commands: versioned development and sealed held-out outcome evaluation;
+  recall-before-research, stale/partial/conflict and delta-only refresh matrix;
+  adapter contract matrix; stratified RAG retrieval evaluation; three-scope and
+  Hub authorization tests; CLI command matrix; Standalone/user-global/Hub
+  install/upgrade/interruption/postflight-recovery/uninstall fixtures;
+  claim-to-proof audit.
+- Thresholds: token savings cannot mask quality loss; legacy >=80%; held-out
+  correctness non-regressing; fresh Research prevents redundant refresh;
+  stale/partial/conflicted Research never passes as current; four-profile
+  contract-validity thresholds pass; RAG per-stratum thresholds pass; scope
+  leak=0; mutations support preview/JSON; user knowledge survives uninstall;
+  every claim has tier/version/evidence/limitation.
 - Demonstrable increment: beginner and automated client complete lifecycle and recover from interrupted upgrade.
 - Promotion: product surface freezes for v1 docs.
 
 ### G-100-C-PROOF - Documentation and final journey
 
 - Tickets: `OW-100-07`, `OW-100-08`.
-- Commands: docs link/accessibility/command extraction; moderated beginner/power-user journeys; four-profile conformance; evidence-only reconstruction.
-- Thresholds: public docs English; first-value journey succeeds without maintainer; Tier-1 declared equivalence >=95%; missing evidence fails clearly; no chat history required.
-- Demonstrable increment: complete v1 story from install through reviewed knowledge and RAG citation.
+- Commands: docs link/accessibility/command extraction; moderated standalone,
+  user-global, and Hub-admin journeys; Codex/Claude/Pi/generic MCP conformance;
+  generic Hermes/OpenCode compatibility; evidence-only reconstruction.
+- Thresholds: public docs English; first-value journey succeeds without
+  maintainer; Tier-1 declared equivalence >=95%; Core GA and Hub Beta labels
+  never conflate; missing evidence fails clearly; no chat history required.
+- Demonstrable increment: complete v1 story from standalone install through
+  Research reuse, reviewed knowledge, RAG citation, and authenticated Single-Org Hub.
 - Promotion: v1 release artifacts may be cut.
 
 ### G-100-GA - v1.0 general availability

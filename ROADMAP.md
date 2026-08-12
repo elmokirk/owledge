@@ -1,5 +1,8 @@
 # Roadmap
 
+Roadmap version: **2.3.0**
+Last updated: **2026-08-12T14:32:51+02:00**
+
 ## Current Release Goal
 
 Prepare v0.7.1 as the adoption, truth, and compatibility release while
@@ -17,7 +20,33 @@ Public contract:
 - `OWLEDGE.md` is the visible project and agent entrypoint.
 - Public docs are uv-first.
 - Read-only MCP, Wikilink Audit, Native Planning Layers, and Benchmark Kit V2 are P0.
-- Harness benchmarks, write-enabled MCP, Hermes, RAG engine integrations, cloud/frontier benchmark matrices, and marketplace certification are roadmap items until implemented and benchmarked.
+- Harness benchmarks, write-enabled MCP, Research Memory recall, Pi integration,
+  Single-Organization Hub Beta, RAG engine integrations, cloud/frontier benchmark
+  matrices, and marketplace certification are roadmap items until implemented and benchmarked.
+- The v1 target is Standalone Core GA plus a separately labelled Single-Organization
+  Hub Beta. Hosted multi-tenant SaaS remains post-v1.
+- Knowledge scopes are `project_user`, `user_global`, and `enterprise`; every
+  cross-project query remains deny-by-default outside its authorized scope.
+  `user_global` is private and local-first in v1; the Hub never uploads it implicitly.
+- V0.8.1 must prove one private local `user_global` composition shared by at
+  least two harnesses; remote private-global synchronization remains post-v1.
+- Scope, knowledge abstraction, and lifecycle are independent. The promoted
+  global Knowledge Base stores reviewed essences and preserves authorized
+  drill-down to project/source revisions; Global Raw is only a private review queue.
+- Material managed-document edits require a document revision bump distinct
+  from schema/profile versions. Deterministic Knowledge Health is planned for
+  Core; content-free Hub operations health remains separate from generic tracing.
+- Semantic mutations use one revision-aware Core interface, and policy-driven
+  source withdrawal propagates through promoted and derived surfaces.
+- V1 defines managed-surface, module-manifest, resource-reference, transactional
+  upgrade, and separated health-profile contracts without adding a plugin SDK,
+  binary store, transcription pipeline, or privacy-management suite.
+- A coverage-bounded personal-data erasure/DSAR control plane and PII
+  detection/redaction adapters are relevant post-v1 enterprise modules. General
+  tombstone and source-withdrawal hygiene remains in V1; masking is not deletion.
+- V0.7.1 RC requires the clean aggregate finalization suite, including the
+  generated-surface `upgrade-drift` gate. The diagnosed regression is routed
+  into `OW-071-08` and does not authorize V0.8 work.
 
 ## Release Board
 
@@ -43,7 +72,18 @@ Public contract:
 | Planned | POST-008 | Cloud/frontier benchmark matrix | Extend Benchmark Kit to Ollama Cloud/frontier/local-hosted models with cost and resource warnings. | v0.9.x |
 | Planned | POST-009 | RAG integrations | Export Owledge's canonical Markdown layer to Mem0, Graphiti, LlamaIndex, vector DBs, or enterprise RAG systems. | v0.9.x |
 | Planned | POST-012 | OKF interchange profile | Validate, export, and import Google Open Knowledge Format bundles without weakening Owledge's stricter lifecycle, privacy, and promotion model. | v0.8.x |
-| Planned | POST-010 | Hermes adapter | Ship only when SOUL.md, project context, memory rules, runtime hooks, docs, and tests can land together. | Post-v0.9 |
+| Planned | POST-013 / OW-080-16 | Research Memory recall | Deepen the existing research folders and templates into stable source/finding/synthesis contracts with recall-first deduplication, source mutability, freshness, research reason/context, delta-only refresh, and settings-controlled autonomous capture. | v0.8.0-v0.9.0 |
+| Planned | POST-014 / OW-081-04 | Pi reference adapter | Ship `@owledge/pi` as a thin reference adapter for bootstrap, scoped retrieval, structured Session Recap/Handoff, and controlled Candidate writes over shared Owledge capabilities. | v0.8.1 |
+| Planned | POST-015 / OW-100-11 | Single-Organization Hub Beta | Support one organization per deployment with OAuth/OIDC remote MCP, project registry, three knowledge scopes, server-side authorization, audit receipts, backup/restore of Hub state, and read/propose profiles. Private user-global promotion follows raw-inbox -> reviewed promotion or reasoned rejection/archive and is not implicitly uploaded. | v1.0 Beta |
+| Planned | POST-016 | Structured Session Recap | Deepen existing capture/compact-session behavior into Decisions, Learnings, Gotchas, open questions, Evidence, affected artifacts, and Promotion Candidates without raw transcript promotion. | v0.8.1 |
+| Planned | POST-017 / OW-080-09 | Knowledge Health | Deterministically report schema/document revisions, duplicate IDs/claims, broken edges, stale Research, unresolved source drill-down, context-budget pollution, raw-inbox debt, and projection drift without an LLM or knowledge-body telemetry. | v0.8.0-v1.0 |
+| Planned | POST-018 / OW-081-09 / OW-090-02 | Global Essence and Deep Retrieval | Centralize reviewed Research essences, learnings, patterns, and transferable concepts in the global Knowledge Base while retaining permission-checked expansion to exact project and Evidence revisions. | v0.8.1-v0.9.0 |
+| Planned | POST-019 / OW-080-01 / OW-100-03 | Modular extension foundation | Define a managed-surface manifest and a permissioned module manifest with Core compatibility, profiles, migrations, health, cleanup, and uninstall declarations; a public plugin SDK or marketplace remains post-v1. | v0.8.0-v1.0 |
+| Planned | POST-020 / OW-080-02 / OW-080-16 | External ResourceRef contract | Link text artifacts to source files through stable, media-neutral references, hashes, data class, availability, access state, and extraction provenance without storing binary blobs in canonical Owledge. | v0.8.0 |
+| Planned | POST-021 / OW-080-09 / OW-100-05 / OW-100-09 | Transactional multi-surface upgrades | Classify Core/user/generated/extension-managed files and prove preflight, dry-run, checkpoint, apply, postflight health, receipt, and recovery across Standalone, user-global, and Hub surfaces. | v0.8.0-v1.0 |
+| Deferred | POST-022 | Media and voice-ingestion adapters | Add file/media import and external transcription adapters over `ResourceRef` only after the text/provenance contract is stable; Owledge remains no binary warehouse. | Post-v1 |
+| Deferred | POST-023 | Bounded enterprise erasure/DSAR module | Orchestrate coverage-bounded subject resolution, policy actions, connector propagation, restore guards, and receipts only after V1; PII masking may assist detection/redaction but cannot prove deletion. | Post-v1 enterprise |
+| Planned | POST-010 | Hermes/OpenCode generic compatibility | Prove the generic MCP/CLI contract first; add dedicated adapters only where runtime hooks create measurable additional value. | v0.8.1+ |
 | Planned | POST-011 | Marketplace certification | Claim marketplace readiness only after standards, manifests, screenshots, install flows, and review gates are complete. | Post-v0.9 |
 
 ## Shipped In v0.7.0 Pre-Release

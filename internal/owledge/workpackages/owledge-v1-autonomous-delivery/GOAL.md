@@ -1,7 +1,8 @@
 ---
-title: "Owledge v1.0 Autonomous Delivery Goal"
-date: "2026-07-27"
-version: "1.1.0"
+title: "Owledge v1.0 Federated Research Memory Delivery Goal"
+date: "2026-08-11"
+version: "2.2.0"
+document_version: 1
 memory_id: "mem:owledge:global:owledge:goal:v1-autonomous-delivery"
 tenant_id: "owledge"
 customer_id: "global"
@@ -13,8 +14,8 @@ visibility: "private"
 data_class: "internal"
 project: "owledge"
 scope: "v0.7.1-v1.0"
-semantic_title: "Owledge v1 autonomous delivery goal"
-summary: "Durable outcome, execution boundary, and escalation rules for autonomous delivery through Owledge v1.0."
+semantic_title: "Owledge v1 federated research memory delivery goal"
+summary: "Deliver the Standalone Core GA and Single-Organization Hub Beta with recall-first Research Memory, scoped access, and portable agent adapters."
 concept_tags: ["v1-roadmap", "delivery-goal", "long-horizon"]
 stack_tags: ["markdown", "yaml", "git"]
 problem_patterns: ["scope-drift", "unsafe-autonomy"]
@@ -24,7 +25,7 @@ confidence: 0.96
 review_status: "reviewed"
 sanitization_status: "not_required"
 created_at: "2026-07-16T00:00:00Z"
-updated_at: "2026-07-27T00:00:00Z"
+updated_at: "2026-08-12T01:47:18+02:00"
 source_hash: ""
 owners:
   - "product-owner"
@@ -37,21 +38,46 @@ reusable_lessons: []
 edges: []
 ---
 
-# Owledge v1.0 Autonomous Delivery Goal
+# Owledge v1.0 Federated Research Memory Delivery Goal
 
-Deliver the approved v0.7.1-to-v1.0 roadmap through the ticket DAG and cumulative gates in this control plane.
+Deliver the approved v0.7.1-to-v1.0 roadmap through the ticket DAG and cumulative
+gates, culminating in a Standalone Core GA and explicitly labeled
+Single-Organization Hub Beta.
+
+The product must let Codex, Claude Code, Pi, and generic MCP/CLI harnesses reuse
+durable project and Research Memory across `project_user`, private
+`user_global`, and reviewed `enterprise` scopes without making any runtime,
+vector database, web-search provider, or orchestration framework canonical.
+Private cross-project knowledge moves only through a settings-controlled raw
+inbox and reviewed promotion lifecycle. The proposed versioned Schema Registry,
+pending owner confirmation, and deterministic effective settings are intended
+to prevent agents from inventing frontmatter, scope, provider, or automation policy.
+
+The promoted global layer is the central Knowledge Base of reviewed Research
+essences, learnings, patterns, and transferable concepts. It starts retrieval
+compactly and preserves permission-checked drill-down to exact project and
+Evidence revisions. Scope, abstraction, and lifecycle remain independent.
+Every material managed-document edit bumps `document_version`. Deterministic
+Knowledge Health and content-free Hub operations health keep large knowledge
+bases maintainable without turning Owledge into a trace warehouse.
 
 ## First Allowed Step
 
-Run `python tools/validate_v1_delivery_plan.py`, then start `OW-071-01` only after confirming a clean or intentionally scoped worktree and recording the base SHA in its checkpoint.
+Run `python tools/validate_v1_delivery_plan.py`, then resume the first incomplete
+ticket recorded in `RUN-STATE.yaml` (currently `OW-071-05`) after confirming an
+intentionally scoped worktree and checkpoint evidence. This planning revision
+does not skip or reopen current v0.7.1 execution.
 
 ## WIP and Execution Rule
 
 - One active ticket per agent.
 - Only dependency-ready tickets may start.
-- Parallel tickets require separate worktrees and non-overlapping `allowed_paths`.
-- `subagent: true` is eligibility only; use the optional `owledge-autonomous-delivery` skill to classify work, display risks, and record user approval before dispatch.
-- Small tickets remain single-agent. Medium work needs phase approval; high-risk work needs per-ticket approval and isolated QA/Red-Team lanes.
+- Parallel tickets, when an external runtime supports them, require separate
+  worktrees and non-overlapping `allowed_paths`; Owledge records evidence but
+  does not own runtime dispatch.
+- `subagent: true` is eligibility metadata only and never authorizes dispatch.
+- Small tickets remain single-agent. High-risk work needs explicit approval and
+  independent QA/Red-Team evidence.
 - The release integration branch advances only through an integration owner.
 - After every RC/GA gate, run only its matching alignment ticket. It must set `RUN-STATE.yaml` to `awaiting_user_alignment`, create the required version update, and stop until the user responds.
 - During each version, append non-blocking questions, implementation findings,
@@ -63,7 +89,19 @@ Run `python tools/validate_v1_delivery_plan.py`, then start `OW-071-01` only aft
 - No automatic canonical promotion or implicit subagent dispatch.
 - No arbitrary MCP filesystem-write tool.
 - No loading the full control plane into every model prompt.
+- No web or model call inside deterministic Research recall; external research
+  starts only from a stale, partial, missing, or conflicted delta brief.
 - No raw frontmatter in embedding text.
+- No agent writes directly to canonical knowledge; agents create Candidate or
+  Evidence artifacts and promotion remains a separate reviewed transition.
+- No local Hub password database, multi-tenant SaaS control plane, SAML/SCIM, or
+  highly available cluster in the v1 critical path.
+- No raw global inbox content in normal retrieval, no silent discard without a
+  reason receipt, and no customization layer may widen Core/organization policy.
+- No full project copy as the global default, no pointer-only global essence,
+  and no deep-dive source expansion without a fresh authorization and budget check.
+- No generic tracing backend, full agent harness, model jury, scheduler,
+  LangGraph-owned memory, or knowledge frontend in the v1 Core.
 - No silent capability fallback, privacy waiver, threshold reduction, or scope change.
 - No publication or release tag from a dirty tracked worktree.
 - No publish/tag or next-release ticket after an RC/GA until the matching user-alignment ticket is `done`.
@@ -89,4 +127,6 @@ Only an explicit user response recorded in that update may resolve the stop:
 
 ## Final Success
 
-`G-100-GA` and `G-100-ALIGNMENT` pass; their evidence reconstructs the v1 golden journey and the final user alignment without chat history.
+`G-100-GA` and `G-100-ALIGNMENT` pass; their evidence reconstructs recall-first
+Research reuse, scoped cross-harness continuity, reviewed promotion, Standalone
+Core GA, Single-Organization Hub Beta, and final user alignment without chat history.
