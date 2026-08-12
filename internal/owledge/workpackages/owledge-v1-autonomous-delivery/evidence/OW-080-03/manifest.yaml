@@ -1,0 +1,20 @@
+ticket: OW-080-03
+status: accepted
+accepted_at: "2026-08-12"
+source_commits: [d180858, 694f506]
+verification:
+  - "python -m unittest tests.unit.test_ow08003_work_contract -v: 6 passed"
+  - "python -m py_compile tools/owledge.py tools/owledge_work_contract.py: passed"
+  - "python tools/owledge.py test docs-contract --project-root .: 347 checks passed"
+  - "python tools/validate_v1_delivery_plan.py: 0 errors"
+independent_qa:
+  result: accepted
+  score: 95
+  resolved_p1:
+    - dependency readiness and WIP claim rules
+    - claim-owner binding and independent QA acceptance handoff
+    - contract-bound gate/evidence references
+    - schema/runtime closed-world parity
+residual_risks:
+  - "The WorkContract is an additive portable file contract; broader evidence-manifest validation is OW-080-04."
+publication_authority: not_granted
