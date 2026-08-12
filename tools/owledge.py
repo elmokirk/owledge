@@ -72,6 +72,7 @@ import owledge_evidence_contracts as evidence_contracts  # noqa: E402
 import owledge_health  # noqa: E402
 import owledge_migration  # noqa: E402
 import owledge_research_memory  # noqa: E402
+import owledge_small_model_profiles  # noqa: E402
 import build_kb_module  # noqa: E402
 import build_project_folder_kit  # noqa: E402
 import validate_benchmark_baseline as benchmark_baseline  # noqa: E402
@@ -141,6 +142,7 @@ HOST_TOOL_FILES = [
     "owledge_context_compiler.py",
     "owledge_context_profiles.py",
     "owledge_rag_projection.py",
+    "owledge_small_model_profiles.py",
     "validate_benchmark_baseline.py",
     "validate_upgrade_notes.py",
     "build_kb_module.py",
@@ -3885,6 +3887,13 @@ def main(argv: list[str] | None = None) -> int:
     recall_p = sub.add_parser("research-recall", parents=[project_parent])
     recall_p.add_argument("--query", required=True)
     sub.add_parser("rag-projection-v1", parents=[project_parent])
+    small_model_p = sub.add_parser("small-model-validate", parents=[project_parent])
+    small_model_p.add_argument("--profile", required=True, choices=["4k", "8k", "16k", "standard"])
+    small_model_p.add_argument("--capsule-chars", required=True, type=int)
+    small_model_p.add_argument("--tools", default="")
+    small_model_p.add_argument("--hops", default=0, type=int)
+    small_model_p.add_argument("--attempts", default=0, type=int)
+    small_model_p.add_argument("--output-json", required=True)
 
     test_p = sub.add_parser("test", parents=[project_parent])
     test_p.add_argument(
@@ -4119,6 +4128,11 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "rag-projection-v1":
             print_json(core.export_rag_projection_v1(root))
             return 0
+        if args.command == "small-model-validate":
+            output = json.loads(resolve_path(args.output_json).read_text(encoding="utf-8"))
+            result = owledge_small_model_profiles.validate(args.profile, args.capsule_chars, [item for item in args.tools.split(",") if item], args.hops, args.attempts, output)
+            print_json(result)
+            return 0 if result["passed"] else 1
         if args.command == "test":
             suites: dict[str, Callable[[], dict[str, Any]]] = {
                 "public-docs": lambda: public_docs_gate(root),

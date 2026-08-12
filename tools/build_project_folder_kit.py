@@ -121,6 +121,7 @@ CORE_TOOLS = [
     "owledge_context_compiler.py",
     "owledge_context_profiles.py",
     "owledge_rag_projection.py",
+    "owledge_small_model_profiles.py",
     "validate_benchmark_baseline.py",
     "validate_upgrade_notes.py",
     "build_project_folder_kit.py",
