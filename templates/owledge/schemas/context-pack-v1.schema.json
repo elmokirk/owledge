@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ContextPackV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["pack_version", "pack_type", "task_id", "agent_role", "query", "budget_chars", "included", "excluded", "dropped_sources", "remaining_chars", "research_action", "reusable_research_ids", "digest"],
+  "properties": {
+    "pack_version": {"const": "1.0"},
+    "pack_type": {"enum": ["bootstrap", "task", "reviewer", "handoff", "release", "pre_plan", "pre_research"]},
+    "task_id": {"type": "string", "minLength": 1},
+    "agent_role": {"type": "string", "minLength": 1},
+    "objective": {"type": "string"},
+    "query": {"type": "string"},
+    "budget_chars": {"type": "integer", "minimum": 1},
+    "included": {"type": "array", "items": {"type": "object", "required": ["stable_id", "reason", "summary", "chars", "source_revision"]}},
+    "excluded": {"type": "array", "items": {"type": "object", "required": ["stable_id", "reason"]}},
+    "dropped_sources": {"type": "integer", "minimum": 0},
+    "remaining_chars": {"type": "integer", "minimum": 0},
+    "research_action": {"enum": ["reuse_research_memory", "refresh_if_needed"]},
+    "reusable_research_ids": {"type": "array", "items": {"type": "string"}},
+    "digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+  }
+}

@@ -138,6 +138,9 @@ HOST_TOOL_FILES = [
     "owledge_health.py",
     "owledge_migration.py",
     "owledge_research_memory.py",
+    "owledge_context_compiler.py",
+    "validate_benchmark_baseline.py",
+    "validate_upgrade_notes.py",
     "build_kb_module.py",
     "build_project_folder_kit.py",
 ]
@@ -3851,6 +3854,9 @@ def main(argv: list[str] | None = None) -> int:
     context_p.add_argument("--agent-role", default="worker")
     context_p.add_argument("--budget-chars", type=int)
     context_p.add_argument("--objective")
+    context_p.add_argument("--pack-version", choices=["v0.7", "v1"], default="v0.7")
+    context_p.add_argument("--pack-type", choices=["bootstrap", "task", "reviewer", "handoff", "release", "pre_plan", "pre_research"], default="task")
+    context_p.add_argument("--include-reviewed-global", action="store_true", help="Explicitly permit reviewed/canonical user_global essences in a v1 pack.")
 
     work_p = sub.add_parser("work-contract", parents=[project_parent])
     work_p.add_argument("--contract", required=True)
@@ -4032,6 +4038,15 @@ def main(argv: list[str] | None = None) -> int:
             )
             return 0
         if args.command == "build-context-pack":
+            if args.pack_version == "v1":
+                print_json(
+                    core.build_context_pack_v1(
+                        root, args.task_id, args.agent_role, args.budget_chars,
+                        objective=args.objective, pack_type=args.pack_type,
+                        allow_reviewed_global=args.include_reviewed_global,
+                    )
+                )
+                return 0
             print_json(
                 core.build_context_pack_markdown(
                     root,

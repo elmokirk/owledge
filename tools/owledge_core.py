@@ -39,6 +39,8 @@ import urllib.parse
 import uuid
 from typing import Any
 
+import owledge_context_compiler
+
 
 UTC = getattr(dt, "UTC", dt.timezone.utc)
 
@@ -1838,6 +1840,61 @@ def build_context_pack_markdown(
         "estimated_tokens": max(1, included_chars // 4) if included_chars else 0,
         "dropped_sources": len(dropped),
     }
+
+
+def build_context_pack_v1(
+    root: pathlib.Path,
+    task_id: str,
+    agent_role: str = "worker",
+    budget_chars: int | None = None,
+    objective: str | None = None,
+    pack_type: str = "task",
+    allow_reviewed_global: bool = False,
+) -> dict[str, Any]:
+    """Compile the additive v1 receipt format without changing the v0.7 pack."""
+    budget = int(budget_chars or (
+        DEFAULTS["planner_context_budget_chars"]
+        if agent_role in {"planner", "orchestrator", "strategic-reviewer"}
+        else DEFAULTS["worker_context_budget_chars"]
+    ))
+    records: list[dict[str, Any]] = []
+    for record in load_memory_records(root, include_sessions=False):
+        meta = record["metadata"]
+        doc_type = str(meta.get("doc_type") or "")
+        capsule_type = {
+            "adr": "decision", "decision": "decision", "idea": "idea", "concept": "concept",
+            "pattern": "pattern", "lesson": "lesson", "research": "research_finding",
+            "roadmap": "roadmap",
+        }.get(doc_type, doc_type)
+        records.append({
+            "stable_id": meta.get("memory_id"),
+            "summary": meta.get("summary") or markdown_body(record["content"])[:2000],
+            "source_path": record["source_path"],
+            "knowledge_scope": meta.get("knowledge_scope", "project_user"),
+            "data_class": meta.get("data_class", "internal"),
+            "lifecycle": meta.get("lifecycle", meta.get("status", "")),
+            "capsule_type": capsule_type,
+            "source_revision": meta.get("source_hash") or meta.get("content_hash"),
+            "source_freshness": meta.get("source_freshness", meta.get("freshness", "current")),
+            "research_freshness": meta.get("research_freshness", ""),
+            "review_freshness": meta.get("review_freshness", ""),
+            "conflicted": bool(meta.get("conflicted", False)),
+            "source_available": pathlib.Path(record["source_path"]).exists(),
+            "material": bool(meta.get("material", True)),
+        })
+    query = " ".join(part for part in [task_id, objective or ""] if part).strip()
+    allowed_scopes = {"project_user"}
+    if allow_reviewed_global:
+        allowed_scopes.add("user_global")
+    result = owledge_context_compiler.compile_pack(
+        records,
+        pack_type=pack_type,
+        query=query,
+        budget_chars=budget,
+        allowed_scopes=allowed_scopes,
+    )
+    result.update({"task_id": task_id, "objective": objective or "", "agent_role": agent_role})
+    return result
 
 
 def promote_memory(conn: sqlite3.Connection, root: pathlib.Path, body: dict[str, Any]) -> dict[str, Any]:

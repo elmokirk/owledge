@@ -29,6 +29,7 @@ Package examples can be run as `uvx owledge ...` or, after `uv tool install owle
 | `python tools/owledge.py project-snapshot --project-root . --render-html` | Yes | Render optional static dashboard pages from existing snapshots |
 | `python tools/owledge.py project-snapshot --project-root . --yes` | Yes | Generate snapshots and dashboard pages without prompts |
 | `python tools/owledge.py build-context-pack --project-root . --task-id publish-v1` | No | Generate scoped task context |
+| `python tools/owledge.py build-context-pack --project-root . --task-id publish-v1 --pack-version v1 --pack-type pre_plan [--include-reviewed-global]` | No | Generate deterministic v1 context receipt with explicit inclusion/exclusion reasons; reviewed global essences require explicit opt-in and v0.7 remains the default |
 | `python tools/owledge.py work-contract --project-root . --contract contract.json` | No | Validate a portable WorkContract and its dependency DAG |
 | `python tools/owledge.py work-contract --contract contract.json --transition claimed --expected-status ready --actor agent-a` | Yes, contract file | Atomically claim a contract; stale state and double claims fail closed |
 | `python tools/owledge.py evidence-manifest --manifest evidence.json --expected-commit <sha>` | No | Validate checkpoint/gate evidence against an exact tested commit |
