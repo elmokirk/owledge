@@ -21,6 +21,7 @@ VISIBILITIES = {"private", "tenant", "customer", "shared"}
 DATA_CLASSES = {"public", "internal", "confidential", "personal", "special-category"}
 TRANSFERABILITY = {"none", "project_only", "user_global_candidate", "enterprise_candidate", "reviewed_global"}
 CAPABILITY_RESULTS = {"supported", "unsupported", "denied"}
+GLOBAL_USER_TYPES = {"user_context", "preference", "goal", "daily", "personal_task", "research", "personal_pattern", "coach_report", "onboarding_profile"}
 _EXTENSION_KEY = re.compile(r"^[a-z0-9][a-z0-9_-]*(?:\.[a-z0-9][a-z0-9_-]*)+$")
 _ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:-]{0,255}$")
 
@@ -141,21 +142,107 @@ def validate_artifact_envelope(document: Any, previous: dict[str, Any] | None = 
     return sorted(set(errors))
 
 
+def preview_legacy_migration(legacy: Any, *, server_project_scope: str, owner_user_id: str, source_hash: str) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Map legacy frontmatter without writing it or assigning caller path authority."""
+    if not isinstance(legacy, dict):
+        raise ValueError("migration.legacy_type")
+    memory_id = legacy.get("memory_id")
+    if not isinstance(memory_id, str) or not memory_id.startswith("mem:"):
+        raise ValueError("migration.memory_id")
+    doc_type = str(legacy.get("doc_type") or "project_context")
+    known = {
+        "memory_id", "schema_version", "profile_version", "document_version", "source_hash",
+        "knowledge_scope", "server_project_scope", "owner_user_id", "lifecycle", "visibility",
+        "data_class", "audience_ids", "transferability", "applies_to", "edges", "extensions",
+        "resource_refs", "created_at", "updated_at", "profile", "summary", "title", "doc_type",
+        "status", "tenant_id", "customer_id", "project_id", "semantic_title",
+    }
+    legacy_status = str(legacy.get("status") or "draft")
+    lifecycle = {"draft": "candidate", "active": "canonical", "reviewed": "reviewed", "promoted": "canonical", "superseded": "superseded", "archived": "archived"}.get(legacy_status, "candidate")
+    scope = "user_global" if doc_type in GLOBAL_USER_TYPES else "project_user"
+    preserved = {key: value for key, value in legacy.items() if key not in known}
+    raw_extensions = legacy.get("extensions") or {}
+    if not isinstance(raw_extensions, dict):
+        raise ValueError("migration.extensions_type")
+    extensions = {
+        key: value for key, value in raw_extensions.items()
+        if isinstance(key, str) and _EXTENSION_KEY.fullmatch(key)
+    }
+    legacy_extension_fields = {
+        key: value for key, value in raw_extensions.items()
+        if key not in extensions
+    }
+    if preserved:
+        extensions["legacy.frontmatter"] = preserved
+    if legacy_extension_fields:
+        extensions["legacy.extensions"] = legacy_extension_fields
+    envelope = {
+        "memory_id": memory_id,
+        "schema_version": "1.0",
+        "profile_version": "1.0",
+        "document_version": int(legacy.get("document_version") or 1),
+        "source_hash": source_hash,
+        "knowledge_scope": scope,
+        "server_project_scope": server_project_scope,
+        "owner_user_id": owner_user_id,
+        "lifecycle": lifecycle,
+        "visibility": legacy.get("visibility", "private"),
+        "data_class": legacy.get("data_class", "internal"),
+        "audience_ids": list(legacy.get("audience_ids") or []),
+        "transferability": legacy.get("transferability", "project_only"),
+        "applies_to": list(legacy.get("applies_to") or [server_project_scope]),
+        "edges": list(legacy.get("edges") or []),
+        "extensions": extensions,
+        "profile": doc_type,
+        "summary": legacy.get("summary", ""),
+        "title": legacy.get("semantic_title", legacy.get("title", "")),
+    }
+    receipt = {
+        "operation": "legacy_frontmatter_preview",
+        "apply": False,
+        "memory_id": memory_id,
+        "preserved_extension_keys": sorted(preserved),
+        "server_project_scope": server_project_scope,
+        "warnings": ["Legacy metadata remains source-owned until an explicit apply transaction."],
+    }
+    return envelope, receipt
+
+
 def resolve_settings(layers: list[tuple[str, dict[str, Any]]]) -> tuple[dict[str, Any], dict[str, Any]]:
     """Combine ordered settings. Any denial wins and grants never re-expand."""
     effective: dict[str, Any] = {}
     receipt: dict[str, Any] = {"layers": [], "denials": [], "accepted": []}
     deny_seen: set[str] = set()
-    for layer_name, values in layers:
+    core_allow: dict[str, bool] = {}
+    core_scopes: set[str] | None = None
+    for index, (layer_name, values) in enumerate(layers):
         if not isinstance(values, dict):
             raise ValueError(f"settings.layer_type:{layer_name}")
         for key, value in values.items():
             if key.startswith("allow_") and not isinstance(value, bool):
                 raise ValueError(f"settings.allow_bool:{key}")
+            if key == "allowed_scopes":
+                if not isinstance(value, list) or not set(value).issubset(KNOWLEDGE_SCOPES):
+                    raise ValueError("settings.allowed_scopes")
+                scope_value = set(value)
+                if index == 0:
+                    core_scopes = scope_value
+                    effective[key] = sorted(scope_value)
+                    receipt["accepted"].append({"layer": layer_name, "key": key})
+                elif core_scopes is None or not scope_value.issubset(set(effective.get(key, []))):
+                    receipt["denials"].append({"layer": layer_name, "key": key, "reason": "policy_widening"})
+                else:
+                    effective[key] = sorted(scope_value)
+                    receipt["accepted"].append({"layer": layer_name, "key": key})
+                continue
+            if key.startswith("allow_") and index == 0:
+                core_allow[key] = value
             if key.startswith("allow_") and value is False:
                 effective[key] = False
                 deny_seen.add(key)
                 receipt["denials"].append({"layer": layer_name, "key": key})
+            elif key.startswith("allow_") and (core_allow.get(key) is not True or key not in core_allow):
+                receipt["denials"].append({"layer": layer_name, "key": key, "reason": "policy_widening"})
             elif key in deny_seen:
                 receipt["denials"].append({"layer": layer_name, "key": key, "reason": "prior_deny"})
             elif key.startswith("allow_") and effective.get(key) is False:
@@ -191,11 +278,22 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Validate an Owledge v1 artifact envelope JSON document.")
     parser.add_argument("document")
     parser.add_argument("--previous")
+    parser.add_argument("--legacy-preview", action="store_true")
+    parser.add_argument("--server-project-scope")
+    parser.add_argument("--owner-user-id")
+    parser.add_argument("--source-hash")
     args = parser.parse_args()
     document = json.loads(open(args.document, encoding="utf-8").read())
     previous = json.loads(open(args.previous, encoding="utf-8").read()) if args.previous else None
-    errors = validate_artifact_envelope(document, previous)
-    print(json.dumps({"passed": not errors, "errors": errors}, indent=2))
+    if args.legacy_preview:
+        if not all([args.server_project_scope, args.owner_user_id, args.source_hash]):
+            parser.error("--legacy-preview requires --server-project-scope, --owner-user-id, and --source-hash")
+        envelope, receipt = preview_legacy_migration(document, server_project_scope=args.server_project_scope, owner_user_id=args.owner_user_id, source_hash=args.source_hash)
+        errors = validate_artifact_envelope(envelope)
+        print(json.dumps({"passed": not errors, "errors": errors, "envelope": envelope, "receipt": receipt}, indent=2))
+    else:
+        errors = validate_artifact_envelope(document, previous)
+        print(json.dumps({"passed": not errors, "errors": errors}, indent=2))
     return 0 if not errors else 1
 
 

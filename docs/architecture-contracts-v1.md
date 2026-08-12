@@ -1,6 +1,6 @@
 ---
 title: "Owledge V1 Contract Architecture"
-document_version: 1
+document_version: 2
 status: active
 ---
 
@@ -21,6 +21,11 @@ canonical; adapters and derived indexes are not a second source of truth.
    receipt; they never provide arbitrary file writes.
 4. Migration is opt-in, preview-first, checkpointed, receipt-backed, and
    recoverable. User-owned Markdown is never silently overwritten.
+
+The shipped `tools/owledge_contracts.py` validator can produce a preview mapping
+for legacy frontmatter. It does not read caller-supplied paths as authority and
+does not apply a write; the server-resolved project scope, owner, source hash,
+preserved legacy fields, and `apply: false` receipt are explicit.
 
 ## Scope and product boundary
 

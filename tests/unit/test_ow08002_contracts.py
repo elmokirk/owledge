@@ -66,6 +66,33 @@ class ContractEnvelopeTests(unittest.TestCase):
         capability = {"request_id": "request-1", "protocol_version": "1.0", "core_api_range": ">=1", "capability_id": "deep_dive", "operation_kind": "query", "requested_scopes": ["project_user"], "effective_permissions": ["read"], "data_class": "internal", "result": "denied", "reason_code": "scope_denied"}
         self.assertEqual(contracts.validate_capability_receipt(capability), [])
 
+    def test_later_settings_layers_cannot_widen_core_policy_or_scopes(self):
+        effective, receipt = contracts.resolve_settings([
+            ("core", {"allow_cross_project": True, "allow_remote_write": False, "allowed_scopes": ["project_user", "user_global"]}),
+            ("organization", {"allow_cross_project": False, "allow_remote_write": True, "allowed_scopes": ["project_user", "enterprise"]}),
+        ])
+        self.assertFalse(effective["allow_cross_project"])
+        self.assertFalse(effective["allow_remote_write"])
+        self.assertEqual(effective["allowed_scopes"], ["project_user", "user_global"])
+        self.assertGreaterEqual(len(receipt["denials"]), 2)
+
+    def test_legacy_preview_preserves_unknown_fields_without_path_authority(self):
+        legacy = {"memory_id": "mem:tenant:customer:project:canonical:legacy", "doc_type": "canonical", "status": "active", "summary": "legacy", "custom_flag": "preserve", "extensions": {"unscoped": "preserve"}}
+        mapped, receipt = contracts.preview_legacy_migration(legacy, server_project_scope="server-project", owner_user_id="owner-1", source_hash="d" * 64)
+        self.assertEqual(mapped["memory_id"], legacy["memory_id"])
+        self.assertEqual(mapped["server_project_scope"], "server-project")
+        self.assertEqual(mapped["extensions"]["legacy.frontmatter"]["custom_flag"], "preserve")
+        self.assertEqual(mapped["extensions"]["legacy.extensions"]["unscoped"], "preserve")
+        self.assertFalse(receipt["apply"])
+        self.assertEqual(contracts.validate_artifact_envelope(mapped), [])
+
+    def test_all_knowledge_scopes_validate_without_caller_path_authority(self):
+        for scope in ("project_user", "user_global", "enterprise"):
+            document = envelope()
+            document["knowledge_scope"] = scope
+            document.pop("source_path", None)
+            self.assertEqual(contracts.validate_artifact_envelope(document), [], scope)
+
 
 if __name__ == "__main__":
     unittest.main()
