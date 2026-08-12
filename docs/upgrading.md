@@ -52,6 +52,19 @@ If an upgrade goes wrong:
 2. `python tools/owledge.py upgrade --dry-run` (see the diff)
 3. `git checkout -- <files>` to revert any file
 
+## Preview-first migration
+
+For the versioned contract migration, first create a reviewable plan, then pass
+that exact plan to the explicit apply command. The dry run reports only paths,
+hashes, classifications, collisions, and never-touch exclusions; it does not
+emit or rewrite knowledge bodies. Apply backs up every target, checks postflight
+Knowledge Health, writes a receipt, and restores the backup if postflight fails.
+
+```bash
+python tools/owledge.py migrate --project-root . --dry-run --output-plan .owledge/migrations/preview.json
+python tools/owledge.py migrate --project-root . --apply --plan .owledge/migrations/preview.json
+```
+
 ## Additive vs breaking changes
 
 Each release section in `CHANGELOG.md` contains exactly one `### Upgrade notes`

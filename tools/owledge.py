@@ -70,6 +70,7 @@ import owledge_core as core  # noqa: E402
 import owledge_work_contract as work_contract  # noqa: E402
 import owledge_evidence_contracts as evidence_contracts  # noqa: E402
 import owledge_health  # noqa: E402
+import owledge_migration  # noqa: E402
 import build_kb_module  # noqa: E402
 import build_project_folder_kit  # noqa: E402
 import validate_benchmark_baseline as benchmark_baseline  # noqa: E402
@@ -134,6 +135,7 @@ HOST_TOOL_FILES = [
     "owledge_work_contract.py",
     "owledge_evidence_contracts.py",
     "owledge_health.py",
+    "owledge_migration.py",
     "build_kb_module.py",
     "build_project_folder_kit.py",
 ]
@@ -3864,6 +3866,12 @@ def main(argv: list[str] | None = None) -> int:
     evidence_p.add_argument("--owner-actor", required=True)
     health_p = sub.add_parser("knowledge-health", parents=[project_parent])
     health_p.add_argument("--context-budget-chars", type=int, default=24000)
+    migrate_p = sub.add_parser("migrate", parents=[project_parent])
+    migrate_p.add_argument("--source-root", default=str(REPO_ROOT))
+    migrate_p.add_argument("--dry-run", action="store_true")
+    migrate_p.add_argument("--apply", action="store_true")
+    migrate_p.add_argument("--plan")
+    migrate_p.add_argument("--output-plan")
 
     test_p = sub.add_parser("test", parents=[project_parent])
     test_p.add_argument(
@@ -4062,6 +4070,27 @@ def main(argv: list[str] | None = None) -> int:
             result = owledge_health.knowledge_health(root, context_budget_chars=args.context_budget_chars)
             print_json(result)
             return 0 if result["passed"] else 1
+        if args.command == "migrate":
+            if bool(args.dry_run) == bool(args.apply):
+                print_json({"passed": False, "error": "choose exactly one of --dry-run or --apply"})
+                return 2
+            source_root = resolve_path(args.source_root)
+            if args.dry_run:
+                result = owledge_migration.preview(root, source_root)
+                if args.output_plan:
+                    output = resolve_path(args.output_plan)
+                    output.parent.mkdir(parents=True, exist_ok=True)
+                    output.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+                    result["plan_path"] = str(output)
+                print_json(result)
+                return 0 if result.get("passed") else 1
+            if not args.plan:
+                print_json({"passed": False, "error": "--apply requires --plan produced by --dry-run"})
+                return 2
+            plan = json.loads(resolve_path(args.plan).read_text(encoding="utf-8"))
+            result = owledge_migration.apply(root, source_root, plan)
+            print_json(result)
+            return 0 if result.get("passed") else 1
         if args.command == "test":
             suites: dict[str, Callable[[], dict[str, Any]]] = {
                 "public-docs": lambda: public_docs_gate(root),
