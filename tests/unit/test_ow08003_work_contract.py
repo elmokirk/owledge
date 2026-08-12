@@ -38,8 +38,25 @@ class WorkContractTests(unittest.TestCase):
         qa = work.transition(review, "qa", actor="agent-a")
         with self.assertRaisesRegex(ValueError, "gate_and_evidence_required"):
             work.transition(qa, "accepted", actor="reviewer")
+        with self.assertRaisesRegex(ValueError, "unrecognized_gate_or_evidence"):
+            work.transition(qa, "accepted", actor="reviewer", gate_refs=["not-a-gate"], evidence_refs=["not-evidence"])
         accepted = work.transition(qa, "accepted", actor="reviewer", gate_refs=["G-test"], evidence_refs=["evidence/test"])
         self.assertEqual(accepted["status"], "accepted")
+
+    def test_dependencies_and_claim_owner_are_enforced(self):
+        value = contract(dependencies=["OW-parent"])
+        with self.assertRaisesRegex(ValueError, "dependencies_not_ready"):
+            work.transition(value, "claimed", actor="agent-a", dependency_statuses={"OW-parent": "backlog"})
+        claimed = work.transition(value, "claimed", actor="agent-a", dependency_statuses={"OW-parent": "done"})
+        with self.assertRaisesRegex(ValueError, "actor_mismatch"):
+            work.transition(claimed, "in_progress", actor="agent-b")
+        reset = work.transition(claimed, "ready", actor="agent-a")
+        self.assertIsNone(reset["claimed_by"])
+
+    def test_runtime_rejects_unknown_schema_field(self):
+        value = contract()
+        value["unknown"] = True
+        self.assertIn("contract.unknown_field:unknown", work.validate_contract(value))
 
     def test_atomic_compare_and_swap_preserves_original_on_failure(self):
         with tempfile.TemporaryDirectory() as temporary:

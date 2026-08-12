@@ -20,6 +20,7 @@ TRANSITIONS = {
     "accepted": {"done", "in_progress"}, "blocked": {"ready", "in_progress"}, "done": set(),
 }
 REQUIRED = {"id", "goal", "target_user", "smallest_useful_outcome", "success_signal", "mvp_cutline", "definition_of_done", "qa_gates", "out_of_scope", "evidence_refs", "handoff", "unresolved_questions", "roadmap_dispositions", "dependencies", "status"}
+OPTIONAL = {"claimed_by", "gate_refs"}
 
 
 def _nonempty(value: Any) -> bool:
@@ -30,6 +31,7 @@ def validate_contract(contract: Any) -> list[str]:
     if not isinstance(contract, dict):
         return ["contract.type"]
     errors = [f"contract.missing:{key}" for key in sorted(REQUIRED - set(contract))]
+    errors.extend(f"contract.unknown_field:{key}" for key in sorted(set(contract) - REQUIRED - OPTIONAL))
     if not _nonempty(contract.get("id")):
         errors.append("contract.id")
     for key in ("goal", "target_user", "smallest_useful_outcome", "success_signal", "mvp_cutline", "definition_of_done", "handoff"):
@@ -78,33 +80,39 @@ def validate_dag(contracts: list[dict[str, Any]]) -> list[str]:
     return sorted(set(errors))
 
 
-def transition(contract: dict[str, Any], target: str, *, actor: str, gate_refs: list[str] | None = None, evidence_refs: list[str] | None = None) -> dict[str, Any]:
+def transition(contract: dict[str, Any], target: str, *, actor: str, dependency_statuses: dict[str, str] | None = None, gate_refs: list[str] | None = None, evidence_refs: list[str] | None = None) -> dict[str, Any]:
     errors = validate_contract(contract)
     if errors:
         raise ValueError(",".join(errors))
     current = contract["status"]
     if target == "claimed" and contract.get("claimed_by") not in {None, actor}:
         raise ValueError("transition.double_claim")
+    if target == "claimed" and any((dependency_statuses or {}).get(dependency) != "done" for dependency in contract["dependencies"]):
+        raise ValueError("transition.dependencies_not_ready")
+    if current in {"claimed", "in_progress", "review"} and contract.get("claimed_by") not in {None, actor}:
+        raise ValueError("transition.actor_mismatch")
     if target not in TRANSITIONS[current]:
         raise ValueError("transition.not_allowed")
     if target in {"accepted", "done"}:
         if not gate_refs or not evidence_refs:
             raise ValueError("transition.gate_and_evidence_required")
+        if not set(gate_refs).issubset(set(contract["qa_gates"])) or not set(evidence_refs).issubset(set(contract["evidence_refs"])):
+            raise ValueError("transition.unrecognized_gate_or_evidence")
     updated = dict(contract)
     updated["status"] = target
-    updated["claimed_by"] = actor if target == "claimed" else contract.get("claimed_by")
+    updated["claimed_by"] = actor if target == "claimed" else (None if target == "ready" else contract.get("claimed_by"))
     updated["gate_refs"] = gate_refs or contract.get("gate_refs", [])
     updated["evidence_refs"] = evidence_refs or contract["evidence_refs"]
     return updated
 
 
-def atomic_transition(path: pathlib.Path, expected_status: str, target: str, *, actor: str, gate_refs: list[str] | None = None, evidence_refs: list[str] | None = None) -> dict[str, Any]:
+def atomic_transition(path: pathlib.Path, expected_status: str, target: str, *, actor: str, dependency_statuses: dict[str, str] | None = None, gate_refs: list[str] | None = None, evidence_refs: list[str] | None = None) -> dict[str, Any]:
     """Atomic single-file CAS; mismatched state leaves the original bytes untouched."""
     raw = path.read_text(encoding="utf-8")
     contract = json.loads(raw)
     if contract.get("status") != expected_status:
         raise ValueError("transition.compare_and_swap_failed")
-    updated = transition(contract, target, actor=actor, gate_refs=gate_refs, evidence_refs=evidence_refs)
+    updated = transition(contract, target, actor=actor, dependency_statuses=dependency_statuses, gate_refs=gate_refs, evidence_refs=evidence_refs)
     fd, temporary = tempfile.mkstemp(prefix=f".{path.name}.", dir=path.parent, text=True)
     try:
         with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as handle:
@@ -137,7 +145,8 @@ def main() -> int:
     if args.transition:
         if not args.expected_status or not args.actor:
             parser.error("--transition requires --expected-status and --actor")
-        contract = atomic_transition(path, args.expected_status, args.transition, actor=args.actor, gate_refs=args.gate_ref, evidence_refs=args.evidence_ref)
+        dependency_statuses = {item["id"]: item["status"] for item in contracts}
+        contract = atomic_transition(path, args.expected_status, args.transition, actor=args.actor, dependency_statuses=dependency_statuses, gate_refs=args.gate_ref, evidence_refs=args.evidence_ref)
     print(json.dumps({"passed": True, "contract": contract}, indent=2, sort_keys=True))
     return 0
 

@@ -4030,7 +4030,8 @@ def main(argv: list[str] | None = None) -> int:
                 if not args.expected_status or not args.actor:
                     print_json({"passed": False, "error": "--transition requires --expected-status and --actor"})
                     return 2
-                contract = work_contract.atomic_transition(contract_path, args.expected_status, args.transition, actor=args.actor, gate_refs=args.gate_ref, evidence_refs=args.evidence_ref)
+                dependency_statuses = {item["id"]: item["status"] for item in contracts}
+                contract = work_contract.atomic_transition(contract_path, args.expected_status, args.transition, actor=args.actor, dependency_statuses=dependency_statuses, gate_refs=args.gate_ref, evidence_refs=args.evidence_ref)
             print_json({"passed": True, "contract": contract})
             return 0
         if args.command == "test":
