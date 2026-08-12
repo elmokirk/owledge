@@ -1,0 +1,24 @@
+ticket: OW-080-05
+status: accepted
+accepted_at: "2026-08-12"
+source_commits: [78b0bae]
+verification:
+  - "python -m unittest tests.unit.test_ow08005_context_compiler tests.unit.test_ow07105_golden_demo: 8 passed"
+  - "fresh build-project-kit --verify: passed; doctor score 100"
+  - "generated-kit build-context-pack --pack-version v1 --pack-type pre_plan: passed"
+  - "python tools/validate_v1_delivery_plan.py: 0 errors, 61 tickets"
+  - "git diff --check: passed"
+independent_qa:
+  result: accepted
+  score: 96
+  resolved_p1:
+    - "Copied context compiler and all public CLI imports into both project-kit build paths."
+    - "Reviewed global essences require explicit public opt-in and reviewed/canonical lifecycle."
+coverage:
+  - "Deterministic digest and ordering with inclusion/exclusion receipts."
+  - "Scope, privacy, conflict, stale source/research/review, relevance, and over-budget exclusions."
+  - "Explicit expansion receipts reject unauthorized or unavailable deep dives."
+  - "Additive v1 CLI; v0.7 context-pack remains default."
+limitations:
+  - "Public global recall is explicit local opt-in; server-resolved principal authorization remains a later delivery seam."
+publication_authority: not_granted
