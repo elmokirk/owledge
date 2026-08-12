@@ -3,15 +3,15 @@ document_version: 4
 project: owledge
 plan: internal/owledge/plans/owledge-v1-autonomous-delivery-master-plan.md
 objective: Deliver Owledge v0.7.1 through a Standalone Core GA and bounded Single-Organization Hub Beta with recall-first Research Memory and portable agent adapters.
-status: in_progress
+status: awaiting_user_alignment
 current_release: v0.7.1
-current_phase: 071-RC
-active_ticket: OW-071-08
+current_phase: 071-ALIGNMENT
+active_ticket: OW-071-09
 last_green_gate: G-071-C-COMPAT
 alignment:
-  state: none
-  awaiting_release: null
-  active_alignment_ticket: null
+  state: awaiting_user_alignment
+  awaiting_release: v0.7.1
+  active_alignment_ticket: OW-071-09
   user_decision: null
   open_questions: []
   findings:
