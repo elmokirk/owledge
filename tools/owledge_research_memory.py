@@ -2,6 +2,8 @@
 """Deterministic, metadata-only Research Memory contracts and recall-first lookup."""
 from __future__ import annotations
 import datetime as dt
+import json
+import pathlib
 from typing import Any
 
 TYPES = {"research_brief", "source_record", "atomic_finding", "synthesis", "research_task_index"}
@@ -47,3 +49,17 @@ def recall(records: list[dict[str, Any]], *, query: str, allowed_scopes: set[str
     elif any(item["freshness"] == "stale" for item in candidates): state = "stale"
     else: state = "partial"
     return {"state": state, "model_calls": 0, "external_search_calls": 0, "results": candidates, "contradictions": sorted(set(conflicts)), "gaps": sorted(set(gaps)), "delta_brief": [] if state == "sufficient_current" else ["Refresh only missing, stale, or conflicted source revisions."], "read_policy": "metadata-only deterministic recall"}
+
+def load_local_records(root: pathlib.Path) -> list[dict[str, Any]]:
+    records: list[dict[str, Any]] = []
+    for directory in (root / ".owledge" / "research", root / "global-memory" / "research"):
+        if not directory.is_dir(): continue
+        for path in sorted(directory.rglob("*.jsonl")):
+            try: path.resolve().relative_to(directory.resolve())
+            except ValueError: continue
+            for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
+                try:
+                    item = json.loads(line)
+                    if isinstance(item, dict): records.append(item)
+                except ValueError: continue
+    return records

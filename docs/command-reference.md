@@ -35,6 +35,7 @@ Package examples can be run as `uvx owledge ...` or, after `uv tool install owle
 | `python tools/owledge.py knowledge-health --project-root .` | No | Inspect metadata-only knowledge health and managed-surface drift |
 | `python tools/owledge.py migrate --project-root . --dry-run --output-plan .owledge/migrations/preview.json` | Yes, generated plan only | Produce a metadata-only migration plan; never applies writes |
 | `python tools/owledge.py migrate --project-root . --apply --plan .owledge/migrations/preview.json` | Yes, planned Core files only | Apply an explicit plan with backup, postflight, receipt, and recovery |
+| `python tools/owledge.py research-recall --project-root . --query "tool compatibility"` | No | Deterministically reuse authorized Research Memory before proposing refresh |
 | `python tools/owledge.py wikilink-audit --project-root . --check` | No | Audit Obsidian-style wiki links for valid, broken, and ambiguous targets |
 | `python tools/benchmark-kit/run-benchmark-kit.py --mode ci --scale-mode small --yes` | Yes, ignored reports | Run optional Benchmark Kit deterministic real Markdown fixture benchmark |
 | `python tools/benchmark-kit/run-benchmark-kit.py --mode local --scale-mode small --models gemma4:latest --yes` | Yes, ignored reports | Run selected Ollama model sequentially against real Markdown fixtures |

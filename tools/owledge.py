@@ -71,6 +71,7 @@ import owledge_work_contract as work_contract  # noqa: E402
 import owledge_evidence_contracts as evidence_contracts  # noqa: E402
 import owledge_health  # noqa: E402
 import owledge_migration  # noqa: E402
+import owledge_research_memory  # noqa: E402
 import build_kb_module  # noqa: E402
 import build_project_folder_kit  # noqa: E402
 import validate_benchmark_baseline as benchmark_baseline  # noqa: E402
@@ -136,6 +137,7 @@ HOST_TOOL_FILES = [
     "owledge_evidence_contracts.py",
     "owledge_health.py",
     "owledge_migration.py",
+    "owledge_research_memory.py",
     "build_kb_module.py",
     "build_project_folder_kit.py",
 ]
@@ -3872,6 +3874,9 @@ def main(argv: list[str] | None = None) -> int:
     migrate_p.add_argument("--apply", action="store_true")
     migrate_p.add_argument("--plan")
     migrate_p.add_argument("--output-plan")
+    recall_p = sub.add_parser("research-recall", parents=[project_parent])
+    recall_p.add_argument("--query", required=True)
+    recall_p.add_argument("--scope", action="append", default=["project_user"])
 
     test_p = sub.add_parser("test", parents=[project_parent])
     test_p.add_argument(
@@ -4091,6 +4096,13 @@ def main(argv: list[str] | None = None) -> int:
             result = owledge_migration.apply(root, source_root, plan)
             print_json(result)
             return 0 if result.get("passed") else 1
+        if args.command == "research-recall":
+            scopes = set(args.scope)
+            if not scopes.issubset(owledge_research_memory.SCOPES):
+                print_json({"passed": False, "error": "unknown research scope"})
+                return 2
+            print_json(owledge_research_memory.recall(owledge_research_memory.load_local_records(root), query=args.query, allowed_scopes=scopes))
+            return 0
         if args.command == "test":
             suites: dict[str, Callable[[], dict[str, Any]]] = {
                 "public-docs": lambda: public_docs_gate(root),

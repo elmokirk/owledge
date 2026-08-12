@@ -117,6 +117,7 @@ CORE_TOOLS = [
     "owledge_evidence_contracts.py",
     "owledge_health.py",
     "owledge_migration.py",
+    "owledge_research_memory.py",
     "build_project_folder_kit.py",
     "build_kb_module.py",
 ]
