@@ -1,0 +1,37 @@
+ticket: OW-080-02
+status: accepted
+accepted_at: "2026-08-12"
+source_commits:
+  - 89e5f78
+  - 791c72a
+  - 7588e99
+  - d08c9f4
+  - 5f1cbe4
+scope:
+  - versioned artifact envelope and five profile schemas
+  - preview-only legacy mapping with host-resolved identity
+  - denies-win layered settings and typed capability receipts
+verification:
+  - command: "python -m unittest tests.unit.test_ow08002_contracts -v"
+    result: "9 passed"
+  - command: "python -m py_compile tools/owledge_contracts.py"
+    result: "passed"
+  - command: "python tools/owledge.py build-project-kit --output-path <temp> --force --verify"
+    result: "passed; generated-kit doctor score 100"
+  - command: "python tools/validate_v1_delivery_plan.py"
+    result: "passed; 0 errors"
+  - command: "python tools/owledge.py test docs-contract --project-root ."
+    result: "passed; 346 checks"
+independent_qa:
+  reviewer: beginner-ux-reviewer
+  result: accepted
+  score: 97
+  initial_findings:
+    - "P1: caller-supplied scope was removed from the CLI; preview now requires ResolvedProjectIdentity."
+    - "P1: runtime and ResourceRef schema integrity fields are parity-tested."
+    - "P1: shipped examples now validate with full SHA-256 hashes and a complete ProjectManifest envelope."
+residual_risks:
+  - "Preview mapping is deliberately not an apply transaction; apply/recovery orchestration remains OW-080-09."
+  - "No remote or Hub authority is introduced by this contract work."
+next_ticket: OW-080-03
+publication_authority: "not granted"

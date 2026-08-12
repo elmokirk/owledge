@@ -1,12 +1,12 @@
 schema_version: 1
-document_version: 8
+document_version: 9
 project: owledge
 plan: internal/owledge/plans/owledge-v1-autonomous-delivery-master-plan.md
 objective: Deliver Owledge v0.7.1 through a Standalone Core GA and bounded Single-Organization Hub Beta with recall-first Research Memory and portable agent adapters.
 status: in_progress
 current_release: v0.8.0
 current_phase: 080-A
-active_ticket: OW-080-02
+active_ticket: OW-080-03
 last_green_gate: G-071-ALIGNMENT
 alignment:
   state: approved
@@ -486,8 +486,9 @@ last_completed_actions:
   - OW-071-05 accepted through cb741d3 after a wheel-only Windows fresh-environment journey, idempotent resume proof, public-docs/docs-contract checks, and independent beginner QA re-review at 89/100 with no P0/P1 findings.
   - G-071-B-ADOPTION promoted from cumulative evidence at cb741d3: 28 focused adoption tests, public-docs, docs-contract, read-only MCP, runtime-adapter, and control-plane checks passed without broadening the D-071-24 platform boundary.
   - OW-071-06 accepted pending commit after Owlib current-contract migration, 10 focused tests (one Windows symlink integration skip), and independent privacy/migration re-review at 94/100 with no P0/P1 findings.
+  - OW-080-02 accepted through 5f1cbe4 after a preview-only migration and fail-closed contract review loop. Independent re-review accepted 97/100 with no P0/P1; evidence is evidence/OW-080-02/manifest.yaml.
 next_actions:
-  - Execute OW-080-02 only within its declared schema/tool/test/docs paths; do not activate another v0.8 ticket until it is accepted.
+  - Execute OW-080-03 only within its declared planning/state-machine paths; OW-080-04 remains backlog until its lane is deliberately selected.
   - Retain the three-OS wheel-only fixture and collect executed macOS/Linux evidence at OW-100-09; do not issue an earlier cross-platform support claim.
 last_commands:
   - "python tools/validate_v1_delivery_plan.py (exit 0; 64 tickets, 25 gates, 44 waves, 0 errors; one allowed OW-080-13 checkpoint warning)"
@@ -512,7 +513,7 @@ last_commands:
   - "python tools/owledge.py test public-docs --project-root .; python tools/owledge.py test docs-contract --project-root .; python tools/owledge.py test mcp-readonly --project-root .; python tools/owledge.py test runtime-adapters --project-root . (exit 0; public-docs 0 failures, docs-contract 473 checks)"
   - "PYTHONPATH=owlib/src python -m unittest discover -s owlib/tests -v (exit 0; 10 tests, one Windows symlink integration skip)"
 checkpoint:
-  last_completed_action: "OW-080-02 contract-validator foundation is implemented and its four focused standard-library fixtures pass; registry schemas and integration remain in progress."
+  last_completed_action: "OW-080-02 is accepted: schema profiles, preview-only mapping, settings enforcement, integrity parity, generated-kit delivery, and independent re-review are green."
   changed_files:
     - "README.md"
     - "docs/README.md"
@@ -543,6 +544,7 @@ checkpoint:
     - "templates/owledge/schemas/settings-v1.schema.json"
     - "templates/owledge/schemas/capability-receipt-v1.schema.json"
     - "tools/build_project_folder_kit.py"
+    - "internal/owledge/workpackages/owledge-v1-autonomous-delivery/evidence/OW-080-02/manifest.yaml"
   passed_commands:
     - "Public docs passed with zero failures after adding the Installation Hub"
     - "Docs contract passed with zero failures after adding the Installation Hub"
@@ -561,14 +563,15 @@ checkpoint:
     - "Independent OW-071-06 privacy/migration QA: final accept, 94/100, no open P0/P1"
     - "Focused OW-080-02 contract foundation: 4/4 passed, covering exact revision bumps, inert namespaced extensions, visibility/data-class safety, ResourceRef containment, denies-win settings, and typed capability receipts."
     - "OW-080-02 generated project-kit replay: all five contract profiles and tools/owledge_contracts.py exist and the validator --help command succeeds."
+    - "OW-080-02 final focused suite: 9/9 passed; schema JSON parse, py_compile, docs-contract (346 checks), and validate_v1_delivery_plan (0 errors) passed; independent QA accepted at 97/100."
   failed_commands:
     - "OW-071-06 real symlink integration test is skipped on this Windows runner because symlink creation is unavailable; retain the test for a symlink-capable Linux/macOS CI lane."
     - "Actual macOS/Linux wheel execution is intentionally deferred by D-071-24 to OW-100-09 Stable/GA; the configured CI fixture is not execution evidence and must not support a v0.7.1 cross-platform claim."
     - "python -m unittest tests.unit.test_validate_v1_delivery_plan tests.unit.test_validate_live_work_register -q: one pre-existing downstream mismatch; test_current_control_plane_is_valid still expects zero warnings while accepted OW-080-13 intentionally emits one internal-checkpoint warning. The validator itself passed with zero errors."
     - "python tools/owledge_core.py --project-root . validate-memory --strict: 307 pre-existing legacy frontmatter failures across historical internal memory; the touched canonical plan/checklists pass the release-specific frontmatter validation inside validate_v1_delivery_plan.py."
     - "python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports: completed 36/38 on 2026-08-12; source-identity correctly rejected the dirty planning tree and upgrade-drift exposed a host-project/Kit-mode regression. Routed to OW-071-08 under F-071-24."
-  workspace_state: "G-071-ALIGNMENT is promoted and OW-080-01 is accepted after independent architecture QA. OW-080-02 is the sole active v0.8 schema-contract lane; its validator foundation, five JSON profiles, and generated-kit delivery path are green. Migration mapping and complete settings/envelope integration remain pending. Publication and tagging remain blocked."
-  next_exact_action: "Implement OW-080-02 profile upgrade mapping and complete effective-settings/envelope integration fixtures without activating another ticket."
+  workspace_state: "G-071-ALIGNMENT is promoted; OW-080-01 and OW-080-02 are accepted. OW-080-03 is the sole active v0.8 planning/state-machine lane. Publication, tagging, release, and push remain blocked."
+  next_exact_action: "Read only OW-080-03 and its gate context, then implement the bounded lifecycle/plan-state contract without activating OW-080-04."
   open_assumptions:
     - "The product owner wants the existing five-release train retained unless a later version reflection changes it."
     - "Local serial execution is the default; subagents are exceptional and justified only by independent risk reduction."
@@ -576,5 +579,5 @@ checkpoint:
     - "Do not start v0.8.0 before G-071-ALIGNMENT and an explicit owner approve decision."
     - "Do not trust or publish inherited dist artifacts; rebuild from committed source at RC."
     - "Do not broaden the accepted local HTTP profile or benchmark claims while rewriting adoption documentation."
-updated_at: "2026-08-12T15:55:00+02:00"
+updated_at: "2026-08-12T17:05:00+02:00"
 updated_by: codex
