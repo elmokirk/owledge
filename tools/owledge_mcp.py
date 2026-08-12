@@ -18,6 +18,7 @@ if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
 import owledge_core as core  # noqa: E402
+import owledge_context_profiles as context_profiles  # noqa: E402
 
 
 TOOLS = [
@@ -41,6 +42,8 @@ TOOLS = [
         "description": "Build a scoped context pack for a task without writing files.",
         "inputSchema": {"type": "object", "properties": {"project_root": {"type": "string"}, "task_id": {"type": "string"}, "objective": {"type": "string"}}, "required": ["task_id"]},
     },
+    {"name": "owledge_context_synopsis", "description": "Return a bounded, non-canonical synopsis for a selected memory record.", "inputSchema": {"type": "object", "properties": {"project_root": {"type": "string"}, "memory_id": {"type": "string"}}, "required": ["memory_id"]}},
+    {"name": "owledge_active_tools", "description": "Return only the allowlisted tools for an explicit task class.", "inputSchema": {"type": "object", "properties": {"project_root": {"type": "string"}, "task_class": {"enum": ["orientation", "retrieval", "delivery"]}}, "required": ["task_class"]}},
     {
         "name": "owledge_list_tasks",
         "description": "List task and workpackage Markdown artifacts.",
@@ -124,6 +127,13 @@ def call_tool(name: str, args: dict[str, Any], bound_root: pathlib.Path) -> dict
         return _content({"query": query, "results": rows[:25]})
     if name == "owledge_build_context_pack":
         return _content(core.build_context_pack_markdown(root, str(args["task_id"]), objective=args.get("objective")))
+    if name == "owledge_context_synopsis":
+        for record in core.load_memory_records(root, include_sessions=False):
+            if record["metadata"].get("memory_id") == args["memory_id"]:
+                return _content(context_profiles.synopsis(record["body"], str(record["metadata"].get("summary", "")), source_revision=str(record.get("source_hash") or record["metadata"].get("source_hash") or "unknown")))
+        return _content({"passed": False, "error": "memory_id.not_found"})
+    if name == "owledge_active_tools":
+        return _content(context_profiles.active_tools(str(args["task_class"]), {item["name"] for item in TOOLS}))
     if name == "owledge_list_tasks":
         return _content({"tasks": _list_markdown(root, [".owledge/tasks", ".owledge/workpackages", ".owledge/plans"])})
     if name == "owledge_list_reviews":

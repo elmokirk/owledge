@@ -40,12 +40,12 @@ def run_server(project: Path, messages: list[dict]) -> list[dict]:
 class HermesReadonlyProfileTests(unittest.TestCase):
     def test_docs_contract_and_fixture_state_boundaries(self) -> None:
         text = DOC.read_text(encoding="utf-8")
-        for phrase in ("hermes config show", "hermes mcp test owledge_readonly", "/reload-mcp", "Hermes conversation memory/compression is separate", "does not grant", "exactly these six tools"):
+        for phrase in ("hermes config show", "hermes mcp test owledge_readonly", "/reload-mcp", "Hermes conversation memory/compression is separate", "does not grant", "exactly these eight tools"):
             self.assertIn(phrase, text)
         contract = json.loads(CONTRACT.read_text(encoding="utf-8"))
         transcript = json.loads(TRANSCRIPT.read_text(encoding="utf-8"))
         self.assertEqual(contract["profile"], "tier-1-read-only")
-        self.assertEqual(len(contract["required_tools"]), 6)
+        self.assertEqual(len(contract["required_tools"]), 8)
         self.assertEqual(transcript["expected"]["write_tools"], 0)
 
     def test_all_required_tools_are_read_only_and_bound(self) -> None:

@@ -139,6 +139,7 @@ HOST_TOOL_FILES = [
     "owledge_migration.py",
     "owledge_research_memory.py",
     "owledge_context_compiler.py",
+    "owledge_context_profiles.py",
     "validate_benchmark_baseline.py",
     "validate_upgrade_notes.py",
     "build_kb_module.py",

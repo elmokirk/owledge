@@ -35,12 +35,14 @@ Do not add a filesystem or Git MCP server merely to make this profile work.
 
 ## Required tool proof
 
-The server offers exactly these six tools:
+The server offers exactly these eight tools:
 
 1. `owledge_read_entrypoint`
 2. `owledge_doctor`
 3. `owledge_search_memory`
 4. `owledge_build_context_pack`
+5. `owledge_context_synopsis`
+6. `owledge_active_tools`
 5. `owledge_list_tasks`
 6. `owledge_list_reviews`
 
