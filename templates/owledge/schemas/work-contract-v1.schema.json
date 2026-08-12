@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://owledge.dev/schemas/work-contract-v1.schema.json",
+  "title": "Owledge WorkContract v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "goal", "target_user", "smallest_useful_outcome", "success_signal", "mvp_cutline", "definition_of_done", "qa_gates", "out_of_scope", "evidence_refs", "handoff", "unresolved_questions", "roadmap_dispositions", "dependencies", "status"],
+  "properties": {
+    "id": {"type": "string", "minLength": 1}, "goal": {"type": "string", "minLength": 1}, "target_user": {"type": "string", "minLength": 1}, "smallest_useful_outcome": {"type": "string", "minLength": 1}, "success_signal": {"type": "string", "minLength": 1}, "mvp_cutline": {"type": "string", "minLength": 1}, "definition_of_done": {"type": "string", "minLength": 1}, "qa_gates": {"type": "array"}, "out_of_scope": {"type": "array"}, "evidence_refs": {"type": "array"}, "handoff": {"type": "string", "minLength": 1}, "unresolved_questions": {"type": "array"}, "roadmap_dispositions": {"type": "array"}, "dependencies": {"type": "array", "items": {"type": "string"}}, "status": {"enum": ["backlog", "ready", "claimed", "in_progress", "review", "qa", "blocked", "accepted", "done"]}, "claimed_by": {"type": ["string", "null"]}, "gate_refs": {"type": "array"}
+  }
+}

@@ -67,6 +67,7 @@ if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
 import owledge_core as core  # noqa: E402
+import owledge_work_contract as work_contract  # noqa: E402
 import build_kb_module  # noqa: E402
 import build_project_folder_kit  # noqa: E402
 import validate_benchmark_baseline as benchmark_baseline  # noqa: E402
@@ -127,6 +128,8 @@ ROOT_FILE_MAP = [
 HOST_TOOL_FILES = [
     "owledge.py",
     "owledge_core.py",
+    "owledge_contracts.py",
+    "owledge_work_contract.py",
     "build_kb_module.py",
     "build_project_folder_kit.py",
 ]
@@ -3841,6 +3844,15 @@ def main(argv: list[str] | None = None) -> int:
     context_p.add_argument("--budget-chars", type=int)
     context_p.add_argument("--objective")
 
+    work_p = sub.add_parser("work-contract", parents=[project_parent])
+    work_p.add_argument("--contract", required=True)
+    work_p.add_argument("--contracts", nargs="*", default=[])
+    work_p.add_argument("--transition")
+    work_p.add_argument("--expected-status")
+    work_p.add_argument("--actor")
+    work_p.add_argument("--gate-ref", action="append", default=[])
+    work_p.add_argument("--evidence-ref", action="append", default=[])
+
     test_p = sub.add_parser("test", parents=[project_parent])
     test_p.add_argument(
         "suite",
@@ -4005,6 +4017,21 @@ def main(argv: list[str] | None = None) -> int:
                     objective=args.objective,
                 )
             )
+            return 0
+        if args.command == "work-contract":
+            contract_path = resolve_path(args.contract)
+            contract = json.loads(contract_path.read_text(encoding="utf-8"))
+            contracts = [contract] + [json.loads(resolve_path(item).read_text(encoding="utf-8")) for item in args.contracts]
+            errors = work_contract.validate_dag(contracts)
+            if errors:
+                print_json({"passed": False, "errors": errors})
+                return 1
+            if args.transition:
+                if not args.expected_status or not args.actor:
+                    print_json({"passed": False, "error": "--transition requires --expected-status and --actor"})
+                    return 2
+                contract = work_contract.atomic_transition(contract_path, args.expected_status, args.transition, actor=args.actor, gate_refs=args.gate_ref, evidence_refs=args.evidence_ref)
+            print_json({"passed": True, "contract": contract})
             return 0
         if args.command == "test":
             suites: dict[str, Callable[[], dict[str, Any]]] = {

@@ -113,6 +113,7 @@ CORE_TOOLS = [
     "owledge.py",
     "owledge_core.py",
     "owledge_contracts.py",
+    "owledge_work_contract.py",
     "build_project_folder_kit.py",
     "build_kb_module.py",
 ]

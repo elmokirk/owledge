@@ -48,6 +48,21 @@ Recommended migration preview fields:
 | `proposed_changes` | Non-destructive mapping proposal |
 | `requires_review` | Whether a human must resolve ambiguity |
 
+## WorkContract v1
+
+Use a WorkContract to turn approved intent into one bounded, portable unit of
+delivery. A valid contract records the target user, smallest useful outcome,
+observable success signal, MVP cutline, definition of done, QA gates,
+out-of-scope work, evidence, handoff, open questions, roadmap dispositions,
+dependencies, and lifecycle status. It is not a substitute for owner approval.
+
+`python tools/owledge.py work-contract --contract contract.json` validates a
+contract and its optional dependency files. A mutation must provide the expected
+current status and actor, for example `--transition claimed --expected-status
+ready --actor agent-a`. The update is atomic; a stale expected status, cycle,
+missing dependency, second claim, or attempt to accept/done without explicit
+gate and evidence references fails without a partial state update.
+
 ## Red-Team Metrics During Work
 
 Use these gates during implementation:
