@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "owlib"
-version = "0.1.0"
+version = "0.2.0"
 description = "Standalone local knowledge hub for Owledge-compatible project memory."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -25,4 +25,3 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 owlib = ["data/**/*.md", "data/**/*.json"]
-

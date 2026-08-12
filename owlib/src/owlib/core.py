@@ -7,6 +7,7 @@ import os
 import pathlib
 import re
 import shutil
+import warnings
 from typing import Any, Iterable
 
 
@@ -33,6 +34,11 @@ ALLOWED_AGENT_MEMORY_DIRS = {
     "handoffs",
     "evidence",
 }
+
+CURRENT_ENTRYPOINT = "OWLEDGE.md"
+CURRENT_MEMORY_DIR = ".owledge"
+LEGACY_ENTRYPOINT = "PROJECT_CONTEXT.md"
+LEGACY_MEMORY_DIR = "agent-memory"
 
 LIST_FIELDS = {
     "concept_tags",
@@ -90,7 +96,7 @@ def init_library(root: pathlib.Path) -> dict[str, Any]:
         config.write_text(
             json.dumps(
                 {
-                    "schema": "owlib-v0.1",
+                    "schema": "owlib-v0.2",
                     "created_at": utc_now(),
                     "storage": "markdown-jsonl",
                     "promotion_policy": "candidate-only",
@@ -174,8 +180,8 @@ def read_registry(library_root: pathlib.Path) -> list[dict[str, Any]]:
     return read_jsonl(registry_path(library_root))
 
 
-def project_id_from_context(project_root: pathlib.Path) -> str:
-    context = project_root / "PROJECT_CONTEXT.md"
+def project_id_from_context(project_root: pathlib.Path, entrypoint: str = CURRENT_ENTRYPOINT) -> str:
+    context = project_root / entrypoint
     if context.exists():
         meta = parse_frontmatter(context.read_text(encoding="utf-8", errors="replace"))
         project_id = str(meta.get("project_id") or "").strip()
@@ -184,20 +190,42 @@ def project_id_from_context(project_root: pathlib.Path) -> str:
     return slugify(project_root.name)
 
 
-def validate_owledge_project(project_root: pathlib.Path) -> None:
+def project_layout(project_root: pathlib.Path, allow_legacy: bool = False) -> str:
     if not project_root.exists():
         raise ValueError(f"Project path does not exist: {project_root}")
-    if not (project_root / "PROJECT_CONTEXT.md").exists():
-        raise ValueError(f"Missing PROJECT_CONTEXT.md: {project_root}")
-    if not (project_root / "agent-memory").exists():
-        raise ValueError(f"Missing agent-memory directory: {project_root}")
+    current = (project_root / CURRENT_ENTRYPOINT).is_file() and (project_root / CURRENT_MEMORY_DIR).is_dir()
+    legacy = (project_root / LEGACY_ENTRYPOINT).is_file() and (project_root / LEGACY_MEMORY_DIR).is_dir()
+    if current and legacy:
+        raise ValueError("Mixed current/legacy project layout; remove the legacy layout or re-register with --legacy-layout")
+    if current:
+        return "current"
+    if legacy:
+        if allow_legacy:
+            warnings.warn(
+                "The legacy PROJECT_CONTEXT.md/agent-memory layout is deprecated; migrate to OWLEDGE.md/.owledge.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            return "legacy"
+        raise ValueError("Legacy PROJECT_CONTEXT.md/agent-memory layout requires explicit --legacy-layout migration")
+    raise ValueError(f"Missing {CURRENT_ENTRYPOINT} and {CURRENT_MEMORY_DIR} directory: {project_root}")
 
 
-def register_project(library_root: pathlib.Path, project_path: pathlib.Path, name: str | None = None) -> dict[str, Any]:
+def validate_owledge_project(project_root: pathlib.Path, allow_legacy: bool = False) -> str:
+    return project_layout(project_root, allow_legacy=allow_legacy)
+
+
+def register_project(
+    library_root: pathlib.Path,
+    project_path: pathlib.Path,
+    name: str | None = None,
+    allow_legacy: bool = False,
+) -> dict[str, Any]:
     ensure_library(library_root)
     project_root = project_path.resolve()
-    validate_owledge_project(project_root)
-    project_id = project_id_from_context(project_root)
+    layout = validate_owledge_project(project_root, allow_legacy=allow_legacy)
+    entrypoint = LEGACY_ENTRYPOINT if layout == "legacy" else CURRENT_ENTRYPOINT
+    project_id = project_id_from_context(project_root, entrypoint)
     rows = read_registry(library_root)
     kept = [row for row in rows if row.get("project_id") != project_id and pathlib.Path(row.get("path", "")).resolve() != project_root]
     entry = {
@@ -206,18 +234,21 @@ def register_project(library_root: pathlib.Path, project_path: pathlib.Path, nam
         "path": str(project_root),
         "registered_at": utc_now(),
         "source": "owledge-project",
+        "layout": layout,
     }
     kept.append(entry)
     write_jsonl(registry_path(library_root), kept)
     return {"passed": True, "project": entry, "registry": str(registry_path(library_root))}
 
 
-def is_allowed_project_file(project_root: pathlib.Path, path: pathlib.Path) -> bool:
+def is_allowed_project_file(project_root: pathlib.Path, path: pathlib.Path, layout: str) -> bool:
     rel = path.relative_to(project_root).as_posix()
-    if rel == "PROJECT_CONTEXT.md":
+    entrypoint = LEGACY_ENTRYPOINT if layout == "legacy" else CURRENT_ENTRYPOINT
+    memory_dir = LEGACY_MEMORY_DIR if layout == "legacy" else CURRENT_MEMORY_DIR
+    if rel == entrypoint:
         return True
     parts = rel.split("/")
-    if len(parts) >= 3 and parts[0] == "agent-memory" and parts[1] in ALLOWED_AGENT_MEMORY_DIRS:
+    if len(parts) >= 3 and parts[0] == memory_dir and parts[1] in ALLOWED_AGENT_MEMORY_DIRS:
         return path.suffix.lower() == ".md"
     return False
 
@@ -236,11 +267,28 @@ def is_unsafe_shared(meta: dict[str, Any]) -> bool:
     )
 
 
-def iter_importable_records(project_root: pathlib.Path, reviewed_only: bool) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+def is_within_project(project_root: pathlib.Path, path: pathlib.Path) -> bool:
+    try:
+        path.resolve().relative_to(project_root.resolve())
+    except ValueError:
+        return False
+    return True
+
+
+def iter_importable_records(
+    project_root: pathlib.Path,
+    reviewed_only: bool = True,
+    allow_legacy: bool = False,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     records: list[dict[str, Any]] = []
     rejected: list[dict[str, Any]] = []
+    layout = validate_owledge_project(project_root, allow_legacy=allow_legacy)
+    entrypoint = LEGACY_ENTRYPOINT if layout == "legacy" else CURRENT_ENTRYPOINT
     for path in sorted(project_root.rglob("*.md"), key=lambda item: item.as_posix()):
-        if not is_allowed_project_file(project_root, path):
+        if not is_within_project(project_root, path):
+            rejected.append({"source_path": path.relative_to(project_root).as_posix(), "reason": "path-escape"})
+            continue
+        if not is_allowed_project_file(project_root, path, layout):
             continue
         rel = path.relative_to(project_root).as_posix()
         text = path.read_text(encoding="utf-8", errors="replace")
@@ -248,21 +296,22 @@ def iter_importable_records(project_root: pathlib.Path, reviewed_only: bool) -> 
         if is_unsafe_shared(meta):
             rejected.append({"source_path": rel, "reason": "unsafe-shared-record"})
             continue
-        if reviewed_only and rel != "PROJECT_CONTEXT.md" and not is_reviewed_record(meta):
+        if reviewed_only and rel != entrypoint and not is_reviewed_record(meta):
             rejected.append({"source_path": rel, "reason": "not-reviewed"})
             continue
         body = markdown_body(text)
         records.append(
             {
-                "memory_id": meta.get("memory_id") or f"owlib:{slugify(rel)}",
-                "project_id": meta.get("project_id") or project_id_from_context(project_root),
-                "doc_type": meta.get("doc_type") or ("project_context" if rel == "PROJECT_CONTEXT.md" else "note"),
+                "memory_id": meta.get("memory_id") or f"owlib:{project_id_from_context(project_root, entrypoint)}:{sha256_text(rel)[:16]}",
+                "project_id": meta.get("project_id") or project_id_from_context(project_root, entrypoint),
+                "doc_type": meta.get("doc_type") or ("project_context" if rel == entrypoint else "note"),
                 "status": meta.get("status", ""),
                 "visibility": meta.get("visibility", "private"),
                 "semantic_title": meta.get("semantic_title") or path.stem,
                 "summary": meta.get("summary") or body[:240].replace("\n", " "),
                 "metadata": meta,
                 "source_path": rel,
+                "source_id": f"owlib-source:{project_id_from_context(project_root, entrypoint)}:{sha256_text(rel)[:16]}",
                 "source_hash": sha256_file(path),
                 "text_excerpt": body[:4000],
                 "imported_at": utc_now(),
@@ -271,15 +320,17 @@ def iter_importable_records(project_root: pathlib.Path, reviewed_only: bool) -> 
     return records, rejected
 
 
-def sync_library(library_root: pathlib.Path, reviewed_only: bool = False) -> dict[str, Any]:
+def sync_library(library_root: pathlib.Path, reviewed_only: bool = True, allow_legacy: bool = False) -> dict[str, Any]:
     ensure_library(library_root)
     imported = 0
     rejected_total = 0
     project_results = []
     for project in read_registry(library_root):
         project_root = pathlib.Path(project["path"]).resolve()
-        validate_owledge_project(project_root)
-        records, rejected = iter_importable_records(project_root, reviewed_only=reviewed_only)
+        registered_layout = str(project.get("layout") or "")
+        legacy = allow_legacy or registered_layout == "legacy"
+        layout = validate_owledge_project(project_root, allow_legacy=legacy)
+        records, rejected = iter_importable_records(project_root, reviewed_only=reviewed_only, allow_legacy=legacy)
         import_dir = library_root / "imports" / project["project_id"]
         if import_dir.exists():
             shutil.rmtree(import_dir)
@@ -288,7 +339,7 @@ def sync_library(library_root: pathlib.Path, reviewed_only: bool = False) -> dic
         write_jsonl(import_dir / "rejected.jsonl", rejected)
         imported += len(records)
         rejected_total += len(rejected)
-        project_results.append({"project_id": project["project_id"], "records": len(records), "rejected": len(rejected)})
+        project_results.append({"project_id": project["project_id"], "layout": layout, "records": len(records), "rejected": len(rejected)})
     return {"passed": True, "projects": project_results, "records": imported, "rejected": rejected_total}
 
 

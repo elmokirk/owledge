@@ -1,7 +1,8 @@
 # Owlib
 
 Owlib is a standalone, Python-first knowledge hub for Owledge-compatible
-project memory. Owledge stays project-local; Owlib reads reviewed project
+project memory. The current project contract is `OWLEDGE.md` plus `.owledge/`.
+Owledge stays project-local; Owlib reads reviewed project
 artifacts into a central library so agents can find cross-project parallels,
 stale knowledge, recurring failures, central project candidates, and reusable
 patterns.
@@ -15,7 +16,7 @@ human or curator workflow.
 ```bash
 python -m owlib init --library-root /path/to/owl-library
 python -m owlib register-project --library-root /path/to/owl-library --path /path/to/project
-python -m owlib sync --library-root /path/to/owl-library --reviewed-only
+python -m owlib sync --library-root /path/to/owl-library
 python -m owlib index --library-root /path/to/owl-library
 python -m owlib find-parallels --library-root /path/to/owl-library
 python -m owlib report --library-root /path/to/owl-library
@@ -65,6 +66,13 @@ module catalog, skill catalog, growth scan, and PI red-team output.
 ## Boundaries
 
 - Owlib reads registered Owledge projects read-only.
+- Sync imports reviewed records only by default. `--include-unreviewed` is an
+  explicit, auditable override.
+- The old `PROJECT_CONTEXT.md` plus `agent-memory/` layout is deprecated.
+  Migrate it explicitly with `register-project --legacy-layout`; mixed layouts
+  fail closed until resolved.
 - Raw sessions and unsafe shared records are not imported.
+- Imported records retain a stable source ID and a content hash; source paths
+  must resolve inside the registered project.
 - Reports, growth suggestions, and PI outputs are candidate knowledge.
 - Promotion into project canonical memory is always explicit and external.

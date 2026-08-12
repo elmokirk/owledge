@@ -28,10 +28,14 @@ def main(argv: list[str] | None = None) -> int:
     register_p.add_argument("--library-root", default=".")
     register_p.add_argument("--path", required=True)
     register_p.add_argument("--name")
+    register_p.add_argument("--legacy-layout", action="store_true", help="Import the deprecated PROJECT_CONTEXT.md/agent-memory layout explicitly.")
 
     sync_p = sub.add_parser("sync")
     sync_p.add_argument("--library-root", default=".")
-    sync_p.add_argument("--reviewed-only", action="store_true")
+    sync_review = sync_p.add_mutually_exclusive_group()
+    sync_review.add_argument("--reviewed-only", action="store_true", help="Use the safe default explicitly.")
+    sync_review.add_argument("--include-unreviewed", action="store_true", help="Override the safe reviewed-only default.")
+    sync_p.add_argument("--legacy-layout", action="store_true", help="Permit explicitly registered legacy projects during migration.")
 
     index_p = sub.add_parser("index")
     index_p.add_argument("--library-root", default=".")
@@ -94,9 +98,12 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "init":
             print_json(core.init_library(library_root(args)))
         elif args.command == "register-project":
-            print_json(core.register_project(library_root(args), pathlib.Path(args.path), args.name))
+            print_json(core.register_project(library_root(args), pathlib.Path(args.path), args.name, allow_legacy=args.legacy_layout))
         elif args.command == "sync":
-            print_json(core.sync_library(library_root(args), reviewed_only=args.reviewed_only))
+            reviewed_only = not args.include_unreviewed
+            if args.reviewed_only:
+                reviewed_only = True
+            print_json(core.sync_library(library_root(args), reviewed_only=reviewed_only, allow_legacy=args.legacy_layout))
         elif args.command == "index":
             print_json(core.build_index(library_root(args)))
         elif args.command == "find-parallels":
