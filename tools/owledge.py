@@ -2637,11 +2637,11 @@ def project_folder_kit_gate(root: pathlib.Path, include_compliance: bool = False
 
 
 def upgrade_drift_check(root: pathlib.Path) -> dict[str, Any]:
-    """On a temp-init'd project at current version, doctor --check-version must pass."""
+    """A freshly initialized host project must pass its current-version doctor check."""
     tmp = pathlib.Path(tempfile.mkdtemp(prefix="owledge-upgrade-drift-"))
     try:
         init_project(tmp, REPO_ROOT, include_plugin_adapter=False, include_compliance=False)
-        doc = core.memory_doctor(tmp, mode="kit")
+        doc = core.memory_doctor(tmp, mode="host")
         vd = [c for c in doc.get("checks", []) if c.get("name") == "version-drift"]
         passed = doc.get("passed", False) and all(c.get("passed") for c in vd)
         return {"passed": passed, "project": str(root), "temp_project": str(tmp), "version_drift_check": vd}

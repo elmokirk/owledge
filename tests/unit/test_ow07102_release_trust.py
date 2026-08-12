@@ -386,7 +386,7 @@ class ReleasePolishRegressionTests(unittest.TestCase):
             self.assertFalse(changed["passed"])
             self.assertEqual(changed["drifted_files"], ["one-template.md"])
 
-    def test_upgrade_drift_uses_kit_doctor_mode(self) -> None:
+    def test_upgrade_drift_uses_host_doctor_mode(self) -> None:
         with mock.patch.object(OWLEDGE, "init_project", return_value={}), mock.patch.object(
             OWLEDGE.core,
             "memory_doctor",
@@ -397,7 +397,7 @@ class ReleasePolishRegressionTests(unittest.TestCase):
         ) as doctor:
             result = OWLEDGE.upgrade_drift_check(REPO_ROOT)
         self.assertTrue(result["passed"], result)
-        self.assertEqual(doctor.call_args.kwargs["mode"], "kit")
+        self.assertEqual(doctor.call_args.kwargs["mode"], "host")
 
 
 if __name__ == "__main__":
