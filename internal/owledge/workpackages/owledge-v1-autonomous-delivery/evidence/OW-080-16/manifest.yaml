@@ -1,0 +1,20 @@
+ticket: OW-080-16
+status: accepted
+accepted_at: "2026-08-12"
+source_commits: [70ce314, 34b9834, 4cc000b]
+verification:
+  - "python -m unittest tests.unit.test_ow08016_research_memory -v: 5 passed"
+  - "fresh build-project-kit --verify: passed; doctor score 100"
+  - "python tools/owledge.py test docs-contract --project-root .: 351 checks passed"
+  - "python tools/validate_v1_delivery_plan.py: 0 errors"
+independent_qa:
+  result: accepted
+  score: 97
+  resolved_p1:
+    - caller scope authority removed from public recall CLI
+    - schema/runtime closed-profile parity and strict optional fields
+    - source revision/hash/ref, detailed delta briefs, and rename stability
+    - deterministic no-web/no-model primitive
+limitations:
+  - "Public CLI is project_user-only until a later server-resolved authorization seam exists."
+publication_authority: not_granted
