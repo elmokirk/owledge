@@ -23,7 +23,7 @@ import owledge_core as core  # noqa: E402
 TOOLS = [
     {
         "name": "owledge_read_entrypoint",
-        "description": "Read OWLEDGE.md, falling back to OWLEDGE.md for legacy projects.",
+        "description": "Read the bound project's OWLEDGE.md entrypoint.",
         "inputSchema": {"type": "object", "properties": {"project_root": {"type": "string"}}, "required": []},
     },
     {
@@ -54,8 +54,33 @@ TOOLS = [
 ]
 
 
-def _root(args: dict[str, Any]) -> pathlib.Path:
-    return pathlib.Path(str(args.get("project_root") or ".")).expanduser().resolve()
+def _root(args: dict[str, Any], bound_root: pathlib.Path) -> pathlib.Path:
+    requested = args.get("project_root")
+    if requested is None:
+        return bound_root
+    candidate = pathlib.Path(str(requested)).expanduser().resolve()
+    if candidate != bound_root:
+        raise ValueError("project_root is bound when the Owledge MCP server starts; restart the server for a different project.")
+    return bound_root
+
+
+def _ensure_within(bound_root: pathlib.Path, candidate: pathlib.Path, label: str) -> None:
+    try:
+        candidate.resolve().relative_to(bound_root.resolve())
+    except ValueError as exc:
+        raise ValueError(f"{label} resolves outside the bound project and is not readable through this MCP server.") from exc
+
+
+def _validate_bound_project(bound_root: pathlib.Path) -> None:
+    entrypoint = bound_root / "OWLEDGE.md"
+    if not entrypoint.is_file():
+        raise ValueError(f"Missing OWLEDGE.md in bound project: {bound_root}")
+    _ensure_within(bound_root, entrypoint, "OWLEDGE.md")
+    memory = bound_root / ".owledge"
+    if memory.exists():
+        _ensure_within(bound_root, memory, ".owledge")
+        for path in memory.rglob("*"):
+            _ensure_within(bound_root, path, path.relative_to(bound_root).as_posix())
 
 
 def _content(payload: Any) -> dict[str, Any]:
@@ -73,12 +98,11 @@ def _list_markdown(root: pathlib.Path, rels: list[str]) -> list[str]:
     return rows
 
 
-def call_tool(name: str, args: dict[str, Any]) -> dict[str, Any]:
-    root = _root(args)
+def call_tool(name: str, args: dict[str, Any], bound_root: pathlib.Path) -> dict[str, Any]:
+    root = _root(args, bound_root)
+    _validate_bound_project(root)
     if name == "owledge_read_entrypoint":
         path = root / "OWLEDGE.md"
-        if not path.is_file():
-            path = root / "OWLEDGE.md"
         if not path.is_file():
             return _content({"passed": False, "error": "No OWLEDGE.md entrypoint found."})
         return _content({"path": path.relative_to(root).as_posix(), "text": path.read_text(encoding="utf-8", errors="replace")})
@@ -107,17 +131,17 @@ def call_tool(name: str, args: dict[str, Any]) -> dict[str, Any]:
     raise ValueError(f"Unknown tool: {name}")
 
 
-def handle(message: dict[str, Any]) -> dict[str, Any] | None:
+def handle(message: dict[str, Any], bound_root: pathlib.Path) -> dict[str, Any] | None:
     method = message.get("method")
     msg_id = message.get("id")
     try:
         if method == "initialize":
-            result = {"protocolVersion": "2024-11-05", "serverInfo": {"name": "owledge-readonly", "version": "0.7.0"}, "capabilities": {"tools": {}}}
+            result = {"protocolVersion": "2024-11-05", "serverInfo": {"name": "owledge-readonly", "version": "0.7.1"}, "capabilities": {"tools": {}}}
         elif method == "tools/list":
             result = {"tools": TOOLS}
         elif method == "tools/call":
             params = message.get("params") or {}
-            result = call_tool(str(params.get("name")), params.get("arguments") or {})
+            result = call_tool(str(params.get("name")), params.get("arguments") or {}, bound_root)
         elif method == "notifications/initialized":
             return None
         else:
@@ -127,12 +151,22 @@ def handle(message: dict[str, Any]) -> dict[str, Any] | None:
         return {"jsonrpc": "2.0", "id": msg_id, "error": {"code": -32000, "message": str(exc)}}
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Read-only Owledge MCP stdio server")
+    parser.add_argument("--project-root", required=True, help="Bind this server instance to exactly one Owledge project.")
+    args = parser.parse_args(argv)
+    bound_root = pathlib.Path(args.project_root).expanduser().resolve()
+    try:
+        _validate_bound_project(bound_root)
+    except ValueError as exc:
+        parser.error(str(exc))
     for line in sys.stdin:
         line = line.strip()
         if not line:
             continue
-        response = handle(json.loads(line))
+        response = handle(json.loads(line), bound_root)
         if response is not None:
             sys.stdout.write(json.dumps(response, sort_keys=True) + "\n")
             sys.stdout.flush()
@@ -141,4 +175,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

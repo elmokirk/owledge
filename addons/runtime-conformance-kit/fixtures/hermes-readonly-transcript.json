@@ -1,0 +1,19 @@
+{
+  "fixture": "hermes-readonly-local",
+  "project_binding": "/absolute/path/to/project",
+  "steps": [
+    "initialize",
+    "tools/list",
+    "owledge_read_entrypoint",
+    "owledge_search_memory",
+    "owledge_build_context_pack",
+    "owledge_list_tasks",
+    "owledge_list_reviews"
+  ],
+  "expected": {
+    "write_tools": 0,
+    "path_mismatch": "explicit error",
+    "unbound_project": "startup failure",
+    "disabled_tool": "unknown tool error"
+  }
+}

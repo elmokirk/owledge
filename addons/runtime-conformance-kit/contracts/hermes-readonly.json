@@ -1,0 +1,17 @@
+{
+  "runtime": "hermes-agent",
+  "version": "0.7.1",
+  "profile": "tier-1-read-only",
+  "transport": "stdio-mcp",
+  "required_tools": [
+    "owledge_read_entrypoint",
+    "owledge_doctor",
+    "owledge_search_memory",
+    "owledge_build_context_pack",
+    "owledge_list_tasks",
+    "owledge_list_reviews"
+  ],
+  "forbidden_capabilities": ["write", "promotion", "sync", "remote-filesystem", "git"],
+  "project_binding": "startup --project-root; request paths must match",
+  "evidence": "docs/hermes-readonly-profile.md"
+}

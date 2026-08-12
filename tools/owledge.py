@@ -3750,7 +3750,7 @@ def mcp_readonly_smoke(root: pathlib.Path) -> dict[str, Any]:
             },
         ]
         process = run_subprocess(
-            [sys.executable, str(root / "tools" / "owledge_mcp.py")],
+            [sys.executable, str(root / "tools" / "owledge_mcp.py"), "--project-root", str(project_root)],
             cwd=root,
             input_text="\n".join(json.dumps(message) for message in messages) + "\n",
         )

@@ -87,13 +87,17 @@ class AgentIntegrationContractTests(unittest.TestCase):
             self.assertIn("owledge-long-horizon-delivery", discovery["details"])
 
     def test_running_mcp_tool_surface_has_only_the_read_only_allowlist(self) -> None:
-        process = subprocess.run(
-            [sys.executable, "tools/owledge_mcp.py"],
-            cwd=ROOT,
-            input='{"jsonrpc":"2.0","id":1,"method":"tools/list"}\n',
-            text=True,
-            capture_output=True,
-        )
+        with tempfile.TemporaryDirectory(prefix="ow07112-mcp-") as temp_dir:
+            project = Path(temp_dir)
+            (project / "OWLEDGE.md").write_text("# Owledge\n", encoding="utf-8")
+            (project / ".owledge").mkdir()
+            process = subprocess.run(
+                [sys.executable, "tools/owledge_mcp.py", "--project-root", str(project)],
+                cwd=ROOT,
+                input='{"jsonrpc":"2.0","id":1,"method":"tools/list"}\n',
+                text=True,
+                capture_output=True,
+            )
         self.assertEqual(process.returncode, 0, process.stderr)
         tools = json.loads(process.stdout)["result"]["tools"]
         names = {tool["name"] for tool in tools}

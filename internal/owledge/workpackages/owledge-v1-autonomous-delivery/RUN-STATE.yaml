@@ -5,9 +5,9 @@ plan: internal/owledge/plans/owledge-v1-autonomous-delivery-master-plan.md
 objective: Deliver Owledge v0.7.1 through a Standalone Core GA and bounded Single-Organization Hub Beta with recall-first Research Memory and portable agent adapters.
 status: in_progress
 current_release: v0.7.1
-current_phase: 071-C2
-active_ticket: OW-071-07
-last_green_gate: G-071-B-ADOPTION
+current_phase: 071-RC
+active_ticket: OW-071-08
+last_green_gate: G-071-C-COMPAT
 alignment:
   state: none
   awaiting_release: null
@@ -440,8 +440,8 @@ orchestration:
   approved_by: product-owner
   approved_at: "2026-07-27T14:25:00Z"
   expires_at_alignment: true
-  active_dispatch: ow07107_hermes_readonly_profile_after_ow07106_acceptance
-  pending_risk_brief: "OW-071-06 is accepted pending commit after independent privacy/migration QA at 94/100. Its symlink integration test requires a symlink-capable Linux/macOS CI lane; do not turn that limitation into a runtime-support claim. OW-071-07 is the sole active lane."
+  active_dispatch: ow07108_release_candidate_after_g071c_promotion
+  pending_risk_brief: "G-071-C-COMPAT passed for bounded v0.7.1. OW-071-08 is the sole active lane and must repair/replay finalization without masking the pre-existing host/Kit upgrade-drift failure; no publication or v0.8 work is authorized."
 workspace:
   code_root: .
   planning_root: internal/owledge/workpackages/owledge-v1-autonomous-delivery
@@ -475,7 +475,7 @@ last_completed_actions:
   - G-071-B-ADOPTION promoted from cumulative evidence at cb741d3: 28 focused adoption tests, public-docs, docs-contract, read-only MCP, runtime-adapter, and control-plane checks passed without broadening the D-071-24 platform boundary.
   - OW-071-06 accepted pending commit after Owlib current-contract migration, 10 focused tests (one Windows symlink integration skip), and independent privacy/migration re-review at 94/100 with no P0/P1 findings.
 next_actions:
-  - Execute OW-071-07 only within its declared Hermes read-only adapter paths and obtain independent runtime-conformance QA before G-071-C-COMPAT review.
+  - Execute OW-071-08 only within release-candidate allowed paths; obtain independent release-assurance QA before G-071-RC promotion.
   - Retain the three-OS wheel-only fixture and collect executed macOS/Linux evidence at OW-100-09; do not issue an earlier cross-platform support claim.
 last_commands:
   - "python tools/validate_v1_delivery_plan.py (exit 0; 64 tickets, 25 gates, 44 waves, 0 errors; one allowed OW-080-13 checkpoint warning)"
