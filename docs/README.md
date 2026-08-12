@@ -41,7 +41,7 @@ separates no-install, package, source, adapter, and add-on paths.
 - Try the bounded [vibecoding golden demo](vibecoding-golden-demo.md)
 - Then read [command-reference.md](command-reference.md)
 - Use `uvx owledge quickstart --target <path>` for the package-first path
-- Expect `OWLEDGE.md` and `.owledge/` in new v0.7.0 projects
+- Expect `OWLEDGE.md` and `.owledge/` in new v0.7.1 projects
 
 ## I want plugin or harness setup
 
@@ -58,7 +58,7 @@ separates no-install, package, source, adapter, and add-on paths.
 
 ## Reference, quality, and maintainer material
 
-**Owledge v0.7.0** is the current released package. The canonical release
+**Owledge v0.7.1** is the current released package. The canonical release
 version is [../VERSION](../VERSION); use [quickstart.md](quickstart.md) for new
 installs and [upgrading.md](upgrading.md) for existing projects.
 
@@ -108,7 +108,7 @@ PyPI confirmation, main-promotion, and release-evidence contract.
 
 - [feedback-round-2026-06.md](feedback-round-2026-06.md) - structured feedback triage with tickets FB-001 through FB-017 (including Round 2 feature ideas FB-013 through FB-017)
 - [roadmap-ideas-2026-06.md](roadmap-ideas-2026-06.md) - idea log from the 2026-06 feedback round with 16 idea cards (including Round 2 feature ideas)
-- [strategic-roadmap-2026-2027.md](strategic-roadmap-2026-2027.md) - decision-ready product and execution roadmap after the v0.7.0 release
+- [strategic-roadmap-2026-2027.md](strategic-roadmap-2026-2027.md) - decision-ready product and execution roadmap after the v0.7.1 release
 
 ### Maintainer And Historical Docs
 
