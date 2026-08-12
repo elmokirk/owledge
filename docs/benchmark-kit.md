@@ -54,7 +54,7 @@ python tools/benchmark-kit/compare-benchmark-runs.py --inputs \
 The comparison command never calls Ollama and never runs models. It only reads
 completed `latest.json` reports.
 
-## Published v0.7.0 Proof
+## Historical v0.7.0 Proof
 
 The v0.7.0 release includes curated benchmark artifacts:
 

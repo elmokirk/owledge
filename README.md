@@ -2,7 +2,7 @@
 
 **An Agentic Engineering Context & Planning Layer for teams that want agents to ship durable work, not lose it in chat.**
 
-[![Version](https://img.shields.io/badge/version-0.7.0-blue)](VERSION)
+[![Version](https://img.shields.io/badge/version-0.7.1-blue)](VERSION)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Storage: Markdown](https://img.shields.io/badge/storage-Markdown-black)](docs/quickstart.md)
 [![Runtime support](https://img.shields.io/badge/runtimes-Codex%20%7C%20Claude%20Code%20%7C%20Cowork%20%7C%20OpenCode-orange)](docs/harness-plugin-matrix.md)
@@ -334,7 +334,7 @@ flowchart LR
 
 ### Read-Only MCP
 
-Owledge ships a read-only MCP surface in v0.7.0.
+Owledge ships a read-only MCP surface in v0.7.1.
 
 ```mermaid
 flowchart LR
@@ -419,10 +419,10 @@ flowchart LR
 | Symptom | Check |
 | --- | --- |
 | `owledge` command not found | Run `uvx owledge --help` or `uv tool install owledge`. |
-| Fresh project has old `OWLEDGE.md`/`.owledge/` | Re-run `owledge quickstart --target <path>` with v0.7.0 and check for `OWLEDGE.md` plus `.owledge/`. |
+| Fresh project has old `OWLEDGE.md`/`.owledge/` | Re-run `owledge quickstart --target <path>` with v0.7.1 and check for `OWLEDGE.md` plus `.owledge/`. |
 | Wikilink audit fails | Run `owledge wikilink-audit --project-root .` and fix unresolved or ambiguous targets. Code blocks and inline code are ignored. |
 | Local benchmark refuses to run | Install `benchmark-kit`, then pass explicit scale mode, model, and consent: `python tools/benchmark-kit/run-benchmark-kit.py --mode local --scale-mode small --models gemma4:latest --yes`. |
-| MCP integration should not write | Use `tools/owledge_mcp.py`; v0.7.0 P0 exposes read-only tools only. |
+| MCP integration should not write | Use `tools/owledge_mcp.py`; v0.7.1 P0 exposes read-only tools only. |
 | Docs look stale after code changes | Run `owledge test public-docs`, `owledge test release-trust`, and `owledge wikilink-audit --check`. |
 
 ## Not This

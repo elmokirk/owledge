@@ -13,7 +13,7 @@ add-on command unless the recipe explicitly says to use a source checkout.
 
 ## Footprint and ownership
 
-The package wheel for v0.7.0 is 289,991 bytes compressed. The source-project
+The package wheel size is release-artifact dependent. The source-project
 recipe was measured on 2026-07-29 from a clean checkout: 184 files / 894,212
 bytes in the host project; `.owledge/` accounts for 115 files / 83,798 bytes.
 Exact totals change with release content and optional selections.

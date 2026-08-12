@@ -2,6 +2,25 @@
 
 ## Unreleased
 
+## 0.7.1 (2026-08-12)
+
+- Adoption: added a bounded no-write golden demo, package-only resume proof,
+  canonical installation routes, explicit preset boundaries, and workflow docs.
+- Compatibility: Owlib 0.2 now defaults to `OWLEDGE.md` plus `.owledge/` and
+  supports legacy projects only through explicit migration; Hermes gains a
+  project-bound, six-tool read-only MCP profile.
+- Release: corrected generated host-project upgrade-drift verification and
+  replayed the full finalization suite.
+
+### Upgrade notes
+
+```json
+{
+  "breaking": "no",
+  "summary": "v0.7.1 is additive; Owlib legacy imports now require explicit migration and Hermes MCP is read-only and project-bound."
+}
+```
+
 - Release QA hardening: machine-readable version, documentation, and feature
   contracts now block incomplete public changes; future releases promote a
   tested release branch to main only after PyPI confirms the package.
