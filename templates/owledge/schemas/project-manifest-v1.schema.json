@@ -7,5 +7,5 @@
     {"$ref": "artifact-envelope-v1.schema.json"},
     {"properties": {"profile": {"const": "project_manifest"}, "profile_version": {"const": "1.0"}, "knowledge_scope": {"const": "project_user"}}}
   ],
-  "examples": [{"profile": "project_manifest", "knowledge_scope": "project_user", "schema_version": "1.0", "profile_version": "1.0", "document_version": 1}]
+  "examples": [{"memory_id": "mem:tenant:customer:project:canonical:manifest", "schema_version": "1.0", "profile_version": "1.0", "document_version": 1, "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "knowledge_scope": "project_user", "server_project_scope": "project-001", "owner_user_id": "user-001", "lifecycle": "candidate", "visibility": "private", "data_class": "internal", "audience_ids": [], "transferability": "project_only", "applies_to": ["project-001"], "edges": [], "extensions": {}, "profile": "project_manifest"}]
 }

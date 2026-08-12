@@ -10,7 +10,7 @@
     "schema_version": {"type": "string", "const": "1.0"},
     "profile_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+$"},
     "document_version": {"type": "integer", "minimum": 1},
-    "source_hash": {"type": "string", "minLength": 16},
+    "source_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
     "knowledge_scope": {"enum": ["project_user", "user_global", "enterprise"]},
     "server_project_scope": {"type": "string", "minLength": 1},
     "owner_user_id": {"type": "string", "minLength": 1},
@@ -29,5 +29,5 @@
     "created_at": {"type": "string"},
     "updated_at": {"type": "string"}
   },
-  "examples": [{"memory_id": "mem:tenant:customer:project:canonical:example", "schema_version": "1.0", "profile_version": "1.0", "document_version": 1, "source_hash": "aaaaaaaaaaaaaaaa", "knowledge_scope": "project_user", "server_project_scope": "project-001", "owner_user_id": "user-001", "lifecycle": "candidate", "visibility": "private", "data_class": "internal", "audience_ids": [], "transferability": "project_only", "applies_to": ["project-001"], "edges": [], "extensions": {}}]
+  "examples": [{"memory_id": "mem:tenant:customer:project:canonical:example", "schema_version": "1.0", "profile_version": "1.0", "document_version": 1, "source_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "knowledge_scope": "project_user", "server_project_scope": "project-001", "owner_user_id": "user-001", "lifecycle": "candidate", "visibility": "private", "data_class": "internal", "audience_ids": [], "transferability": "project_only", "applies_to": ["project-001"], "edges": [], "extensions": {}}]
 }

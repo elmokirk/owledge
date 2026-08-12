@@ -79,13 +79,29 @@ class ContractEnvelopeTests(unittest.TestCase):
 
     def test_legacy_preview_preserves_unknown_fields_without_path_authority(self):
         legacy = {"memory_id": "mem:tenant:customer:project:canonical:legacy", "doc_type": "canonical", "status": "active", "summary": "legacy", "custom_flag": "preserve", "extensions": {"unscoped": "preserve"}}
-        mapped, receipt = contracts.preview_legacy_migration(legacy, server_project_scope="server-project", owner_user_id="owner-1", source_hash="d" * 64)
+        identity = contracts.ResolvedProjectIdentity(server_project_scope="server-project", owner_user_id="owner-1")
+        mapped, receipt = contracts.preview_legacy_migration(legacy, identity=identity, source_hash="d" * 64)
         self.assertEqual(mapped["memory_id"], legacy["memory_id"])
         self.assertEqual(mapped["server_project_scope"], "server-project")
         self.assertEqual(mapped["extensions"]["legacy.frontmatter"]["custom_flag"], "preserve")
         self.assertEqual(mapped["extensions"]["legacy.extensions"]["unscoped"], "preserve")
         self.assertFalse(receipt["apply"])
         self.assertEqual(contracts.validate_artifact_envelope(mapped), [])
+
+    def test_migration_rejects_unresolved_identity_and_resource_ref_parity_fields(self):
+        legacy = {"memory_id": "mem:tenant:customer:project:canonical:legacy"}
+        with self.assertRaises(ValueError):
+            contracts.preview_legacy_migration(legacy, identity={"server_project_scope": "spoofed", "owner_user_id": "owner-1"}, source_hash="d" * 64)
+        value = envelope()
+        value["resource_refs"][0]["media_type"] = ""
+        value["resource_refs"][0]["content_hash"] = "not-a-hash"
+        value["resource_refs"][0]["extraction_provenance"] = ""
+        value["source_hash"] = "not-a-hash"
+        errors = contracts.validate_artifact_envelope(value)
+        self.assertIn("envelope.source_hash", errors)
+        self.assertIn("resource_ref.media_type", errors)
+        self.assertIn("resource_ref.content_hash", errors)
+        self.assertIn("resource_ref.extraction_provenance", errors)
 
     def test_all_knowledge_scopes_validate_without_caller_path_authority(self):
         for scope in ("project_user", "user_global", "enterprise"):
@@ -104,6 +120,9 @@ class ContractEnvelopeTests(unittest.TestCase):
         self.assertIn("profile", schemas["project-manifest-v1"]["required"])
         for name, schema in schemas.items():
             self.assertTrue(schema.get("examples"), name)
+        self.assertEqual(contracts.validate_artifact_envelope(schemas["artifact-envelope-v1"]["examples"][0]), [])
+        self.assertEqual(contracts.validate_artifact_envelope(schemas["project-manifest-v1"]["examples"][0]), [])
+        self.assertEqual(contracts.validate_resource_ref(schemas["resource-ref-v1"]["examples"][0]), [])
 
 
 if __name__ == "__main__":

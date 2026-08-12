@@ -22,10 +22,12 @@ canonical; adapters and derived indexes are not a second source of truth.
 4. Migration is opt-in, preview-first, checkpointed, receipt-backed, and
    recoverable. User-owned Markdown is never silently overwritten.
 
-The shipped `tools/owledge_contracts.py` validator can produce a preview mapping
-for legacy frontmatter. It does not read caller-supplied paths as authority and
-does not apply a write; the server-resolved project scope, owner, source hash,
-preserved legacy fields, and `apply: false` receipt are explicit.
+The shipped contract library can produce a preview mapping for legacy
+frontmatter only after its host supplies a resolved project identity. Its CLI
+does not accept project scope or owner flags. The mapping does not read
+caller-supplied paths as authority and does not apply a write; the
+server-resolved project scope, owner, source hash, preserved legacy fields, and
+`apply: false` receipt are explicit.
 
 Schema examples and defaults are descriptive only; they never fill in identity,
 scope, ownership, lifecycle, or source-integrity facts. A migration mapping

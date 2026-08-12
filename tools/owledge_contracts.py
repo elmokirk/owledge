@@ -12,6 +12,7 @@ import argparse
 import hashlib
 import json
 import re
+from dataclasses import dataclass
 from typing import Any
 
 
@@ -24,6 +25,7 @@ CAPABILITY_RESULTS = {"supported", "unsupported", "denied"}
 GLOBAL_USER_TYPES = {"user_context", "preference", "goal", "daily", "personal_task", "research", "personal_pattern", "coach_report", "onboarding_profile"}
 _EXTENSION_KEY = re.compile(r"^[a-z0-9][a-z0-9_-]*(?:\.[a-z0-9][a-z0-9_-]*)+$")
 _ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:-]{0,255}$")
+_SHA256 = re.compile(r"^[a-f0-9]{64}$")
 
 ENVELOPE_REQUIRED = {
     "memory_id", "schema_version", "profile_version", "document_version", "source_hash",
@@ -31,6 +33,14 @@ ENVELOPE_REQUIRED = {
     "data_class", "audience_ids", "transferability", "applies_to", "edges", "extensions",
 }
 ENVELOPE_OPTIONAL = {"resource_refs", "created_at", "updated_at", "profile", "summary", "title"}
+
+
+@dataclass(frozen=True)
+class ResolvedProjectIdentity:
+    """Identity returned by a trusted host resolver, never a CLI flag."""
+
+    server_project_scope: str
+    owner_user_id: str
 
 
 def _error(errors: list[str], code: str) -> None:
@@ -62,6 +72,10 @@ def validate_resource_ref(value: Any) -> list[str]:
     locator = value.get("locator")
     if not isinstance(locator, str) or not locator or locator.startswith(("/", "\\")) or ".." in locator.replace("\\", "/").split("/"):
         _error(errors, "resource_ref.locator")
+    if not isinstance(value.get("media_type"), str) or not value.get("media_type"):
+        _error(errors, "resource_ref.media_type")
+    if not isinstance(value.get("content_hash"), str) or not _SHA256.fullmatch(value["content_hash"]):
+        _error(errors, "resource_ref.content_hash")
     if value.get("data_class") not in DATA_CLASSES:
         _error(errors, "resource_ref.data_class")
     if not isinstance(value.get("size_bytes"), int) or value.get("size_bytes") < 0:
@@ -70,6 +84,8 @@ def validate_resource_ref(value: Any) -> list[str]:
         _error(errors, "resource_ref.availability")
     if value.get("access_state") not in {"authorized", "restricted", "revoked", "unknown"}:
         _error(errors, "resource_ref.access_state")
+    if not isinstance(value.get("extraction_provenance"), str) or not value.get("extraction_provenance"):
+        _error(errors, "resource_ref.extraction_provenance")
     return errors
 
 
@@ -89,7 +105,7 @@ def validate_artifact_envelope(document: Any, previous: dict[str, Any] | None = 
             _error(errors, f"envelope.{key}")
     if not isinstance(document.get("document_version"), int) or document.get("document_version", 0) < 1:
         _error(errors, "envelope.document_version")
-    if not isinstance(document.get("source_hash"), str) or len(document.get("source_hash", "")) < 16:
+    if not isinstance(document.get("source_hash"), str) or not _SHA256.fullmatch(document["source_hash"]):
         _error(errors, "envelope.source_hash")
     if document.get("knowledge_scope") not in KNOWLEDGE_SCOPES:
         _error(errors, "envelope.knowledge_scope")
@@ -142,13 +158,19 @@ def validate_artifact_envelope(document: Any, previous: dict[str, Any] | None = 
     return sorted(set(errors))
 
 
-def preview_legacy_migration(legacy: Any, *, server_project_scope: str, owner_user_id: str, source_hash: str) -> tuple[dict[str, Any], dict[str, Any]]:
-    """Map legacy frontmatter without writing it or assigning caller path authority."""
+def preview_legacy_migration(legacy: Any, *, identity: ResolvedProjectIdentity, source_hash: str) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Map legacy frontmatter using a host-resolved identity without writing it."""
     if not isinstance(legacy, dict):
         raise ValueError("migration.legacy_type")
     memory_id = legacy.get("memory_id")
     if not isinstance(memory_id, str) or not memory_id.startswith("mem:"):
         raise ValueError("migration.memory_id")
+    if not isinstance(identity, ResolvedProjectIdentity):
+        raise ValueError("migration.resolved_identity")
+    if not _identifier(identity.server_project_scope) or not _identifier(identity.owner_user_id):
+        raise ValueError("migration.resolved_identity")
+    if not isinstance(source_hash, str) or not _SHA256.fullmatch(source_hash):
+        raise ValueError("migration.source_hash")
     doc_type = str(legacy.get("doc_type") or "project_context")
     known = {
         "memory_id", "schema_version", "profile_version", "document_version", "source_hash",
@@ -183,14 +205,14 @@ def preview_legacy_migration(legacy: Any, *, server_project_scope: str, owner_us
         "document_version": int(legacy.get("document_version") or 1),
         "source_hash": source_hash,
         "knowledge_scope": scope,
-        "server_project_scope": server_project_scope,
-        "owner_user_id": owner_user_id,
+        "server_project_scope": identity.server_project_scope,
+        "owner_user_id": identity.owner_user_id,
         "lifecycle": lifecycle,
         "visibility": legacy.get("visibility", "private"),
         "data_class": legacy.get("data_class", "internal"),
         "audience_ids": list(legacy.get("audience_ids") or []),
         "transferability": legacy.get("transferability", "project_only"),
-        "applies_to": list(legacy.get("applies_to") or [server_project_scope]),
+        "applies_to": list(legacy.get("applies_to") or [identity.server_project_scope]),
         "edges": list(legacy.get("edges") or []),
         "extensions": extensions,
         "profile": doc_type,
@@ -202,7 +224,7 @@ def preview_legacy_migration(legacy: Any, *, server_project_scope: str, owner_us
         "apply": False,
         "memory_id": memory_id,
         "preserved_extension_keys": sorted(preserved),
-        "server_project_scope": server_project_scope,
+        "server_project_scope": identity.server_project_scope,
         "warnings": ["Legacy metadata remains source-owned until an explicit apply transaction."],
     }
     return envelope, receipt
@@ -278,22 +300,11 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Validate an Owledge v1 artifact envelope JSON document.")
     parser.add_argument("document")
     parser.add_argument("--previous")
-    parser.add_argument("--legacy-preview", action="store_true")
-    parser.add_argument("--server-project-scope")
-    parser.add_argument("--owner-user-id")
-    parser.add_argument("--source-hash")
     args = parser.parse_args()
     document = json.loads(open(args.document, encoding="utf-8").read())
     previous = json.loads(open(args.previous, encoding="utf-8").read()) if args.previous else None
-    if args.legacy_preview:
-        if not all([args.server_project_scope, args.owner_user_id, args.source_hash]):
-            parser.error("--legacy-preview requires --server-project-scope, --owner-user-id, and --source-hash")
-        envelope, receipt = preview_legacy_migration(document, server_project_scope=args.server_project_scope, owner_user_id=args.owner_user_id, source_hash=args.source_hash)
-        errors = validate_artifact_envelope(envelope)
-        print(json.dumps({"passed": not errors, "errors": errors, "envelope": envelope, "receipt": receipt}, indent=2))
-    else:
-        errors = validate_artifact_envelope(document, previous)
-        print(json.dumps({"passed": not errors, "errors": errors}, indent=2))
+    errors = validate_artifact_envelope(document, previous)
+    print(json.dumps({"passed": not errors, "errors": errors}, indent=2))
     return 0 if not errors else 1
 
 
