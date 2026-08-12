@@ -82,7 +82,7 @@ def test_manual_patch_is_git_applyable(tmp_path):
     shutil.copytree(REPO_ROOT / "skills", fake_src / "skills", dirs_exist_ok=True)
     fake_tools = fake_src / "tools"
     fake_tools.mkdir(exist_ok=True)
-    for tool in ["owledge.py", "owledge_core.py", "build_kb_module.py", "build_project_folder_kit.py"]:
+    for tool in ["owledge.py", "owledge_core.py", "owledge_contracts.py", "build_kb_module.py", "build_project_folder_kit.py"]:
         shutil.copy2(REPO_ROOT / "tools" / tool, fake_tools / tool)
     (fake_src / "VERSION").write_text("0.6.0\n", encoding="utf-8")
     old_template = "# Old v0.6.0 task card\n\nThis is the old version.\n"

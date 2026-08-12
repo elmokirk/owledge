@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://owledge.dev/schemas/capability-receipt-v1.schema.json",
+  "title": "Owledge Capability Request/Result Receipt v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["request_id", "protocol_version", "core_api_range", "capability_id", "operation_kind", "requested_scopes", "effective_permissions", "data_class", "result", "reason_code"],
+  "properties": {
+    "request_id": {"type": "string", "minLength": 1},
+    "protocol_version": {"const": "1.0"},
+    "core_api_range": {"type": "string", "minLength": 1},
+    "capability_id": {"type": "string", "minLength": 1},
+    "operation_kind": {"enum": ["query", "command"]},
+    "requested_scopes": {"type": "array", "items": {"enum": ["project_user", "user_global", "enterprise"]}},
+    "effective_permissions": {"type": "array", "items": {"type": "string"}},
+    "data_class": {"enum": ["public", "internal", "confidential", "personal", "special-category"]},
+    "result": {"enum": ["supported", "unsupported", "denied"]},
+    "reason_code": {"type": "string", "minLength": 1},
+    "migration_hint": {"type": "string"},
+    "extensions": {"type": "object", "patternProperties": {"^[a-z0-9][a-z0-9_-]*(\\.[a-z0-9][a-z0-9_-]*)+$": {}}, "additionalProperties": false}
+  }
+}

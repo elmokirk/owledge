@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://owledge.dev/schemas/settings-v1.schema.json",
+  "title": "Owledge Layered Settings v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "layers"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "layers": {
+      "type": "array",
+      "items": {"type": "object", "additionalProperties": false, "required": ["name", "values"], "properties": {"name": {"enum": ["core", "organization", "user", "project", "session"]}, "values": {"type": "object"}}}
+    }
+  }
+}

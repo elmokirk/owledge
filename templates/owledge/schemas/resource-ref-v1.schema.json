@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://owledge.dev/schemas/resource-ref-v1.schema.json",
+  "title": "Owledge ResourceRef v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["resource_id", "relation", "locator", "media_type", "content_hash", "size_bytes", "data_class", "availability", "access_state", "extraction_provenance"],
+  "properties": {
+    "resource_id": {"type": "string", "minLength": 1},
+    "relation": {"type": "string", "minLength": 1},
+    "locator": {"type": "string", "minLength": 1, "not": {"pattern": "^(?:/|\\\\|.*(?:^|/)\\.\\.(?:/|$))"}},
+    "media_type": {"type": "string", "minLength": 1},
+    "content_hash": {"type": "string", "minLength": 16},
+    "size_bytes": {"type": "integer", "minimum": 0},
+    "data_class": {"enum": ["public", "internal", "confidential", "personal", "special-category"]},
+    "availability": {"enum": ["available", "unavailable", "withdrawn", "unknown"]},
+    "access_state": {"enum": ["authorized", "restricted", "revoked", "unknown"]},
+    "extraction_provenance": {"type": "string", "minLength": 1}
+  }
+}

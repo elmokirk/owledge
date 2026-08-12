@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://owledge.dev/schemas/project-manifest-v1.schema.json",
+  "title": "Owledge ProjectManifest v1",
+  "allOf": [
+    {"$ref": "artifact-envelope-v1.schema.json"},
+    {"properties": {"profile": {"const": "project_manifest"}, "profile_version": {"const": "1.0"}, "knowledge_scope": {"const": "project_user"}}}
+  ]
+}

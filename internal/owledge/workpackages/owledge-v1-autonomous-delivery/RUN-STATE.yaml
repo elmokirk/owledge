@@ -1,5 +1,5 @@
 schema_version: 1
-document_version: 7
+document_version: 8
 project: owledge
 plan: internal/owledge/plans/owledge-v1-autonomous-delivery-master-plan.md
 objective: Deliver Owledge v0.7.1 through a Standalone Core GA and bounded Single-Organization Hub Beta with recall-first Research Memory and portable agent adapters.
@@ -537,6 +537,12 @@ checkpoint:
     - "internal/owledge/reviews/ow-071-06-owlib-project-contract-evidence.md"
     - "tools/owledge_contracts.py"
     - "tests/unit/test_ow08002_contracts.py"
+    - "templates/owledge/schemas/artifact-envelope-v1.schema.json"
+    - "templates/owledge/schemas/project-manifest-v1.schema.json"
+    - "templates/owledge/schemas/resource-ref-v1.schema.json"
+    - "templates/owledge/schemas/settings-v1.schema.json"
+    - "templates/owledge/schemas/capability-receipt-v1.schema.json"
+    - "tools/build_project_folder_kit.py"
   passed_commands:
     - "Public docs passed with zero failures after adding the Installation Hub"
     - "Docs contract passed with zero failures after adding the Installation Hub"
@@ -554,14 +560,15 @@ checkpoint:
     - "Focused OW-071-06 Owlib suite: 10 tests passed; current contract, legacy opt-in/deprecation, mixed-layout rejection, reviewed-only default, unsafe shared rejection, stable source IDs, CLI flag conflict, and containment logic covered"
     - "Independent OW-071-06 privacy/migration QA: final accept, 94/100, no open P0/P1"
     - "Focused OW-080-02 contract foundation: 4/4 passed, covering exact revision bumps, inert namespaced extensions, visibility/data-class safety, ResourceRef containment, denies-win settings, and typed capability receipts."
+    - "OW-080-02 generated project-kit replay: all five contract profiles and tools/owledge_contracts.py exist and the validator --help command succeeds."
   failed_commands:
     - "OW-071-06 real symlink integration test is skipped on this Windows runner because symlink creation is unavailable; retain the test for a symlink-capable Linux/macOS CI lane."
     - "Actual macOS/Linux wheel execution is intentionally deferred by D-071-24 to OW-100-09 Stable/GA; the configured CI fixture is not execution evidence and must not support a v0.7.1 cross-platform claim."
     - "python -m unittest tests.unit.test_validate_v1_delivery_plan tests.unit.test_validate_live_work_register -q: one pre-existing downstream mismatch; test_current_control_plane_is_valid still expects zero warnings while accepted OW-080-13 intentionally emits one internal-checkpoint warning. The validator itself passed with zero errors."
     - "python tools/owledge_core.py --project-root . validate-memory --strict: 307 pre-existing legacy frontmatter failures across historical internal memory; the touched canonical plan/checklists pass the release-specific frontmatter validation inside validate_v1_delivery_plan.py."
     - "python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports: completed 36/38 on 2026-08-12; source-identity correctly rejected the dirty planning tree and upgrade-drift exposed a host-project/Kit-mode regression. Routed to OW-071-08 under F-071-24."
-  workspace_state: "G-071-ALIGNMENT is promoted and OW-080-01 is accepted after independent architecture QA. OW-080-02 is the sole active v0.8 schema-contract lane; its executable contract-validator foundation is green, while registry schemas and generated-kit integration remain pending. Publication and tagging remain blocked."
-  next_exact_action: "Add the OW-080-02 JSON Schema Registry profiles and generated-kit inventory integration, then extend the focused contract fixtures without activating another ticket."
+  workspace_state: "G-071-ALIGNMENT is promoted and OW-080-01 is accepted after independent architecture QA. OW-080-02 is the sole active v0.8 schema-contract lane; its validator foundation, five JSON profiles, and generated-kit delivery path are green. Migration mapping and complete settings/envelope integration remain pending. Publication and tagging remain blocked."
+  next_exact_action: "Implement OW-080-02 profile upgrade mapping and complete effective-settings/envelope integration fixtures without activating another ticket."
   open_assumptions:
     - "The product owner wants the existing five-release train retained unless a later version reflection changes it."
     - "Local serial execution is the default; subagents are exceptional and justified only by independent risk reduction."

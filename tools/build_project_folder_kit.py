@@ -112,6 +112,7 @@ GLOBAL_DIRS = [
 CORE_TOOLS = [
     "owledge.py",
     "owledge_core.py",
+    "owledge_contracts.py",
     "build_project_folder_kit.py",
     "build_kb_module.py",
 ]
