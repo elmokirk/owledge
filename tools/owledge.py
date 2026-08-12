@@ -3858,8 +3858,8 @@ def main(argv: list[str] | None = None) -> int:
     evidence_p = sub.add_parser("evidence-manifest", parents=[project_parent])
     evidence_p.add_argument("--manifest", required=True)
     evidence_p.add_argument("--expected-commit")
-    evidence_p.add_argument("--expected-input-hash")
-    evidence_p.add_argument("--owner-actor")
+    evidence_p.add_argument("--expected-input-hash", required=True)
+    evidence_p.add_argument("--owner-actor", required=True)
 
     test_p = sub.add_parser("test", parents=[project_parent])
     test_p.add_argument(
@@ -4044,7 +4044,14 @@ def main(argv: list[str] | None = None) -> int:
             return 0
         if args.command == "evidence-manifest":
             value = json.loads(resolve_path(args.manifest).read_text(encoding="utf-8"))
-            errors = evidence_contracts.validate_evidence_manifest(value, expected_commit=args.expected_commit, expected_input_hash=args.expected_input_hash, owner_actor=args.owner_actor)
+            expected_commit = args.expected_commit
+            if not expected_commit:
+                resolved = subprocess.run(["git", "-C", str(root), "rev-parse", "HEAD"], capture_output=True, text=True, check=False)
+                if resolved.returncode != 0:
+                    print_json({"passed": False, "error": "unable to resolve current git commit; provide --expected-commit"})
+                    return 2
+                expected_commit = resolved.stdout.strip()
+            errors = evidence_contracts.validate_evidence_manifest(value, expected_commit=expected_commit, expected_input_hash=args.expected_input_hash, owner_actor=args.owner_actor)
             print_json({"passed": not errors, "errors": errors})
             return 0 if not errors else 1
         if args.command == "test":

@@ -21,6 +21,8 @@ class EvidenceContractTests(unittest.TestCase):
     def test_missing_exit_code_self_only_qa_stale_and_mismatch_fail(self):
         value = manifest(); value["checkpoint"]["command_results"] = [{"command": "test"}]
         self.assertIn("checkpoint.command_result", evidence.validate_evidence_manifest(value))
+        value = manifest(); value["checkpoint"]["command_results"][0]["extra"] = True
+        self.assertIn("checkpoint.command_result", evidence.validate_evidence_manifest(value))
         value = manifest(); value["gate_result"]["reviewer"] = "worker"
         self.assertIn("gate.self_only_qa", evidence.validate_evidence_manifest(value, owner_actor="worker"))
         value = manifest(); value["gate_result"]["tested_commit"] = "c" * 40
@@ -28,3 +30,11 @@ class EvidenceContractTests(unittest.TestCase):
         value = manifest()
         self.assertIn("evidence.stale_commit", evidence.validate_evidence_manifest(value, expected_commit="c" * 40))
         self.assertIn("evidence.stale_input_hash", evidence.validate_evidence_manifest(value, expected_input_hash="d" * 64))
+        value = manifest(); value["unexpected"] = True
+        self.assertIn("evidence.unknown_field:unexpected", evidence.validate_evidence_manifest(value, expected_commit="a" * 40, expected_input_hash="b" * 64, owner_actor="worker"))
+
+    def test_expected_bindings_and_owner_are_mandatory(self):
+        errors = evidence.validate_evidence_manifest(manifest())
+        self.assertIn("evidence.expected_commit_required", errors)
+        self.assertIn("evidence.expected_input_hash_required", errors)
+        self.assertIn("evidence.owner_actor_required", errors)
