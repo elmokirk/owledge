@@ -30,6 +30,14 @@ class MigrationTests(unittest.TestCase):
         with temp:
             plan = migration.preview(root, source); result = migration.apply(root, source, plan, simulate_postflight_failure=True)
             self.assertFalse(result["passed"]); self.assertTrue(result["recovered"]); self.assertEqual(target.read_text(), "old")
+    def test_tampered_source_path_is_rejected(self):
+        temp, root, source, target = self.host()
+        with temp:
+            plan = migration.preview(root, source); plan["writes"][0]["source"] = "../outside"
+            result = migration.apply(root, source, plan)
+            self.assertFalse(result["passed"]); self.assertTrue(result["recovered"]); self.assertEqual(target.read_text(), "old")
+            with self.assertRaises(ValueError): migration.safe_relative("C:\\Windows\\win.ini")
+            self.assertTrue(migration.contained(root, target)); self.assertFalse(migration.contained(root, pathlib.Path(temp.name).parent / "outside"))
 
     def test_public_cli_requires_explicit_preview_then_plan_apply(self):
         temp, root, source, target = self.host()

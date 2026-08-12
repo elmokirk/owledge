@@ -18,11 +18,16 @@ def digest(path: pathlib.Path) -> str:
 
 def safe_relative(value: str) -> pathlib.Path:
     path = pathlib.PurePosixPath(value.replace("\\", "/"))
-    if path.is_absolute() or ".." in path.parts or not path.parts: raise ValueError("migration.unsafe_path")
+    windows = pathlib.PureWindowsPath(value)
+    if path.is_absolute() or windows.is_absolute() or windows.drive or ".." in path.parts or not path.parts: raise ValueError("migration.unsafe_path")
     return pathlib.Path(path.as_posix())
 
 def never_touch(rel: str) -> bool:
     return rel in NEVER_TOUCH or rel.startswith("global-memory/") or any(rel.startswith(f".owledge/{part}/") for part in ("decisions", "plans", "sessions", "evidence", "handoffs"))
+
+def contained(root: pathlib.Path, path: pathlib.Path) -> bool:
+    try: path.resolve().relative_to(root.resolve()); return True
+    except ValueError: return False
 
 def source_for(rel: str, source_root: pathlib.Path) -> pathlib.Path:
     return source_root / "templates" / "owledge" / rel[len(".owledge/"):] if rel.startswith(".owledge/") else source_root / rel
@@ -43,6 +48,9 @@ def preview(root: pathlib.Path, source_root: pathlib.Path) -> dict[str, Any]:
         target = root / rel; delivery = str(entry.get("sha256_original") or "")
         if never_touch(rel): never.append(rel); continue
         source = source_for(rel, source_root)
+        target = root / rel
+        if not contained(root, target): collisions.append({"path": rel, "reason": "target_escape"}); continue
+        if not contained(source_root, source): collisions.append({"path": rel, "reason": "source_escape"}); continue
         if not source.is_file(): collisions.append({"path": rel, "reason": "source_missing"}); continue
         current = digest(target) if target.is_file() else ""
         if target.is_file() and delivery and current != delivery:
@@ -68,7 +76,12 @@ def apply(root: pathlib.Path, source_root: pathlib.Path, plan: dict[str, Any], *
         for row in plan["writes"]:
             rel = str(row.get("target") or ""); safe_relative(rel)
             if never_touch(rel): raise ValueError("migration.never_touch")
-            target = root / rel; source = source_root / str(row.get("source") or "")
+            source_rel = str(row.get("source") or "")
+            safe_relative(source_rel)
+            target = root / rel; source = source_root / source_rel
+            if not contained(root, target): raise ValueError("migration.target_escape")
+            if not contained(source_root, source):
+                raise ValueError("migration.source_escape")
             if not source.is_file(): raise ValueError("migration.source_missing")
             current = digest(target) if target.is_file() else ""
             if current != str(row.get("expected_current_hash") or ""): raise ValueError("migration.concurrent_change")
