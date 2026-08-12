@@ -81,6 +81,16 @@ class OW07105GoldenDemoTests(unittest.TestCase):
             self.assertIn("filter-request-check.md", (destinations["filter-request-resume.md"]).read_text(encoding="utf-8"))
             self.assertIn("filter-request.md", (destinations["filter-request-check.md"]).read_text(encoding="utf-8"))
 
+    def test_fresh_resume_artifacts_state_scope_checks_and_next_safe_action(self) -> None:
+        request = (SEED / "filter-request.md").read_text(encoding="utf-8")
+        evidence = (SEED / "filter-request-check.md").read_text(encoding="utf-8")
+        handoff = " ".join((SEED / "filter-request-resume.md").read_text(encoding="utf-8").split())
+        self.assertIn("without changing stored data", request)
+        for check in ["Unfinished item remains visible", "Completed item is hidden", "Stored items are unchanged"]:
+            self.assertIn(check, evidence)
+        self.assertIn("Confirm the three checks are still applicable", handoff)
+        self.assertIn("Do not infer sync, deletion, or account work", handoff)
+
 
 if __name__ == "__main__":
     unittest.main()

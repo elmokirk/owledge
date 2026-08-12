@@ -63,6 +63,8 @@ owledge build-context-pack --project-root ./owledge-filter-demo \
 
 Both commands return JSON. The second output must include the scoped request
 and identify selected or excluded sources; it is a read-only context result.
+Rerunning `quickstart` against the same target is additive and reports existing
+files as skipped, so it does not overwrite the three agent-authored artifacts.
 
 To reset, delete only the disposable `owledge-filter-demo` folder. Nothing was
 written outside that target.
@@ -79,9 +81,11 @@ recorded checks, and the next safe action. Do not add sync, accounts, deletion,
 or remote-runtime work.
 ```
 
-Success means the agent can name the request, evidence, three checks, and scope
-boundary from project files alone. If an optional runtime is unavailable, this
-manual prompt and the CLI path still work; no runtime plugin is required.
+Success means the agent can name the request, evidence, three checks, scope
+boundary, and the safe next action (confirm the checks before creating a
+separate request) from project files alone. If an optional runtime is
+unavailable, this manual prompt and the installed CLI path still work; no
+runtime plugin is required.
 
 ## Source-only optional demo
 
