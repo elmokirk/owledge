@@ -70,6 +70,16 @@ class ResumeContextTests(unittest.TestCase):
         result = owledge.resume_context_v1(self.state, self.controls, "unknown")
         self.assertEqual("resume_context.invalid_runtime_model", result["error"])
 
+    def test_stale_handoff_fails_closed(self) -> None:
+        result = owledge.resume_context_v1(
+            self.state,
+            self.controls,
+            "reset_baseline",
+            handoff_path=self.handoff,
+            handoff_expected_sha256="0" * 64,
+        )
+        self.assertEqual({"passed": False, "error": "resume_context.stale_handoff"}, result)
+
     def test_gate_payload_is_capped_but_preserves_audit_payload(self) -> None:
         payload = {"passed": False, "errors": [f"failure-{index}" for index in range(7)]}
         summary = owledge.capped_gate_payload(payload)
@@ -85,6 +95,22 @@ class ResumeContextTests(unittest.TestCase):
         self.assertTrue(result["passed"])
         self.assertTrue(result["roundtrip_equal"])
         self.assertEqual(5, len(result["summary"]["first_failings"]))
+
+    def test_acceptance_witness_is_transcript_complete(self) -> None:
+        alignment = pathlib.Path(self.temp.name) / "alignment.yaml"
+        alignment.write_text("status: awaiting_user_alignment\nactive_ticket: OW-080-11\n", encoding="utf-8")
+        result = owledge.resume_acceptance_witness_v1(
+            self.state,
+            self.controls,
+            self.handoff,
+            alignment,
+            pathlib.Path(self.temp.name) / "sidecar.json",
+            100000,
+        )
+        self.assertTrue(result["passed"])
+        self.assertEqual(0, result["golden_gate"]["diff_exit_code"])
+        self.assertEqual("resume_context.stale_handoff", result["stale_handoff"]["error"])
+        self.assertFalse(result["owner_alignment_stop"]["selection_allowed"])
 
 
 if __name__ == "__main__":

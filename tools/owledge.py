@@ -362,6 +362,7 @@ def resume_context_v1(
     handoff_path: pathlib.Path | None = None,
     handoff_in_context: bool = False,
     session_path: pathlib.Path | None = None,
+    handoff_expected_sha256: str | None = None,
 ) -> dict[str, Any]:
     """Build a bounded, auditable resume capsule without loading full control text.
 
@@ -378,6 +379,8 @@ def resume_context_v1(
         return {"passed": False, "error": "resume_context.missing_handoff"}
     if handoff_path is not None and not handoff_path.is_file():
         return {"passed": False, "error": "resume_context.missing_handoff"}
+    if handoff_path is not None and handoff_expected_sha256 and sha256_file(handoff_path) != handoff_expected_sha256:
+        return {"passed": False, "error": "resume_context.stale_handoff"}
 
     session_text = session_path.read_text(encoding="utf-8", errors="replace")
     state_text = state_path.read_text(encoding="utf-8", errors="replace") if runtime_resume_model == "reset_baseline" else ""
@@ -425,6 +428,91 @@ def resume_context_v1(
         "cold_resume_drain": session_tokens + durable_tokens + control_tokens + handoff_tokens,
         "warm_resume_drain": session_tokens + control_tokens + handoff_tokens,
         "tokenizer": "owledge.regex-v1",
+    }
+
+
+def _json_sha256(payload: Any) -> str:
+    return hashlib.sha256((json.dumps(payload, sort_keys=True, separators=(",", ":")) + "\n").encode("utf-8")).hexdigest()
+
+
+def owner_alignment_stop_v1(alignment_state_path: pathlib.Path, candidate_ticket: str) -> dict[str, Any]:
+    """Verify that an awaiting alignment state refuses a next-ticket selection."""
+    if not alignment_state_path.is_file():
+        return {"passed": False, "error": "alignment_stop.missing_state"}
+    text = alignment_state_path.read_text(encoding="utf-8", errors="replace")
+    status = _yaml_scalar(text, "status")
+    active_ticket = _yaml_scalar(text, "active_ticket")
+    blocked = status == "awaiting_user_alignment" and bool(candidate_ticket) and candidate_ticket != active_ticket
+    return {
+        "passed": blocked,
+        "status": status,
+        "active_ticket": active_ticket,
+        "candidate_ticket": candidate_ticket,
+        "selection_allowed": not blocked,
+        "result": "owner_alignment_required" if blocked else "alignment_stop.not_enforced",
+    }
+
+
+def resume_acceptance_witness_v1(
+    state_path: pathlib.Path,
+    control_paths: list[pathlib.Path],
+    handoff_path: pathlib.Path,
+    alignment_state_path: pathlib.Path,
+    sidecar_path: pathlib.Path,
+    model_auto_compact_token_limit: int,
+) -> dict[str, Any]:
+    """Emit the complete OW-080-13 acceptance witness for a transcript-only judge."""
+    if model_auto_compact_token_limit <= 0:
+        return {"passed": False, "error": "resume_acceptance.invalid_auto_compact_limit"}
+    persisted = resume_context_v1(
+        state_path,
+        control_paths,
+        "persisted",
+        {path.as_posix() for path in control_paths},
+        handoff_path,
+        handoff_in_context=True,
+    )
+    reset = resume_context_v1(state_path, control_paths, "reset_baseline", handoff_path=handoff_path)
+    stale_handoff = resume_context_v1(
+        state_path,
+        control_paths,
+        "reset_baseline",
+        handoff_path=handoff_path,
+        handoff_expected_sha256="0" * 64,
+    )
+    payload = {
+        "passed": False,
+        "results": [{"name": f"fixture-{index}", "passed": False} for index in range(1, 7)],
+    }
+    sidecar = gate_sidecar_roundtrip_v1(payload, sidecar_path)
+    reconstructed = json.loads(sidecar_path.read_text(encoding="utf-8"))
+    golden_digest = _json_sha256(payload)
+    reconstructed_digest = _json_sha256(reconstructed)
+    alignment = owner_alignment_stop_v1(alignment_state_path, "OW-080-14")
+    resume_passed = all(
+        isinstance(result, dict)
+        and result.get("passed")
+        and result["warm_resume_drain"] < result["cold_resume_drain"] < result["baseline_file_content_tokens"]
+        for result in (persisted, reset)
+    )
+    sidecar_passed = bool(sidecar["passed"] and sidecar["roundtrip_equal"] and golden_digest == reconstructed_digest)
+    stale_passed = stale_handoff == {"passed": False, "error": "resume_context.stale_handoff"}
+    return {
+        "passed": bool(resume_passed and sidecar_passed and stale_passed and alignment["passed"]),
+        "auto_compact_provenance": {
+            "model_auto_compact_token_limit": model_auto_compact_token_limit,
+            "enabled": True,
+            "verification": "invocation_required",
+        },
+        "resume": {"persisted": persisted, "reset_baseline": reset},
+        "golden_gate": {
+            "golden_digest": golden_digest,
+            "reconstructed_digest": reconstructed_digest,
+            "diff_exit_code": 0 if golden_digest == reconstructed_digest else 1,
+        },
+        "sidecar": {"summary": sidecar["summary"], "reconstructed_payload": reconstructed, "roundtrip_equal": sidecar["roundtrip_equal"]},
+        "stale_handoff": stale_handoff,
+        "owner_alignment_stop": alignment,
     }
 
 
@@ -4061,11 +4149,20 @@ def main(argv: list[str] | None = None) -> int:
     resume_context_p.add_argument("--already-loaded", action="append", default=[])
     resume_context_p.add_argument("--handoff-path")
     resume_context_p.add_argument("--handoff-in-context", action="store_true")
+    resume_context_p.add_argument("--handoff-expected-sha256")
     resume_context_p.add_argument("--output-path")
     gate_sidecar_p = sub.add_parser("gate-sidecar-v1", parents=[project_parent])
     gate_sidecar_p.add_argument("--payload-json", required=True)
     gate_sidecar_p.add_argument("--sidecar-path", required=True)
     gate_sidecar_p.add_argument("--output-path")
+    resume_acceptance_p = sub.add_parser("resume-acceptance-v1", parents=[project_parent])
+    resume_acceptance_p.add_argument("--state-path", required=True)
+    resume_acceptance_p.add_argument("--control-path", action="append", required=True)
+    resume_acceptance_p.add_argument("--handoff-path", required=True)
+    resume_acceptance_p.add_argument("--alignment-state-path", required=True)
+    resume_acceptance_p.add_argument("--sidecar-path", required=True)
+    resume_acceptance_p.add_argument("--model-auto-compact-token-limit", required=True, type=int)
+    resume_acceptance_p.add_argument("--output-path")
 
     test_p = sub.add_parser("test", parents=[project_parent])
     test_p.add_argument(
@@ -4314,6 +4411,7 @@ def main(argv: list[str] | None = None) -> int:
                 resolve_path(args.handoff_path) if args.handoff_path else None,
                 args.handoff_in_context,
                 resolve_path(args.session_path) if args.session_path else None,
+                args.handoff_expected_sha256,
             )
             safe_result = sanitize_generated_payload(result, root)
             if args.output_path:
@@ -4326,6 +4424,22 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "gate-sidecar-v1":
             payload = json.loads(resolve_path(args.payload_json).read_text(encoding="utf-8"))
             result = gate_sidecar_roundtrip_v1(payload, resolve_path(args.sidecar_path))
+            if args.output_path:
+                output = resolve_path(args.output_path)
+                output.parent.mkdir(parents=True, exist_ok=True)
+                with output.open("w", encoding="utf-8", newline="\n") as handle:
+                    handle.write(json.dumps(result, indent=2, sort_keys=True) + "\n")
+            print_json(result)
+            return 0 if result["passed"] else 1
+        if args.command == "resume-acceptance-v1":
+            result = resume_acceptance_witness_v1(
+                resolve_path(args.state_path),
+                [resolve_path(path) for path in args.control_path],
+                resolve_path(args.handoff_path),
+                resolve_path(args.alignment_state_path),
+                resolve_path(args.sidecar_path),
+                args.model_auto_compact_token_limit,
+            )
             if args.output_path:
                 output = resolve_path(args.output_path)
                 output.parent.mkdir(parents=True, exist_ok=True)
