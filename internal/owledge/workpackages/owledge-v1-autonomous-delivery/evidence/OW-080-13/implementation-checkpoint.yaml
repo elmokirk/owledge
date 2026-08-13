@@ -18,4 +18,5 @@ coverage:
 limitations:
   - "The two receipts exercise the runtime-neutral CLI contract locally; they are not an executed Codex /goal v0.128+ or Claude Code /goal v2.1.139+ session transcript."
   - "Do not accept OW-080-13 or promote G-080-B-CONTEXT until each required harness has transcript-visible evidence or the ticket/gate is owner-amended."
+  - "Claude Code 2.1.228 was authenticated. A 0.25 USD Print run exceeded its budget before checks; a 1.00 USD run connected but denied Bash in dontAsk mode. Raw attempt transcripts are intentionally not retained or committed."
 publication_authority: not_granted
