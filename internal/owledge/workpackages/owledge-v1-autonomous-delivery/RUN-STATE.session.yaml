@@ -2,9 +2,9 @@ schema_version: 1
 runtime_resume_model: persisted
 session_slice:
   active_version: v0.8.0
-  active_ticket: OW-080-13
-  current_step: "All technical checks passed in Claude and a non-ephemeral Codex GPT-5.5 exec resume; owner must decide literal /goal equivalence."
-  next_command: "Await owner decision Q-080-04; do not accept OW-080-13 or activate downstream tickets."
+  active_ticket: OW-080-14
+  current_step: "OW-080-13 is accepted; W-080-B5 runs OW-080-14 and OW-080-15 in disjoint parallel lanes."
+  next_command: "Execute OW-080-14 locally and OW-080-15 in an isolated subagent lane, then run their scoped QA before G-080-B-CONTEXT."
 durable_state_ref: RUN-STATE.yaml
 durable_state_tokens: 14162
 baseline_file_content_tokens: 18940

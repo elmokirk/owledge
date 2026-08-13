@@ -9,6 +9,14 @@
 5. Recovery
 6. Artifact Routing
 
+## Goal-host harness evidence
+
+When execution already occurs inside a Codex desktop Goal thread, that active
+thread is the primary Codex `/goal` harness. Record its thread identity and
+owner-visible transcript as evidence; do not recursively start Codex CLI only
+to prove that Codex is running. A CLI `exec resume` receipt is supplemental
+portable-contract evidence, not a replacement for the host Goal thread.
+
 ## MVP Sparring
 
 ### Purpose

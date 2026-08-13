@@ -6,7 +6,7 @@ objective: Deliver Owledge v0.7.1 through a Standalone Core GA and bounded Singl
 status: in_progress
 current_release: v0.8.0
 current_phase: 080-B
-active_ticket: OW-080-13
+active_ticket: OW-080-14
 session_slice_ref: RUN-STATE.session.yaml
 last_green_gate: G-071-ALIGNMENT
 alignment:
@@ -41,8 +41,9 @@ alignment:
       source: OW-080-13-independent-final-qa
       question: "Should the owner amend OW-080-13/G-080-B-CONTEXT to define the documented non-ephemeral `codex exec resume` standard as equivalent to a Codex `/goal` resume, or require a literal interactive `/goal` transcript?"
       impact: "All technical Verify clauses now pass in Claude Code and Codex CLI 0.147.0/GPT-5.5, but the ticket does not currently define the observed `exec` mode as equivalent to literal `/goal`."
-      safe_default: "Do not accept OW-080-13 or activate OW-080-14 until the owner chooses a standard."
-      status: awaiting_product_owner
+      resolution: "The owner clarified that this active Codex desktop Goal thread is the literal Codex `/goal` runtime. A recursive `codex` CLI invocation is redundant, so CLI `exec resume` receipts are supplemental technical evidence only."
+      safe_default: "Run final validation and independent QA before accepting OW-080-13; do not recursively invoke Codex from the active Goal thread."
+      status: resolved_owner_clarified_active_goal_primary
   findings:
     - id: F-071-01
       source: v0.7.1-v1-version-reflection-contract-2026-07-27
@@ -286,14 +287,13 @@ alignment:
       status: routed
     - id: F-080-01
       source: OW-080-13-independent-qa
-      evidence: "evidence/OW-080-13/implementation-checkpoint.yaml; evidence/OW-080-13/codex-cli-availability.yaml; independent QA review after local deterministic contract replay"
+      evidence: "evidence/OW-080-13/codex-active-goal-harness-receipt.yaml; implementation-checkpoint.yaml; supplemental Codex CLI receipts; independent QA review after local deterministic contract replay"
       severity: high
-      user_impact: "The bounded resume implementation now has full technical witness evidence in Claude Code and a non-ephemeral Codex CLI 0.147.0/GPT-5.5 `exec resume` session, but the ticket does not define whether that documented resume is equivalent to literal `/goal`."
-      release_impact: "OW-080-13 and G-080-B-CONTEXT remain blocked; no context-profile promotion or downstream ticket activation is allowed."
-      options: ["amend the ticket/gate with a defined non-ephemeral exec-resume equivalence standard", "require a literal interactive /goal transcript", "defer the ticket and retain the current context lane blocked"]
-      recommendation: "Amend to the now-proven non-ephemeral `codex exec resume` standard only if the owner considers it an acceptable Codex `/goal` harness equivalent; otherwise collect a literal interactive transcript."
-      safe_default: "Do not accept the ticket or activate downstream work until Q-080-04 is decided."
-      status: open
+      user_impact: "The active owner-visible Codex desktop Goal thread is the primary `/goal` harness. The existing Codex CLI 0.147.0/GPT-5.5 `exec resume` session remains supplemental receipt evidence, not a recursive runtime requirement."
+      release_impact: "The literal-harness ambiguity is resolved. OW-080-13 may advance only after final validator and independent QA acceptance."
+      recommendation: "Preserve the host-thread receipt and retain CLI receipts as supplemental audit evidence; do not recurse into Codex CLI from a Goal thread."
+      safe_default: "Run final validation and independent QA before activating W-080-B5."
+      status: resolved
     - id: F-080-03
       source: OW-080-13-independent-qa
       evidence: "evidence/OW-080-13/codex-initial-harness-receipt.yaml; implementation-checkpoint.yaml"
@@ -306,7 +306,7 @@ alignment:
       evidence: "evidence/OW-080-13/claude-harness-receipt.yaml; implementation-checkpoint.yaml"
       severity: medium
       user_impact: "Claude Code 2.1.228 executed all three required checks with Safe Mode and a narrow Bash allowlist; no bypass permission was used."
-      release_impact: "The Claude runtime receipt is now satisfied; OW-080-13 remains blocked only on the required Codex runtime receipt."
+      release_impact: "Both runtime requirements are recorded; retain the compact Claude receipt for audit."
       recommendation: "Retain the compact receipt and do not rerun Claude Code unless the contract changes."
       safe_default: "Do not spend additional Claude credentials; pursue only the remaining Codex evidence or an owner amendment."
       status: resolved
@@ -577,7 +577,7 @@ last_commands:
   - "python tools/owledge.py test public-docs --project-root .; python tools/owledge.py test docs-contract --project-root .; python tools/owledge.py test mcp-readonly --project-root .; python tools/owledge.py test runtime-adapters --project-root . (exit 0; public-docs 0 failures, docs-contract 473 checks)"
   - "PYTHONPATH=owlib/src python -m unittest discover -s owlib/tests -v (exit 0; 10 tests, one Windows symlink integration skip)"
 checkpoint:
-  last_completed_action: "OW-080-13 full Acceptance Witness passed in Claude Code 2.1.228/Sonnet and an actual non-ephemeral Codex CLI 0.147.0/GPT-5.5 `exec resume` session. Independent QA's literal `/goal` concern remains a product-definition decision under Q-080-04/F-080-01."
+  last_completed_action: "OW-080-13 accepted after owner clarification, deterministic 8/8 resume-context tests, zero-error plan validation, and independent final QA. The active Codex desktop Goal thread is the primary literal `/goal` harness; CLI `exec resume` receipts are supplemental evidence."
   changed_files:
     - "internal/owledge/workpackages/owledge-v1-autonomous-delivery/RUN-STATE.session.yaml"
     - "tools/owledge.py"
@@ -641,8 +641,8 @@ checkpoint:
     - "python -m unittest tests.unit.test_validate_v1_delivery_plan tests.unit.test_validate_live_work_register -q: one pre-existing downstream mismatch; test_current_control_plane_is_valid still expects zero warnings while accepted OW-080-13 intentionally emits one internal-checkpoint warning. The validator itself passed with zero errors."
     - "python tools/owledge_core.py --project-root . validate-memory --strict: 307 pre-existing legacy frontmatter failures across historical internal memory; the touched canonical plan/checklists pass the release-specific frontmatter validation inside validate_v1_delivery_plan.py."
     - "python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports: completed 36/38 on 2026-08-12; source-identity correctly rejected the dirty planning tree and upgrade-drift exposed a host-project/Kit-mode regression. Routed to OW-071-08 under F-071-24."
-  workspace_state: "G-071-ALIGNMENT is promoted; OW-080-01 through OW-080-09 and OW-080-16 are accepted. OW-080-07 is independently accepted; OW-080-13 is the sole active v0.8 context lane. Publication, tagging, release, and push remain blocked."
-  next_exact_action: "Await the owner decision on Q-080-04; do not accept OW-080-13 or activate OW-080-14/OW-080-15."
+  workspace_state: "G-071-ALIGNMENT is promoted; OW-080-01 through OW-080-09, OW-080-13, and OW-080-16 are accepted. W-080-B5 is active with OW-080-14 and OW-080-15 in parallel non-overlapping lanes. Publication, tagging, release, and push remain blocked."
+  next_exact_action: "Execute OW-080-14 and OW-080-15 in their disjoint allowed paths, each with scoped evidence and independent QA; then evaluate G-080-B-CONTEXT."
   open_assumptions:
     - "The product owner wants the existing five-release train retained unless a later version reflection changes it."
     - "Local serial execution is the default; subagents are exceptional and justified only by independent risk reduction."

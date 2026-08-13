@@ -1,0 +1,19 @@
+ticket: OW-080-13
+status: primary_codex_goal_harness_accepted_by_owner
+recorded_at: 2026-08-13
+harness:
+  name: Codex desktop active Goal thread
+  thread_id: 019fa3c7-2424-7d43-ab4c-1ef35f3991ec
+  evidence_surface: "The current owner-visible Codex conversation and Goal continuation context."
+  runtime_semantics: "This is the literal Codex /goal execution surface; /goal is host-managed, not a shell command to invoke recursively."
+owner_clarification:
+  decision: "Treat the active Codex desktop Goal run as the required Codex /goal harness evidence. Do not require the runtime to invoke a second Codex binary from inside the same Goal run."
+  rationale: "The active thread is already Codex executing /goal; recursive CLI invocation is redundant and can be semantically weaker than the host goal context."
+supplemental_evidence:
+  - "codex-complete-harness-receipt.yaml: bounded CLI contract replay"
+  - "codex-persistent-resume-receipt.yaml: persisted CLI resume replay"
+technical_assertions:
+  current_goal_run_present: true
+  owner_alignment_stop_observed: true
+  publication_authority: not_granted
+limitation: "The desktop-host Goal runtime is the primary behavioral harness. CLI receipts remain supplemental and must not be described as a substitute for this Goal thread."
