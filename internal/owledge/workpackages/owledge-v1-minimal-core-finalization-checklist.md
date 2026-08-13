@@ -5,7 +5,7 @@ customer_id: "global"
 project_id: "owledge"
 doc_type: "task"
 artifact_type: "workpackage"
-document_version: 3
+document_version: 4
 workpackage_version: "1.0.2"
 status: "active"
 visibility: "private"
@@ -65,17 +65,20 @@ Evidence:
 
 ## Phase 1 — Reconcile, do not restart
 
-- [ ] Confirm delivery checkout is clean and no ticket is `in_progress`.
-- [ ] Cherry-pick the planning commit onto the delivery branch.
-- [ ] Re-read live `RUN-STATE.yaml`, `BACKLOG.yaml`, current gate and completed
+- [x] Confirm delivery checkout is clean and no ticket is `in_progress`.
+- [x] Cherry-pick the planning commit onto the delivery branch.
+- [x] Re-read live `RUN-STATE.yaml`, `BACKLOG.yaml`, current gate and completed
   adapter evidence after cherry-pick.
-- [ ] Execute only `V1M-01` first.
-- [ ] Amend existing master plan/control plane rather than creating a parallel
+- [x] Execute only `V1M-01` first.
+- [x] Amend existing master plan/control plane rather than creating a parallel
   active execution truth.
-- [ ] Mark superseded unstarted tickets `post_v1` or map them to one V1M ticket.
-- [ ] Remove all V1 DAG dependencies on parked tickets.
-- [ ] Add complexity-budget validation and run the full plan validator.
-- [ ] Gate `G-V1M-PLAN` green before runtime changes.
+- [x] Mark superseded unstarted tickets `post_v1` or map them to one V1M ticket.
+- [x] Remove all V1 DAG dependencies on parked tickets.
+- [x] Add complexity-budget validation and run the full plan validator.
+- [x] Gate `G-V1M-PLAN` green before runtime changes.
+
+Evidence: V1M-01 commit `5272dcf`; G-V1M-PLAN independent QA accepted after
+canonical `PARK-*` reference resolution and 10/10 validator regressions.
 
 ## Phase 2 — Minimal surface
 

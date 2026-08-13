@@ -1,6 +1,6 @@
 gate: G-V1M-PLAN
-status: implementation_accepted_pending_integration_binding
-tested_integration_commit: pending_v1m01_commit
+status: accepted_independent_qa
+tested_integration_commit: 5272dcf
 environment:
   os: windows
   python: "3.14.0"
@@ -24,7 +24,7 @@ independent_qa:
   initial_verdict: "reject P1: PARK reference was regex-only"
   corrective_action: "Canonical parking-lot resolution plus permanent regression test added."
   recheck_verdict: accepted
-  status: accepted_pending_integration_binding
+  status: accepted
 limitations:
   - "This gate authorizes planning-to-runtime transition only; it does not prove any minimal profile or runtime behavior."
 publication_authority: not_granted

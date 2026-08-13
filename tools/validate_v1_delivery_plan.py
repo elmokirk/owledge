@@ -276,7 +276,8 @@ def validate() -> dict[str, Any]:
         errors.append("RUN-STATE.yaml: active plan must be the V1 Minimal Core plan")
     active_match = re.search(r"^active_ticket:\s*(.+)$", run_state, re.MULTILINE)
     active = active_match.group(1).strip() if active_match else ""
-    if active not in known:
+    clean_gate_stop = active in {"", "null", "None"} and "last_green_gate: G-V1M-PLAN" in run_state and "Select V1M-02" in run_state
+    if active not in known and not clean_gate_stop:
         errors.append(f"RUN-STATE.yaml: active_ticket must be active V1M ticket, got {active}")
     if active == "V1M-01" and next(row["status"] for row in rows if row["id"] == active) != "in_progress":
         errors.append("RUN-STATE.yaml: V1M-01 must be in_progress while plan gate is open")
@@ -291,6 +292,8 @@ def validate() -> dict[str, Any]:
                 errors.append("G-V1M-PLAN: completed V1M-01 requires accepted_independent_qa manifest")
         if "last_green_gate: G-V1M-PLAN" not in run_state:
             errors.append("RUN-STATE.yaml: completed V1M-01 requires last_green_gate G-V1M-PLAN")
+        if next((row["status"] for row in rows if row["id"] == "V1M-02"), None) != "ready":
+            errors.append("BACKLOG.yaml: green G-V1M-PLAN requires V1M-02 ready")
 
     traceability = read(TRACEABILITY)
     for ticket_id in known:
