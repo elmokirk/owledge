@@ -1,20 +1,18 @@
 {
-  "runtime": "claude-code",
-  "status": "local-adapter-support",
-  "fixtures": [
-    "fixtures/session-start.json",
-    "fixtures/user-prompt.json"
-  ],
-  "expected_artifacts": [
-    "OWLEDGE.md",
-    "CLAUDE.md",
-    ".owledge/",
-    "tools/owledge_core.py"
-  ],
-  "failure_modes": [
-    "missing-claude-instructions",
-    "hook-error-hidden",
-    "raw-session-exported"
-  ],
-  "verification": "read-only contract check plus optional plugin smoke tests"
+  "manifest_version": "1.0",
+  "adapter_id": "claude-code",
+  "core_api_range": ">=0.8.1,<2.0.0",
+  "granted_permissions": ["read_project", "read_user_global", "write_candidate"],
+  "context_scopes": ["project_user", "user_global"],
+  "supported_capabilities": ["context.read", "control.read", "checkpoint.handoff", "candidate.write"],
+  "fixtures": ["fixtures/session-start.json", "fixtures/user-prompt.json"],
+  "expected_artifacts": ["OWLEDGE.md", "CLAUDE.md", ".owledge/", "tools/owledge_core.py"],
+  "failure_modes": ["missing-claude-instructions", "hook-error-hidden", "raw-session-exported"],
+  "unsupported_capabilities": [
+    {"capability_id": "preplan.auto_inspect", "reason_code": "owner_invocation_required"},
+    {"capability_id": "routing.durable", "reason_code": "core_owned"},
+    {"capability_id": "core.storage.direct", "reason_code": "core_owned"},
+    {"capability_id": "scope.enterprise", "reason_code": "out_of_v1_scope"},
+    {"capability_id": "orchestration.dispatch", "reason_code": "out_of_v1_scope"}
+  ]
 }

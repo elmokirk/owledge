@@ -134,6 +134,7 @@ HOST_TOOL_FILES = [
     "owledge.py",
     "owledge_core.py",
     "owledge_contracts.py",
+    "owledge_adapter_contracts.py",
     "owledge_work_contract.py",
     "owledge_evidence_contracts.py",
     "owledge_health.py",
@@ -1771,7 +1772,7 @@ def launch_readiness_gate(root: pathlib.Path) -> dict[str, Any]:
         results.add(f"pi-proof-loop:{signal}", signal in corpus_text, "PI proof corpus demonstrates the full learning loop.")
 
     runtime_contracts = root / "addons" / "runtime-conformance-kit" / "contracts"
-    for runtime in ["codex", "claude-code", "cowork-compatible"]:
+    for runtime in ["codex", "claude-code", "generic-mcp-cli"]:
         path = runtime_contracts / f"{runtime}.json"
         results.add(f"runtime-contract:{runtime}", path.exists(), "Runtime conformance contract exists.")
         if path.exists():

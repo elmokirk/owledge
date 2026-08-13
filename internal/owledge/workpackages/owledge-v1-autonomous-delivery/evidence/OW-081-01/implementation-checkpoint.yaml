@@ -1,0 +1,30 @@
+ticket: OW-081-01
+status: accepted_independent_qa
+scope:
+  - AdapterManifest v1 schema and standard-library validator
+  - Codex, Claude Code, and generic MCP/CLI fixture manifests
+  - read-only add-on conformance runner and project-kit inclusion
+contract:
+  supported_profiles: [codex, claude-code, generic-mcp-cli]
+  local_scopes: [project_user, user_global]
+  supported_capabilities: [context.read, control.read, checkpoint.handoff, candidate.write]
+  explicit_degradations: [preplan.auto_inspect, routing.durable, core.storage.direct, scope.enterprise, orchestration.dispatch]
+  candidate_write_scope: project_user
+verification:
+  - "python -m unittest tests.unit.test_ow08101_adapter_contracts -v: 5 passed"
+  - "python tools/owledge.py test launch-readiness --project-root .: passed, 78 checks"
+  - "python tools/owledge.py test runtime-adapters --project-root .: passed"
+  - "python tools/build_project_folder_kit.py --output-path <temp> --verify: passed; AdapterManifest schema and validator shipped"
+  - "python tools/validate_v1_delivery_plan.py: passed, 0 errors"
+  - "git diff --check: passed"
+negative_coverage:
+  - "Core API version mismatch returns core_api_incompatible."
+  - "Missing required permission returns permission_denied."
+  - "Undeclared capability returns structured unsupported/undeclared_capability."
+  - "Direct Core storage and enterprise scope return explicit unsupported results."
+  - "Pi identifier or incomplete degradation declaration fails manifest validation."
+  - "An installed add-on manifest with an invalid Core range makes the read-only runner fail."
+limitations:
+  - "This is the shared contract and fixtures only; harness-specific runtime execution remains OW-081-02, OW-081-03, and OW-081-05."
+  - "No Hub, Pi Tier-1, enterprise scope, supply-chain, or orchestration capability is declared by V1 profiles."
+publication_authority: not_granted

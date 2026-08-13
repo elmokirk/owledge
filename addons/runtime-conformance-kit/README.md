@@ -1,8 +1,9 @@
 # Runtime Conformance Kit
 
 Runtime Conformance Kit is an optional add-on for checking that runtime adapter
-claims are backed by fixture contracts. It starts with Codex, Claude Code, and
-Cowork-compatible runtimes.
+claims are backed by AdapterManifest v1 fixtures. It covers exactly Codex,
+Claude Code, and generic MCP/CLI. Hub, Pi, and automatic orchestration are not
+V1 adapter capabilities.
 
 ## Install
 
@@ -16,6 +17,5 @@ python tools/owledge.py install-addon --project-root . --addon runtime-conforman
 python tools/runtime-conformance/run-runtime-conformance.py --project-root .
 ```
 
-The runner is read-only. It verifies that contracts and fixture references are
-present and that expected artifact paths are declared.
-
+The runner is read-only. It verifies that all three manifests make the required
+equivalent capability and explicit-degradation declarations.

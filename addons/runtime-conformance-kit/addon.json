@@ -1,7 +1,7 @@
 {
   "name": "runtime-conformance-kit",
-  "version": "0.1.0",
-  "description": "Optional read-only runtime conformance fixtures for Codex, Claude Code, and Cowork-compatible adapters.",
+  "version": "0.2.0",
+  "description": "Optional read-only AdapterManifest v1 fixtures for Codex, Claude Code, and generic MCP/CLI adapters.",
   "install_directories": [
     ".owledge/runtime-conformance",
     "tools/runtime-conformance"
@@ -16,8 +16,8 @@
       "target": ".owledge/runtime-conformance/claude-code.json"
     },
     {
-      "source": "contracts/cowork-compatible.json",
-      "target": ".owledge/runtime-conformance/cowork-compatible.json"
+      "source": "contracts/generic-mcp-cli.json",
+      "target": ".owledge/runtime-conformance/generic-mcp-cli.json"
     },
     {
       "source": "fixtures/session-start.json",

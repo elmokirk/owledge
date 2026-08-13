@@ -1,13 +1,13 @@
 {
   "manifest_version": "1.0",
-  "adapter_id": "codex",
+  "adapter_id": "generic-mcp-cli",
   "core_api_range": ">=0.8.1,<2.0.0",
   "granted_permissions": ["read_project", "read_user_global", "write_candidate"],
   "context_scopes": ["project_user", "user_global"],
   "supported_capabilities": ["context.read", "control.read", "checkpoint.handoff", "candidate.write"],
   "fixtures": ["fixtures/session-start.json", "fixtures/user-prompt.json"],
-  "expected_artifacts": ["OWLEDGE.md", "AGENTS.md", ".owledge/", "tools/owledge_core.py"],
-  "failure_modes": ["missing-project-context", "missing-local-cli", "raw-session-exported"],
+  "expected_artifacts": ["OWLEDGE.md", ".owledge/", "tools/owledge_core.py"],
+  "failure_modes": ["missing-project-context", "invalid-json-rpc", "raw-session-exported"],
   "unsupported_capabilities": [
     {"capability_id": "preplan.auto_inspect", "reason_code": "owner_invocation_required"},
     {"capability_id": "routing.durable", "reason_code": "core_owned"},
