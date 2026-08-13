@@ -125,28 +125,32 @@ class ValidateV1MinimalCorePlanTests(unittest.TestCase):
         self.assertFalse(result["passed"])
         self.assertIn("BACKLOG.yaml: V1M-11 must be the final user_authorization_stop wave", result["errors"])
 
-    def test_clean_surface_gate_stop_requires_done_members_and_exact_next_action(self) -> None:
+    def test_clean_completed_gate_stop_requires_done_members_and_exact_next_action(self) -> None:
         current = self.validator.read(self.validator.RUN_STATE)
+        gate_match = re.search(r"^last_green_gate: ([^\n]+)$", current, flags=re.MULTILINE)
+        self.assertIsNotNone(gate_match)
+        gate = gate_match.group(1)
+        expected_action = self.validator.CLEAN_GATE_NEXT_ACTIONS[gate]
         clean_stop = re.sub(r"^active_ticket: [^\n]+$", "active_ticket: null", current, count=1, flags=re.MULTILINE)
-        clean_stop = re.sub(r"^current_phase: [^\n]+$", "current_phase: V1M-GATE-SURFACE", clean_stop, count=1, flags=re.MULTILINE)
+        clean_stop = re.sub(r"^current_phase: [^\n]+$", f"current_phase: V1M-GATE-{gate.removeprefix('G-V1M-')}", clean_stop, count=1, flags=re.MULTILINE)
         clean_stop = re.sub(
             r'^  next_exact_action: ".*"$',
-            '  next_exact_action: "Select V1M-04 after the completed G-V1M-SURFACE gate."',
+            f'  next_exact_action: "{expected_action} after the completed {gate} gate."',
             clean_stop,
             count=1,
             flags=re.MULTILINE,
         )
         self.assertIn("active_ticket: null", clean_stop)
-        self.assertIn("last_green_gate: G-V1M-SURFACE", clean_stop)
-        self.assertIn("Select V1M-04", clean_stop)
+        self.assertIn(f"last_green_gate: {gate}", clean_stop)
+        self.assertIn(expected_action, clean_stop)
         result = self.validate_run_state(clean_stop)
         self.assertTrue(result["passed"], result["errors"])
-        invalid = self.validate_run_state(clean_stop.replace("Select V1M-04", "Select V1M-05", 1))
+        invalid = self.validate_run_state(clean_stop.replace(expected_action, "Select V1M-11", 1))
         self.assertFalse(invalid["passed"])
         self.assertIn("RUN-STATE.yaml: active_ticket must be active V1M ticket, got null", invalid["errors"])
-        stale_gate = self.validate_run_state(clean_stop.replace("last_green_gate: G-V1M-SURFACE", "last_green_gate: G-V1M-PLAN", 1))
+        stale_gate = self.validate_run_state(clean_stop.replace(f"last_green_gate: {gate}", "last_green_gate: G-V1M-PLAN", 1))
         self.assertFalse(stale_gate["passed"])
-        self.assertIn("RUN-STATE.yaml: last_green_gate must be latest completed gate G-V1M-SURFACE, got G-V1M-PLAN", stale_gate["errors"])
+        self.assertIn(f"RUN-STATE.yaml: last_green_gate must be latest completed gate {gate}, got G-V1M-PLAN", stale_gate["errors"])
 
 
 if __name__ == "__main__":

@@ -1,0 +1,33 @@
+gate: G-V1M-READ
+status: accepted_independent_qa
+tested_integration_commit: 4c189d4
+environment:
+  os: windows
+  python: "3.14.0"
+  execution: "controlled local read-path contract validation"
+included_tickets: [V1M-04, V1M-05]
+ticket_evidence:
+  - "evidence/V1M-04/implementation-checkpoint.yaml"
+  - "evidence/V1M-05/implementation-checkpoint.yaml"
+verification:
+  - "python -m unittest tests.unit.test_v1m05_retrieval tests.unit.test_v1m04_null_space tests.unit.test_v1m03_public_facade tests.unit.test_v1m02_minimal_profiles tests.unit.test_ow07110_install_contract tests.unit.test_ow08015_native_hooks tests.unit.test_validate_v1_delivery_plan -v: passed; 39/39, one expected Windows symlink skip"
+  - "python tools/build_project_folder_kit.py --output-path <temporary> --verify: passed; both owledge_null_space.py and owledge_v1_retrieval.py are present"
+  - "python tools/owledge.py test public-docs --project-root .: passed; 257 checks"
+  - "python -m py_compile tools/owledge.py tools/owledge_core.py tools/owledge_null_space.py tools/owledge_v1_retrieval.py tools/build_project_folder_kit.py: passed"
+  - "python tools/validate_v1_delivery_plan.py: passed; 11 tickets / 7 gates / 11 waves / 0 errors"
+  - "git diff --check: passed"
+threshold_witness:
+  scopes: "exactly project_user and user_global; enterprise, unlinked, implicit, environment/default and UNC/network paths are denied"
+  local_link: "two explicitly linked projects share only an owner allowlisted local Null-Space; direct scan equals disposable rebuilt index"
+  recall: "deterministically sorted essence-first records include source, revision, reason, freshness and lifecycle exclusions; detail is scope-authorized"
+  context: "public context uses the same local contract, source/exclusion receipts and fixed character budget; explicit zero budget fails closed"
+  packaging: "full init and project-folder kit include both local read-boundary modules"
+independent_qa:
+  mode: separately_initialized_read_only_gate_reviewer
+  result: accepted
+  status: accepted
+  findings: []
+limitations:
+  - "The direct symlink-escape fixture is skipped on this Windows host because symlink creation is unavailable; it remains a stable-platform follow-up and supports no cross-platform claim."
+promotion: "Permits V1M-06 only; G-V1M-LIFECYCLE remains closed."
+publication_authority: not_granted
