@@ -57,6 +57,15 @@ class ResumeContextTests(unittest.TestCase):
         result = owledge.resume_context_v1(self.state, self.controls, "unknown")
         self.assertEqual("resume_context.invalid_runtime_model", result["error"])
 
+    def test_gate_payload_is_capped_but_preserves_audit_payload(self) -> None:
+        payload = {"passed": False, "errors": [f"failure-{index}" for index in range(7)]}
+        summary = owledge.capped_gate_payload(payload)
+        self.assertEqual(5, len(summary["first_failings"]))
+        gate = owledge.run_gate("fixture", lambda: payload)
+        self.assertFalse(gate["passed"])
+        self.assertEqual(payload, gate["audit_payload"])
+        self.assertEqual(summary, gate["summary"])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -2425,16 +2425,42 @@ def poweruser_simulations_gate(root: pathlib.Path) -> dict[str, Any]:
     return results.payload(project=str(root), simulated_files=5000)
 
 
+def capped_gate_payload(payload: Any, limit: int = 5) -> dict[str, Any]:
+    """Return transcript-safe failure triage while preserving a full sidecar."""
+    if not isinstance(payload, dict):
+        return {"passed": False, "failed": 1, "total": 1, "first_failings": [str(payload)[:500]]}
+    rows = payload.get("results") or payload.get("findings") or payload.get("errors") or []
+    if not isinstance(rows, list):
+        rows = [rows]
+    failing = [row for row in rows if not isinstance(row, dict) or row.get("passed") is not True]
+    return {
+        "passed": bool(payload.get("passed", False)),
+        "failed": int(payload.get("failed", len(failing) or 1)),
+        "total": int(payload.get("total", len(rows) or 1)),
+        "first_failings": failing[:limit],
+    }
+
+
 def run_gate(name: str, func: Callable[[], Any]) -> dict[str, Any]:
     started = time.perf_counter()
     try:
         payload = func()
         passed = bool(payload.get("passed", True)) if isinstance(payload, dict) else True
         if not passed:
-            raise RuntimeError(json.dumps(payload, indent=2))
+            summary = capped_gate_payload(payload)
+            return {
+                "name": name,
+                "passed": False,
+                "error": json.dumps(summary, sort_keys=True),
+                "summary": summary,
+                "audit_payload": payload,
+                "seconds": round(time.perf_counter() - started, 3),
+            }
         return {"name": name, "passed": True, "seconds": round(time.perf_counter() - started, 3)}
     except Exception as exc:
-        return {"name": name, "passed": False, "error": str(exc), "seconds": round(time.perf_counter() - started, 3)}
+        payload = {"passed": False, "errors": [str(exc)]}
+        summary = capped_gate_payload(payload)
+        return {"name": name, "passed": False, "error": json.dumps(summary, sort_keys=True), "summary": summary, "audit_payload": payload, "seconds": round(time.perf_counter() - started, 3)}
 
 
 def py_compile_gate(root: pathlib.Path) -> dict[str, Any]:
@@ -2968,6 +2994,19 @@ def finalization_gates(root: pathlib.Path, include_exports: bool, include_compli
     failed = [gate for gate in gates if not gate["passed"]]
     report_dir = _active_memory_dir(memory_root) / "exports" / "finalization-gates"
     report_dir.mkdir(parents=True, exist_ok=True)
+    sidecar_dir = report_dir / "sidecars"
+    for gate in gates:
+        payload = gate.pop("audit_payload", None)
+        if payload is None:
+            continue
+        sidecar_dir.mkdir(parents=True, exist_ok=True)
+        safe_payload = sanitize_generated_payload(payload, root)
+        sidecar_path = sidecar_dir / f"{gate['name']}.json"
+        sidecar_text = json.dumps(safe_payload, indent=2, sort_keys=True) + "\n"
+        sidecar_path.write_text(sidecar_text, encoding="utf-8")
+        gate["sidecar"] = relative_posix(sidecar_path, root)
+        gate["sidecar_sha256"] = hashlib.sha256(sidecar_text.encode("utf-8")).hexdigest()
+        print_json({"gate": gate["name"], "summary": gate.get("summary"), "sidecar": gate["sidecar"], "sidecar_sha256": gate["sidecar_sha256"]})
     quality_summary_path = report_dir / "quality-ratchet-summary.json"
     quality_scores: dict[str, int] = {}
     if quality_summary_path.exists():
