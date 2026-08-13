@@ -2465,6 +2465,21 @@ def capped_gate_payload(payload: Any, limit: int = 5) -> dict[str, Any]:
     }
 
 
+def gate_sidecar_roundtrip_v1(payload: Any, sidecar_path: pathlib.Path) -> dict[str, Any]:
+    """Persist and reconstruct a full gate payload behind a capped transcript view."""
+    serialized = json.dumps(payload, indent=2, sort_keys=True) + "\n"
+    sidecar_path.parent.mkdir(parents=True, exist_ok=True)
+    sidecar_path.write_text(serialized, encoding="utf-8", newline="\n")
+    reconstructed = json.loads(sidecar_path.read_text(encoding="utf-8"))
+    return {
+        "passed": reconstructed == payload,
+        "summary": capped_gate_payload(payload),
+        "sidecar_sha256": hashlib.sha256(serialized.encode("utf-8")).hexdigest(),
+        "sidecar_bytes": len(serialized.encode("utf-8")),
+        "roundtrip_equal": reconstructed == payload,
+    }
+
+
 def run_gate(name: str, func: Callable[[], Any]) -> dict[str, Any]:
     started = time.perf_counter()
     try:
@@ -4040,6 +4055,10 @@ def main(argv: list[str] | None = None) -> int:
     resume_context_p.add_argument("--already-loaded", action="append", default=[])
     resume_context_p.add_argument("--handoff-path")
     resume_context_p.add_argument("--handoff-in-context", action="store_true")
+    resume_context_p.add_argument("--output-path")
+    gate_sidecar_p = sub.add_parser("gate-sidecar-v1", parents=[project_parent])
+    gate_sidecar_p.add_argument("--payload-json", required=True)
+    gate_sidecar_p.add_argument("--sidecar-path", required=True)
 
     test_p = sub.add_parser("test", parents=[project_parent])
     test_p.add_argument(
@@ -4288,6 +4307,16 @@ def main(argv: list[str] | None = None) -> int:
                 resolve_path(args.handoff_path) if args.handoff_path else None,
                 args.handoff_in_context,
             )
+            safe_result = sanitize_generated_payload(result, root)
+            if args.output_path:
+                output = resolve_path(args.output_path)
+                output.parent.mkdir(parents=True, exist_ok=True)
+                output.write_text(json.dumps(safe_result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+            print_json(safe_result)
+            return 0 if result["passed"] else 1
+        if args.command == "gate-sidecar-v1":
+            payload = json.loads(resolve_path(args.payload_json).read_text(encoding="utf-8"))
+            result = gate_sidecar_roundtrip_v1(payload, resolve_path(args.sidecar_path))
             print_json(result)
             return 0 if result["passed"] else 1
         if args.command == "test":

@@ -76,6 +76,13 @@ class ResumeContextTests(unittest.TestCase):
         self.assertEqual(payload, gate["audit_payload"])
         self.assertEqual(summary, gate["summary"])
 
+    def test_gate_sidecar_roundtrip_is_exact(self) -> None:
+        payload = {"passed": False, "results": [{"passed": False, "name": f"failure-{index}"} for index in range(7)]}
+        result = owledge.gate_sidecar_roundtrip_v1(payload, pathlib.Path(self.temp.name) / "sidecar.json")
+        self.assertTrue(result["passed"])
+        self.assertTrue(result["roundtrip_equal"])
+        self.assertEqual(5, len(result["summary"]["first_failings"]))
+
 
 if __name__ == "__main__":
     unittest.main()
