@@ -90,4 +90,3 @@ the later owner-approved scope cut. Hub becomes a post-V1/V1.1 evaluation.
 - MCP and harness adapters cannot access storage internals or create their own
   knowledge semantics.
 - Pulling any parked surface back into V1 requires a named owner amendment.
-
