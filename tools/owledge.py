@@ -4319,7 +4319,8 @@ def main(argv: list[str] | None = None) -> int:
             if args.output_path:
                 output = resolve_path(args.output_path)
                 output.parent.mkdir(parents=True, exist_ok=True)
-                output.write_text(json.dumps(safe_result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+                with output.open("w", encoding="utf-8", newline="\n") as handle:
+                    handle.write(json.dumps(safe_result, indent=2, sort_keys=True) + "\n")
             print_json(safe_result)
             return 0 if result["passed"] else 1
         if args.command == "gate-sidecar-v1":
@@ -4328,7 +4329,8 @@ def main(argv: list[str] | None = None) -> int:
             if args.output_path:
                 output = resolve_path(args.output_path)
                 output.parent.mkdir(parents=True, exist_ok=True)
-                output.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+                with output.open("w", encoding="utf-8", newline="\n") as handle:
+                    handle.write(json.dumps(result, indent=2, sort_keys=True) + "\n")
             print_json(result)
             return 0 if result["passed"] else 1
         if args.command == "test":
