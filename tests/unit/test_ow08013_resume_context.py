@@ -14,16 +14,18 @@ class ResumeContextTests(unittest.TestCase):
     def setUp(self) -> None:
         self.temp = tempfile.TemporaryDirectory()
         root = pathlib.Path(self.temp.name)
-        self.state = root / "RUN-STATE.yaml"
-        self.state.write_text(
-            "current_release: v0.8.0\nactive_ticket: OW-080-13\ncheckpoint:\n"
-            "  last_completed_action: source committed\n"
-            "  next_exact_action: run deterministic resume proof\n",
-            encoding="utf-8",
-        )
         self.controls = [root / "policy.md", root / "alignment.md"]
         for path in self.controls:
-            path.write_text("# control\nThis is bounded control text.\n", encoding="utf-8")
+            path.write_text("# control\n" + "bounded control text " * 100 + "\n", encoding="utf-8")
+        self.state = root / "RUN-STATE.yaml"
+        self.state.write_text(
+            "current_release: v0.8.0\nactive_ticket: OW-080-13\nsession:\n"
+            "  session_slice:\n    active_version: v0.8.0\n    active_ticket: OW-080-13\n"
+            "    current_step: source committed\n    next_command: run deterministic resume proof\n"
+            "  last_control_sha:\n"
+            + "".join(f"    {path.name}: {owledge.sha256_file(path)}\n" for path in self.controls),
+            encoding="utf-8",
+        )
         self.handoff = root / "handoff.md"
         self.handoff.write_text("# handoff\nNext action is deterministic.\n", encoding="utf-8")
 
@@ -44,14 +46,22 @@ class ResumeContextTests(unittest.TestCase):
         self.assertTrue(all(not row["loaded"] for row in result["controls"]))
         self.assertFalse(result["handoff"]["loaded"])
         self.assertLess(result["warm_resume_drain"], result["cold_resume_drain"])
+        self.assertLess(result["cold_resume_drain"], result["baseline_file_content_tokens"])
 
-    def test_reset_baseline_requires_handoff_and_reloads_controls(self) -> None:
+    def test_reset_baseline_requires_handoff_and_only_loads_hash_delta(self) -> None:
         missing = owledge.resume_context_v1(self.state, self.controls, "reset_baseline")
         self.assertEqual("resume_context.missing_handoff", missing["error"])
         result = owledge.resume_context_v1(self.state, self.controls, "reset_baseline", handoff_path=self.handoff)
         self.assertTrue(result["passed"])
-        self.assertTrue(all(row["loaded"] for row in result["controls"]))
+        self.assertTrue(all(not row["loaded"] for row in result["controls"]))
         self.assertTrue(result["handoff"]["loaded"])
+
+    def test_changed_control_hash_is_loaded(self) -> None:
+        self.controls[0].write_text("# changed\n" + "new content " * 100 + "\n", encoding="utf-8")
+        result = owledge.resume_context_v1(self.state, self.controls, "reset_baseline", handoff_path=self.handoff)
+        self.assertTrue(result["controls"][0]["loaded"])
+        self.assertEqual("hash_delta_changed", result["controls"][0]["reason"])
+        self.assertFalse(result["controls"][1]["loaded"])
 
     def test_invalid_runtime_fails_closed(self) -> None:
         result = owledge.resume_context_v1(self.state, self.controls, "unknown")

@@ -337,6 +337,23 @@ def _yaml_scalar(text: str, key: str, indent: int = 0) -> str:
     return match.group(1).strip().strip('"\'') if match else ""
 
 
+def _yaml_mapping(text: str, key: str, indent: int) -> dict[str, str]:
+    """Read a simple YAML scalar mapping without adding a runtime dependency."""
+    start = re.search(rf"(?m)^{re.escape(' ' * indent)}{re.escape(key)}:[ \t]*$", text)
+    if not start:
+        return {}
+    mapping: dict[str, str] = {}
+    for line in text[start.end():].splitlines():
+        if not line.strip():
+            continue
+        if not line.startswith(" " * (indent + 2)):
+            break
+        match = re.match(r"\s*([^:#]+):\s*(.+?)\s*$", line)
+        if match:
+            mapping[match.group(1).strip().strip('"\'')] = match.group(2).strip().strip('"\'')
+    return mapping
+
+
 def resume_context_v1(
     state_path: pathlib.Path,
     control_paths: list[pathlib.Path],
@@ -362,15 +379,21 @@ def resume_context_v1(
 
     state_text = state_path.read_text(encoding="utf-8", errors="replace")
     loaded = already_loaded or set()
+    previous_hashes = _yaml_mapping(state_text, "last_control_sha", indent=2)
     controls: list[dict[str, Any]] = []
     control_tokens = 0
     for path in control_paths:
         text = path.read_text(encoding="utf-8", errors="replace")
         identity = path.as_posix()
-        retained = runtime_resume_model == "persisted" and identity in loaded
-        tokens = 0 if retained else file_content_token_count(text)
+        current_hash = sha256_file(path)
+        previous_hash = previous_hashes.get(path.name, "")
+        hash_unchanged = bool(previous_hash and previous_hash == current_hash)
+        retained = runtime_resume_model == "persisted" and identity in loaded and hash_unchanged
+        skip_delta = hash_unchanged and not retained
+        reason = "runtime_context_retained" if retained else "hash_delta_unchanged" if skip_delta else "hash_delta_changed"
+        tokens = 0 if retained or skip_delta else file_content_token_count(text)
         control_tokens += tokens
-        controls.append({"path": identity, "sha256": hashlib.sha256(text.encode("utf-8")).hexdigest(), "loaded": not retained, "tokens": tokens})
+        controls.append({"path": identity, "sha256": current_hash, "loaded": not (retained or skip_delta), "reason": reason, "tokens": tokens})
 
     handoff: dict[str, Any] | None = None
     if handoff_path is not None:
@@ -379,10 +402,10 @@ def resume_context_v1(
         handoff = {"path": handoff_path.as_posix(), "sha256": hashlib.sha256(handoff_text.encode("utf-8")).hexdigest(), "loaded": not retained, "tokens": 0 if retained else file_content_token_count(handoff_text)}
 
     session_slice = {
-        "active_version": _yaml_scalar(state_text, "current_release"),
-        "active_ticket": _yaml_scalar(state_text, "active_ticket"),
-        "current_step": _yaml_scalar(state_text, "last_completed_action", indent=2),
-        "next_command": _yaml_scalar(state_text, "next_exact_action", indent=2),
+        "active_version": _yaml_scalar(state_text, "active_version", indent=4) or _yaml_scalar(state_text, "current_release"),
+        "active_ticket": _yaml_scalar(state_text, "active_ticket", indent=4) or _yaml_scalar(state_text, "active_ticket"),
+        "current_step": _yaml_scalar(state_text, "current_step", indent=4) or _yaml_scalar(state_text, "last_completed_action", indent=2),
+        "next_command": _yaml_scalar(state_text, "next_command", indent=4) or _yaml_scalar(state_text, "next_exact_action", indent=2),
     }
     session_tokens = file_content_token_count(json.dumps(session_slice, sort_keys=True))
     durable_tokens = file_content_token_count(state_text)
@@ -393,7 +416,8 @@ def resume_context_v1(
         "session_slice": session_slice,
         "controls": controls,
         "handoff": handoff,
-        "cold_resume_drain": session_tokens + durable_tokens + sum(file_content_token_count(path.read_text(encoding="utf-8", errors="replace")) for path in control_paths) + (file_content_token_count(handoff_path.read_text(encoding="utf-8", errors="replace")) if handoff_path else 0),
+        "baseline_file_content_tokens": durable_tokens + sum(file_content_token_count(path.read_text(encoding="utf-8", errors="replace")) for path in control_paths) + (file_content_token_count(handoff_path.read_text(encoding="utf-8", errors="replace")) if handoff_path else 0),
+        "cold_resume_drain": session_tokens + durable_tokens + control_tokens + handoff_tokens,
         "warm_resume_drain": session_tokens + control_tokens + handoff_tokens,
         "tokenizer": "owledge.regex-v1",
     }
