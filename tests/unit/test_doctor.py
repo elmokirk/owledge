@@ -51,16 +51,12 @@ def test_global_link_survives_move(fresh_project, tmp_path):
         assert global_link_checks2[0]["passed"] is True, "doctor should pass when global layer restored"
 
 
-def test_global_link_resolves_env(fresh_project, tmp_path, monkeypatch):
-    """E4: OWLEDGE_GLOBAL_HOME set + --link-global (no arg) -> path == env value."""
+def test_global_link_requires_explicit_path(fresh_project, tmp_path, monkeypatch):
+    """V1M-04: a bare flag must not discover an environment global path."""
     project = fresh_project
     env_global = tmp_path / "env-global"
     env_global.mkdir()
     monkeypatch.setenv("OWLEDGE_GLOBAL_HOME", str(env_global))
     result = run_owledge(["init-project", "--target", str(project), "--link-global"])
-    assert result.returncode == 0
-    link_path = project / "owledge" / "global-link.json"
-    if link_path.is_file():
-        link = json.loads(link_path.read_text(encoding="utf-8"))
-        assert pathlib.Path(link["path"]) == env_global, f"global-link path {link['path']} != env {env_global}"
-        assert link["source"] == "env"
+    assert result.returncode == 2
+    assert not (project / ".owledge" / "global-link.json").exists()

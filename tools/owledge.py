@@ -72,6 +72,7 @@ import owledge_evidence_contracts as evidence_contracts  # noqa: E402
 import owledge_health  # noqa: E402
 import owledge_migration  # noqa: E402
 import owledge_research_memory  # noqa: E402
+import owledge_null_space  # noqa: E402
 import owledge_small_model_profiles  # noqa: E402
 import build_kb_module  # noqa: E402
 import build_project_folder_kit  # noqa: E402
@@ -145,7 +146,13 @@ def _add_init_arguments(command: argparse.ArgumentParser) -> None:
     command.add_argument("--include-plugin-adapter", action="store_true")
     command.add_argument("--include-compliance", action="store_true")
     command.add_argument("--profile", choices=["principles", "minimal", "full"], default="minimal")
-    command.add_argument("--link-global", nargs="?", const="", default=None, help="Link a global user-memory layer. With no arg, uses OWLEDGE_GLOBAL_HOME env or ~/.owledge/global default.")
+    command.add_argument(
+        "--link-global",
+        default=None,
+        metavar="PATH",
+        help="Link an explicitly selected local user-global Null-Space directory.",
+    )
+    command.add_argument("--owner-id", default="local-owner", help="Local owner identifier for an explicit user-global Null-Space link.")
 
 
 def _add_context_arguments(command: argparse.ArgumentParser) -> None:
@@ -207,6 +214,7 @@ HOST_TOOL_FILES = [
     "owledge_health.py",
     "owledge_migration.py",
     "owledge_research_memory.py",
+    "owledge_null_space.py",
     "owledge_context_compiler.py",
     "owledge_context_profiles.py",
     "owledge_rag_projection.py",
@@ -780,26 +788,22 @@ def _write_kit_manifest(project_root: pathlib.Path, source_root: pathlib.Path, p
 
 
 def _resolve_global_link(arg_value: str, source_root: pathlib.Path) -> dict[str, str]:
-    import os
     import datetime as _dt
-    source = "flag"
-    if arg_value == "":
-        env_path = os.environ.get("OWLEDGE_GLOBAL_HOME", "")
-        if env_path:
-            resolved = pathlib.Path(env_path).expanduser().resolve()
-            source = "env"
-        else:
-            resolved = pathlib.Path.home() / ".owledge" / "global"
-            resolved = resolved.resolve()
-            source = "default"
-    else:
-        resolved = pathlib.Path(arg_value).expanduser().resolve()
+    del source_root
+    if not arg_value:
+        raise ValueError("link_global_requires_explicit_path")
+    selected = pathlib.Path(arg_value).expanduser()
+    if not selected.is_absolute():
+        raise ValueError("link_global_requires_absolute_path")
+    if str(selected).startswith(("\\\\", "//")):
+        raise ValueError("link_global_requires_local_path")
+    resolved = selected.resolve()
     kit_version = KIT_VERSION
     return {
         "path": str(resolved),
         "resolved_at": _dt.datetime.now(_dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
         "kit_version": kit_version,
-        "source": source,
+        "source": "flag",
     }
 
 
@@ -848,7 +852,7 @@ def sync_dogfood(root: pathlib.Path, dry_run: bool = True) -> dict[str, Any]:
     }
 
 
-def init_project(project_root: pathlib.Path, source_root: pathlib.Path, include_plugin_adapter: bool, include_compliance: bool, link_global: str | None = None, profile: str = "minimal") -> dict[str, Any]:
+def init_project(project_root: pathlib.Path, source_root: pathlib.Path, include_plugin_adapter: bool, include_compliance: bool, link_global: str | None = None, profile: str = "minimal", owner_id: str = "local-owner") -> dict[str, Any]:
     if profile == "principles":
         if include_plugin_adapter or include_compliance or link_global is not None:
             raise ValueError("principles profile is zero-install; choose --profile full for add-ons or user-global linking")
@@ -859,6 +863,12 @@ def init_project(project_root: pathlib.Path, source_root: pathlib.Path, include_
         # An add-on is an explicit request for the legacy compatibility surface;
         # keep callers safe while leaving the unflagged default minimal.
         profile = "full"
+    resolved_global_link = None
+    if link_global is not None:
+        # Validate before any project file is created: a local user-global link
+        # must never use a UNC/network project location.
+        owledge_null_space._safe_local_directory(project_root, label="project_root")
+        resolved_global_link = _resolve_global_link(link_global, source_root)
     project_root.mkdir(parents=True, exist_ok=True)
     created: list[str] = []
     skipped: list[str] = []
@@ -930,9 +940,11 @@ def init_project(project_root: pathlib.Path, source_root: pathlib.Path, include_
     _write_kit_manifest(project_root, source_root, profile=profile)
     global_link_info = None
     if link_global is not None:
-        global_link_info = _resolve_global_link(link_global, source_root)
-        (project_root / ".owledge" / "global-link.json").write_text(
-            json.dumps(global_link_info, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+        global_link_info = owledge_null_space.link_project(
+            project_root,
+            pathlib.Path(resolved_global_link["path"]),
+            owner_id=owner_id,
+            source=resolved_global_link["source"],
         )
     return {
         "project_root": str(project_root),
@@ -4414,7 +4426,7 @@ def main(argv: list[str] | None = None) -> int:
             print_json(result)
             return 0 if result["passed"] else 1
         if args.command in {"init", "init-project"}:
-            print_json(init_project(resolve_path(args.target), resolve_path(args.source_root), args.include_plugin_adapter, args.include_compliance, link_global=getattr(args, "link_global", None), profile=args.profile))
+            print_json(init_project(resolve_path(args.target), resolve_path(args.source_root), args.include_plugin_adapter, args.include_compliance, link_global=getattr(args, "link_global", None), profile=args.profile, owner_id=args.owner_id))
             return 0
         if args.command == "quickstart":
             result = quickstart_project(resolve_path(args.target), resolve_path(args.source_root), args.include_plugin_adapter)

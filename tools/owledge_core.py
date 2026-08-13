@@ -2626,15 +2626,17 @@ def memory_doctor(root: pathlib.Path, mode: str = "auto") -> dict[str, Any]:
     else:
         try:
             gl = json.loads(global_link_path.read_text(encoding="utf-8"))
-            gp = pathlib.Path(gl.get("path", "")).expanduser()
+            gp = pathlib.Path(gl.get("global_root", gl.get("path", ""))).expanduser()
             if not gp or str(gp) == ".":
                 add("global-link", False, "error", "global-link.json has empty path.", "Re-run owledge init-project --link-global with a valid path.")
+            elif "global_root" in gl and (gl.get("scope") != "user_global" or gl.get("network") != "disabled" or gl.get("sync") != "disabled"):
+                add("global-link", False, "error", "global-link.json violates the local user-global no-sync policy.", "Re-run owledge init --link-global with a local path.")
             elif not gp.exists():
                 add("global-link", False, "error", f"Global layer moved/unmounted: {gp}", "Restore the global layer at the linked path or re-run owledge init-project --link-global.")
             elif not os.access(str(gp), os.R_OK):
                 add("global-link", False, "warning", f"Global layer unreadable (possibly transient): {gp}", "Check permissions on the global layer path.")
             else:
-                add("global-link", True, "info", f"Global layer linked: {gp}", "")
+                add("global-link", True, "info", f"Global layer linked: {gp.name}", "")
         except json.JSONDecodeError as exc:
             add("global-link", False, "warning", f"global-link.json is malformed: {exc}", "Re-run owledge init-project --link-global to regenerate.")
     outdated_files: list[str] = []

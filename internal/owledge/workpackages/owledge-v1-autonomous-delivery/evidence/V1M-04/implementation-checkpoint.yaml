@@ -1,0 +1,42 @@
+ticket: V1M-04
+status: accepted_independent_qa
+base_commit: 931f5ee
+branch: codex/v071-integration
+scope: private-local-user-global-null-space
+implementation:
+  - "A project links to a selected local Null-Space only through an owner-controlled allowlist registry."
+  - "Only project_user and user_global scopes are executable; enterprise, network and remote-sync paths fail closed."
+  - "Both the project and global link inputs reject symlinked and UNC/network locations before link I/O."
+  - "--link-global requires an explicit absolute local PATH; environment and home-directory discovery are unavailable."
+  - "Small user-global vaults scan directly, while the local JSONL index is a disposable exact projection."
+commands:
+  - command: python -m unittest tests.unit.test_v1m04_null_space tests.unit.test_validate_v1_delivery_plan tests.unit.test_v1m03_public_facade tests.unit.test_v1m02_minimal_profiles tests.unit.test_ow07110_install_contract tests.unit.test_ow08015_native_hooks -v
+    exit_code: 0
+    result: "35 passed; 1 Windows symlink fixture skipped because this host cannot create symlinks"
+  - command: python tools/validate_v1_delivery_plan.py
+    exit_code: 0
+    result: "11 tickets, 7 gates, 11 waves, 0 errors"
+  - command: python -m py_compile tools/owledge.py tools/owledge_core.py tools/owledge_null_space.py tools/build_project_folder_kit.py
+    exit_code: 0
+  - command: git diff --check
+    exit_code: 0
+positive_contracts:
+  - "Two explicitly linked local projects owned by the same registry read the same reviewed private user_global record."
+  - "The direct user-global scan and generated local index contain exactly the same records."
+  - "The full project-folder kit contains the shared Null-Space boundary."
+negative_contracts:
+  - "An unlinked project, enterprise scope, registry network tamper, and global symlink escape fail closed."
+  - "A bare --link-global flag cannot resolve OWLEDGE_GLOBAL_HOME or a home-directory default."
+  - "Relative and UNC/network global paths fail before link I/O; the CLI UNC regression leaves no project directory."
+independent_qa:
+  required: true
+  mode: separately_initialized_read_only_privacy_reviewer
+  result: accepted
+  status: accepted
+  findings:
+    - "Initial P1: bare --link-global could resolve an environment/default path; corrected by requiring explicit absolute PATH."
+    - "Initial P1: UNC paths are formally absolute on Windows; corrected by rejecting network namespaces in CLI and direct boundary checks."
+known_limitations:
+  - "The direct symlink-escape fixture is skipped on this Windows host because symlink creation is unavailable; retain it for a symlink-capable stable-platform lane."
+publication_authority: not_granted
+next_exact_action: "Select V1M-05 only; do not promote G-V1M-READ until both read-path tickets and its cumulative evidence are green."

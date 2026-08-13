@@ -5,7 +5,7 @@ customer_id: "global"
 project_id: "owledge"
 doc_type: "task"
 artifact_type: "workpackage"
-document_version: 6
+document_version: 7
 workpackage_version: "1.0.2"
 status: "active"
 visibility: "private"
@@ -21,7 +21,7 @@ confidence: 0.97
 review_status: "reviewed"
 sanitization_status: "not_required"
 created_at: "2026-08-13T17:20:00+02:00"
-updated_at: "2026-08-13T19:15:00+02:00"
+updated_at: "2026-08-13T20:10:00+02:00"
 source_hash: ""
 reusable_lessons:
   - "A new plan enters an active release train only at a clean ticket/gate boundary."
@@ -92,13 +92,19 @@ canonical `PARK-*` reference resolution and 10/10 validator regressions.
 
 ## Phase 3 — Local read path
 
-- [ ] V1M-04 links explicit projects to the private local Null-Space.
-- [ ] Only `project_user` and local `user_global` exist in V1 execution paths.
-- [ ] Direct scan is correct for small vaults; derived index is disposable.
+- [x] V1M-04 links explicit projects to the private local Null-Space.
+- [x] Only `project_user` and local `user_global` exist in V1 execution paths.
+- [x] Direct scan is correct for small vaults; derived index is disposable.
 - [ ] V1M-05 proves recall-before-research and recall-before-planning.
 - [ ] Context packs include budgets, reasons, exclusions, revisions, and source
   drill-down without full-vault injection.
 - [ ] Gate `G-V1M-READ` green.
+
+Evidence: V1M-04 is accepted with two-project allowlist, direct-scan/index
+equivalence and privacy receipts. Bare, relative and UNC/network link inputs,
+unlinked projects, enterprise scope and network/sync tamper fail closed; the
+symlink fixture remains a stable-platform follow-up because this Windows host
+cannot create symlinks.
 
 ## Phase 4 — Knowledge lifecycle and parking
 

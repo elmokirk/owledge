@@ -126,10 +126,11 @@ project-specific link. The upgrade command does **not** touch it — upgrades
 operate only on shipped kit files, never on project configuration or the global
 layer.
 
-If the global layer path changes (for example, you move `~/.owledge/global`), do
-not run `upgrade`. Re-run `owledge init-project --link-global <new-path>` to
+If the explicitly selected local global layer path changes, do not run
+`upgrade`. Re-run `owledge init-project --link-global <new-absolute-path>` to
 refresh the link. `doctor` reports a `global-link` error if the linked path is
-missing.
+missing. Owledge never discovers this layer from an environment variable or a
+home-directory default.
 
 ## Dogfood sync (for maintainers)
 

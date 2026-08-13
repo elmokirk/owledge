@@ -45,6 +45,24 @@ project needs those compatibility surfaces or a source-only add-on:
 python tools/owledge.py init-project --target /path/to/your-project --profile full
 ```
 
+### Private local user-global Null-Space
+
+Link a project only when you explicitly choose a local directory that you own:
+
+```bash
+python tools/owledge.py init --target /path/to/your-project --link-global /path/to/your-null-space --owner-id local-owner
+```
+
+`--link-global` always requires that explicit absolute path; Owledge never
+discovers a Null-Space from an environment variable, home-directory default, or
+network location.
+
+Owledge records that project in an owner-controlled local allowlist. The link
+permits only `project_user` and `user_global`; networking, remote sync,
+enterprise scope and automatic discovery are denied. Reviewed private Markdown
+under the Null-Space can be scanned directly; any generated index remains a
+rebuildable local projection.
+
 ### Source-only optional add-ons
 
 Add-ons require that same source checkout. They are not part of the package

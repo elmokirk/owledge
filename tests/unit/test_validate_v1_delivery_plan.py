@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 import pathlib
+import re
 import tempfile
 import unittest
 
@@ -126,15 +127,24 @@ class ValidateV1MinimalCorePlanTests(unittest.TestCase):
 
     def test_clean_surface_gate_stop_requires_done_members_and_exact_next_action(self) -> None:
         current = self.validator.read(self.validator.RUN_STATE)
-        self.assertIn("active_ticket: null", current)
-        self.assertIn("last_green_gate: G-V1M-SURFACE", current)
-        self.assertIn("Select V1M-04", current)
-        result = self.validate_run_state(current)
+        clean_stop = re.sub(r"^active_ticket: [^\n]+$", "active_ticket: null", current, count=1, flags=re.MULTILINE)
+        clean_stop = re.sub(r"^current_phase: [^\n]+$", "current_phase: V1M-GATE-SURFACE", clean_stop, count=1, flags=re.MULTILINE)
+        clean_stop = re.sub(
+            r'^  next_exact_action: ".*"$',
+            '  next_exact_action: "Select V1M-04 after the completed G-V1M-SURFACE gate."',
+            clean_stop,
+            count=1,
+            flags=re.MULTILINE,
+        )
+        self.assertIn("active_ticket: null", clean_stop)
+        self.assertIn("last_green_gate: G-V1M-SURFACE", clean_stop)
+        self.assertIn("Select V1M-04", clean_stop)
+        result = self.validate_run_state(clean_stop)
         self.assertTrue(result["passed"], result["errors"])
-        invalid = self.validate_run_state(current.replace("Select V1M-04", "Select V1M-05", 1))
+        invalid = self.validate_run_state(clean_stop.replace("Select V1M-04", "Select V1M-05", 1))
         self.assertFalse(invalid["passed"])
         self.assertIn("RUN-STATE.yaml: active_ticket must be active V1M ticket, got null", invalid["errors"])
-        stale_gate = self.validate_run_state(current.replace("last_green_gate: G-V1M-SURFACE", "last_green_gate: G-V1M-PLAN", 1))
+        stale_gate = self.validate_run_state(clean_stop.replace("last_green_gate: G-V1M-SURFACE", "last_green_gate: G-V1M-PLAN", 1))
         self.assertFalse(stale_gate["passed"])
         self.assertIn("RUN-STATE.yaml: last_green_gate must be latest completed gate G-V1M-SURFACE, got G-V1M-PLAN", stale_gate["errors"])
 
