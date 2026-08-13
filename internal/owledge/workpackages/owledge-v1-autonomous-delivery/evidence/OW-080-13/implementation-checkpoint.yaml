@@ -1,9 +1,9 @@
 ticket: OW-080-13
-status: implementation_complete_pending_runtime_evidence
+status: implementation_complete_pending_codex_runtime_evidence
 source_commits: [d7c7b4f, 4110daf, b12f2a0, ea2f97d, 38871c0, ab997dd]
 verification:
   - "python -m unittest tests.unit.test_ow08013_resume_context: 6 passed"
-  - "python tools/owledge.py resume-context-v1 persisted: baseline_file_content_tokens 18148; cold_resume_drain 13443; warm_resume_drain 73; durable_state_loaded false"
+  - "python tools/owledge.py resume-context-v1 persisted: baseline_file_content_tokens 18439; cold_resume_drain 13740; warm_resume_drain 79; durable_state_loaded false"
   - "python tools/owledge.py resume-context-v1 reset_baseline: baseline_file_content_tokens 18174; cold_resume_drain 13469; warm_resume_drain 99; handoff and durable state loaded"
   - "python tools/owledge.py gate-sidecar-v1: exact roundtrip, 413 bytes, first_failings capped at 5"
 receipts:
@@ -11,12 +11,13 @@ receipts:
   reset_baseline: {path: reset-baseline-receipt.json, sha256: f6874b580f52ff65059a395d99ae31b20d842ecfb48fe6c98b33b2088392ad8c}
   gate_sidecar: {path: gate-sidecar.json, sha256: fca90f3e879c2a53d97be6cef6da1964e7e6844f1e3caf2aa55b45c59c93504a}
   gate_sidecar_receipt: {path: gate-sidecar-receipt.json, sha256: b2356d20904d909b6f4616a9c9506e2724f506b5c0bb4a8d0c91fa52bb9bd408}
+  claude_harness: {path: claude-harness-receipt.yaml, sha256: d01e4bdadfd49310818115b315f43cb1de4d8cb4c748c5c59d16eb21cc1d4f51}
 coverage:
   - "Persisted runtime reads the separate session slice only; it skips hash-verified controls and does not load durable state or an in-context handoff."
   - "Baseline-reset runtime requires and loads the handoff, then skips unchanged controls by recorded hash."
   - "Changed control hash, unknown runtime, absent handoff, capped payload, and exact sidecar reconstruction have deterministic negative/positive tests."
 limitations:
-  - "The two receipts exercise the runtime-neutral CLI contract locally; they are not an executed Codex /goal v0.128+ or Claude Code /goal v2.1.139+ session transcript."
-  - "Do not accept OW-080-13 or promote G-080-B-CONTEXT until each required harness has transcript-visible evidence or the ticket/gate is owner-amended."
-  - "Claude Code 2.1.228 was authenticated. A 0.25 USD Print run exceeded its budget before checks; a 1.00 USD run connected but denied Bash in dontAsk mode. Raw attempt transcripts are intentionally not retained or committed."
+  - "The deterministic receipts and one executed Claude Code 2.1.228 Safe-Mode run prove the runtime-neutral CLI contract; the required Codex /goal v0.128+ transcript remains absent."
+  - "Do not accept OW-080-13 or promote G-080-B-CONTEXT until the Codex harness has transcript-visible evidence or the ticket/gate is owner-amended."
+  - "Claude Code initially exhausted 0.25 USD and 0.50/1.00 USD non-Safe-Mode caps, then passed at low effort with a 1.00 USD Safe-Mode cap and exact Bash allowlist. Raw transcripts are intentionally not retained or committed."
 publication_authority: not_granted

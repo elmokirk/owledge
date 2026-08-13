@@ -1,0 +1,33 @@
+{
+  "passed": true,
+  "roundtrip_equal": true,
+  "sidecar_bytes": 413,
+  "sidecar_sha256": "fca90f3e879c2a53d97be6cef6da1964e7e6844f1e3caf2aa55b45c59c93504a",
+  "summary": {
+    "failed": 6,
+    "first_failings": [
+      {
+        "name": "fixture-1",
+        "passed": false
+      },
+      {
+        "name": "fixture-2",
+        "passed": false
+      },
+      {
+        "name": "fixture-3",
+        "passed": false
+      },
+      {
+        "name": "fixture-4",
+        "passed": false
+      },
+      {
+        "name": "fixture-5",
+        "passed": false
+      }
+    ],
+    "passed": false,
+    "total": 6
+  }
+}

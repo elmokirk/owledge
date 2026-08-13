@@ -30,7 +30,7 @@ alignment:
       question: "May the agent run Claude Code with bypass permissions and unrestricted Bash, constrained only by the OW-080-13 prompt, after the exact-command allowlist was rejected by the CLI?"
       impact: "Claude Code cannot execute the three required read-only checks in its current dontAsk/allowlist configuration."
       safe_default: "Do not use bypass permissions; preserve the runtime-evidence blocker and do not accept OW-080-13."
-      status: awaiting_product_owner
+      status: resolved_safe_mode_allowlist
   findings:
     - id: F-071-01
       source: v0.7.1-v1-version-reflection-contract-2026-07-27
@@ -284,14 +284,13 @@ alignment:
       status: open
     - id: F-080-02
       source: OW-080-13-claude-code-harness-attempts
-      evidence: "evidence/OW-080-13/implementation-checkpoint.yaml"
+      evidence: "evidence/OW-080-13/claude-harness-receipt.yaml; implementation-checkpoint.yaml"
       severity: medium
-      user_impact: "Claude Code 2.1.228 is authenticated, but the narrow Print-mode evidence run did not execute the checks: the first budget was too small and the second denied Bash under dontAsk."
-      release_impact: "Does not invalidate deterministic evidence; it leaves the required real Claude Code receipt absent and OW-080-13 blocked."
-      options: ["explicitly authorize bypass-permissions Bash for the three checks", "provide a project settings allowlist that Claude Code honors", "defer runtime evidence"]
-      recommendation: "Prefer a project settings allowlist if available; otherwise obtain explicit owner approval before bypass permissions."
-      safe_default: "Do not rerun with bypass permissions without separate approval."
-      status: open
+      user_impact: "Claude Code 2.1.228 executed all three required checks with Safe Mode and a narrow Bash allowlist; no bypass permission was used."
+      release_impact: "The Claude runtime receipt is now satisfied; OW-080-13 remains blocked only on the required Codex runtime receipt."
+      recommendation: "Retain the compact receipt and do not rerun Claude Code unless the contract changes."
+      safe_default: "Do not spend additional Claude credentials; pursue only the remaining Codex evidence or an owner amendment."
+      status: resolved
   decisions:
     - id: D-071-01
       related: F-071-01
@@ -559,7 +558,7 @@ last_commands:
   - "python tools/owledge.py test public-docs --project-root .; python tools/owledge.py test docs-contract --project-root .; python tools/owledge.py test mcp-readonly --project-root .; python tools/owledge.py test runtime-adapters --project-root . (exit 0; public-docs 0 failures, docs-contract 473 checks)"
   - "PYTHONPATH=owlib/src python -m unittest discover -s owlib/tests -v (exit 0; 10 tests, one Windows symlink integration skip)"
 checkpoint:
-  last_completed_action: "OW-080-13 implementation checkpoint remains green; Claude Code 2.1.228 authenticated evidence attempts did not execute the checks (budget then denied Bash), so F-080-01/F-080-02 and Q-080-02 remain open."
+  last_completed_action: "OW-080-13 Claude Code 2.1.228 Safe-Mode harness receipt passed all three constrained checks; Q-080-02 and F-080-02 are resolved. F-080-01 remains open for the unavailable Codex runtime receipt."
   changed_files:
     - "internal/owledge/workpackages/owledge-v1-autonomous-delivery/RUN-STATE.session.yaml"
     - "tools/owledge.py"
@@ -614,6 +613,7 @@ checkpoint:
     - "Focused OW-071-06 Owlib suite: 10 tests passed; current contract, legacy opt-in/deprecation, mixed-layout rejection, reviewed-only default, unsafe shared rejection, stable source IDs, CLI flag conflict, and containment logic covered"
     - "Independent OW-071-06 privacy/migration QA: final accept, 94/100, no open P0/P1"
     - "Focused OW-080-02 contract foundation: 4/4 passed, covering exact revision bumps, inert namespaced extensions, visibility/data-class safety, ResourceRef containment, denies-win settings, and typed capability receipts."
+    - "OW-080-13 Claude Code 2.1.228 Safe-Mode harness: resume-context-v1, gate-sidecar-v1, and focused resume-context suite all exited 0 under the exact Bash allowlist; compact receipt is hash-bound."
     - "OW-080-02 generated project-kit replay: all five contract profiles and tools/owledge_contracts.py exist and the validator --help command succeeds."
     - "OW-080-02 final focused suite: 9/9 passed; schema JSON parse, py_compile, docs-contract (346 checks), and validate_v1_delivery_plan (0 errors) passed; independent QA accepted at 97/100."
   failed_commands:
@@ -623,7 +623,7 @@ checkpoint:
     - "python tools/owledge_core.py --project-root . validate-memory --strict: 307 pre-existing legacy frontmatter failures across historical internal memory; the touched canonical plan/checklists pass the release-specific frontmatter validation inside validate_v1_delivery_plan.py."
     - "python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports: completed 36/38 on 2026-08-12; source-identity correctly rejected the dirty planning tree and upgrade-drift exposed a host-project/Kit-mode regression. Routed to OW-071-08 under F-071-24."
   workspace_state: "G-071-ALIGNMENT is promoted; OW-080-01 through OW-080-09 and OW-080-16 are accepted. OW-080-07 is independently accepted; OW-080-13 is the sole active v0.8 context lane. Publication, tagging, release, and push remain blocked."
-  next_exact_action: "Await the owner decision on Q-080-02 before any Claude Code bypass-permissions invocation; do not activate OW-080-14 or OW-080-15."
+  next_exact_action: "Collect the required Codex /goal v0.128+ transcript-visible receipt or obtain an owner amendment; do not activate OW-080-14 or OW-080-15."
   open_assumptions:
     - "The product owner wants the existing five-release train retained unless a later version reflection changes it."
     - "Local serial execution is the default; subagents are exceptional and justified only by independent risk reduction."

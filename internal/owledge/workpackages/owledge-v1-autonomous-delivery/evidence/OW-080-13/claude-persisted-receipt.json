@@ -1,0 +1,40 @@
+{
+  "baseline_file_content_tokens": 18439,
+  "cold_resume_drain": 13740,
+  "controls": [
+    {
+      "loaded": false,
+      "path": "./internal/owledge/workpackages/owledge-v1-autonomous-delivery/CONTROL-PLANE-POLICY.md",
+      "reason": "hash_delta_unchanged",
+      "sha256": "455b8bff35f61006a03834e6c2004046cbe442e4ab4b1b1dbeaadf3c2d58611c",
+      "tokens": 0
+    },
+    {
+      "loaded": false,
+      "path": "./internal/owledge/workpackages/owledge-v1-autonomous-delivery/ALIGNMENT-PROTOCOL.md",
+      "reason": "hash_delta_unchanged",
+      "sha256": "079f2b07e852bd7b5f41217d02bad9575951a4acc5284e4904a59377f6c73af7",
+      "tokens": 0
+    },
+    {
+      "loaded": false,
+      "path": "./skills/owledge-long-horizon-delivery/references/modes.md",
+      "reason": "hash_delta_unchanged",
+      "sha256": "9a9c2415cf51fe06a326063b4e3a3ea70a7f5cad29c819af8a97e37f7cea55a1",
+      "tokens": 0
+    }
+  ],
+  "durable_state_loaded": false,
+  "handoff": null,
+  "passed": true,
+  "runtime_resume_model": "persisted",
+  "session_path": "./internal/owledge/workpackages/owledge-v1-autonomous-delivery/RUN-STATE.session.yaml",
+  "session_slice": {
+    "active_ticket": "OW-080-13",
+    "active_version": "v0.8.0",
+    "current_step": "Deterministic resume implementation and independent QA are complete; Claude Code evidence is blocked by its current Print-mode Bash permission.",
+    "next_command": "Await owner decision Q-080-02 before a Claude Code bypass-permissions run."
+  },
+  "tokenizer": "owledge.regex-v1",
+  "warm_resume_drain": 79
+}

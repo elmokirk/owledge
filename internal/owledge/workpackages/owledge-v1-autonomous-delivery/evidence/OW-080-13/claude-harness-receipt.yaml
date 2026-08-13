@@ -1,0 +1,47 @@
+ticket: OW-080-13
+status: passed
+executed_at: 2026-08-13
+harness:
+  name: Claude Code
+  version: 2.1.228
+  mode: print_safe_mode
+model:
+  alias: sonnet
+  effort: low
+  maximum_budget_usd: 1.00
+permissions:
+  bypass_permissions: false
+  allowed_bash_prefixes:
+    - "python tools/owledge.py resume-context-v1 *"
+    - "python tools/owledge.py gate-sidecar-v1 *"
+    - "python -m unittest tests.unit.test_ow08013_resume_context"
+commands:
+  - command: resume-context-v1
+    exit_code: 0
+    passed: true
+    receipt: {path: claude-persisted-receipt.json, sha256: bc47a996eae0243a34fa635de9d720072db1d5ca100653b04d99edc7d6fef4fe}
+  - command: gate-sidecar-v1
+    exit_code: 0
+    passed: true
+    note: "The fixture summary deliberately contains six failures; the command passes because the capped sidecar roundtrip is exact."
+    sidecar: {path: claude-gate-sidecar.json, sha256: fca90f3e879c2a53d97be6cef6da1964e7e6844f1e3caf2aa55b45c59c93504a}
+    receipt: {path: claude-gate-sidecar-receipt.json, sha256: b2356d20904d909b6f4616a9c9506e2724f506b5c0bb4a8d0c91fa52bb9bd408}
+  - command: test_ow08013_resume_context
+    exit_code: 0
+    passed: true
+    result: "6 tests passed"
+execution_inputs:
+  git_commit: d94bbf1
+  run_state: {path: ../../RUN-STATE.yaml, sha256: 2b4d6c6592deb9801de3a71354399fc1868865a5bdef5ff1c9d825a6696493f6}
+  session_state: {path: ../../RUN-STATE.session.yaml, sha256: b3b8ebf1b8ad3925772827547778b7ceeb94740aa1895c82ad8a659f29d50a4b}
+  controls:
+    CONTROL-PLANE-POLICY.md: 455b8bff35f61006a03834e6c2004046cbe442e4ab4b1b1dbeaadf3c2d58611c
+    ALIGNMENT-PROTOCOL.md: 079f2b07e852bd7b5f41217d02bad9575951a4acc5284e4904a59377f6c73af7
+    modes.md: 9a9c2415cf51fe06a326063b4e3a3ea70a7f5cad29c819af8a97e37f7cea55a1
+transcript:
+  raw_sha256: 15f21fe0215bc6f4890d91a24c7134ba5c1a54344985f294659a6d3e11c6a3f2
+  sanitised_excerpt: claude-transcript-excerpt.md
+  raw_retained: false
+  sanitised_excerpt_retained: true
+  rationale: "Only this compact, hash-bound receipt is retained; the user authorized removal of temporary raw transcripts."
+publication_authority: not_granted
