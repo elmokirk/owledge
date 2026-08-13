@@ -70,7 +70,7 @@ truth.
 | Run a CLI command | Human or agent | Direct command invocation | On-demand and local | Creates only the command's documented local artifacts | The command does not automatically approve its output | Inspect artifacts, rerun with corrected inputs, or remove only the documented generated output |
 | Read through MCP | MCP client | Explicit client tool call | Read-only P0 profile | Returns project information to the client | `tools/owledge_mcp.py` has no write-enabled promotion tools | Stop the client call; use the normal reviewed Markdown workflow for changes |
 | Curate a proposal | Responsible owner/reviewer | Review of evidence and scope | Manual decision | Accepts, revises, rejects, or defers a candidate | Owner approval is required by workflow; the local CLI records preconditions but does not authenticate the owner | Keep the candidate unpromoted, request revision, or record a rejection |
-| Synchronize between machines or teams | Project owner | Explicit future integration | No hosted remote synchronization in v0.7.1 | None by default | A future Team Hub/sync capability is post-v1, not a current authority path | Use normal Git or approved project sharing practices today |
+| Synchronize between machines or teams | Project owner | Explicit future integration | No hosted remote synchronization in v0.8.0 | None by default | A future Team Hub/sync capability is post-v1, not a current authority path | Use normal Git or approved project sharing practices today |
 | Run background automation | Scheduler or service | Scheduled event | No autonomous background scheduler | None by default | No scheduler has implicit authority | Keep work on explicit human/agent invocation |
 
 ## A practical daily loop

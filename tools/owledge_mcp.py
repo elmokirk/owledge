@@ -21,6 +21,11 @@ import owledge_core as core  # noqa: E402
 import owledge_context_profiles as context_profiles  # noqa: E402
 
 
+def _product_version() -> str:
+    version_file = SCRIPT_DIR.parent / "VERSION"
+    return version_file.read_text(encoding="utf-8", errors="replace").strip() if version_file.is_file() else "unknown"
+
+
 TOOLS = [
     {
         "name": "owledge_read_entrypoint",
@@ -146,7 +151,7 @@ def handle(message: dict[str, Any], bound_root: pathlib.Path) -> dict[str, Any] 
     msg_id = message.get("id")
     try:
         if method == "initialize":
-            result = {"protocolVersion": "2024-11-05", "serverInfo": {"name": "owledge-readonly", "version": "0.7.1"}, "capabilities": {"tools": {}}}
+            result = {"protocolVersion": "2024-11-05", "serverInfo": {"name": "owledge-readonly", "version": _product_version()}, "capabilities": {"tools": {}}}
         elif method == "tools/list":
             result = {"tools": TOOLS}
         elif method == "tools/call":

@@ -41,7 +41,7 @@ separates no-install, package, source, adapter, and add-on paths.
 - Try the bounded [vibecoding golden demo](vibecoding-golden-demo.md)
 - Then read [command-reference.md](command-reference.md)
 - Use `uvx owledge quickstart --target <path>` for the package-first path
-- Expect `OWLEDGE.md` and `.owledge/` in new v0.7.1 projects
+- Expect `OWLEDGE.md` and `.owledge/` in new v0.8.0 projects
 
 ## I want plugin or harness setup
 
@@ -58,7 +58,7 @@ separates no-install, package, source, adapter, and add-on paths.
 
 ## Reference, quality, and maintainer material
 
-**Owledge v0.7.1** is the current released package. The canonical release
+**Owledge v0.8.0** is the current release candidate. The canonical release
 version is [../VERSION](../VERSION); use [quickstart.md](quickstart.md) for new
 installs and [upgrading.md](upgrading.md) for existing projects.
 

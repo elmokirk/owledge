@@ -1,13 +1,13 @@
 ---
 title: "Hermes Read-Only Owledge Profile"
-version: "0.7.1"
+version: "0.8.0"
 document_version: 1
 status: active
 ---
 
 # Hermes Read-Only Owledge Profile
 
-This is the v0.7.1 Tier-1 **read-only** profile for Hermes Agent. It binds one
+This is the v0.8.0 Tier-1 **read-only** profile for Hermes Agent. It binds one
 Hermes MCP server process to one local Owledge project. It does not grant
 Owledge write, promotion, Git, network, synchronization, or Hermes memory
 authority.

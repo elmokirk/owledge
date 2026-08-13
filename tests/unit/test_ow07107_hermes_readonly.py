@@ -62,7 +62,7 @@ class HermesReadonlyProfileTests(unittest.TestCase):
                 {"jsonrpc": "2.0", "id": 6, "method": "tools/call", "params": {"name": "owledge_list_tasks", "arguments": {}}},
                 {"jsonrpc": "2.0", "id": 7, "method": "tools/call", "params": {"name": "owledge_list_reviews", "arguments": {}}},
             ])
-            self.assertEqual(next(row for row in responses if row["id"] == 1)["result"]["serverInfo"]["version"], "0.7.1")
+            self.assertEqual(next(row for row in responses if row["id"] == 1)["result"]["serverInfo"]["version"], (ROOT / "VERSION").read_text(encoding="utf-8").strip())
             tools = next(row for row in responses if row["id"] == 2)["result"]["tools"]
             self.assertEqual({tool["name"] for tool in tools}, set(json.loads(CONTRACT.read_text(encoding="utf-8"))["required_tools"]))
             self.assertTrue(all("write" not in f"{tool['name']} {tool['description']}".lower() for tool in tools))

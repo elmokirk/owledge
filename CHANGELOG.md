@@ -2,6 +2,27 @@
 
 ## Unreleased
 
+## 0.8.0 (2026-08-13)
+
+- Context: added copy-only RUN-STATE sharding fixtures with an explicit local
+  migration tool; legacy live state remains valid and unchanged until migration
+  is explicitly requested.
+- Runtime adapters: project-local Claude/Cowork hooks now inject a bounded
+  SessionStart capsule, ship a non-overwriting local allow-list, and refuse
+  external-kit fallback unless explicitly enabled.
+- Delivery: added bounded resume evidence that recognizes the active Codex Goal
+  host as the primary `/goal` runtime; recursive CLI invocation is supplemental
+  only.
+
+### Upgrade notes
+
+```json
+{
+  "breaking": "no",
+  "summary": "v0.8.0 is additive. Existing flat RUN-STATE files remain valid; use the explicit copy-only migration tool only when adopting sharded registers."
+}
+```
+
 ## 0.7.1 (2026-08-12)
 
 - Adoption: added a bounded no-write golden demo, package-only resume proof,

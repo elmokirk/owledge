@@ -63,7 +63,7 @@ class WorkflowDocumentationContractTests(unittest.TestCase):
             "not shared project truth",
             "no write-enabled promotion tools",
             "Owner approval is required by workflow",
-            "No hosted remote synchronization in v0.7.1",
+            "No hosted remote synchronization in v0.8.0",
             "No autonomous background scheduler",
         ):
             self.assertIn(claim, self.text)
