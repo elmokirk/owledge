@@ -191,8 +191,8 @@ Every gate starts from the tested integration commit and controlled environment 
 ### G-080-RC - v0.8.0 release candidate
 
 - Tickets: `OW-080-10` plus all earlier v0.8.0 gates.
-- Commands: cumulative contract/context/retrieval suites; upgrade from v0.7.1; build/twine/wheel smoke; docs extraction.
-- Thresholds: all v0.8 gates green; v0.7 regression green; schema/version/migration docs aligned; clean artifacts.
+- Commands: cumulative contract/context/retrieval suites; frozen v0.7 legacy-regression replay; upgrade from v0.7.1; build/twine/wheel smoke; docs extraction. No new comparative benchmark campaign runs at this gate.
+- Thresholds: all v0.8 gates green; frozen v0.7 regression green; schema/version/migration docs aligned; clean artifacts. New performance/quality claims are prohibited; the release-wide comparative evaluation is deferred to `OW-100-04`/`G-100-B-PRODUCT`.
 - Demonstrable increment: fresh and upgraded projects complete planning-to-context journey.
 - Promotion: technical candidate only; execute `G-080-ALIGNMENT` before publication/tag or v0.8.1 work.
 

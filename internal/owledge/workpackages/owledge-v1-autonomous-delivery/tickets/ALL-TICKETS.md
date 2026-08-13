@@ -549,8 +549,8 @@ reference profiles and capability contracts are stable.
 - Priority/dependencies: P0; `OW-080-07`, `OW-080-08`, `OW-080-09`.
 - Outcome: portable contracts, context efficiency, small models, retrieval projection, and migration ship together.
 - Allowed paths: version/changelog/workflows/release docs/package manifests.
-- Implement: cumulative gates, contract fixtures, migration notes, artifacts, wheel-based smoke.
-- Accept: `G-080-RC` passes from clean state and v0.7 legacy regression remains green.
+- Implement: cumulative functional gates, contract fixtures, migration notes, artifacts, wheel-based smoke, and frozen legacy-regression replay. Do not introduce a new comparative benchmark campaign or a new performance/quality claim in v0.8.0.
+- Accept: `G-080-RC` passes from clean state and v0.7 legacy regression remains green. Comprehensive comparative benchmarking and final outcome claims are deferred to `OW-100-04`/`G-100-B-PRODUCT`; ticket-local deterministic measurements remain required where they prove an implemented behavior.
 - Verify/evidence: release matrix; `evidence/OW-080-10/`.
 - Negative QA: schema/version mismatch or missing migration path blocks release.
 
@@ -1010,6 +1010,9 @@ and machine-readable errors independently of a model-specific delivery profile.
   sources, quality thresholds, research recall-before-search and stale/delta
   metrics, cross-scope leak tests, adapter contract metrics, RAG
   projection/retrieval/embedding/language strata, and no universal ROI claim.
+- Scope: this is the first release-wide comparative benchmark and outcome-claim
+  campaign. Earlier releases retain only frozen-regression replays and
+  ticket-local deterministic measurements needed to prove their behavior.
 - Accept: legacy token, held-out correctness, small-model, retrieval-quality, and lifecycle outcome gates pass and are reported independently.
 - Verify/evidence: full evaluation matrix with fixture version, environment, commands, limitations, and per-metric verdicts; `evidence/OW-100-04/`.
 - Negative QA: token savings with lower correctness cannot pass.

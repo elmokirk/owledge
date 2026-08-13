@@ -420,6 +420,14 @@ alignment:
       constraints: "Publication, tagging, release, and push remain unauthorized. D-071-24 macOS/Linux evidence remains deferred to OW-100-09; every later version must stop for owner alignment."
       affected_artifacts: ["release-updates/v0.7.1.md", "evidence/OW-071-09/", "RUN-STATE.yaml", "BACKLOG.yaml", "OW-080-01"]
       verification_status: owner_approved
+    - id: D-080-01
+      related: [OW-080-10, G-080-RC, OW-100-04, G-100-B-PRODUCT]
+      authority: product-owner
+      decision: "Defer comprehensive comparative benchmarking and final performance/quality claims until v1.0; retain only frozen regression replays and deterministic ticket-local measurements required to prove implemented behavior in earlier releases."
+      rationale: "This preserves fast, evidence-backed incremental delivery while avoiding repeated costly benchmark campaigns and premature broad claims before the complete product surface exists."
+      constraints: "No v0.8/v0.8.1/v0.9 gate may substitute benchmark deferral for functional, security, privacy, migration, or release verification. OW-080-13 must still measure file-content loading to prove its resume contract. Publication, tagging, release, and push remain unauthorized."
+      affected_artifacts: ["OW-080-10", "G-080-RC", "OW-100-04", "G-100-B-PRODUCT", "RUN-STATE.yaml"]
+      verification_status: owner_approved_recorded
   next_plan_reflection:
     status: approved_for_execution
     target_release: v0.8.0
@@ -492,6 +500,7 @@ last_completed_actions:
   - OW-080-09 accepted through 6550744 after independent data-safety QA at 96/100 with no P0/P1; evidence is evidence/OW-080-09/manifest.yaml.
   - OW-080-16 accepted through 4cc000b after independent retrieval-contract QA at 97/100 with no P0/P1; evidence is evidence/OW-080-16/manifest.yaml.
 next_actions:
+  - Owner-approved D-080-01: defer comprehensive comparative benchmarks and final outcome claims to OW-100-04/G-100-B-PRODUCT; retain only frozen regression and ticket-local functional measurements before v1.0.
   - OW-080-08 accepted: clean RAG Retrieval Projection v1 is recorded at evidence/OW-080-08/manifest.yaml.
   - Retain the three-OS wheel-only fixture and collect executed macOS/Linux evidence at OW-100-09; do not issue an earlier cross-platform support claim.
 last_commands:
@@ -583,5 +592,5 @@ checkpoint:
     - "Do not start v0.8.0 before G-071-ALIGNMENT and an explicit owner approve decision."
     - "Do not trust or publish inherited dist artifacts; rebuild from committed source at RC."
     - "Do not broaden the accepted local HTTP profile or benchmark claims while rewriting adoption documentation."
-updated_at: "2026-08-13T12:24:00+02:00"
+updated_at: "2026-08-13T12:33:00+02:00"
 updated_by: codex
