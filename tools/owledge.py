@@ -73,6 +73,7 @@ import owledge_health  # noqa: E402
 import owledge_migration  # noqa: E402
 import owledge_research_memory  # noqa: E402
 import owledge_null_space  # noqa: E402
+import owledge_v1_retrieval  # noqa: E402
 import owledge_small_model_profiles  # noqa: E402
 import build_kb_module  # noqa: E402
 import build_project_folder_kit  # noqa: E402
@@ -163,6 +164,7 @@ def _add_context_arguments(command: argparse.ArgumentParser) -> None:
     command.add_argument("--pack-version", choices=["v0.7", "v1"], default="v0.7")
     command.add_argument("--pack-type", choices=["bootstrap", "task", "reviewer", "handoff", "release", "pre_plan", "pre_research"], default="task")
     command.add_argument("--include-reviewed-global", action="store_true", help="Explicitly permit reviewed/canonical user_global essences in a v1 pack.")
+    command.add_argument("--purpose", choices=["research", "planning"], default="research")
 
 
 PUBLIC_DOC_FILES = [
@@ -215,6 +217,7 @@ HOST_TOOL_FILES = [
     "owledge_migration.py",
     "owledge_research_memory.py",
     "owledge_null_space.py",
+    "owledge_v1_retrieval.py",
     "owledge_context_compiler.py",
     "owledge_context_profiles.py",
     "owledge_rag_projection.py",
@@ -4193,7 +4196,11 @@ def main(argv: list[str] | None = None) -> int:
     doctor_p.add_argument("--mode", choices=["auto", "kit", "host"], default="auto")
 
     recall_parent = argparse.ArgumentParser(add_help=False)
-    recall_parent.add_argument("--query", required=True)
+    recall_parent.add_argument("--query")
+    recall_parent.add_argument("--purpose", choices=["research", "planning"], default="research")
+    recall_parent.add_argument("--scope", action="append", choices=["project_user", "user_global"])
+    recall_parent.add_argument("--include-user-global", action="store_true")
+    recall_parent.add_argument("--detail-id")
     recall_p = sub.add_parser("recall", parents=[project_parent, recall_parent], help="Recall local authorized knowledge before new research.")
 
     context_parent = argparse.ArgumentParser(add_help=False)
@@ -4481,6 +4488,18 @@ def main(argv: list[str] | None = None) -> int:
             )
             return 0
         if args.command in {"context", "build-context-pack"}:
+            if args.command == "context":
+                result = owledge_v1_retrieval.build_context_pack(
+                    root,
+                    task_id=args.task_id,
+                    objective=args.objective or "",
+                    purpose=args.purpose,
+                    budget_chars=args.budget_chars if args.budget_chars is not None else 4000,
+                    scopes={"project_user", "user_global"} if args.include_reviewed_global else {"project_user"},
+                    include_user_global=args.include_reviewed_global,
+                )
+                print_json(result)
+                return 0 if result.get("passed") else 2
             if args.pack_version == "v1":
                 print_json(
                     core.build_context_pack_v1(
@@ -4553,7 +4572,19 @@ def main(argv: list[str] | None = None) -> int:
             result = owledge_migration.apply(root, source_root, plan)
             print_json(result)
             return 0 if result.get("passed") else 1
-        if args.command in {"recall", "research-recall"}:
+        if args.command == "recall":
+            scopes = set(args.scope or ["project_user"])
+            result = (
+                owledge_v1_retrieval.detail(root, detail_id=args.detail_id, scopes=scopes, include_user_global=args.include_user_global)
+                if args.detail_id
+                else owledge_v1_retrieval.recall(root, query=args.query or "", purpose=args.purpose, scopes=scopes, include_user_global=args.include_user_global)
+            )
+            print_json(result)
+            return 0 if result.get("passed") else 2
+        if args.command == "research-recall":
+            if not args.query:
+                print_json({"passed": False, "error": "empty_query"})
+                return 2
             print_json(owledge_research_memory.recall(owledge_research_memory.load_local_records(root), query=args.query, allowed_scopes={"project_user"}))
             return 0
         if args.command == "rag-projection-v1":

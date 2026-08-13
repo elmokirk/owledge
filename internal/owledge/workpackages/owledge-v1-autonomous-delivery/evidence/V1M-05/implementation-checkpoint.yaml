@@ -1,0 +1,46 @@
+ticket: V1M-05
+status: accepted_independent_qa
+base_commit: 21ef8f8
+branch: codex/v071-integration
+scope: deterministic-local-recall-and-bounded-context
+implementation:
+  - "The public recall route reads only project_user by default and adds user_global only through an explicit opt-in."
+  - "Recall returns essence-first records with source, revision, freshness, lifecycle, source reason and deterministic exclusions."
+  - "Detail is scope-authorized, source-contained and available only for current non-excluded records."
+  - "The public context route uses the same recall contract, deterministic character budget and source/exclusion receipts."
+  - "Legacy research-recall and build-context-pack remain explicit compatibility routes; the public facade uses the V1 local contract."
+commands:
+  - command: python -m unittest tests.unit.test_v1m05_retrieval tests.unit.test_v1m04_null_space tests.unit.test_v1m03_public_facade tests.unit.test_v1m02_minimal_profiles tests.unit.test_ow07110_install_contract tests.unit.test_ow08015_native_hooks -v
+    exit_code: 0
+    result: "28 passed; 1 Windows symlink fixture skipped because this host cannot create symlinks"
+  - command: python tools/build_project_folder_kit.py --output-path <temporary> --verify
+    exit_code: 0
+    result: "green; the generated kit contains tools/owledge_v1_retrieval.py"
+  - command: python tools/validate_v1_delivery_plan.py
+    exit_code: 0
+    result: "11 tickets, 7 gates, 11 waves, 0 errors"
+  - command: python tools/owledge.py test public-docs --project-root .
+    exit_code: 0
+    result: "257 checks passed"
+  - command: python -m py_compile tools/owledge.py tools/owledge_null_space.py tools/owledge_v1_retrieval.py tools/build_project_folder_kit.py
+    exit_code: 0
+  - command: git diff --check
+    exit_code: 0
+positive_contracts:
+  - "Research and planning purpose return deterministic source-linked essences before a detail request."
+  - "A source detail needs a matching authorized scope and does not require a dummy query."
+  - "Context never exceeds its declared character budget and records source receipts."
+negative_contracts:
+  - "Empty query, unsupported scope, non-opted user_global, unlinked source, stale source, unavailable detail and zero budget fail closed."
+  - "Raw, parked, rejected, superseded and tombstoned lifecycles are excluded from normal recall."
+  - "No network location, full-vault injection or implicit discovery is used."
+independent_qa:
+  required: true
+  mode: separately_initialized_read_only_retrieval_reviewer
+  result: accepted
+  status: accepted
+  findings:
+    - "Initial P1: explicit --budget-chars 0 was coerced to the 4000 default; corrected with None-only defaulting and CLI regression."
+    - "The redundant required query for authorized detail was removed; detail denial and success remain explicit."
+publication_authority: not_granted
+next_exact_action: "Run G-V1M-READ cumulative verification; do not select V1M-06 until its manifest is green and committed."

@@ -63,6 +63,17 @@ enterprise scope and automatic discovery are denied. Reviewed private Markdown
 under the Null-Space can be scanned directly; any generated index remains a
 rebuildable local projection.
 
+Recall stays local and returns a compact essence with a source link before any
+detail is requested. Include the private global scope deliberately:
+
+```bash
+python tools/owledge.py recall --project-root /path/to/your-project --query "local decision" --scope user_global --include-user-global
+python tools/owledge.py context --project-root /path/to/your-project --task-id research --objective "local decision" --budget-chars 1200 --include-reviewed-global
+```
+
+Both commands are deterministic, report excluded stale or out-of-budget sources,
+and never inject an entire vault or perform network discovery.
+
 ### Source-only optional add-ons
 
 Add-ons require that same source checkout. They are not part of the package

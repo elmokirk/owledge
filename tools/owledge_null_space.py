@@ -169,6 +169,10 @@ def scan_project_user(project_root: pathlib.Path) -> dict[str, Any]:
             "source": f"project_user/{source}",
             "summary": str(meta.get("summary") or core.first_markdown_heading(record["content"], pathlib.Path(source).stem)),
             "source_hash": str(record["source_hash"]),
+            "source_revision": str(meta.get("source_revision") or meta.get("source_hash") or record["source_hash"]),
+            "freshness": str(meta.get("source_freshness") or meta.get("freshness") or "current"),
+            "lifecycle": str(meta.get("lifecycle") or meta.get("status") or "reviewed"),
+            "source_reason": str(meta.get("research_reason") or meta.get("reason") or meta.get("semantic_title") or meta.get("summary") or "project memory"),
         })
     return {"passed": True, "scope": "project_user", "records": sorted(records, key=lambda item: (item["stable_id"], item["source"])), "network": "disabled", "sync": "disabled", "implicit_discovery": False}
 
@@ -205,6 +209,10 @@ def scan_user_global(project_root: pathlib.Path, *, requested_scope: str = "user
                 "source": f"user_global/{directory_name}/{path.relative_to(directory).as_posix()}",
                 "summary": str(meta.get("summary") or core.first_markdown_heading(text, path.stem)),
                 "source_hash": hashlib.sha256(text.encode("utf-8")).hexdigest(),
+                "source_revision": str(meta.get("source_revision") or meta.get("source_hash") or hashlib.sha256(text.encode("utf-8")).hexdigest()),
+                "freshness": str(meta.get("source_freshness") or meta.get("freshness") or "current"),
+                "lifecycle": str(meta.get("lifecycle") or meta.get("status") or "reviewed"),
+                "source_reason": str(meta.get("research_reason") or meta.get("reason") or meta.get("semantic_title") or meta.get("summary") or "reviewed local essence"),
             })
     return {"passed": True, "scope": "user_global", "records": sorted(records, key=lambda item: (item["stable_id"], item["source"])), "project_id": link["project_id"], "network": "disabled", "sync": "disabled", "implicit_discovery": False}
 

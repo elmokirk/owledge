@@ -121,6 +121,7 @@ CORE_TOOLS = [
     "owledge_migration.py",
     "owledge_research_memory.py",
     "owledge_null_space.py",
+    "owledge_v1_retrieval.py",
     "owledge_context_compiler.py",
     "owledge_context_profiles.py",
     "owledge_rag_projection.py",
