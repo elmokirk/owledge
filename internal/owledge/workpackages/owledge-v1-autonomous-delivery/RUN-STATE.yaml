@@ -36,6 +36,12 @@ alignment:
       question: "May the agent run the remaining transcript-visible OW-080-13 acceptance checks in both Claude Code and Codex, including model_auto_compact provenance, golden digest/diff equality, stale-handoff rejection, capped/reconstructed payload output, and owner-alignment-stop verification?"
       impact: "The two current three-command harness receipts are genuine but partial; accepting the ticket without the explicit Verify-clause evidence would weaken G-080-B-CONTEXT."
       safe_default: "Do not spend further model credentials or accept OW-080-13; retain partial evidence and wait for owner direction."
+      status: approved_executed_pending_literal_harness_decision
+    - id: Q-080-04
+      source: OW-080-13-independent-final-qa
+      question: "Should the owner amend OW-080-13/G-080-B-CONTEXT to define the documented non-ephemeral `codex exec resume` standard as equivalent to a Codex `/goal` resume, or require a literal interactive `/goal` transcript?"
+      impact: "All technical Verify clauses now pass in Claude Code and Codex CLI 0.147.0/GPT-5.5, but the ticket does not currently define the observed `exec` mode as equivalent to literal `/goal`."
+      safe_default: "Do not accept OW-080-13 or activate OW-080-14 until the owner chooses a standard."
       status: awaiting_product_owner
   findings:
     - id: F-071-01
@@ -282,21 +288,19 @@ alignment:
       source: OW-080-13-independent-qa
       evidence: "evidence/OW-080-13/implementation-checkpoint.yaml; evidence/OW-080-13/codex-cli-availability.yaml; independent QA review after local deterministic contract replay"
       severity: high
-      user_impact: "The bounded resume implementation, Claude Code harness, and an initial Codex CLI 0.147.0 / GPT-5.5 harness are available, but the full runtime acceptance contract is not yet independently demonstrated."
+      user_impact: "The bounded resume implementation and full transcript-visible technical witness now pass in Claude Code and Codex CLI 0.147.0 / GPT-5.5, but the Codex mode is not the ticket's literal `/goal` resume."
       release_impact: "OW-080-13 and G-080-B-CONTEXT remain blocked; no context-profile promotion or downstream ticket activation is allowed."
-      options: ["authorize the remaining acceptance checks in both harnesses", "owner-amend the ticket/gate to accept the partial evidence", "defer the ticket and retain the current context lane blocked"]
-      recommendation: "Authorize one bounded, transcript-visible completion campaign in both harnesses; preserve the existing receipts and do not repeat their already-passing checks."
-      safe_default: "Do not spend further model credentials/cost or accept the ticket until an explicit owner decision is recorded."
+      options: ["amend the ticket/gate with a defined non-ephemeral exec-resume equivalence standard", "require a literal interactive /goal transcript", "defer the ticket and retain the current context lane blocked"]
+      recommendation: "Amend to a documented non-ephemeral `codex exec resume` standard only if the owner considers it an acceptable Codex `/goal` harness equivalent; otherwise collect a literal interactive transcript."
+      safe_default: "Do not accept the ticket or activate downstream work until Q-080-04 is decided."
       status: open
     - id: F-080-03
       source: OW-080-13-independent-qa
       evidence: "evidence/OW-080-13/codex-initial-harness-receipt.yaml; implementation-checkpoint.yaml"
       severity: high
-      user_impact: "The current Codex and Claude transcripts show the three selected commands, but omit several ticket-mandated acceptance proofs and their required transcript detail."
-      release_impact: "OW-080-13 and G-080-B-CONTEXT must remain blocked; no downstream context ticket may activate."
-      recommendation: "Run the minimum remaining acceptance checks once in each runtime, with a compact sanitised transcript excerpt and immutable input hashes."
-      safe_default: "Do not infer full gate success from the current partial receipts."
-      status: open
+      user_impact: "The missing technical Verify clauses were completed once in each runtime with hash-bound, sanitised transcript-visible output."
+      release_impact: "This finding no longer blocks acceptance; the literal Codex mode mismatch remains separately tracked by F-080-01."
+      status: resolved
     - id: F-080-02
       source: OW-080-13-claude-code-harness-attempts
       evidence: "evidence/OW-080-13/claude-harness-receipt.yaml; implementation-checkpoint.yaml"
@@ -573,7 +577,7 @@ last_commands:
   - "python tools/owledge.py test public-docs --project-root .; python tools/owledge.py test docs-contract --project-root .; python tools/owledge.py test mcp-readonly --project-root .; python tools/owledge.py test runtime-adapters --project-root . (exit 0; public-docs 0 failures, docs-contract 473 checks)"
   - "PYTHONPATH=owlib/src python -m unittest discover -s owlib/tests -v (exit 0; 10 tests, one Windows symlink integration skip)"
 checkpoint:
-  last_completed_action: "OW-080-13 Codex CLI 0.147.0 / GPT-5.5 partial harness receipt passed the same three core checks as Claude Code. Independent QA found missing explicit Verify-clause evidence, so Q-080-03/F-080-03 remain open and the ticket is not accepted."
+  last_completed_action: "OW-080-13 full Acceptance Witness passed in Claude Code 2.1.228/Sonnet and Codex CLI 0.147.0/GPT-5.5. Independent QA resolved the technical evidence gap but rejected acceptance because Codex used goal-resume-equivalent exec rather than literal `/goal`; Q-080-04/F-080-01 remain open."
   changed_files:
     - "internal/owledge/workpackages/owledge-v1-autonomous-delivery/RUN-STATE.session.yaml"
     - "tools/owledge.py"
@@ -638,7 +642,7 @@ checkpoint:
     - "python tools/owledge_core.py --project-root . validate-memory --strict: 307 pre-existing legacy frontmatter failures across historical internal memory; the touched canonical plan/checklists pass the release-specific frontmatter validation inside validate_v1_delivery_plan.py."
     - "python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports: completed 36/38 on 2026-08-12; source-identity correctly rejected the dirty planning tree and upgrade-drift exposed a host-project/Kit-mode regression. Routed to OW-071-08 under F-071-24."
   workspace_state: "G-071-ALIGNMENT is promoted; OW-080-01 through OW-080-09 and OW-080-16 are accepted. OW-080-07 is independently accepted; OW-080-13 is the sole active v0.8 context lane. Publication, tagging, release, and push remain blocked."
-  next_exact_action: "Await the owner decision on Q-080-03 before any additional model-backed acceptance run; do not activate OW-080-14 or OW-080-15."
+  next_exact_action: "Await the owner decision on Q-080-04; do not accept OW-080-13 or activate OW-080-14/OW-080-15."
   open_assumptions:
     - "The product owner wants the existing five-release train retained unless a later version reflection changes it."
     - "Local serial execution is the default; subagents are exceptional and justified only by independent risk reduction."

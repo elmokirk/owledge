@@ -1,0 +1,28 @@
+ticket: OW-080-13
+status: complete_technical_acceptance_evidence
+executed_at: 2026-08-13
+harness: {name: Claude Code, version: 2.1.228, mode: print_safe_mode}
+model: {alias: sonnet, effort: low, maximum_budget_usd: 1.00}
+permissions:
+  bypass_permissions: false
+  allowed_bash_prefix: "python tools/owledge.py resume-acceptance-v1 *"
+execution_inputs:
+  git_commit: 46a247a
+  run_state_sha256: c270e2e7c55f7920568b7cb40fb1aa22a1892c77c0bc3c8b1786d94e1689ece1
+  session_state_sha256: 3585e70f6886e21b4a2fe23aaa35214c6f483e31b2721d573d1dfc09213c821b
+  owledge_cli_sha256: c4d4c1afd4e44048261a74dadaed30eaf08d37d9eb7b40b0ec69ae994bfb1a3a
+output:
+  witness: {path: claude-acceptance-witness.json, sha256: c6c8cbb74e002cfb060ec6bec4daf7420cc57f06c79d4747fb0f70da5178fded}
+  sidecar: {path: claude-acceptance-sidecar.json, sha256: fca90f3e879c2a53d97be6cef6da1964e7e6844f1e3caf2aa55b45c59c93504a}
+  transcript_excerpt: claude-acceptance-transcript-excerpt.md
+  raw_transcript_sha256: 358f3b84290e4ba38b00b90d3882ad3fb2128e7a681bc87d28886b6eb42bd614
+  raw_transcript_retained: false
+assertions:
+  witness_passed: true
+  persisted_token_relation: "84 < 14101 < 18795"
+  reset_token_relation: "110 < 14127 < 18821"
+  golden_diff_exit_code: 0
+  stale_handoff_rejected: true
+  sidecar_roundtrip_equal: true
+  owner_alignment_selection_allowed: false
+publication_authority: not_granted
