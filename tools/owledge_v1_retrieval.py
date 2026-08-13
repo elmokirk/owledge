@@ -10,7 +10,7 @@ import owledge_null_space as null_space
 
 
 PURPOSES = {"research", "planning"}
-EXCLUDED_LIFECYCLES = {"candidate", "raw", "parked", "rejected", "superseded", "tombstoned"}
+EXCLUDED_LIFECYCLES = {"candidate", "raw", "parked", "promoted", "rejected", "superseded", "tombstoned"}
 
 
 def _requested_scopes(scopes: set[str] | None, include_user_global: bool) -> tuple[set[str] | None, dict[str, Any] | None]:
@@ -65,7 +65,7 @@ def recall(project_root: pathlib.Path, *, query: str, purpose: str = "research",
         scope = str(record.get("scope") or "")
         lifecycle = str(record.get("lifecycle") or "reviewed")
         freshness = str(record.get("freshness") or "unknown")
-        if lifecycle == "parked" and purpose == "planning":
+        if lifecycle == "parked" and purpose == "planning" and freshness == "current":
             matched, score = _matches(record, query)
             if matched:
                 results.append({

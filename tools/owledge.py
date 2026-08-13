@@ -98,7 +98,7 @@ __version__ = KIT_VERSION
 # V1 Minimal Core is intentionally small.  Keep this list next to the CLI
 # boundary rather than inferring it from the much larger maintainer toolset.
 PUBLIC_CORE_VERBS = ("init", "doctor", "recall", "context", "propose", "review", "sync", "upgrade")
-DEFERRED_CORE_VERBS = {"review", "sync"}
+DEFERRED_CORE_VERBS: set[str] = set()
 COMPATIBILITY_REPLACEMENTS = {
     "init-project": "init",
     "research-recall": "recall",
@@ -4216,8 +4216,15 @@ def main(argv: list[str] | None = None) -> int:
     propose_p.add_argument("--park", action="store_true")
     propose_p.add_argument("--park-reason", default="")
     propose_p.add_argument("--reconsider-when", default="")
-    for command_name, command_help in (("review", "Reserved Candidate review operation; enabled with the reviewed lifecycle Core."), ("sync", "Reserved local synchronization operation; enabled with the reviewed lifecycle Core.")):
-        sub.add_parser(command_name, parents=[project_parent], help=command_help)
+    review_p = sub.add_parser("review", parents=[project_parent], help="Review one private Candidate through the local lifecycle.")
+    review_p.add_argument("--candidate-id", required=True)
+    review_p.add_argument("--action", required=True, choices=sorted(owledge_v1_lifecycle.REVIEW_ACTIONS))
+    review_p.add_argument("--expected-revision", required=True)
+    review_p.add_argument("--reason", default="")
+    review_p.add_argument("--reconsider-when", default="")
+    review_p.add_argument("--superseded-by", default="")
+    sync_p = sub.add_parser("sync", parents=[project_parent], help="Rebuild the disposable local user-global index; no network sync occurs.")
+    sync_p.add_argument("--rebuild-index", action="store_true", help="Explicitly acknowledge a local index rebuild.")
 
     init_compat_p = sub.add_parser("init-project", parents=[init_parent])
 
@@ -4440,8 +4447,30 @@ def main(argv: list[str] | None = None) -> int:
             )
             print_json(result)
             return 0 if result.get("passed") else 2
+        if args.command == "review":
+            result = owledge_v1_lifecycle.review(
+                root, candidate_id=args.candidate_id, action=args.action,
+                expected_revision=args.expected_revision, reason=args.reason,
+                reconsider_when=args.reconsider_when, superseded_by=args.superseded_by,
+            )
+            print_json(result)
+            return 0 if result.get("passed") else 2
+        if args.command == "sync":
+            if not args.rebuild_index:
+                print_json({"passed": False, "error": "sync_requires_rebuild_index", "network": "disabled"})
+                return 2
+            result = owledge_null_space.rebuild_index(root)
+            print_json({**result, "operation": "local_index_rebuild", "network": "disabled"})
+            return 0 if result.get("passed") else 2
         if args.command == "doctor":
             result = core.memory_doctor(root, mode=args.mode)
+            lifecycle_health = owledge_v1_lifecycle.health(root)
+            if lifecycle_health.get("passed"):
+                result["checks"].append({"name": "v1-lifecycle-health", "passed": True, "severity": "info", "details": "Local lifecycle health completed without integrity errors.", "fix": ""})
+            else:
+                result["checks"].append({"name": "v1-lifecycle-health", "passed": False, "severity": "error", "details": "Local lifecycle health found an integrity error.", "fix": "Inspect the privacy-safe lifecycle health receipt."})
+                result["passed"] = False
+            result["v1_lifecycle_health"] = lifecycle_health
             print_json(result)
             return 0 if result["passed"] else 1
         if args.command in {"init", "init-project"}:

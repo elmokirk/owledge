@@ -5,7 +5,7 @@ customer_id: "global"
 project_id: "owledge"
 doc_type: "task"
 artifact_type: "workpackage"
-document_version: 10
+document_version: 11
 workpackage_version: "1.0.2"
 status: "active"
 visibility: "private"
@@ -112,9 +112,9 @@ cannot create symlinks.
 - [x] Parked records contain reason, sources, horizon, trigger and related project.
 - [x] Ordinary recall excludes raw and parked records.
 - [x] Planning-purpose recall resurfaces only relevant parked essences.
-- [ ] V1M-07 proves promote/park/reject/supersede and tombstone propagation.
-- [ ] Health catches stale sources, broken links, promotion debt and index drift.
-- [ ] Gate `G-V1M-LIFECYCLE` green.
+- [x] V1M-07 proves promote/park/reject/supersede and tombstone propagation.
+- [x] Health catches stale sources, broken links, promotion debt and index drift.
+- [x] Gate `G-V1M-LIFECYCLE` green.
 
 ## Phase 5 — Thin adapters
 

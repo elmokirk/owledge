@@ -1,0 +1,47 @@
+ticket: V1M-07
+status: accepted_independent_qa
+base_commit: faefdeb
+branch: codex/v071-integration
+scope: local-review-promotion-tombstones-and-privacy-safe-health
+implementation:
+  - "Review is an explicit revision-bound state machine: promote, park, reject and supersede; terminal states cannot be silently reactivated."
+  - "Promotion writes one private user_global reviewed essence, bound to the allowlisted origin project, Candidate bytes and review receipt."
+  - "Reject and supersede write local tombstones; withdrawn, altered, unallowlisted or non-reviewed origins are excluded from recall as stale or tombstoned."
+  - "The public sync verb only rebuilds the disposable local index after --rebuild-index; it never performs remote synchronization."
+  - "Doctor includes a privacy-safe lifecycle-health receipt with IDs/counts for stale sources, invalid revisions, orphan receipts, promotion debt, context overflow and index drift; no bodies are emitted."
+commands:
+  - command: python -m unittest tests.unit.test_v1m07_lifecycle_health tests.unit.test_v1m06_lifecycle tests.unit.test_v1m05_retrieval tests.unit.test_v1m04_null_space tests.unit.test_v1m03_public_facade tests.unit.test_v1m02_minimal_profiles tests.unit.test_ow07110_install_contract tests.unit.test_ow08015_native_hooks tests.unit.test_validate_v1_delivery_plan -v
+    exit_code: 0
+    result: "50 passed; three Windows symlink fixtures skipped because host creation is unavailable"
+  - command: python tools/build_project_folder_kit.py --output-path <temporary> --verify
+    exit_code: 0
+    result: "green; generated kit includes the V1 lifecycle modules and passes host doctor/contract checks"
+  - command: python -m py_compile tools/owledge.py tools/owledge_null_space.py tools/owledge_v1_retrieval.py tools/owledge_v1_lifecycle.py tools/build_project_folder_kit.py
+    exit_code: 0
+  - command: python tools/validate_v1_delivery_plan.py
+    exit_code: 0
+    result: "11 tickets, 7 gates, 11 waves, 0 errors"
+  - command: python tools/owledge.py test public-docs --project-root .
+    exit_code: 0
+    result: "257 checks passed"
+  - command: git diff --check
+    exit_code: 0
+negative_contracts:
+  - "Revision conflict cannot create a canonical reviewed essence."
+  - "Withdrawn source remains excluded while existing canonical Markdown is not mutated."
+  - "Candidate, receipt, review and canonical paths reject symlink/path escapes."
+  - "Review and sync require explicit arguments; no network route exists."
+independent_qa:
+  required: true
+  mode: separately_initialized_read_only_data_safety_reviewer
+  status: accepted
+  result: accepted
+  findings:
+    - "Initial P1: identical transitions were not no-write idempotent; corrected by replaying the latest matching transition receipt."
+    - "Initial P1: review, global, index and lifecycle-health reads could follow prepared symlink directories; corrected by shared resolved containment checks before enumeration or read."
+    - "Initial P1: promote and terminal transitions could leave partial state when later receipt/tombstone paths failed; corrected with preflight and narrow rollback of a newly created canonical file."
+    - "Initial P2: installation documentation still described review as unavailable; corrected to the enabled revision-bound lifecycle contract."
+known_limitations:
+  - "Windows cannot create symlinks in this runner; the existing host-gated symlink fixtures remain required stable-platform evidence and do not support a cross-platform claim."
+publication_authority: not_granted
+next_exact_action: "Run full V1M-07 verification, request independent data-safety QA, then commit only after accepted evidence."

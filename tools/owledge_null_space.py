@@ -62,6 +62,142 @@ def _write_json(path: pathlib.Path, value: dict[str, Any]) -> None:
     path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
+def _safe_write_target(root: pathlib.Path, path: pathlib.Path, *, label: str) -> pathlib.Path:
+    for ancestor in (path, *path.parents):
+        if ancestor.exists() and ancestor.is_symlink():
+            raise ValueError(f"{label}_symlink_denied")
+        if ancestor == root:
+            break
+    path.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        path.parent.resolve().relative_to(root)
+        if path.exists() and path.is_symlink():
+            raise ValueError(f"{label}_symlink_denied")
+        path.resolve().relative_to(root)
+    except ValueError as exc:
+        if str(exc).endswith("_symlink_denied"):
+            raise
+        raise ValueError(f"{label}_path_escape") from exc
+    return path
+
+
+def _safe_read_target(root: pathlib.Path, path: pathlib.Path, *, label: str) -> pathlib.Path:
+    for ancestor in (path, *path.parents):
+        if ancestor.exists() and ancestor.is_symlink():
+            raise ValueError(f"{label}_symlink_denied")
+        if ancestor == root:
+            break
+    try:
+        resolved = path.resolve(strict=True)
+        resolved.relative_to(root)
+    except (OSError, ValueError) as exc:
+        raise ValueError(f"{label}_path_invalid") from exc
+    if not resolved.is_file():
+        raise ValueError(f"{label}_missing")
+    return resolved
+
+
+def _safe_local_subdirectory(root: pathlib.Path, path: pathlib.Path, *, label: str) -> pathlib.Path:
+    if path.exists() and path.is_symlink():
+        raise ValueError(f"{label}_symlink_denied")
+    try:
+        resolved = path.resolve(strict=True)
+        resolved.relative_to(root)
+    except (OSError, ValueError) as exc:
+        raise ValueError(f"{label}_path_invalid") from exc
+    if not resolved.is_dir():
+        raise ValueError(f"{label}_not_directory")
+    return resolved
+
+
+def _sha256_text(text: str) -> str:
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def _valid_review_contract(review: dict[str, Any], candidate_id: str, candidate_revision: str) -> bool:
+    state = review.get("state")
+    transitions = review.get("transitions")
+    if (
+        review.get("schema_version") != SCHEMA_VERSION
+        or review.get("candidate_id") != candidate_id
+        or review.get("candidate_revision") != candidate_revision
+        or state not in {"candidate", "parked", "reviewed", "rejected", "superseded"}
+        or not isinstance(transitions, list)
+        or not transitions
+    ):
+        return False
+    latest = transitions[-1]
+    if not isinstance(latest, dict) or latest.get("to") != state:
+        return False
+    action = latest.get("action")
+    if state == "parked":
+        return action == "park" and isinstance(latest.get("reason"), str) and bool(latest["reason"].strip()) and isinstance(latest.get("reconsider_when"), str) and bool(latest["reconsider_when"].strip())
+    if state == "reviewed":
+        return action == "promote"
+    if state == "rejected":
+        return action == "reject" and isinstance(latest.get("reason"), str) and bool(latest["reason"].strip())
+    if state == "superseded":
+        return action == "supersede" and isinstance(latest.get("reason"), str) and bool(latest["reason"].strip()) and isinstance(latest.get("superseded_by"), str) and bool(latest["superseded_by"].strip())
+    return False
+
+
+def _candidate_review_state(project: pathlib.Path, candidate_id: str, candidate_revision: str) -> tuple[str, str, str] | None:
+    review_path = project / ".owledge" / "receipts" / "reviews" / f"{candidate_id}.json"
+    if not review_path.exists():
+        return None
+    try:
+        if review_path.is_symlink():
+            return ("tombstoned", "", "")
+        review = _read_json(review_path)
+    except ValueError:
+        return ("tombstoned", "", "")
+    state = review.get("state")
+    if not _valid_review_contract(review, candidate_id, candidate_revision):
+        return ("tombstoned", "", "")
+    transition = review["transitions"][-1]
+    if not isinstance(transition, dict):
+        return ("tombstoned", "", "")
+    return (
+        "promoted" if state == "reviewed" else str(state),
+        str(transition.get("reason") or ""),
+        str(transition.get("reconsider_when") or ""),
+    )
+
+
+def _reviewed_origin_freshness(meta: dict[str, Any], registry: dict[str, Any]) -> str:
+    if meta.get("origin_contract") != "v1_candidate_review_v1":
+        return str(meta.get("source_freshness") or meta.get("freshness") or "current")
+    candidate_id = str(meta.get("source_candidate_id") or "")
+    candidate_revision = str(meta.get("source_candidate_revision") or "")
+    source_root_raw = meta.get("source_project_root")
+    source_project_id = str(meta.get("source_project_id") or "")
+    if not candidate_id or not candidate_revision or not isinstance(source_root_raw, str) or not source_project_id:
+        return "invalid_revision"
+    try:
+        source_root = _safe_local_directory(pathlib.Path(source_root_raw), label="source_project_root")
+    except ValueError:
+        return "withdrawn"
+    registered = [
+        item for item in registry.get("allowed_projects", [])
+        if item.get("project_id") == source_project_id and item.get("project_root") == str(source_root)
+    ]
+    if len(registered) != 1:
+        return "withdrawn"
+    candidate_path = source_root / ".owledge" / "candidates" / f"{candidate_id}.md"
+    review_path = source_root / ".owledge" / "receipts" / "reviews" / f"{candidate_id}.json"
+    try:
+        candidate_path = _safe_read_target(source_root, candidate_path, label="source_candidate")
+        review_path = _safe_read_target(source_root, review_path, label="source_review")
+        if hashlib.sha256(candidate_path.read_bytes()).hexdigest() != candidate_revision:
+            return "invalid_revision"
+        review = _read_json(review_path)
+    except (OSError, ValueError):
+        return "withdrawn"
+    if not _valid_review_contract(review, candidate_id, candidate_revision):
+        return "invalid_revision"
+    return "current" if review.get("state") == "reviewed" else "tombstoned"
+
+
 def _registry_path(global_root: pathlib.Path) -> pathlib.Path:
     return global_root / REGISTRY_RELATIVE_PATH
 
@@ -199,15 +335,18 @@ def scan_project_user(project_root: pathlib.Path) -> dict[str, Any]:
             except ValueError:
                 receipt_matches = False
             source = str(path.relative_to(project)).replace("\\", "/")
-            source_hash = hashlib.sha256(text.encode("utf-8")).hexdigest()
+            source_hash = hashlib.sha256(path.read_bytes()).hexdigest()
+            candidate_id = path.stem
+            review_override = _candidate_review_state(project, candidate_id, source_hash) if receipt_matches else ("tombstoned", "", "")
+            review_state, review_reason, review_trigger = review_override or (str(meta.get("lifecycle")), "", "")
             records.append({
                 "stable_id": str(meta.get("memory_id") or source_hash[:20]), "scope": "project_user",
                 "source": f"project_user/{source}", "summary": str(meta.get("summary") or core.first_markdown_heading(text, path.stem)),
                 "source_hash": source_hash, "source_revision": str(meta.get("source_revision") or source_hash),
                 "freshness": str(meta.get("source_freshness") or meta.get("freshness") or "current"),
-                "lifecycle": str(meta.get("lifecycle")) if receipt_matches else "tombstoned",
+                "lifecycle": review_state if receipt_matches else "tombstoned",
                 "source_reason": str(meta.get("reason") or meta.get("summary") or "candidate proposal"),
-                "park_reason": str(meta.get("park_reason") or ""), "reconsider_when": str(meta.get("reconsider_when") or ""),
+                "park_reason": review_reason or str(meta.get("park_reason") or ""), "reconsider_when": review_trigger or str(meta.get("reconsider_when") or ""),
             })
     return {"passed": True, "scope": "project_user", "records": sorted(records, key=lambda item: (item["stable_id"], item["source"])), "network": "disabled", "sync": "disabled", "implicit_discovery": False}
 
@@ -218,7 +357,7 @@ def scan_user_global(project_root: pathlib.Path, *, requested_scope: str = "user
     if requested_scope == "project_user":
         return scan_project_user(project_root)
     try:
-        global_space, link, _ = _load_link(project_root)
+        global_space, link, registry = _load_link(project_root)
     except ValueError as exc:
         return {"passed": False, "error": str(exc), "requested_scope": requested_scope}
     records: list[dict[str, str]] = []
@@ -226,11 +365,15 @@ def scan_user_global(project_root: pathlib.Path, *, requested_scope: str = "user
         directory = global_space / directory_name
         if not directory.is_dir():
             continue
+        try:
+            directory = _safe_local_subdirectory(global_space, directory, label=f"global_{directory_name}")
+        except ValueError as exc:
+            return {"passed": False, "error": str(exc), "requested_scope": requested_scope}
         for path in sorted(directory.rglob("*.md")):
             try:
-                resolved = path.resolve()
-                resolved.relative_to(directory.resolve())
-            except ValueError:
+                path = _safe_read_target(global_space, path, label="global_record")
+                path.relative_to(directory)
+            except (OSError, ValueError):
                 return {"passed": False, "error": "global_symlink_escape", "requested_scope": requested_scope}
             text = path.read_text(encoding="utf-8", errors="replace")
             meta = core.parse_frontmatter(text)
@@ -239,13 +382,13 @@ def scan_user_global(project_root: pathlib.Path, *, requested_scope: str = "user
             if meta.get("visibility", "private") != "private":
                 continue
             records.append({
-                "stable_id": str(meta.get("memory_id") or hashlib.sha256(text.encode("utf-8")).hexdigest()[:20]),
+                "stable_id": str(meta.get("memory_id") or _sha256_text(text)[:20]),
                 "scope": "user_global",
                 "source": f"user_global/{directory_name}/{path.relative_to(directory).as_posix()}",
                 "summary": str(meta.get("summary") or core.first_markdown_heading(text, path.stem)),
-                "source_hash": hashlib.sha256(text.encode("utf-8")).hexdigest(),
-                "source_revision": str(meta.get("source_revision") or meta.get("source_hash") or hashlib.sha256(text.encode("utf-8")).hexdigest()),
-                "freshness": str(meta.get("source_freshness") or meta.get("freshness") or "current"),
+                "source_hash": _sha256_text(text),
+                "source_revision": str(meta.get("source_revision") or meta.get("source_candidate_revision") or meta.get("source_hash") or _sha256_text(text)),
+                "freshness": _reviewed_origin_freshness(meta, registry),
                 "lifecycle": str(meta.get("lifecycle") or meta.get("status") or "reviewed"),
                 "source_reason": str(meta.get("research_reason") or meta.get("reason") or meta.get("semantic_title") or meta.get("summary") or "reviewed local essence"),
             })
@@ -258,7 +401,10 @@ def rebuild_index(project_root: pathlib.Path) -> dict[str, Any]:
         return scan
     project = _safe_local_directory(project_root, label="project_root")
     index_path = project / ".owledge" / "indexes" / "user-global-index.jsonl"
-    index_path.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        index_path = _safe_write_target(project, index_path, label="index")
+    except ValueError as exc:
+        return {"passed": False, "error": str(exc), "network": "disabled"}
     payload = "".join(json.dumps(record, sort_keys=True) + "\n" for record in scan["records"])
     index_path.write_text(payload, encoding="utf-8")
     return {**scan, "index": ".owledge/indexes/user-global-index.jsonl", "rebuildable": True}

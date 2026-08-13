@@ -74,6 +74,32 @@ python tools/owledge.py context --project-root /path/to/your-project --task-id r
 Both commands are deterministic, report excluded stale or out-of-budget sources,
 and never inject an entire vault or perform network discovery.
 
+### Review, promotion, and local health
+
+`propose` creates only a private Candidate. It becomes a reusable private global
+essence only through an explicit, revision-bound review. Copy the returned
+`receipt_id` and `candidate_revision` into the review command:
+
+```bash
+python tools/owledge.py review --project-root /path/to/project-a \
+  --candidate-id <receipt_id> --action promote --expected-revision <candidate_revision>
+python tools/owledge.py sync --project-root /path/to/project-a --rebuild-index
+python tools/owledge.py doctor --project-root /path/to/project-a
+```
+
+`review` also supports explicit `park`, `reject`, and `supersede` transitions.
+Parking needs a reason and reconsideration trigger; reject and supersede require
+a reason, and supersede additionally names its replacement. A rejected or
+superseded Candidate writes a local tombstone. If the source Candidate is later
+withdrawn, its reviewed essence is excluded from ordinary recall rather than
+being silently retained.
+
+`sync` is deliberately a local rebuild of the disposable user-global index: it
+never contacts a remote service. `doctor` reports stale/withdrawn sources,
+invalid revisions, orphan receipts, promotion debt, context overflow and index
+drift as IDs and counts only. It does not include Candidate or source bodies in
+the health receipt.
+
 Create a private Candidate delta without promoting it. A parked idea is excluded
 from normal recall and can resurface only for an explicit planning-purpose
 recall:
@@ -82,8 +108,8 @@ recall:
 python tools/owledge.py propose --project-root /path/to/your-project --kind idea --summary "Later improvement" --source-ref plan:v1 --park --park-reason "outside the current MVP" --reconsider-when "during the next planning review"
 ```
 
-Candidates are idempotent, project-local and non-canonical. `review` remains
-unavailable until the reviewed lifecycle is implemented.
+Candidates are idempotent, project-local and non-canonical until an explicit,
+revision-bound `review` transition promotes them.
 
 ### Source-only optional add-ons
 

@@ -1,0 +1,34 @@
+gate: G-V1M-LIFECYCLE
+status: accepted_independent_qa
+tested_integration_commit: pending_atomic_commit
+environment:
+  os: windows
+  python: "3.14.0"
+  execution: "controlled local lifecycle and privacy-boundary validation"
+included_tickets: [V1M-06, V1M-07]
+ticket_evidence:
+  - "evidence/V1M-06/implementation-checkpoint.yaml"
+  - "evidence/V1M-07/implementation-checkpoint.yaml"
+verification:
+  - "python -m unittest tests.unit.test_v1m07_lifecycle_health tests.unit.test_v1m06_lifecycle tests.unit.test_v1m05_retrieval tests.unit.test_v1m04_null_space tests.unit.test_v1m03_public_facade tests.unit.test_v1m02_minimal_profiles tests.unit.test_ow07110_install_contract tests.unit.test_ow08015_native_hooks tests.unit.test_validate_v1_delivery_plan -v: passed; 56 tests, 7 expected Windows symlink skips"
+  - "python tools/build_project_folder_kit.py --output-path <temporary-unique> --verify: passed; generated host doctor and contract checks green"
+  - "python -m py_compile tools/owledge.py tools/owledge_null_space.py tools/owledge_v1_retrieval.py tools/owledge_v1_lifecycle.py tools/build_project_folder_kit.py: passed"
+  - "python tools/validate_v1_delivery_plan.py: passed; 11 tickets / 7 gates / 11 waves / 0 errors"
+  - "python tools/owledge.py test public-docs --project-root .: passed; 257 checks"
+  - "git diff --check: passed"
+threshold_witness:
+  lifecycle: "Candidate/parked content has ordinary-recall count=0; planning resurfacing requires receipt-validated matching reason and trigger."
+  transitions: "promote, park, reject and supersede are revision-bound; exact replays are no-write idempotent; terminal transitions have verified tombstones."
+  deletion: "withdrawn, altered, unallowlisted and non-reviewed sources are excluded from normal recall without mutation of existing canonical Markdown."
+  health: "doctor reports stale/invalid/orphan/debt/overflow/index findings as IDs and counts only; body telemetry is excluded."
+  containment: "candidate, review, tombstone, index and user-global paths reject symlink/path escape before read, enumeration or write."
+  locality: "sync is an explicit disposable local index rebuild with network disabled."
+independent_qa:
+  mode: separately_initialized_read_only_data_safety_reviewer
+  result: accepted
+  status: accepted
+  findings: []
+limitations:
+  - "Seven symlink attack fixtures are skipped on this Windows host because symlink creation is unavailable. Their code paths and regressions are present, but a symlink-capable stable-platform replay remains required before any cross-platform claim."
+promotion: "Permits V1M-08 only; publication authority remains blocked."
+publication_authority: not_granted
