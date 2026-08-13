@@ -1,0 +1,47 @@
+ticket: V1M-06
+status: accepted_independent_qa
+base_commit: aa805b2
+branch: codex/v071-integration
+scope: private-candidate-and-park-resurface-lifecycle
+implementation:
+  - "Public propose writes only a private project_user Candidate and never claims canonical promotion."
+  - "Candidate identity is content-addressed; an exact replay returns the original receipt without a duplicate write."
+  - "Parking requires both a reason and reconsideration trigger; normal recall excludes candidate/raw/parked records."
+  - "Planning-purpose recall may surface only receipt-validated matching parked records with reason and trigger."
+  - "Candidate writes fail closed on symlink/junction or containment escapes, and candidate metadata cannot self-authorize lifecycle activation."
+commands:
+  - command: python -m unittest tests.unit.test_v1m06_lifecycle tests.unit.test_v1m05_retrieval tests.unit.test_v1m04_null_space tests.unit.test_v1m03_public_facade tests.unit.test_v1m02_minimal_profiles tests.unit.test_ow07110_install_contract tests.unit.test_ow08015_native_hooks tests.unit.test_validate_v1_delivery_plan -v
+    exit_code: 0
+    result: "43 passed; Windows symlink fixtures skipped where host creation is unavailable"
+  - command: python tools/build_project_folder_kit.py --output-path <temporary> --verify
+    exit_code: 0
+    result: "green; generated kit contains tools/owledge_v1_lifecycle.py"
+  - command: python tools/validate_v1_delivery_plan.py
+    exit_code: 0
+    result: "11 tickets, 7 gates, 11 waves, 0 errors"
+  - command: python tools/owledge.py test public-docs --project-root .
+    exit_code: 0
+    result: "257 checks passed"
+  - command: python -m py_compile tools/owledge.py tools/owledge_null_space.py tools/owledge_v1_retrieval.py tools/owledge_v1_lifecycle.py tools/build_project_folder_kit.py
+    exit_code: 0
+  - command: git diff --check
+    exit_code: 0
+positive_contracts:
+  - "Candidate replays are idempotent and receipt-linked."
+  - "A parked idea is absent from ordinary recall but returns in matching planning recall with park reason and trigger."
+  - "Public propose has only the project_user Candidate boundary and reports promotion:not_available."
+negative_contracts:
+  - "Incomplete parking fields, scope escalation, normal candidate/parked recall, receipt/metadata tampering, and write-path symlink escape fail closed."
+  - "Review and sync remain unavailable; no adapter gets a silent activation or canonical-promotion route."
+independent_qa:
+  required: true
+  mode: separately_initialized_read_only_state_machine_reviewer
+  result: accepted
+  status: accepted
+  findings:
+    - "Initial P1: candidate and receipt paths could follow a prepared symlink/junction; corrected with pre-I/O local containment checks."
+    - "Initial P1: candidate frontmatter could claim reviewed lifecycle; corrected by validating same-stem receipt payload and tombstoning mismatches."
+known_limitations:
+  - "Symlink execution fixtures are skipped on this Windows host; retain a symlink-capable stable-platform replay and make no cross-platform claim from this run."
+publication_authority: not_granted
+next_exact_action: "Select V1M-07 only after this accepted Candidate checkpoint is committed; G-V1M-LIFECYCLE remains pending."

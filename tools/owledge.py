@@ -74,6 +74,7 @@ import owledge_migration  # noqa: E402
 import owledge_research_memory  # noqa: E402
 import owledge_null_space  # noqa: E402
 import owledge_v1_retrieval  # noqa: E402
+import owledge_v1_lifecycle  # noqa: E402
 import owledge_small_model_profiles  # noqa: E402
 import build_kb_module  # noqa: E402
 import build_project_folder_kit  # noqa: E402
@@ -97,7 +98,7 @@ __version__ = KIT_VERSION
 # V1 Minimal Core is intentionally small.  Keep this list next to the CLI
 # boundary rather than inferring it from the much larger maintainer toolset.
 PUBLIC_CORE_VERBS = ("init", "doctor", "recall", "context", "propose", "review", "sync", "upgrade")
-DEFERRED_CORE_VERBS = {"propose", "review", "sync"}
+DEFERRED_CORE_VERBS = {"review", "sync"}
 COMPATIBILITY_REPLACEMENTS = {
     "init-project": "init",
     "research-recall": "recall",
@@ -218,6 +219,7 @@ HOST_TOOL_FILES = [
     "owledge_research_memory.py",
     "owledge_null_space.py",
     "owledge_v1_retrieval.py",
+    "owledge_v1_lifecycle.py",
     "owledge_context_compiler.py",
     "owledge_context_profiles.py",
     "owledge_rag_projection.py",
@@ -4207,11 +4209,14 @@ def main(argv: list[str] | None = None) -> int:
     _add_context_arguments(context_parent)
     context_p = sub.add_parser("context", parents=[project_parent, context_parent], help="Build a scoped local context pack.")
 
-    for command_name, command_help in (
-        ("propose", "Reserved Candidate proposal operation; enabled with the lifecycle Core."),
-        ("review", "Reserved Candidate review operation; enabled with the lifecycle Core."),
-        ("sync", "Reserved local synchronization operation; enabled with the lifecycle Core."),
-    ):
+    propose_p = sub.add_parser("propose", parents=[project_parent], help="Write a private local Candidate delta; it is not canonical.")
+    propose_p.add_argument("--kind", required=True, choices=sorted(owledge_v1_lifecycle.ALLOWED_KINDS))
+    propose_p.add_argument("--summary", required=True)
+    propose_p.add_argument("--source-ref", action="append", default=[])
+    propose_p.add_argument("--park", action="store_true")
+    propose_p.add_argument("--park-reason", default="")
+    propose_p.add_argument("--reconsider-when", default="")
+    for command_name, command_help in (("review", "Reserved Candidate review operation; enabled with the reviewed lifecycle Core."), ("sync", "Reserved local synchronization operation; enabled with the reviewed lifecycle Core.")):
         sub.add_parser(command_name, parents=[project_parent], help=command_help)
 
     init_compat_p = sub.add_parser("init-project", parents=[init_parent])
@@ -4428,6 +4433,13 @@ def main(argv: list[str] | None = None) -> int:
                 "next_action": "This V1 Core operation is reserved and will become available after the local Candidate lifecycle gate.",
             })
             return 2
+        if args.command == "propose":
+            result = owledge_v1_lifecycle.propose(
+                root, kind=args.kind, summary=args.summary, source_refs=args.source_ref,
+                park=args.park, park_reason=args.park_reason, reconsider_when=args.reconsider_when,
+            )
+            print_json(result)
+            return 0 if result.get("passed") else 2
         if args.command == "doctor":
             result = core.memory_doctor(root, mode=args.mode)
             print_json(result)

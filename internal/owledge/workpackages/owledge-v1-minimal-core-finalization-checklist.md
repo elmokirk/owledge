@@ -5,7 +5,7 @@ customer_id: "global"
 project_id: "owledge"
 doc_type: "task"
 artifact_type: "workpackage"
-document_version: 9
+document_version: 10
 workpackage_version: "1.0.2"
 status: "active"
 visibility: "private"
@@ -21,7 +21,7 @@ confidence: 0.97
 review_status: "reviewed"
 sanitization_status: "not_required"
 created_at: "2026-08-13T17:20:00+02:00"
-updated_at: "2026-08-13T20:50:00+02:00"
+updated_at: "2026-08-13T21:25:00+02:00"
 source_hash: ""
 reusable_lessons:
   - "A new plan enters an active release train only at a clean ticket/gate boundary."
@@ -108,10 +108,10 @@ cannot create symlinks.
 
 ## Phase 4 — Knowledge lifecycle and parking
 
-- [ ] V1M-06 writes typed Candidate deltas through one proposal contract.
-- [ ] Parked records contain reason, sources, horizon, trigger and related project.
-- [ ] Ordinary recall excludes raw and parked records.
-- [ ] Planning-purpose recall resurfaces only relevant parked essences.
+- [x] V1M-06 writes typed Candidate deltas through one proposal contract.
+- [x] Parked records contain reason, sources, horizon, trigger and related project.
+- [x] Ordinary recall excludes raw and parked records.
+- [x] Planning-purpose recall resurfaces only relevant parked essences.
 - [ ] V1M-07 proves promote/park/reject/supersede and tombstone propagation.
 - [ ] Health catches stale sources, broken links, promotion debt and index drift.
 - [ ] Gate `G-V1M-LIFECYCLE` green.

@@ -74,6 +74,17 @@ python tools/owledge.py context --project-root /path/to/your-project --task-id r
 Both commands are deterministic, report excluded stale or out-of-budget sources,
 and never inject an entire vault or perform network discovery.
 
+Create a private Candidate delta without promoting it. A parked idea is excluded
+from normal recall and can resurface only for an explicit planning-purpose
+recall:
+
+```bash
+python tools/owledge.py propose --project-root /path/to/your-project --kind idea --summary "Later improvement" --source-ref plan:v1 --park --park-reason "outside the current MVP" --reconsider-when "during the next planning review"
+```
+
+Candidates are idempotent, project-local and non-canonical. `review` remains
+unavailable until the reviewed lifecycle is implemented.
+
 ### Source-only optional add-ons
 
 Add-ons require that same source checkout. They are not part of the package

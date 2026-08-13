@@ -10,7 +10,7 @@ import owledge_null_space as null_space
 
 
 PURPOSES = {"research", "planning"}
-EXCLUDED_LIFECYCLES = {"raw", "parked", "rejected", "superseded", "tombstoned"}
+EXCLUDED_LIFECYCLES = {"candidate", "raw", "parked", "rejected", "superseded", "tombstoned"}
 
 
 def _requested_scopes(scopes: set[str] | None, include_user_global: bool) -> tuple[set[str] | None, dict[str, Any] | None]:
@@ -65,6 +65,18 @@ def recall(project_root: pathlib.Path, *, query: str, purpose: str = "research",
         scope = str(record.get("scope") or "")
         lifecycle = str(record.get("lifecycle") or "reviewed")
         freshness = str(record.get("freshness") or "unknown")
+        if lifecycle == "parked" and purpose == "planning":
+            matched, score = _matches(record, query)
+            if matched:
+                results.append({
+                    "detail_id": f"{scope}/{stable_id}", "stable_id": stable_id, "scope": scope,
+                    "summary": str(record.get("summary") or ""), "source": str(record.get("source") or ""),
+                    "source_reason": str(record.get("source_reason") or ""),
+                    "source_revision": str(record.get("source_revision") or record.get("source_hash") or ""),
+                    "freshness": freshness, "lifecycle": lifecycle, "match_score": score,
+                    "park_reason": str(record.get("park_reason") or ""), "reconsider_when": str(record.get("reconsider_when") or ""),
+                })
+                continue
         if lifecycle in EXCLUDED_LIFECYCLES:
             exclusions.append({"stable_id": stable_id, "reason": f"lifecycle_{lifecycle}"})
             continue

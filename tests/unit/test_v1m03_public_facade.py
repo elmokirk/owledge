@@ -43,12 +43,13 @@ class V1M03PublicFacadeTests(unittest.TestCase):
             self.assertEqual(advanced_result.returncode, 0, advanced_result.stderr)
             self.assertNotIn("DEPRECATION", advanced_result.stderr)
 
-    def test_unavailable_lifecycle_verbs_and_unknown_ninth_verb_fail_without_dispatch(self) -> None:
-        deferred = invoke("propose")
-        self.assertEqual(deferred.returncode, 2)
-        body = json.loads(deferred.stdout)
-        self.assertEqual(body["error"], "operation_not_available_yet")
-        self.assertEqual(body["operation"], "propose")
+    def test_remaining_unavailable_lifecycle_verbs_and_unknown_ninth_verb_fail_without_dispatch(self) -> None:
+        for operation in ("review", "sync"):
+            deferred = invoke(operation)
+            self.assertEqual(deferred.returncode, 2)
+            body = json.loads(deferred.stdout)
+            self.assertEqual(body["error"], "operation_not_available_yet")
+            self.assertEqual(body["operation"], operation)
 
         unknown = invoke("ninth-verb")
         self.assertEqual(unknown.returncode, 2)

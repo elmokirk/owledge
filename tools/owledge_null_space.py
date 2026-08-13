@@ -173,7 +173,42 @@ def scan_project_user(project_root: pathlib.Path) -> dict[str, Any]:
             "freshness": str(meta.get("source_freshness") or meta.get("freshness") or "current"),
             "lifecycle": str(meta.get("lifecycle") or meta.get("status") or "reviewed"),
             "source_reason": str(meta.get("research_reason") or meta.get("reason") or meta.get("semantic_title") or meta.get("summary") or "project memory"),
+            "park_reason": str(meta.get("park_reason") or ""),
+            "reconsider_when": str(meta.get("reconsider_when") or ""),
         })
+    candidate_dir = project / ".owledge" / "candidates"
+    if candidate_dir.is_dir():
+        for path in sorted(candidate_dir.glob("*.md")):
+            if path.is_symlink():
+                continue
+            text = path.read_text(encoding="utf-8", errors="replace")
+            meta = core.parse_frontmatter(text)
+            if meta.get("knowledge_scope") != "project_user":
+                continue
+            receipt_path = project / ".owledge" / "receipts" / "candidates" / f"{path.stem}.json"
+            try:
+                receipt = _read_json(receipt_path)
+                payload = receipt.get("payload")
+                receipt_lifecycle = payload.get("lifecycle") if isinstance(payload, dict) else None
+                receipt_matches = (
+                    receipt_lifecycle in {"candidate", "parked"}
+                    and receipt_lifecycle == meta.get("lifecycle")
+                    and payload.get("summary") == meta.get("summary")
+                    and payload.get("scope") == "project_user"
+                )
+            except ValueError:
+                receipt_matches = False
+            source = str(path.relative_to(project)).replace("\\", "/")
+            source_hash = hashlib.sha256(text.encode("utf-8")).hexdigest()
+            records.append({
+                "stable_id": str(meta.get("memory_id") or source_hash[:20]), "scope": "project_user",
+                "source": f"project_user/{source}", "summary": str(meta.get("summary") or core.first_markdown_heading(text, path.stem)),
+                "source_hash": source_hash, "source_revision": str(meta.get("source_revision") or source_hash),
+                "freshness": str(meta.get("source_freshness") or meta.get("freshness") or "current"),
+                "lifecycle": str(meta.get("lifecycle")) if receipt_matches else "tombstoned",
+                "source_reason": str(meta.get("reason") or meta.get("summary") or "candidate proposal"),
+                "park_reason": str(meta.get("park_reason") or ""), "reconsider_when": str(meta.get("reconsider_when") or ""),
+            })
     return {"passed": True, "scope": "project_user", "records": sorted(records, key=lambda item: (item["stable_id"], item["source"])), "network": "disabled", "sync": "disabled", "implicit_discovery": False}
 
 
