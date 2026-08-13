@@ -30,7 +30,6 @@ UNSUPPORTED_CAPABILITIES = {
 }
 FIXTURE_PATHS = {"fixtures/session-start.json", "fixtures/user-prompt.json"}
 CAPABILITY_PERMISSIONS = {
-    "context.read": {"read_project", "read_user_global"},
     "control.read": {"read_project"},
     "checkpoint.handoff": {"read_project"},
     "candidate.write": {"write_candidate"},
@@ -170,7 +169,11 @@ def negotiate(
         receipt["reason_code"] = "undeclared_capability"
         return receipt
     permissions = set(requested_permissions)
-    required = CAPABILITY_PERMISSIONS.get(capability_id, set())
+    required = (
+        {"read_project"} if capability_id == "context.read" and scope == "project_user"
+        else {"read_user_global"} if capability_id == "context.read" and scope == "user_global"
+        else CAPABILITY_PERMISSIONS.get(capability_id, set())
+    )
     granted = set(manifest["granted_permissions"])
     if not required.issubset(permissions) or not permissions.issubset(granted):
         receipt["reason_code"] = "permission_denied"

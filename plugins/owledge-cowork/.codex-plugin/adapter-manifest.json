@@ -1,0 +1,14 @@
+{
+  "adapter_manifest": "../../../addons/runtime-conformance-kit/contracts/codex.json",
+  "profile": "codex",
+  "discovery_root": ".agents/skills",
+  "routing": {
+    "read_control": "python tools/owledge_adapter_contracts.py negotiate",
+    "context_and_handoff": "owner_invoked_project_local_cli"
+  },
+  "hook_capability": {
+    "result": "unsupported",
+    "reason_code": "codex_native_lifecycle_hook_not_declared"
+  },
+  "storage_boundary": "core_owned_no_direct_storage_access"
+}

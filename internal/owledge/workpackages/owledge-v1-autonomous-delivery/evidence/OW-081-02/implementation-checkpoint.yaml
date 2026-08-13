@@ -1,0 +1,20 @@
+ticket: OW-081-02
+status: accepted_independent_qa
+scope:
+  - Codex project-local discovery and AdapterManifest routing fixture
+  - explicit lifecycle-hook degradation and bounded capsule declaration
+  - Codex runtime documentation and regression tests
+verification:
+  - "python -m unittest tests.unit.test_ow08101_adapter_contracts tests.unit.test_ow08102_codex_adapter -v: 8 passed"
+  - "python tools/owledge.py test runtime-adapters --project-root .: passed"
+  - "python tools/validate_v1_delivery_plan.py: passed, 0 errors"
+  - "git diff --check: passed"
+coverage:
+  - "A fresh host gets AGENTS.md, the .agents/skills/owledge-runtime-bridge mirror, local adapter validator, and the Codex conformance manifest."
+  - "Project-local context.read works with read_project; user_global requires read_user_global."
+  - "The pre-plan capsule declares only OWLEDGE.md and memory-index with owner invocation; automatic inspection is false."
+  - "No Codex native lifecycle hook is claimed; its unsupported result is explicit and source-linked."
+limitations:
+  - "The active Codex desktop Goal is the runtime of record; no recursive Codex CLI invocation was made."
+  - "Checkpoint persistence remains Core-owned and cross-harness execution is implemented by OW-081-07."
+publication_authority: not_granted

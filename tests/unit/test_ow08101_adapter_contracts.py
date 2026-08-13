@@ -41,6 +41,15 @@ class AdapterManifestTests(unittest.TestCase):
         self.assertEqual(receipt["reason_code"], "ok")
         self.assertEqual(receipt["effective_permissions"], ["write_candidate"])
 
+    def test_context_read_requires_only_the_permission_for_its_local_scope(self):
+        profile = self.load("codex")
+        project = adapters.negotiate(profile, capability_id="context.read", scope="project_user", requested_permissions=["read_project"])
+        global_scope = adapters.negotiate(profile, capability_id="context.read", scope="user_global", requested_permissions=["read_user_global"])
+        missing = adapters.negotiate(profile, capability_id="context.read", scope="user_global", requested_permissions=["read_project"])
+        self.assertEqual(project["result"], "supported")
+        self.assertEqual(global_scope["result"], "supported")
+        self.assertEqual(missing["reason_code"], "permission_denied")
+
     def test_unsupported_and_undeclared_capabilities_fail_explicitly(self):
         profile = self.load("generic-mcp-cli")
         unsupported = adapters.negotiate(

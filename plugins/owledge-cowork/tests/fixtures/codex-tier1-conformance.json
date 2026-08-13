@@ -1,0 +1,25 @@
+{
+  "fixture_version": "1.0",
+  "profile": "codex",
+  "source_linked_outputs": [
+    "AGENTS.md",
+    ".agents/skills/owledge-runtime-bridge/SKILL.md",
+    "tools/owledge_adapter_contracts.py",
+    ".owledge/runtime-conformance/codex.json"
+  ],
+  "context_capsule": {
+    "invocation": "owner_invoked",
+    "sources": ["OWLEDGE.md", ".owledge/indexes/memory-index.jsonl"],
+    "max_sources": 2,
+    "automatic_preplan_inspection": false
+  },
+  "handoff": {
+    "capability": "checkpoint.handoff",
+    "persistence": "core_owned",
+    "raw_transcript_promotion": false
+  },
+  "hooks": {
+    "result": "unsupported",
+    "reason_code": "codex_native_lifecycle_hook_not_declared"
+  }
+}
