@@ -1,0 +1,24 @@
+{
+  "fixture_version": "1.0",
+  "profile": "claude-code",
+  "source_linked_outputs": [
+    "CLAUDE.md",
+    "plugins/owledge-cowork/hooks/hooks.python.json",
+    "plugins/owledge-cowork/skills/owledge-runtime-bridge/SKILL.md",
+    ".owledge/runtime-conformance/claude-code.json"
+  ],
+  "lifecycle": ["SessionStart", "UserPromptSubmit", "PostToolUse", "Stop"],
+  "context_capsule": {
+    "sources": ["OWLEDGE.md", ".owledge/indexes/memory-index.jsonl"],
+    "automatic_preplan_inspection": false
+  },
+  "handoff": {
+    "capability": "checkpoint.handoff",
+    "persistence": "core_owned",
+    "raw_transcript_promotion": false
+  },
+  "failure_visibility": {
+    "hook_error_log": ".agent-control/logs/plugin-errors.jsonl",
+    "ticket_completion": "blocked_until_error_resolved"
+  }
+}

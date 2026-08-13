@@ -1,0 +1,18 @@
+ticket: OW-081-03
+status: accepted_independent_qa
+scope:
+  - Claude Code lifecycle conformance fixture and negative error-visibility regression
+  - installed AdapterManifest negotiation coverage
+verification:
+  - "python -m unittest tests.unit.test_ow08103_claude_adapter tests.unit.test_ow08015_native_hooks -v: 10 passed"
+  - "python tools/owledge.py test runtime-adapters --project-root .: passed"
+  - "python tools/validate_v1_delivery_plan.py: passed, 0 errors"
+  - "git diff --check: passed"
+coverage:
+  - "SessionStart, UserPromptSubmit, PostToolUse, and Stop are present in the project-local hook profile."
+  - "The context capsule has exactly two allowed sources and never invokes automatic pre-plan inspection."
+  - "Checkpoint/handoff stays Core-owned; raw transcript promotion is false."
+  - "An invalid Stop payload is logged under .agent-control/logs/plugin-errors.jsonl and creates no synthetic successful summary."
+limitations:
+  - "This deterministic project-local lifecycle proof is not an interactive Claude Code UI permission test."
+publication_authority: not_granted
