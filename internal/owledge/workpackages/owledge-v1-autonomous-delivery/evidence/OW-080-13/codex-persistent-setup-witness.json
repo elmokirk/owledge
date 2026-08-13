@@ -1,0 +1,176 @@
+{
+  "auto_compact_provenance": {
+    "enabled": true,
+    "model_auto_compact_token_limit": 100000,
+    "verification": "invocation_required"
+  },
+  "golden_gate": {
+    "diff_exit_code": 0,
+    "golden_digest": "20933b19cabb422804b60d89c80ba50afd79c325c21e6a0b46e001bd0e56903c",
+    "reconstructed_digest": "20933b19cabb422804b60d89c80ba50afd79c325c21e6a0b46e001bd0e56903c"
+  },
+  "owner_alignment_stop": {
+    "active_ticket": "OW-080-11",
+    "candidate_ticket": "OW-080-14",
+    "passed": true,
+    "result": "owner_alignment_required",
+    "selection_allowed": false,
+    "status": "awaiting_user_alignment"
+  },
+  "passed": true,
+  "resume": {
+    "persisted": {
+      "baseline_file_content_tokens": 18932,
+      "cold_resume_drain": 14240,
+      "controls": [
+        {
+          "loaded": false,
+          "path": "C:/Users/Kirk/Documents/Playground/agent-memory-standalone/internal/owledge/workpackages/owledge-v1-autonomous-delivery/CONTROL-PLANE-POLICY.md",
+          "reason": "runtime_context_retained",
+          "sha256": "455b8bff35f61006a03834e6c2004046cbe442e4ab4b1b1dbeaadf3c2d58611c",
+          "tokens": 0
+        },
+        {
+          "loaded": false,
+          "path": "C:/Users/Kirk/Documents/Playground/agent-memory-standalone/internal/owledge/workpackages/owledge-v1-autonomous-delivery/ALIGNMENT-PROTOCOL.md",
+          "reason": "runtime_context_retained",
+          "sha256": "079f2b07e852bd7b5f41217d02bad9575951a4acc5284e4904a59377f6c73af7",
+          "tokens": 0
+        },
+        {
+          "loaded": false,
+          "path": "C:/Users/Kirk/Documents/Playground/agent-memory-standalone/skills/owledge-long-horizon-delivery/references/modes.md",
+          "reason": "runtime_context_retained",
+          "sha256": "9a9c2415cf51fe06a326063b4e3a3ea70a7f5cad29c819af8a97e37f7cea55a1",
+          "tokens": 0
+        }
+      ],
+      "durable_state_loaded": false,
+      "handoff": {
+        "loaded": false,
+        "path": "C:/Users/Kirk/Documents/Playground/agent-memory-standalone/internal/owledge/workpackages/owledge-v1-autonomous-delivery/evidence/OW-080-13/handoff-fixture.md",
+        "sha256": "f7b06fe19b0e9fa73021414c68f03b0b0b3559d5843fef017419e750b821206a",
+        "tokens": 0
+      },
+      "passed": true,
+      "runtime_resume_model": "persisted",
+      "session_path": "C:/Users/Kirk/Documents/Playground/agent-memory-standalone/internal/owledge/workpackages/owledge-v1-autonomous-delivery/RUN-STATE.session.yaml",
+      "session_slice": {
+        "active_ticket": "OW-080-13",
+        "active_version": "v0.8.0",
+        "current_step": "All technical OW-080-13 Witness checks passed in Claude and Codex; independent QA requires a literal Codex /goal decision.",
+        "next_command": "Await owner decision Q-080-04; do not accept OW-080-13 or activate downstream tickets."
+      },
+      "tokenizer": "owledge.regex-v1",
+      "warm_resume_drain": 86
+    },
+    "reset_baseline": {
+      "baseline_file_content_tokens": 18958,
+      "cold_resume_drain": 14266,
+      "controls": [
+        {
+          "loaded": false,
+          "path": "C:/Users/Kirk/Documents/Playground/agent-memory-standalone/internal/owledge/workpackages/owledge-v1-autonomous-delivery/CONTROL-PLANE-POLICY.md",
+          "reason": "hash_delta_unchanged",
+          "sha256": "455b8bff35f61006a03834e6c2004046cbe442e4ab4b1b1dbeaadf3c2d58611c",
+          "tokens": 0
+        },
+        {
+          "loaded": false,
+          "path": "C:/Users/Kirk/Documents/Playground/agent-memory-standalone/internal/owledge/workpackages/owledge-v1-autonomous-delivery/ALIGNMENT-PROTOCOL.md",
+          "reason": "hash_delta_unchanged",
+          "sha256": "079f2b07e852bd7b5f41217d02bad9575951a4acc5284e4904a59377f6c73af7",
+          "tokens": 0
+        },
+        {
+          "loaded": false,
+          "path": "C:/Users/Kirk/Documents/Playground/agent-memory-standalone/skills/owledge-long-horizon-delivery/references/modes.md",
+          "reason": "hash_delta_unchanged",
+          "sha256": "9a9c2415cf51fe06a326063b4e3a3ea70a7f5cad29c819af8a97e37f7cea55a1",
+          "tokens": 0
+        }
+      ],
+      "durable_state_loaded": true,
+      "handoff": {
+        "loaded": true,
+        "path": "C:/Users/Kirk/Documents/Playground/agent-memory-standalone/internal/owledge/workpackages/owledge-v1-autonomous-delivery/evidence/OW-080-13/handoff-fixture.md",
+        "sha256": "f7b06fe19b0e9fa73021414c68f03b0b0b3559d5843fef017419e750b821206a",
+        "tokens": 26
+      },
+      "passed": true,
+      "runtime_resume_model": "reset_baseline",
+      "session_path": "C:/Users/Kirk/Documents/Playground/agent-memory-standalone/internal/owledge/workpackages/owledge-v1-autonomous-delivery/RUN-STATE.session.yaml",
+      "session_slice": {
+        "active_ticket": "OW-080-13",
+        "active_version": "v0.8.0",
+        "current_step": "All technical OW-080-13 Witness checks passed in Claude and Codex; independent QA requires a literal Codex /goal decision.",
+        "next_command": "Await owner decision Q-080-04; do not accept OW-080-13 or activate downstream tickets."
+      },
+      "tokenizer": "owledge.regex-v1",
+      "warm_resume_drain": 112
+    }
+  },
+  "sidecar": {
+    "reconstructed_payload": {
+      "passed": false,
+      "results": [
+        {
+          "name": "fixture-1",
+          "passed": false
+        },
+        {
+          "name": "fixture-2",
+          "passed": false
+        },
+        {
+          "name": "fixture-3",
+          "passed": false
+        },
+        {
+          "name": "fixture-4",
+          "passed": false
+        },
+        {
+          "name": "fixture-5",
+          "passed": false
+        },
+        {
+          "name": "fixture-6",
+          "passed": false
+        }
+      ]
+    },
+    "roundtrip_equal": true,
+    "summary": {
+      "failed": 6,
+      "first_failings": [
+        {
+          "name": "fixture-1",
+          "passed": false
+        },
+        {
+          "name": "fixture-2",
+          "passed": false
+        },
+        {
+          "name": "fixture-3",
+          "passed": false
+        },
+        {
+          "name": "fixture-4",
+          "passed": false
+        },
+        {
+          "name": "fixture-5",
+          "passed": false
+        }
+      ],
+      "passed": false,
+      "total": 6
+    }
+  },
+  "stale_handoff": {
+    "error": "resume_context.stale_handoff",
+    "passed": false
+  }
+}

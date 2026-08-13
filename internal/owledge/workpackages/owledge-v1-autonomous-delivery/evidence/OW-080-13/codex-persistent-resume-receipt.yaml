@@ -1,0 +1,41 @@
+ticket: OW-080-13
+status: persisted_resume_technical_evidence_pending_owner_equivalence_decision
+executed_at: 2026-08-13
+harness:
+  name: OpenAI Codex CLI
+  version: 0.147.0
+  session_id: 019ffb21-8fe6-7762-bd6e-2a8612ff184f
+  initial_invocation: "exec -c model_auto_compact_token_limit=100000 --approve-for-me"
+  resumed_invocation: "exec resume -m gpt-5.5 <session_id>"
+  session_persistence: non_ephemeral
+  observed_sandbox: workspace-write
+  sandbox_bypass: false
+model_history:
+  - {stage: setup, model: gpt-5.5}
+  - {stage: intermediate_resume, model: gpt-5.6-sol, note: "CLI default; not used as the final requested-model receipt."}
+  - {stage: final_resume, model: gpt-5.5}
+execution_inputs:
+  git_commit: 9f17b74
+  run_state_sha256: 54e51c1dd0a98d8041b0ac25ec101dc3f1c5a9775fea1767053a11f14cebf478
+  session_state_sha256: 6ed016520a89a4420473c5d90d472460d43df4a3e7730b9152c26c15481a2e39
+  owledge_cli_sha256: c4d4c1afd4e44048261a74dadaed30eaf08d37d9eb7b40b0ec69ae994bfb1a3a
+outputs:
+  setup_witness: {path: codex-persistent-setup-witness.json, sha256: d962c61c9ffaf0b643ad415be7c347f649a0fd03152366fce52487f8aa2ca217}
+  final_resume_witness: {path: codex-persistent-gpt55-resume-witness.json, sha256: d962c61c9ffaf0b643ad415be7c347f649a0fd03152366fce52487f8aa2ca217}
+  final_resume_sidecar: {path: codex-persistent-gpt55-resume-sidecar.json, sha256: fca90f3e879c2a53d97be6cef6da1964e7e6844f1e3caf2aa55b45c59c93504a}
+  transcript_excerpt: codex-persistent-resume-transcript-excerpt.md
+  setup_raw_sha256: 0cd3c2b8d97907304e7d2b066f6010db1f2c9494fa39ffc8190284618db0bc28
+  intermediate_resume_raw_sha256: 579e64cb8956854b65c81a99096d7c40674c653635e9e72b924481f5e4e79409
+  final_resume_raw_sha256: aa3b4a898a871147c9a1fdeb2656fab4f53feb8e02a1433aafd19f33931280ca
+  raw_transcripts_retained: false
+assertions:
+  witness_passed: true
+  persisted_token_relation: "86 < 14240 < 18932"
+  reset_token_relation: "112 < 14266 < 18958"
+  auto_compact_token_limit: 100000
+  golden_diff_exit_code: 0
+  stale_handoff_rejected: true
+  sidecar_roundtrip_equal: true
+  owner_alignment_selection_allowed: false
+limitation: "The ticket names a Codex `/goal` resume. This receipt proves a non-ephemeral Codex CLI session resumed by documented `exec resume`; owner Q-080-04 must define or reject equivalence."
+publication_authority: not_granted

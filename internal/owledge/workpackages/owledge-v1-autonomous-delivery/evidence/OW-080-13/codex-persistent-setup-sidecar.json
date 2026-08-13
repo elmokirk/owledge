@@ -1,0 +1,29 @@
+{
+  "passed": false,
+  "results": [
+    {
+      "name": "fixture-1",
+      "passed": false
+    },
+    {
+      "name": "fixture-2",
+      "passed": false
+    },
+    {
+      "name": "fixture-3",
+      "passed": false
+    },
+    {
+      "name": "fixture-4",
+      "passed": false
+    },
+    {
+      "name": "fixture-5",
+      "passed": false
+    },
+    {
+      "name": "fixture-6",
+      "passed": false
+    }
+  ]
+}

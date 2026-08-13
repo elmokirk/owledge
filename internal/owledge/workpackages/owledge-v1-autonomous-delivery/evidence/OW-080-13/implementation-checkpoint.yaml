@@ -15,12 +15,13 @@ receipts:
   codex_initial_harness: {path: codex-initial-harness-receipt.yaml, sha256: 9f1bb48ebf97e3519bdfb5464420976a02a995eb29ece5f898c343cfd47f7e0b}
   claude_complete_harness: {path: claude-complete-harness-receipt.yaml, sha256: c2b945ce2866a54c20917962c1c4608045921a9be0570f0f7085f2709edfe371}
   codex_complete_harness: {path: codex-complete-harness-receipt.yaml, sha256: dc3cc8ac55b04ce80857de50d5fe0a02e1d4255d5f5627f77581bfafb8a18171}
+  codex_persistent_resume: {path: codex-persistent-resume-receipt.yaml, sha256: e7ad68307bd74382cd82489922156415b94fe456b4e854a4bed149736c9ef35c}
 coverage:
   - "Persisted runtime reads the separate session slice only; it skips hash-verified controls and does not load durable state or an in-context handoff."
   - "Baseline-reset runtime requires and loads the handoff, then skips unchanged controls by recorded hash."
   - "Changed control hash, unknown runtime, absent handoff, capped payload, and exact sidecar reconstruction have deterministic negative/positive tests."
 limitations:
   - "The complete Witness covers all listed technical Verify clauses in Claude Code 2.1.228/Sonnet and Codex CLI 0.147.0/GPT-5.5, including a configured Codex auto-compact limit."
-  - "Do not accept OW-080-13 or promote G-080-B-CONTEXT until the owner either accepts a defined non-ephemeral `codex exec resume` equivalence standard or supplies a literal Codex `/goal` transcript."
+  - "A non-ephemeral Codex CLI 0.147.0/GPT-5.5 `exec resume` session now reproduces the full Witness. Do not accept OW-080-13 or promote G-080-B-CONTEXT until the owner either accepts this defined equivalence standard or supplies a literal Codex `/goal` transcript."
   - "Claude Code initially exhausted 0.25 USD and 0.50/1.00 USD non-Safe-Mode caps, then passed at low effort with a 1.00 USD Safe-Mode cap and exact Bash allowlist. Raw transcripts are intentionally not retained or committed."
 publication_authority: not_granted
