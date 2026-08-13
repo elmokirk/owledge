@@ -4065,6 +4065,7 @@ def main(argv: list[str] | None = None) -> int:
     gate_sidecar_p = sub.add_parser("gate-sidecar-v1", parents=[project_parent])
     gate_sidecar_p.add_argument("--payload-json", required=True)
     gate_sidecar_p.add_argument("--sidecar-path", required=True)
+    gate_sidecar_p.add_argument("--output-path")
 
     test_p = sub.add_parser("test", parents=[project_parent])
     test_p.add_argument(
@@ -4324,6 +4325,10 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "gate-sidecar-v1":
             payload = json.loads(resolve_path(args.payload_json).read_text(encoding="utf-8"))
             result = gate_sidecar_roundtrip_v1(payload, resolve_path(args.sidecar_path))
+            if args.output_path:
+                output = resolve_path(args.output_path)
+                output.parent.mkdir(parents=True, exist_ok=True)
+                output.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
             print_json(result)
             return 0 if result["passed"] else 1
         if args.command == "test":
