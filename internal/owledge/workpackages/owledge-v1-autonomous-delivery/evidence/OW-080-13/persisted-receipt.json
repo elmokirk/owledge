@@ -1,6 +1,6 @@
 {
-  "baseline_file_content_tokens": 17781,
-  "cold_resume_drain": 13075,
+  "baseline_file_content_tokens": 18148,
+  "cold_resume_drain": 13443,
   "controls": [
     {
       "loaded": false,
@@ -32,9 +32,9 @@
   "session_slice": {
     "active_ticket": "OW-080-13",
     "active_version": "v0.8.0",
-    "current_step": "Separate session slice and deterministic persisted/reset receipts are complete.",
-    "next_command": "Request independent QA; do not accept OW-080-13 without real Codex and Claude Code transcript evidence."
+    "current_step": "Deterministic resume implementation and independent QA are complete; two real harness receipts remain required.",
+    "next_command": "Await owner decision Q-080-01 before any authenticated Codex or Claude Code runtime invocation."
   },
   "tokenizer": "owledge.regex-v1",
-  "warm_resume_drain": 72
+  "warm_resume_drain": 73
 }

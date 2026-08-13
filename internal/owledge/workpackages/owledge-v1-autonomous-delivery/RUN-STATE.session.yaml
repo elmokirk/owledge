@@ -3,11 +3,11 @@ runtime_resume_model: persisted
 session_slice:
   active_version: v0.8.0
   active_ticket: OW-080-13
-  current_step: "Separate session slice and deterministic persisted/reset receipts are complete."
-  next_command: "Request independent QA; do not accept OW-080-13 without real Codex and Claude Code transcript evidence."
+  current_step: "Deterministic resume implementation and independent QA are complete; two real harness receipts remain required."
+  next_command: "Await owner decision Q-080-01 before any authenticated Codex or Claude Code runtime invocation."
 durable_state_ref: RUN-STATE.yaml
-durable_state_tokens: 13003
-baseline_file_content_tokens: 17781
+durable_state_tokens: 13370
+baseline_file_content_tokens: 18148
 last_control_sha:
   CONTROL-PLANE-POLICY.md: 455b8bff35f61006a03834e6c2004046cbe442e4ab4b1b1dbeaadf3c2d58611c
   ALIGNMENT-PROTOCOL.md: 079f2b07e852bd7b5f41217d02bad9575951a4acc5284e4904a59377f6c73af7

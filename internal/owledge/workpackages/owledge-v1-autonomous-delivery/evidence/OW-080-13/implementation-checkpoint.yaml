@@ -3,12 +3,12 @@ status: implementation_complete_pending_runtime_evidence
 source_commits: [d7c7b4f, 4110daf, b12f2a0, ea2f97d, 38871c0, ab997dd]
 verification:
   - "python -m unittest tests.unit.test_ow08013_resume_context: 6 passed"
-  - "python tools/owledge.py resume-context-v1 persisted: baseline_file_content_tokens 17781; cold_resume_drain 13075; warm_resume_drain 72; durable_state_loaded false"
-  - "python tools/owledge.py resume-context-v1 reset_baseline: baseline_file_content_tokens 17807; cold_resume_drain 13101; warm_resume_drain 98; handoff and durable state loaded"
+  - "python tools/owledge.py resume-context-v1 persisted: baseline_file_content_tokens 18148; cold_resume_drain 13443; warm_resume_drain 73; durable_state_loaded false"
+  - "python tools/owledge.py resume-context-v1 reset_baseline: baseline_file_content_tokens 18174; cold_resume_drain 13469; warm_resume_drain 99; handoff and durable state loaded"
   - "python tools/owledge.py gate-sidecar-v1: exact roundtrip, 413 bytes, first_failings capped at 5"
 receipts:
-  persisted: {path: persisted-receipt.json, sha256: dd8edffd18aeebdb2f75ee5461b184b2a566c2a31c2618dff28d9359e306ecd9}
-  reset_baseline: {path: reset-baseline-receipt.json, sha256: 53b16b7a6dd7f4124241155baa313d698a4f55c2ddb9345e96f58fc7aee8b494}
+  persisted: {path: persisted-receipt.json, sha256: ead80365af0e5b2cf4bf7e4d2609eef61d1f45c82dea6b0fd8267e12370ead21}
+  reset_baseline: {path: reset-baseline-receipt.json, sha256: f6874b580f52ff65059a395d99ae31b20d842ecfb48fe6c98b33b2088392ad8c}
   gate_sidecar: {path: gate-sidecar.json, sha256: fca90f3e879c2a53d97be6cef6da1964e7e6844f1e3caf2aa55b45c59c93504a}
   gate_sidecar_receipt: {path: gate-sidecar-receipt.json, sha256: b2356d20904d909b6f4616a9c9506e2724f506b5c0bb4a8d0c91fa52bb9bd408}
 coverage:
