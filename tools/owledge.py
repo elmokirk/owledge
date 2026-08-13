@@ -143,6 +143,7 @@ HOST_TOOL_FILES = [
     "owledge_context_profiles.py",
     "owledge_rag_projection.py",
     "owledge_small_model_profiles.py",
+    "run_small_model_smoke.py",
     "validate_benchmark_baseline.py",
     "validate_upgrade_notes.py",
     "build_kb_module.py",
@@ -3892,7 +3893,7 @@ def main(argv: list[str] | None = None) -> int:
     small_model_p.add_argument("--capsule-chars", required=True, type=int)
     small_model_p.add_argument("--tools", default="")
     small_model_p.add_argument("--hops", default=0, type=int)
-    small_model_p.add_argument("--attempts", default=0, type=int)
+    small_model_p.add_argument("--retry-count", default=0, type=int)
     small_model_p.add_argument("--output-json", required=True)
 
     test_p = sub.add_parser("test", parents=[project_parent])
@@ -4130,7 +4131,7 @@ def main(argv: list[str] | None = None) -> int:
             return 0
         if args.command == "small-model-validate":
             output = json.loads(resolve_path(args.output_json).read_text(encoding="utf-8"))
-            result = owledge_small_model_profiles.validate(args.profile, args.capsule_chars, [item for item in args.tools.split(",") if item], args.hops, args.attempts, output)
+            result = owledge_small_model_profiles.validate(args.profile, args.capsule_chars, [item for item in args.tools.split(",") if item], args.hops, args.retry_count, output)
             print_json(result)
             return 0 if result["passed"] else 1
         if args.command == "test":

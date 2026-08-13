@@ -1,0 +1,7 @@
+{
+  "evidence_ref": "local-fixture",
+  "freshness_safe": true,
+  "privacy_safe": true,
+  "receipt_id": "fixture-1",
+  "status": "completed"
+}
