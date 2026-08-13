@@ -1,0 +1,21 @@
+{
+  "attempt": 6,
+  "command": "run_small_model_smoke.py --model qwen3.5:4b --scenario resume --attempt 6 --retry-count 0 --timeout 180",
+  "complete": true,
+  "finished_at": "2026-08-13T10:20:13.552853+00:00",
+  "model": "qwen3.5:4b",
+  "model_service": "local",
+  "passed": false,
+  "profile": "8k",
+  "results": [
+    {
+      "detail": "timed out",
+      "passed": false,
+      "reason": "local_model_invocation_failed",
+      "scenario": "resume"
+    }
+  ],
+  "retry_count": 0,
+  "started_at": "2026-08-13T10:17:13.513255+00:00",
+  "timeout_seconds": 180
+}

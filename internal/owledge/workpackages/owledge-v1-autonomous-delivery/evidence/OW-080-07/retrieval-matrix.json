@@ -1,0 +1,26 @@
+{
+  "command": "run_small_model_smoke.py --model qwen3.5:4b --scenario retrieval",
+  "complete": true,
+  "model": "qwen3.5:4b",
+  "model_service": "local",
+  "passed": true,
+  "profile": "8k",
+  "results": [
+    {
+      "errors": [],
+      "expected_tool": "owledge_search_memory",
+      "limits": {
+        "context": 4800,
+        "hops": 2,
+        "retries": 2,
+        "tools": 3
+      },
+      "passed": true,
+      "profile": "8k",
+      "required_field": "query",
+      "response_sha256": "4c4f98cb75375c51b874d7f7cb8cc040a07703fa09a9eba4ccdb1bfeb019816d",
+      "scenario": "retrieval",
+      "selected_tool": "owledge_search_memory"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "command": "run_small_model_smoke.py --model qwen3.5:4b --scenario planning",
+  "complete": true,
+  "model": "qwen3.5:4b",
+  "model_service": "local",
+  "passed": true,
+  "profile": "8k",
+  "results": [
+    {
+      "errors": [],
+      "expected_tool": "owledge_build_context_pack",
+      "limits": {
+        "context": 4800,
+        "hops": 2,
+        "retries": 2,
+        "tools": 3
+      },
+      "passed": true,
+      "profile": "8k",
+      "required_field": "mvp_step",
+      "response_sha256": "77dbbd7bea75c11f888e14c056e4f471b1e45814f59b392d9c228964160d776d",
+      "scenario": "planning",
+      "selected_tool": "owledge_build_context_pack"
+    }
+  ]
+}

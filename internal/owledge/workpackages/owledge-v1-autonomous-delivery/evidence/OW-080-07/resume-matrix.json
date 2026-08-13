@@ -1,0 +1,16 @@
+{
+  "command": "run_small_model_smoke.py --model qwen3.5:4b --scenario resume",
+  "complete": true,
+  "model": "qwen3.5:4b",
+  "model_service": "local",
+  "passed": false,
+  "profile": "8k",
+  "results": [
+    {
+      "detail": "timed out",
+      "passed": false,
+      "reason": "local_model_invocation_failed",
+      "scenario": "resume"
+    }
+  ]
+}

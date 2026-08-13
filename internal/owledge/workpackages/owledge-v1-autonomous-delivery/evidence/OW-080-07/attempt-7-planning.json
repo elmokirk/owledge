@@ -1,0 +1,31 @@
+{
+  "attempt": 7,
+  "command": "run_small_model_smoke.py --model qwen3.5:4b --scenario planning --attempt 7 --retry-count 0 --timeout 180",
+  "complete": true,
+  "finished_at": "2026-08-13T10:23:57.062973+00:00",
+  "model": "qwen3.5:4b",
+  "model_service": "local",
+  "passed": true,
+  "profile": "8k",
+  "results": [
+    {
+      "errors": [],
+      "expected_tool": "owledge_build_context_pack",
+      "limits": {
+        "context": 4800,
+        "hops": 2,
+        "retries": 2,
+        "tools": 3
+      },
+      "passed": true,
+      "profile": "8k",
+      "required_field": "mvp_step",
+      "response_sha256": "ffac0f4d4c6dc7caae329369f9143b31f4160cb605df272f02b087cc2dabbc9c",
+      "scenario": "planning",
+      "selected_tool": "owledge_build_context_pack"
+    }
+  ],
+  "retry_count": 0,
+  "started_at": "2026-08-13T10:22:08.953871+00:00",
+  "timeout_seconds": 180
+}

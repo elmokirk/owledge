@@ -1,0 +1,23 @@
+ticket: OW-080-07
+status: accepted
+accepted_at: "2026-08-13"
+source_commits: [fa0b263]
+verification:
+  - "python -m unittest tests.unit.test_ow08007_small_model_profiles: 6 passed"
+  - "python -m py_compile tools/owledge_small_model_profiles.py tools/run_small_model_smoke.py tools/owledge.py tools/build_project_folder_kit.py: passed"
+  - "python tools/owledge.py small-model-validate --project-root . --profile 8k --capsule-chars 1 --tools owledge_search_memory --hops 1 --retry-count -1 --output-json tests/fixtures/ow08007-small-model-output.json: rejected invalid_retry_count, exit 1"
+  - "python tools/validate_v1_delivery_plan.py: 0 errors, 61 tickets"
+  - "git diff --check: passed"
+local_model_matrix: matrix-manifest.yaml
+independent_qa:
+  result: accepted
+  findings_resolved:
+    - "Retry count is typed as retry provenance, including a negative-value fail-closed guard."
+    - "Accepted local-model receipts explicitly bind attempt, retry_count, timeout boundary, command, UTC timestamps, selected tool, and response hash."
+coverage:
+  - "4B-class local model completes bounded 8k planning, retrieval, and resume scenarios with expected tool selection and structured outputs."
+  - "Oversized context, excess/negative retry counts, unknown tools, excess hops, invalid structure, unsafe output, and missing completion evidence fail closed."
+  - "Kit inventory includes deterministic validator and real local smoke runner."
+limitations:
+  - "A resume attempt failed closed at 180 seconds; a separately initiated 240-second attempt passed. This is recorded in matrix-manifest.yaml and is not a profile-context limit."
+publication_authority: not_granted

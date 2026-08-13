@@ -1,0 +1,30 @@
+{
+  "attempt": 5,
+  "command": "run_small_model_smoke.py --model qwen3.5:4b --scenario resume",
+  "complete": true,
+  "finished_at": "2026-08-12T19:44:02.484827+00:00",
+  "model": "qwen3.5:4b",
+  "model_service": "local",
+  "passed": true,
+  "profile": "8k",
+  "results": [
+    {
+      "errors": [],
+      "expected_tool": "owledge_list_tasks",
+      "limits": {
+        "context": 4800,
+        "hops": 2,
+        "retries": 2,
+        "tools": 3
+      },
+      "passed": true,
+      "profile": "8k",
+      "required_field": "next_action",
+      "response_sha256": "359002eed3e3f477bd9b8b5b40f7ab05513f522094aff6e25a1203a45240d5af",
+      "scenario": "resume",
+      "selected_tool": "owledge_list_tasks"
+    }
+  ],
+  "started_at": "2026-08-12T19:42:39.640998+00:00",
+  "timeout_seconds": 180
+}
