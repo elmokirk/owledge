@@ -2,9 +2,9 @@ schema_version: 1
 runtime_resume_model: persisted
 session_slice:
   active_version: v0.8.0
-  active_ticket: OW-080-10
-  current_step: "W-080-B5 is accepted and G-080-B-CONTEXT is green; OW-080-10 is the active v0.8.0 release-candidate verification ticket."
-  next_command: "Load only OW-080-10, G-080-RC, D-080-01, and directly referenced evidence; execute release-candidate verification without publication, tagging, or push."
+  active_ticket: OW-080-11
+  current_step: "G-080-RC is green and v0.8.0 evidence is complete; OW-080-11 is blocked awaiting explicit product-owner alignment."
+  next_command: "Load only OW-080-11, G-080-ALIGNMENT, release-updates/v0.8.0.md, D-080-01, and directly referenced evidence; present the update and collect approve, adjust, or defer. Do not select OW-081-01."
 durable_state_ref: RUN-STATE.yaml
 durable_state_tokens: 14316
 baseline_file_content_tokens: 18940

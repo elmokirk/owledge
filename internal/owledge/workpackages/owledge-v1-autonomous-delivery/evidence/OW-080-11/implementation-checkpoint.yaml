@@ -1,0 +1,12 @@
+schema_version: 1
+ticket: OW-080-11
+release: v0.8.0
+gate: G-080-ALIGNMENT
+status: awaiting_user_alignment
+recorded_at: "2026-08-13T00:00:00+02:00"
+inputs:
+  - "G-080-RC implementation checkpoint: ../OW-080-10/implementation-checkpoint.yaml"
+  - "alignment protocol: ../../ALIGNMENT-PROTOCOL.md"
+  - "release update: ../../release-updates/v0.8.0.md"
+required_owner_decision: "approve, adjust, or defer v0.8.0 alignment; publication/tag/push remain separately blocked."
+safe_default: "Do not select or start OW-081-01; retain v0.8.1 locked."

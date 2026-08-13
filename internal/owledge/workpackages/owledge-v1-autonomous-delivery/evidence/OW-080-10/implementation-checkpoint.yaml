@@ -1,0 +1,53 @@
+schema_version: 1
+ticket: OW-080-10
+release: v0.8.0
+gate: G-080-RC
+status: passed
+source_commit: 3dca59f
+source_state: clean_detached_release_candidate_worktree_before_build
+recorded_at: "2026-08-13T00:00:00+02:00"
+scope:
+  included:
+    - "version and package-manifest alignment at 0.8.0"
+    - "release notes and public CLI contract documentation"
+    - "fresh wheel/sdist build and artifact integrity checks"
+    - "frozen v0.7.1 regression replay and v0.8 functional contracts"
+    - "safe v0.7.1 host upgrade to v0.8.0"
+  excluded:
+    - "comparative benchmark campaign and outcome claims (D-080-01; OW-100-04/G-100-B-PRODUCT)"
+    - "publication, tagging, release, push, or remote upload"
+checks:
+  - command: "python -m build"
+    result: pass
+    evidence: "wheel and sdist built from clean v0.8.0 candidate source"
+  - command: "python -m twine check dist/*"
+    result: pass
+  - command: "uvx --from dist/owledge-0.8.0-py3-none-any.whl owledge quickstart --target <fresh-host>"
+    result: pass
+    evidence: "fresh wheel-only host doctor score 100"
+  - command: "uv pip install --python <isolated-venv> .; owledge quickstart --target <fresh-host>"
+    result: pass
+    evidence: "direct installed-console-script smoke; fresh host doctor score 100"
+  - command: "python tools/owledge.py test release-contract --project-root . --require-dist --evidence-path dist/release-evidence.json"
+    result: pass
+  - command: "python tools/owledge_core.py --project-root . sdist-clean"
+    result: pass
+    evidence: "2500 files checked; no source-distribution leak"
+  - command: "pytest focused v0.8 contracts plus frozen v0.7.1 baseline"
+    result: pass
+    evidence: "81 tests passed; 16 subtests passed"
+  - command: "python tools/owledge.py upgrade --project-root <v0.7.1-host> --apply --yes --format json"
+    result: pass
+    evidence: "safe additive upgrade; kit manifest advanced 0.7.1 -> 0.8.0; host doctor score 100"
+  - command: "python tools/owledge.py test docs-contract --project-root ."
+    result: pass
+    evidence: "0 failures; 356 checks"
+limitations:
+  - "Setuptools emitted non-blocking metadata deprecation/MANIFEST warnings during build; artifact and sdist checks passed."
+  - "Executed macOS/Linux wheel proof remains deferred to OW-100-09 by D-071-24; no cross-platform support claim is made."
+  - "F-080-04 remains routed: native-hook lifecycle evidence is deterministic project-local coverage, not a live interactive Claude Code permission-UI test."
+release_authority:
+  publication: blocked
+  tag: blocked
+  push: blocked
+  next_release: blocked_pending_G-080-ALIGNMENT

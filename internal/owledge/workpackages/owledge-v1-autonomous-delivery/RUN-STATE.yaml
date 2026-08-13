@@ -5,19 +5,19 @@ plan: internal/owledge/plans/owledge-v1-autonomous-delivery-master-plan.md
 objective: Deliver Owledge v0.7.1 through a Standalone Core GA and bounded Single-Organization Hub Beta with recall-first Research Memory and portable agent adapters.
 status: in_progress
 current_release: v0.8.0
-current_phase: 080-RC
-active_ticket: OW-080-10
+current_phase: 080-ALIGNMENT
+active_ticket: OW-080-11
 session_slice_ref: RUN-STATE.session.yaml
-last_green_gate: G-071-ALIGNMENT
+last_green_gate: G-080-RC
 alignment:
-  state: approved
-  awaiting_release: null
-  active_alignment_ticket: null
-  user_decision: "approve — execute v0.8; publication/tag remains blocked"
-  decided_by: product-owner
-  decided_at: "2026-08-12"
-  scope: "Unlock planned v0.8.0 execution beginning with OW-080-01."
-  constraints: "No publication, tag, release, or push authorization; D-071-24 macOS/Linux evidence remains deferred to OW-100-09; subsequent alignment stops remain mandatory."
+  state: awaiting_user_alignment
+  awaiting_release: v0.8.0
+  active_alignment_ticket: OW-080-11
+  user_decision: pending
+  decided_by: null
+  decided_at: null
+  scope: "G-080-RC passed; owner decision is required before OW-081-01 may begin."
+  constraints: "Publication, tag, release, push, remote upload, macOS/Linux support claims, and comparative benchmark claims remain blocked; D-071-24 and D-080-01 remain active."
   open_questions:
     - id: Q-080-01
       source: OW-080-13-independent-qa
@@ -319,6 +319,15 @@ alignment:
       recommendation: "Keep the deterministic fixture as the current contract proof and add an interactive Claude runtime lane only when release scope or runtime support requires it."
       safe_default: "Do not claim interactive runtime/UI validation from the fixture evidence."
       status: routed
+    - id: F-080-05
+      source: OW-080-10-release-candidate-build
+      evidence: "evidence/OW-080-10/implementation-checkpoint.yaml"
+      severity: low
+      user_impact: "The v0.8.0 build prints setuptools metadata/MANIFEST deprecation warnings although artifact integrity and installation smoke checks pass."
+      release_impact: "Non-blocking for the technical candidate; warnings must not be presented as a packaging failure or silently discarded."
+      recommendation: "Modernize packaging metadata in a separately scoped maintenance increment before Stable/GA if the warnings remain."
+      safe_default: "Retain the warning in release evidence; do not broaden OW-080-10 or mutate package policy during the alignment stop."
+      status: routed
   decisions:
     - id: D-071-01
       related: F-071-01
@@ -489,23 +498,13 @@ alignment:
       affected_artifacts: ["OW-080-10", "G-080-RC", "OW-100-04", "G-100-B-PRODUCT", "RUN-STATE.yaml"]
       verification_status: owner_approved_recorded
   next_plan_reflection:
-    status: approved_for_execution
-    target_release: v0.8.0
+    status: awaiting_owner_decision
+    target_release: v0.8.1
     items:
-      - "Add OW-080-16 Research Memory contracts and recall-first lookup as a v0.8.0 P0 contract dependency."
-      - "Use Codex, Claude Code, Pi, and generic MCP/CLI as v0.8.1 reference profiles; prove Hermes/OpenCode through the generic seam first."
-      - "Remove autonomous delivery/worktree/orchestration/edge delivery tickets from the active v1 critical path and preserve them as post-v1 add-ons."
-      - "Add OW-100-11 for a one-organization OAuth/OIDC Hub Beta while preserving Standalone Core GA and Markdown/Git authority."
-      - "Deepen OW-080-02 into the versioned Schema Registry and layered deterministic settings contract instead of adding a parallel configuration subsystem."
-      - "Deepen OW-090-02 into a private global raw-inbox review lifecycle; raw candidates never enter normal retrieval and rejected items retain reasons/receipts."
-      - "Deepen OW-080-09, OW-090-06/09, and OW-100-01/11 into deterministic Knowledge Health and privacy-safe Hub operations health without adding a V1 dashboard or generic trace backend."
-      - "Model reviewed global essences as a provenance-preserving abstraction DAG with authorized deep retrieval to project/source revisions; keep Global Raw as the excluded review queue."
-      - "Require material document-version increments separately from schema/profile migrations and content hashes in OW-080-01/02/09 and OW-090-01."
-      - "Keep bounded personal-data erasure/DSAR orchestration post-v1; preserve only general V1 lifecycle cleanup and add managed-surface, transactional-upgrade, module-manifest, ResourceRef, and separated-health compatibility seams."
-      - "Repair the host/Kit upgrade-drift aggregate-gate regression and require a clean 38/38 finalization replay in OW-071-08 before V0.7.1 RC."
-      - "Prove a local multi-harness user_global reference composition in OW-081-09 without remote synchronization or implicit Hub upload."
-      - "Concentrate all semantic mutations behind the OW-090-04 Core interface and propagate policy-driven source withdrawal through every promoted and derived surface."
-      - "Publish tested Hub-owned-state Beta RPO/RTO bounds while leaving project Markdown/Git backup explicitly customer-owned."
+      - "keep: OW-081-01 and G-081-A-ADAPTERS retain the capability/AdapterManifest boundary validated by v0.8 portable contracts."
+      - "keep: OW-081-02 and OW-081-05 retain Codex and generic MCP/CLI profiles; recursive Codex CLI is not required for the active Desktop Goal."
+      - "keep: OW-081-03 retains lifecycle conformance; F-080-04 is a later interactive permission-UI enhancement, not a v0.8.0 claim."
+      - "keep: OW-081-04, OW-081-07, and OW-081-08 retain the cross-harness adapter/resume sequence supported by v0.8 contracts."
   update_path: null
 execution_mode:
   initial_run: root_agent_sequential
@@ -586,7 +585,7 @@ last_commands:
   - "python tools/owledge.py test public-docs --project-root .; python tools/owledge.py test docs-contract --project-root .; python tools/owledge.py test mcp-readonly --project-root .; python tools/owledge.py test runtime-adapters --project-root . (exit 0; public-docs 0 failures, docs-contract 473 checks)"
   - "PYTHONPATH=owlib/src python -m unittest discover -s owlib/tests -v (exit 0; 10 tests, one Windows symlink integration skip)"
 checkpoint:
-  last_completed_action: "W-080-B5 completed: OW-080-14 accepted by independent QA (92/100) with copy-only RUN-STATE sharding and live-state byte protection; OW-080-15 accepted (93/100) with a full project-local hook lifecycle fixture and zero external-path approvals. G-080-B-CONTEXT evidence is green; F-080-04 records the non-blocking interactive-Claude UI limitation."
+  last_completed_action: "G-080-RC passed: v0.8.0 was built from clean candidate source, wheel/sdist and direct-install smokes passed, 81 focused tests plus 16 subtests passed, and a fresh v0.7.1 Host safely upgraded to v0.8.0 with Doctor 100. OW-080-11 is now the mandatory owner-alignment stop."
   changed_files:
     - "internal/owledge/workpackages/owledge-v1-autonomous-delivery/RUN-STATE.session.yaml"
     - "tools/owledge.py"
@@ -650,8 +649,8 @@ checkpoint:
     - "python -m unittest tests.unit.test_validate_v1_delivery_plan tests.unit.test_validate_live_work_register -q: one pre-existing downstream mismatch; test_current_control_plane_is_valid still expects zero warnings while accepted OW-080-13 intentionally emits one internal-checkpoint warning. The validator itself passed with zero errors."
     - "python tools/owledge_core.py --project-root . validate-memory --strict: 307 pre-existing legacy frontmatter failures across historical internal memory; the touched canonical plan/checklists pass the release-specific frontmatter validation inside validate_v1_delivery_plan.py."
     - "python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports: completed 36/38 on 2026-08-12; source-identity correctly rejected the dirty planning tree and upgrade-drift exposed a host-project/Kit-mode regression. Routed to OW-071-08 under F-071-24."
-  workspace_state: "G-071-ALIGNMENT and G-080-B-CONTEXT are green; OW-080-01 through OW-080-09, OW-080-13 through OW-080-16 are accepted. OW-080-10 is the active v0.8.0 RC ticket. Publication, tagging, release, and push remain blocked."
-  next_exact_action: "Execute OW-080-10 release-candidate verification with benchmark deferral D-080-01 preserved; do not publish, tag, or push."
+  workspace_state: "G-080-RC is green; v0.8.0 technical candidate evidence is recorded. OW-080-11 is blocked awaiting explicit owner alignment. Publication, tagging, release, push, and v0.8.1 execution remain blocked."
+  next_exact_action: "Present release-updates/v0.8.0.md and collect explicit approve, adjust, or defer. Do not select OW-081-01 or publish, tag, release, push, or upload remotely."
   open_assumptions:
     - "The product owner wants the existing five-release train retained unless a later version reflection changes it."
     - "Local serial execution is the default; subagents are exceptional and justified only by independent risk reduction."
@@ -659,5 +658,5 @@ checkpoint:
     - "Do not start v0.8.0 before G-071-ALIGNMENT and an explicit owner approve decision."
     - "Do not trust or publish inherited dist artifacts; rebuild from committed source at RC."
     - "Do not broaden the accepted local HTTP profile or benchmark claims while rewriting adoption documentation."
-updated_at: "2026-08-13T13:12:00+02:00"
+updated_at: "2026-08-13T00:00:00+02:00"
 updated_by: codex
