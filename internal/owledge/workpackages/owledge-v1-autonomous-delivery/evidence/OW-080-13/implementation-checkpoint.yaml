@@ -7,10 +7,10 @@ verification:
   - "python tools/owledge.py resume-context-v1 reset_baseline: baseline_file_content_tokens 17807; cold_resume_drain 13101; warm_resume_drain 98; handoff and durable state loaded"
   - "python tools/owledge.py gate-sidecar-v1: exact roundtrip, 413 bytes, first_failings capped at 5"
 receipts:
-  persisted: {path: persisted-receipt.json, sha256: d3a91daa3931961c67c14d2161f093c7ff80112b97edca8d5810ab052646748e}
-  reset_baseline: {path: reset-baseline-receipt.json, sha256: fdcc6bc3333279017b621814c554a509235055c62850be153555360cbb454c5f}
+  persisted: {path: persisted-receipt.json, sha256: dd8edffd18aeebdb2f75ee5461b184b2a566c2a31c2618dff28d9359e306ecd9}
+  reset_baseline: {path: reset-baseline-receipt.json, sha256: 53b16b7a6dd7f4124241155baa313d698a4f55c2ddb9345e96f58fc7aee8b494}
   gate_sidecar: {path: gate-sidecar.json, sha256: fca90f3e879c2a53d97be6cef6da1964e7e6844f1e3caf2aa55b45c59c93504a}
-  gate_sidecar_receipt: {path: gate-sidecar-receipt.json, sha256: 550c9d9c1e3e80848744f9d85abc5c1a5dec9a46186c4b233b2abc3cfd3ee8d0}
+  gate_sidecar_receipt: {path: gate-sidecar-receipt.json, sha256: b2356d20904d909b6f4616a9c9506e2724f506b5c0bb4a8d0c91fa52bb9bd408}
 coverage:
   - "Persisted runtime reads the separate session slice only; it skips hash-verified controls and does not load durable state or an in-context handoff."
   - "Baseline-reset runtime requires and loads the handoff, then skips unchanged controls by recorded hash."
