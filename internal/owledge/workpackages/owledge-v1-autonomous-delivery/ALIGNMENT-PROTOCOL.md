@@ -106,7 +106,7 @@ not accepted until the owner decides.
 ## Copy-Ready `/goal` Resume Prompt
 
 ```text
-Resume Owledge v1 delivery from RUN-STATE.yaml. Read GOAL.md, CONTROL-PLANE-POLICY.md, ALIGNMENT-PROTOCOL.md, the active ticket, its gate, and directly referenced evidence only. If alignment.state is awaiting_user_alignment, do not implement or select any other ticket. Present release-updates/<version>.md, including the complete finding, decision, question, and next-plan-reflection sections. Collect explicit approve/adjust/defer decisions, record them, run python tools/validate_v1_delivery_plan.py, and stop again unless the user explicitly unlocks the next action.
+Resume Owledge v1 delivery with the bounded `resume-context-v1` capsule, the active ticket/checkpoint, its compact backlog row, its gate, and directly referenced evidence only. Runtime branch: a persisted runtime verifies retained control-document and handoff hashes before skipping re-reads; a baseline-reset runtime reads the latest handoff first, then applies the control-document hash delta. Read a capped gate-result summary first and reconstruct its sidecar only for triage. If alignment.state is awaiting_user_alignment, do not implement or select any other ticket. Present release-updates/<version>.md, including the complete finding, decision, question, and next-plan-reflection sections. Collect explicit approve/adjust/defer decisions, record them, run python tools/validate_v1_delivery_plan.py, and stop again unless the user explicitly unlocks the next action.
 ```
 
 ## Version Update Template

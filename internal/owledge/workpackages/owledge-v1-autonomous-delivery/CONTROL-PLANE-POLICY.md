@@ -45,6 +45,14 @@ An execution turn loads only:
 
 Use `python tools/validate_v1_delivery_plan.py --ticket-id <ID>` and `--gate-id <ID>` to extract sections. Loading the full master plan, ticket catalog, or gate catalog into a routine agent prompt is a policy violation. OW-080-05 must measure this bootstrap path against full-plan loading.
 
+For a `/goal` resume, use the `resume-context-v1` capsule before control
+documents. A persisted runtime may skip a hash-verified document or handoff
+already retained in context. A baseline-reset runtime must read the latest
+handoff before applying the control-document hash delta. Capped gate summaries
+are the default triage input; full sidecars remain reconstructable audit
+evidence and must be transcript-visible when the judging runtime cannot read
+files.
+
 ## Role and QA Assignment
 
 - `owner_role` is responsible for implementation and checkpoint accuracy.

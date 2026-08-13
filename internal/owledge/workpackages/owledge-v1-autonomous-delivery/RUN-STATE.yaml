@@ -526,8 +526,13 @@ last_commands:
   - "python tools/owledge.py test public-docs --project-root .; python tools/owledge.py test docs-contract --project-root .; python tools/owledge.py test mcp-readonly --project-root .; python tools/owledge.py test runtime-adapters --project-root . (exit 0; public-docs 0 failures, docs-contract 473 checks)"
   - "PYTHONPATH=owlib/src python -m unittest discover -s owlib/tests -v (exit 0; 10 tests, one Windows symlink integration skip)"
 checkpoint:
-  last_completed_action: "OW-080-08 is accepted: clean heading-aware RAG Projection v1, metadata separation, and privacy/staleness/dedupe boundaries are green."
+  last_completed_action: "OW-080-13 partial: bounded resume-context-v1 capsule is implemented and tested; runtime-neutral gate-payload capping and two-runtime evidence remain open."
   changed_files:
+    - "tools/owledge.py"
+    - "tests/unit/test_ow08013_resume_context.py"
+    - "skills/owledge-long-horizon-delivery/references/modes.md"
+    - "internal/owledge/workpackages/owledge-v1-autonomous-delivery/ALIGNMENT-PROTOCOL.md"
+    - "internal/owledge/workpackages/owledge-v1-autonomous-delivery/CONTROL-PLANE-POLICY.md"
     - "README.md"
     - "docs/README.md"
     - "docs/quickstart.md"

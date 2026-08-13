@@ -139,11 +139,19 @@ corrective ticket; never lower a threshold silently.
 
 Read:
 
-1. `RUN-STATE.yaml`;
-2. active ticket/checkpoint;
-3. backlog dependencies;
-4. latest gate report;
-5. directly referenced decisions/evidence.
+1. the bounded `resume-context-v1` capsule (session slice plus control-document hashes);
+2. the active ticket/checkpoint and its compact backlog row;
+3. the current gate section and directly referenced decisions/evidence;
+4. the latest handoff: read it mandatorily for a baseline-reset runtime; for a
+   persisted runtime verify its in-context hash first and do not re-read it
+   when already retained;
+5. a capped gate-result summary; reconstruct its sidecar only when triage
+   requires the full payload.
+
+For persisted runtimes, control documents already retained in context are
+hash-verified and skipped. For baseline-reset runtimes, apply the hash delta
+after the mandatory handoff read. Never load the full backlog, ticket catalog,
+or gate catalog merely to resume one active ticket.
 
 A valid recovery checkpoint includes last completed atomic action, changed
 files, passed/failed commands with exit codes, workspace state, next exact
