@@ -20,6 +20,33 @@ def load_validator():
 
 
 class ValidateV1DeliveryPlanTests(unittest.TestCase):
+
+    def test_post_v1_ticket_is_not_required_in_active_gate_or_wave(self) -> None:
+        current = self.validator.read(self.validator.BACKLOG)
+        self.assertIn("id: OW-081-04, release: v0.8.1, phase: post-v1, status: post_v1", current)
+        self.assertNotIn("OW-081-04]", current.split("G-081-A-ADAPTERS:", 1)[1].splitlines()[0])
+        result = self.validate_backlog(current)
+        self.assertTrue(result["passed"], result["errors"])
+
+    def test_post_v1_ticket_in_active_gate_fails_closed(self) -> None:
+        current = self.validator.read(self.validator.BACKLOG)
+        mutated = current.replace(
+            "G-081-A-ADAPTERS: [OW-081-01, OW-081-02, OW-081-03, OW-081-05]",
+            "G-081-A-ADAPTERS: [OW-081-01, OW-081-02, OW-081-03, OW-081-04, OW-081-05]",
+            1,
+        )
+        result = self.validate_backlog(mutated)
+        self.assertIn("OW-081-04: post_v1 ticket cannot belong to an active gate", result["errors"])
+
+    def test_active_ticket_dependency_on_post_v1_fails_closed(self) -> None:
+        current = self.validator.read(self.validator.BACKLOG)
+        mutated = current.replace(
+            "depends_on: [OW-081-01], gate: G-081-A-ADAPTERS, path: \"tickets/ALL-TICKETS.md#ow-081-02\"",
+            "depends_on: [OW-081-01, OW-081-04], gate: G-081-A-ADAPTERS, path: \"tickets/ALL-TICKETS.md#ow-081-02\"",
+            1,
+        )
+        result = self.validate_backlog(mutated)
+        self.assertIn("OW-081-02: active ticket depends on post_v1 ['OW-081-04']", result["errors"])
     @classmethod
     def setUpClass(cls) -> None:
         cls.validator = load_validator()

@@ -9,7 +9,7 @@ status: "active"
 visibility: "private"
 data_class: "internal"
 semantic_title: "Owledge v1 autonomous delivery phase checklist"
-summary: "Resume-oriented phase, QA, and mandatory user-alignment checklist for the v0.7.1 through v1.0 autonomous delivery plan."
+summary: "Resume-oriented phase, QA, and mandatory alignment checklist for the compact Standalone/local-user-global V1 delivery plan."
 concept_tags: ["v1-roadmap", "phase-checklist", "qa-gates"]
 stack_tags: ["git", "python", "mcp"]
 problem_patterns: ["partial-phase-resume", "checkbox-without-evidence"]
@@ -19,9 +19,9 @@ confidence: 0.94
 review_status: "reviewed"
 sanitization_status: "not_required"
 created_at: "2026-07-16T00:00:00Z"
-updated_at: "2026-08-12T16:15:00+02:00"
-workpackage_version: "2.0.0"
-document_version: 1
+updated_at: "2026-08-13T00:00:00+02:00"
+workpackage_version: "2.1.0"
+document_version: 2
 source_hash: ""
 reusable_lessons: []
 edges:
@@ -35,7 +35,14 @@ edges:
 
 ## Resume State
 
-Current resume point: **v0.7.1 Phase 071-A - Truth and release baseline**.
+Current resume point: **v0.8.1 Phase 081-A - minimal three-profile capability contract (OW-081-01)**.
+
+## 2026-08-13 Compact V1 Cutline
+
+- [x] Standalone Core plus private local user-global Null-Space recorded as V1 boundary
+- [x] Hub, Pi Tier-1, LightRAG, Documentation Compiler, supply-chain, enterprise scope, and JSONL export parked post-V1
+- [x] Active gates/waves/dependencies exclude parked tickets and fail closed under the plan validator
+- [x] Direct-use critical path and blind-spot review recorded in `evidence/OW-080-11/v1-scope-cut-review.yaml`
 
 ## Agent Rules
 

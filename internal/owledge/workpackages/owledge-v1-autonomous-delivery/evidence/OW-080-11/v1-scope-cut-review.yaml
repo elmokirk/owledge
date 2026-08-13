@@ -1,0 +1,36 @@
+schema_version: 1
+ticket: OW-080-11
+decision: D-080-02
+status: owner_approved_and_validated
+recorded_at: "2026-08-13T00:00:00+02:00"
+v1_product_boundary:
+  included: ["Standalone Core GA", "private local user_global Null-Space", "reviewed local Knowledge Base"]
+  excluded_post_v1: ["Single-Organization Hub Beta", "remote identity", "enterprise scope", "Pi Tier-1", "LightRAG", "Documentation Compiler", "supply-chain system"]
+v1_harnesses:
+  tier_1: ["Codex", "Claude Code", "generic MCP/CLI"]
+  generic_degradation_only: ["Pi", "Hermes", "OpenCode"]
+critical_path:
+  - "install/upgrade"
+  - "local user-global Null-Space"
+  - "recall/search"
+  - "Candidate/Research delta"
+  - "review/promotion"
+  - "Codex/Claude/generic MCP usage"
+  - "local security/health"
+  - "minimal GA proof"
+blind_spot_review:
+  status: passed_with_tracked_requirements
+  findings:
+    - "OW-081-09 must define local user-global ownership, storage, backup/erase, and no-sync enforcement."
+    - "OW-081-01/02/03/05 must make Pi/Hub surfaces explicitly unsupported in default discovery and claims."
+    - "OW-081-10 and OW-100-08 must prove actual Codex, Claude Code, and generic MCP/CLI usage, not fixture-only equivalence."
+    - "OW-100-04 must retain core journey/regression checks after removed Hub/RAG workloads."
+validation:
+  command: "python tools/validate_v1_delivery_plan.py"
+  result: "passed; 61 tickets, 25 gates, 41 waves, 0 errors"
+  focused_test: "python -m unittest tests.unit.test_validate_v1_delivery_plan -q"
+  focused_test_result: "passed"
+release_authority:
+  publication: blocked
+  tag: blocked
+  push: blocked

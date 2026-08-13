@@ -1,8 +1,8 @@
 ---
 title: "Owledge v1 Traceability"
 date: "2026-08-11"
-version: "2.4.0"
-document_version: 3
+version: "2.5.0"
+document_version: 4
 memory_id: "mem:owledge:global:owledge:compiled:v1-delivery-traceability"
 tenant_id: "owledge"
 customer_id: "global"
@@ -15,7 +15,7 @@ data_class: "internal"
 project: "owledge"
 scope: "v0.7.1-v1.0"
 semantic_title: "Owledge v1 delivery traceability"
-summary: "Traceability from product outcomes and blindspot controls to tickets, gates, and evidence."
+summary: "Traceability from compact Standalone/local-user-global V1 outcomes to tickets, gates, and evidence."
 concept_tags: ["traceability", "v1-roadmap", "qa"]
 stack_tags: ["markdown", "yaml"]
 problem_patterns: ["orphan-requirements", "unmapped-gates"]
@@ -25,7 +25,7 @@ confidence: 0.95
 review_status: "reviewed"
 sanitization_status: "not_required"
 created_at: "2026-07-16T00:00:00Z"
-updated_at: "2026-08-12T14:32:51+02:00"
+updated_at: "2026-08-13T00:00:00+02:00"
 source_hash: ""
 owners:
   - "release-orchestrator"
@@ -38,6 +38,31 @@ edges: []
 ---
 
 # Owledge v1 Traceability
+
+## 2026-08-13 V1 Scope-Cut Traceability Override
+
+The following rows are the authoritative V1 traceability where they conflict
+with the historical matrix below. Hub, enterprise, Pi Tier-1, LightRAG,
+Documentation Compiler, supply-chain, and generic JSONL export trace rows are
+post-V1 and cannot be used to justify V1 gate completion or product claims.
+
+| V1 requirement | Active tickets | Active gates |
+| --- | --- | --- |
+| Installable Standalone Core and safe upgrade | OW-071-10, OW-080-09, OW-100-05, OW-100-09 | G-071-B-ADOPTION, G-080-C-RETRIEVAL, G-100-B-PRODUCT, G-100-GA |
+| Local user-global Null-Space, recall, and authorized cross-project context | OW-081-09, OW-090-02, OW-090-03, OW-090-09 | G-081-C-JOURNEY, G-090-A-TRUST, G-090-C-RAG |
+| Codex, Claude Code, and generic MCP/CLI capability/degradation contract | OW-081-01, OW-081-02, OW-081-03, OW-081-05, OW-081-10 | G-081-A-ADAPTERS, G-081-RC |
+| Checkpoint, handoff, recall-before-research, Candidate and Research delta | OW-081-07, OW-081-08, OW-090-04 | G-081-B-CONCURRENCY, G-090-B-WRITES |
+| Reviewed local promotion and controlled semantic writes | OW-090-01, OW-090-02, OW-090-03, OW-090-04 | G-090-A-TRUST, G-090-B-WRITES |
+| Local health, freshness, tombstones, and safe source withdrawal | OW-080-09, OW-090-06, OW-090-09 | G-080-C-RETRIEVAL, G-090-B-WRITES, G-090-C-RAG |
+| Compact Core security, regression, lifecycle, docs, and GA proof | OW-100-01, OW-100-02, OW-100-04 through OW-100-10 | G-100-A-HARDENING through G-100-GA |
+
+## Appendix A — Historical Superseded Matrix (Post-V1 Reference Only)
+
+The following pre-cut matrix is retained solely for decision provenance. It is
+not an active V1 planning or selective-read source: its Hub, enterprise, Pi,
+LightRAG, Documentation Compiler, supply-chain, and JSONL rows are superseded
+by the binding matrix above and must not be used for ticket selection or gate
+promotion.
 
 | Requirement | Tickets | Gates |
 | --- | --- | --- |

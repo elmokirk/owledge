@@ -1,8 +1,8 @@
 ---
 title: "Owledge v1 Promotion Gates"
 date: "2026-08-11"
-version: "2.3.0"
-document_version: 3
+version: "2.4.0"
+document_version: 4
 memory_id: "mem:owledge:global:owledge:qa:v1-delivery-gate-catalog"
 tenant_id: "owledge"
 customer_id: "global"
@@ -15,7 +15,7 @@ data_class: "internal"
 project: "owledge"
 scope: "v0.7.1-v1.0"
 semantic_title: "Owledge v1 delivery promotion gates"
-summary: "Executable phase-promotion contracts and evidence requirements for the Owledge v1 release train."
+summary: "Executable promotion contracts for the reduced Standalone/local-user-global Owledge v1 release train."
 concept_tags: ["qa-gates", "release-promotion", "v1-roadmap"]
 stack_tags: ["markdown", "python", "git"]
 problem_patterns: ["false-promotion", "self-approval", "evidence-drift"]
@@ -25,7 +25,7 @@ confidence: 0.96
 review_status: "reviewed"
 sanitization_status: "not_required"
 created_at: "2026-07-16T00:00:00Z"
-updated_at: "2026-08-12T14:32:51+02:00"
+updated_at: "2026-08-13T00:00:00+02:00"
 source_hash: ""
 owners:
   - "release-assurance"
@@ -38,6 +38,14 @@ edges: []
 ---
 
 # Owledge v1 Promotion Gates
+
+## 2026-08-13 V1 Scope-Cut Supersession
+
+The active V1 surface is Standalone Core plus private local `user_global` and
+reviewed local Knowledge Base. Pi, Hub, LightRAG, Documentation Compiler,
+supply-chain manifests, enterprise-provider matrices, and generic JSONL export
+are post-V1. They cannot appear in a V1 gate threshold, claim, or release
+witness; older conflicting prose is retained only as historical context.
 
 ## Common Gate Contract
 
@@ -207,11 +215,12 @@ Every gate starts from the tested integration commit and controlled environment 
 
 ## v0.8.1 Gates
 
-### G-081-A-ADAPTERS - Tier-1 conformance
+### G-081-A-ADAPTERS - Three-profile adapter conformance
 
-- Tickets: `OW-081-01` through `OW-081-05`.
-- Commands: common capability/manifest suite against Codex, Claude Code, Pi,
-  and generic MCP/CLI; generic compatibility smoke for Hermes and OpenCode.
+- Tickets: `OW-081-01`, `OW-081-02`, `OW-081-03`, `OW-081-05`.
+- Commands: common capability/manifest suite against Codex, Claude Code, and
+  generic MCP/CLI. Hermes, OpenCode, and Pi are post-V1 generic consumers and
+  are neither executed V1 profiles nor V1 claims.
 - Thresholds: 100% required read/control capabilities; unsupported optional capability explicitly reported; undeclared scope calls=0; artifact semantics equivalent.
 - Demonstrable increment: same fixture can bootstrap and produce a task context/handoff in every profile.
 - Promotion: profiles may be labelled Tier 1 for declared capabilities.
@@ -231,19 +240,19 @@ Every gate starts from the tested integration commit and controlled environment 
   another harness resumes exact work without chat history.
 - Promotion: structured continuity and recovery may be enabled by declared adapters.
 
-### G-081-C-JOURNEY - Scoped context journey
+### G-081-C-JOURNEY - Local user-global Null-Space journey
 
 - Tickets: `OW-081-09`.
-- Commands: Owlib project-filter/privacy fixtures; `project_user`,
-  `user_global`, and `enterprise` namespace isolation; Research and general
+- Commands: Owlib project-filter/privacy fixtures; `project_user` and private
+  local `user_global` namespace isolation; Research and general
   context determinism, freshness, and relevance evaluation; two-harness local
-  `user_global` reference composition with Hub upload disabled.
+  `user_global` reference composition with network upload disabled.
 - Thresholds: default all-project scan=never; unauthorized project/scope
   results=0; every selected/excluded project, scope, source revision, and
   freshness state is explained; context budget honored; caller paths grant no authority.
-- Demonstrable increment: two harnesses use the same private local user-global
+- Demonstrable increment: two V1 harnesses use the same private local user-global
   federation for the current project plus one explicitly authorized related
-  project while enterprise knowledge remains distinguishable and no Hub upload occurs.
+  project; no network upload or remote synchronization is possible.
 - Promotion: scoped cross-project context becomes supported preview.
 
 ### G-081-RC - v0.8.1 reference-adapter release
@@ -271,7 +280,7 @@ Every gate starts from the tested integration commit and controlled environment 
 
 - Tickets: `OW-090-01`, `OW-090-02`, `OW-090-03`.
 - Commands: ledger integrity; source-revision and research-reason traceability;
-  authority conflict; three-scope lifecycle matrix; private global raw-inbox
+  authority conflict; local project/user-global lifecycle matrix; private global raw-inbox
   retrieval exclusion, bounded delta-capsule and policy-snapshot fixtures,
   reviewed global-essence/project-drill-down relations, promote/reject/archive
   receipts; privacy attack corpus.
@@ -284,26 +293,24 @@ Every gate starts from the tested integration commit and controlled environment 
   reviewed, rejected, or promoted to an authorized scope with complete evidence.
 - Promotion: semantic write surfaces may be implemented.
 
-### G-090-B-WRITES - Semantic writes and living docs
+### G-090-B-WRITES - Local semantic writes and Knowledge Health
 
-- Tickets: `OW-090-04`, `OW-090-05`, `OW-090-06`.
+- Tickets: `OW-090-04`, `OW-090-06`.
 - Commands: MCP protocol/security/idempotency plus traversal, symlink,
   confused-deputy, oversized-payload, lock-theft, and prompt-injection attack
   corpus; expected-document-revision/base-hash conflict and replay matrix;
-  Research Candidate and delta-refresh contracts; docs compiler golden
-  fixture; source-mutability-aware drift/impact and Knowledge Health precision,
+  Research Candidate and delta-refresh contracts; source-mutability-aware
+  freshness, review-debt, stale-source and Knowledge Health precision,
   including raw-inbox debt and unresolved drill-down sources.
 - Thresholds: arbitrary write tool absent; replay/escape/symlink/confused-deputy/undeclared-scope/oversized/injected-instruction accepted=0; lock theft accepted=0; lost accepted revisions=0; every write returns idempotent success or explicit conflict/reconciliation receipt; generated factual sections source-linked=100%; stale sources cannot be current.
-- Demonstrable increment: agent appends evidence, requests promotion, compiles
-  docs, then a mutable source change triggers a targeted Research delta brief.
+- Demonstrable increment: agent appends evidence, requests promotion, then a
+  mutable source change triggers a targeted local Research delta brief.
 - Promotion: reviewed semantic writes may ship as opt-in profile.
 
-### G-090-C-RAG - RAG and hub freshness
+### G-090-C-RAG - Local index freshness and tombstones
 
-- Tickets: `OW-090-07`, `OW-090-08`, `OW-090-09`.
-- Commands: JSONL round-trip; body-only vs title+summary+body vs semantic-tag
-  evaluation over keyword/vector/hybrid modes, two embedding profiles, and
-  multilingual terms; LightRAG reference; three-scope Owlib Research/general
+- Tickets: `OW-090-09`.
+- Commands: local project/user-global Owlib Research/general
   incremental add/change/delete/interruption/source-unavailable fixtures;
   reviewed-global-essence-first recall plus authorized/denied/missing/stale
   project deep-dive matrix; source-withdrawal/access-revocation propagation
@@ -313,15 +320,16 @@ Every gate starts from the tested integration commit and controlled environment 
   accuracy=100%; unavailable source current-results=0; unauthorized deep-dive
   results=0; essence answers retain exact source revision refs=100%; retrieval
   quality meets declared per-stratum thresholds; interrupted sync recovers atomically.
-- Demonstrable increment: reviewed change flows through projection and LightRAG, then deletion removes it without changing canonical Markdown.
-- Promotion: generic RAG contract stable; LightRAG remains optional adapter.
+- Demonstrable increment: reviewed local change flows through the local index,
+  then deletion removes it without changing canonical Markdown.
+- Promotion: local index freshness is stable; export/adapters remain post-V1.
 
 ### G-090-RC - v0.9.0 release candidate
 
 - Tickets: `OW-090-10` plus all earlier v0.9.0 gates.
-- Commands: cumulative trust/write/RAG suites; default read-only install test; opt-in write profile test; build and upgrade smoke.
-- Thresholds: default cannot write; policy-enabled semantic writes audited; RAG deletion proof present; all privacy gates green.
-- Demonstrable increment: user enables one scoped write workflow and one RAG adapter safely.
+- Commands: cumulative trust/write/local-index suites; default read-only install test; opt-in write profile test; build and upgrade smoke.
+- Thresholds: default cannot write; policy-enabled semantic writes audited; local tombstone deletion proof present; all privacy gates green.
+- Demonstrable increment: user enables one scoped local write workflow safely.
 - Promotion: technical candidate only; execute `G-090-ALIGNMENT` before publication/tag or v1.0 work.
 
 ### G-090-ALIGNMENT - v0.9.0 user alignment
@@ -335,62 +343,50 @@ Every gate starts from the tested integration commit and controlled environment 
 
 ## v1.0 Gates
 
-### G-100-A-HARDENING - Security and scale
+### G-100-A-HARDENING - Core security and reproducible scale smokes
 
-- Tickets: `OW-100-01`, `OW-100-02`, `OW-100-03`, `OW-100-11`.
-- Commands: hardware-independent deterministic correctness suite; 10/1k/10k
-  cold/warm benchmark with environment profile; security attack corpus; evidence
-  retention/redaction/size checks; malicious extension/update fixtures; OIDC
-  issuer/audience/JWKS, expiry/revocation, human/service principal,
-  confused-deputy, MCP/HTTP, scope-isolation, restart, backup/restore, Knowledge
-  Health scale, content-free operations-health export fixtures, and tested Hub
-  Beta RPO/RTO with the project-backup responsibility boundary; module
-  compatibility/profile/migration/health/uninstall fixtures and Managed Surface
-  Manifest permission/ownership checks.
-- Thresholds: deterministic correctness always passes; published p95/resource
-  targets met or explicit non-promotable limitation; unsafe shared export=0;
-  raw transcripts committed=0; oversized committed evidence=0; undeclared
-  extension or knowledge scope=0; permission expansion requires approval;
-  wrong/expired/revoked token accepted=0; cross-project/scope result=0; agent
-  direct canonical promotion=0; local password database=absent; standalone
-  regression=green; private `user_global` upload without a separate explicit
-  future capability=0; seeded health faults missed=0; raw prompt/output/
-  knowledge body in metric labels or operational-health payloads=0; module
-  writes to undeclared or user-managed surfaces=0.
-- Demonstrable increment: a 10k-artifact project compiles scoped context, rejects
-  malicious content/extension, and serves two developers plus two agent/service
-  identities from one Single-Org Hub Beta deployment.
+- Tickets: `OW-100-01`, `OW-100-02`.
+- Commands: hardware-independent deterministic correctness suite; small/medium/
+  large local cold/warm smoke with environment profile; Core security attack
+  corpus; evidence retention/redaction/size checks; local MCP/HTTP scope-deny,
+  restart/recovery, and Knowledge Health scale fixtures.
+- Thresholds: deterministic correctness always passes; local p95/resource bounds
+  are met or explicitly non-promotable; unsafe export=0; raw transcripts and
+  oversized evidence committed=0; undeclared local scope=0; cross-project/scope
+  result=0; agent direct canonical promotion=0; standalone regression=green;
+  private `user_global` upload=0; seeded health faults missed=0; raw prompt,
+  output, or knowledge body in reports=0.
+- Demonstrable increment: reproducible small/medium/large local fixtures compile
+  scoped context and reject malicious content without remote identity.
 - Promotion: v1 security and performance claims may be drafted.
 
-### G-100-B-PRODUCT - Outcomes and lifecycle
+### G-100-B-PRODUCT - Core journey regression and lifecycle
 
 - Tickets: `OW-100-04`, `OW-100-05`, `OW-100-06`.
-- Commands: versioned development and sealed held-out outcome evaluation;
-  recall-before-research, stale/partial/conflict and delta-only refresh matrix;
-  adapter contract matrix; stratified RAG retrieval evaluation; three-scope and
-  Hub authorization tests; CLI command matrix; Standalone/user-global/Hub
+- Commands: core-journey regression evaluation; recall-before-research,
+  stale/partial/conflict and delta-only refresh matrix; adapter contract matrix;
+  project/user-global authorization tests; CLI command matrix; Standalone/user-global
   install/upgrade/interruption/postflight-recovery/uninstall fixtures;
   claim-to-proof audit.
-- Thresholds: token savings cannot mask quality loss; legacy >=80%; held-out
-  correctness non-regressing; fresh Research prevents redundant refresh;
-  stale/partial/conflicted Research never passes as current; four-profile
-  contract-validity thresholds pass; RAG per-stratum thresholds pass; scope
+- Thresholds: regression cannot mask correctness loss; legacy >=80%; fresh
+  Research prevents redundant refresh; stale/partial/conflicted Research never
+  passes as current; three-profile contract-validity thresholds pass; scope
   leak=0; mutations support preview/JSON; user knowledge survives uninstall;
   every claim has tier/version/evidence/limitation.
 - Demonstrable increment: beginner and automated client complete lifecycle and recover from interrupted upgrade.
 - Promotion: product surface freezes for v1 docs.
 
-### G-100-C-PROOF - Documentation and final journey
+### G-100-C-PROOF - Core documentation and final journey
 
 - Tickets: `OW-100-07`, `OW-100-08`.
-- Commands: docs link/accessibility/command extraction; moderated standalone,
-  user-global, and Hub-admin journeys; Codex/Claude/Pi/generic MCP conformance;
-  generic Hermes/OpenCode compatibility; evidence-only reconstruction.
+- Commands: docs link/accessibility/command extraction; moderated standalone and
+  user-global journeys; Codex/Claude/generic MCP conformance; evidence-only
+  reconstruction. No Pi, Hub, or enterprise runtime witness is a V1 requirement.
 - Thresholds: public docs English; first-value journey succeeds without
-  maintainer; Tier-1 declared equivalence >=95%; Core GA and Hub Beta labels
-  never conflate; missing evidence fails clearly; no chat history required.
-- Demonstrable increment: complete v1 story from standalone install through
-  Research reuse, reviewed knowledge, RAG citation, and authenticated Single-Org Hub.
+  maintainer; three-profile declared equivalence >=95%; no Hub/Pi Tier-1 claim;
+  missing evidence fails clearly; no chat history required.
+- Demonstrable increment: complete V1 story from standalone install through
+  local user-global Research reuse, reviewed knowledge, and three-profile usage.
 - Promotion: v1 release artifacts may be cut.
 
 ### G-100-GA - v1.0 general availability

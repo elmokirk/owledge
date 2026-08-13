@@ -196,6 +196,13 @@ def validate() -> dict[str, Any]:
     known = set(ids)
     if len(ids) != len(known):
         errors.append("BACKLOG.yaml: duplicate ticket ids")
+    allowed_status_match = re.search(r"^status_values: \[([^\]]+)\]$", backlog_text, re.MULTILINE)
+    allowed_statuses = set(split_csv(allowed_status_match.group(1))) if allowed_status_match else set()
+    if not allowed_statuses:
+        errors.append("BACKLOG.yaml: status_values is missing")
+    for row in rows:
+        if row["status"] not in allowed_statuses:
+            errors.append(f"{row['id']}: unknown status {row['status']}")
 
     execution_rows = parse_execution_rows(matrix_text)
     execution_by_id = {row["id"]: row for row in execution_rows}
@@ -253,9 +260,10 @@ def validate() -> dict[str, Any]:
             errors.append(f"{ticket_id}: owner_role and qa_role must differ")
         if not 1 <= row["estimated_turns"] <= 3:
             errors.append(f"{ticket_id}: estimated_turns must be 1..3")
-        if row["gate"] not in gate_map:
+        parked_post_v1 = row["status"] == "post_v1"
+        if not parked_post_v1 and row["gate"] not in gate_map:
             errors.append(f"{ticket_id}: unknown gate {row['gate']}")
-        if assigned_to_gate.get(ticket_id) != [row["gate"]]:
+        if not parked_post_v1 and assigned_to_gate.get(ticket_id) != [row["gate"]]:
             errors.append(f"{ticket_id}: gate membership disagrees with ticket row")
         if row["path"] != f"tickets/ALL-TICKETS.md#{ticket_id.lower()}":
             errors.append(f"{ticket_id}: invalid selective-read path {row['path']}")
@@ -290,6 +298,15 @@ def validate() -> dict[str, Any]:
         errors.append(f"BACKLOG.yaml: cyclic or unreachable tickets {sorted(known - complete)}")
 
     row_by_id = {row["id"]: row for row in rows}
+    parked_ids = {row["id"] for row in rows if row["status"] == "post_v1"}
+    for row in rows:
+        if row["status"] == "post_v1":
+            if row["phase"] != "post-v1" or row["gate"] != "post-v1":
+                errors.append(f"{row['id']}: post_v1 ticket must use phase/gate post-v1")
+            if assigned_to_gate.get(row["id"]):
+                errors.append(f"{row['id']}: post_v1 ticket cannot belong to an active gate")
+        elif set(row["depends_on"]) & parked_ids:
+            errors.append(f"{row['id']}: active ticket depends on post_v1 {sorted(set(row['depends_on']) & parked_ids)}")
 
     def reaches(ticket_id: str, target_id: str, visited: set[str] | None = None) -> bool:
         if ticket_id == target_id:
@@ -341,6 +358,8 @@ def validate() -> dict[str, Any]:
                 errors.append(f"{ticket_id}: missing alignment action {phrase}")
         if next_release != "null":
             for next_ticket in (row for row in rows if row["release"] == next_release):
+                if next_ticket["status"] == "post_v1":
+                    continue
                 if not reaches(next_ticket["id"], ticket_id):
                     errors.append(f"{next_ticket['id']}: is not blocked by prior alignment {ticket_id}")
 
@@ -395,11 +414,15 @@ def validate() -> dict[str, Any]:
         for wave in execution_waves
         for ticket_id in wave["tickets"]
     ]
-    if set(wave_tickets) != known:
-        errors.append(f"Execution-wave coverage mismatch: missing={sorted(known-set(wave_tickets))} extra={sorted(set(wave_tickets)-known)}")
+    active_ticket_ids = {row["id"] for row in rows if row["status"] != "post_v1"}
+    if set(wave_tickets) != active_ticket_ids:
+        errors.append(f"Execution-wave coverage mismatch: missing={sorted(active_ticket_ids-set(wave_tickets))} extra={sorted(set(wave_tickets)-active_ticket_ids)}")
     duplicates = sorted({item for item in wave_tickets if wave_tickets.count(item) > 1})
     if duplicates:
         errors.append(f"Tickets occur in multiple execution waves: {duplicates}")
+    parked_in_waves = sorted(set(wave_tickets) & parked_ids)
+    if parked_in_waves:
+        errors.append(f"post_v1 tickets cannot occur in execution waves: {parked_in_waves}")
 
     wave_by_ticket: dict[str, tuple[int, dict[str, Any]]] = {}
     previous_release_rank = -1

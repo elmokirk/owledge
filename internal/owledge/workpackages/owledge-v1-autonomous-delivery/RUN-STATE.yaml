@@ -1,23 +1,23 @@
 schema_version: 1
-document_version: 18
+document_version: 19
 project: owledge
 plan: internal/owledge/plans/owledge-v1-autonomous-delivery-master-plan.md
 objective: Deliver Owledge v0.7.1 through a Standalone Core GA and bounded Single-Organization Hub Beta with recall-first Research Memory and portable agent adapters.
 status: in_progress
-current_release: v0.8.0
-current_phase: 080-ALIGNMENT
-active_ticket: OW-080-11
+current_release: v0.8.1
+current_phase: 081-A
+active_ticket: OW-081-01
 session_slice_ref: RUN-STATE.session.yaml
 last_green_gate: G-080-RC
 alignment:
-  state: awaiting_user_alignment
-  awaiting_release: v0.8.0
-  active_alignment_ticket: OW-080-11
-  user_decision: pending
-  decided_by: null
-  decided_at: null
-  scope: "G-080-RC passed; owner decision is required before OW-081-01 may begin."
-  constraints: "Publication, tag, release, push, remote upload, macOS/Linux support claims, and comparative benchmark claims remain blocked; D-071-24 and D-080-01 remain active."
+  state: approved
+  awaiting_release: null
+  active_alignment_ticket: null
+  user_decision: "approve — compact V1 cut and reduced OW-081-01 path"
+  decided_by: product-owner
+  decided_at: "2026-08-13"
+  scope: "Standalone Core GA plus private local user_global Null-Space; Codex, Claude Code, and generic MCP/CLI only."
+  constraints: "Publication, tag, release, push, remote upload, Hub, Pi Tier-1, LightRAG, Documentation Compiler, supply-chain system, enterprise scope, macOS/Linux support claims, and comparative benchmark claims remain blocked."
   open_questions:
     - id: Q-080-01
       source: OW-080-13-independent-qa
@@ -328,6 +328,15 @@ alignment:
       recommendation: "Modernize packaging metadata in a separately scoped maintenance increment before Stable/GA if the warnings remain."
       safe_default: "Retain the warning in release evidence; do not broaden OW-080-10 or mutate package policy during the alignment stop."
       status: routed
+    - id: F-080-06
+      source: owner-approved-v1-scope-cut
+      evidence: "evidence/OW-080-11/v1-scope-cut-review.yaml"
+      severity: high
+      user_impact: "The former V1 plan included Hub, Pi, enterprise, LightRAG, and compiler chains that delayed direct local use and retained incompatible proof claims."
+      release_impact: "Resolved by the owner-approved compact V1 boundary; all affected active gates and dependencies were repaired, and parked tickets stay traceable as post-V1."
+      recommendation: "Execute only the minimal Standalone/local-user-global critical path and reject scope re-entry without a new owner amendment."
+      safe_default: "Treat every Hub/Pi/LightRAG/compiler/supply-chain/enterprise request as post-V1."
+      status: resolved
   decisions:
     - id: D-071-01
       related: F-071-01
@@ -497,8 +506,16 @@ alignment:
       constraints: "No v0.8/v0.8.1/v0.9 gate may substitute benchmark deferral for functional, security, privacy, migration, or release verification. OW-080-13 must still measure file-content loading to prove its resume contract. Publication, tagging, release, and push remain unauthorized."
       affected_artifacts: ["OW-080-10", "G-080-RC", "OW-100-04", "G-100-B-PRODUCT", "RUN-STATE.yaml"]
       verification_status: owner_approved_recorded
+    - id: D-080-02
+      related: [G-080-ALIGNMENT, OW-081-01, OW-081-04, OW-081-09, OW-090-02, OW-090-04, OW-100-11]
+      authority: product-owner
+      decision: "Approve compact V1: Standalone Core GA plus local user-global Null-Space; Codex, Claude Code, and generic MCP/CLI only. Park Hub, Pi Tier-1, LightRAG, Documentation Compiler, supply-chain, enterprise scope, and generic JSONL export post-V1."
+      rationale: "Make Owledge immediately installable and useful in local projects with a fast, core-oriented critical path."
+      constraints: "No push, tag, publish, release, remote upload, false platform/Tier-1/performance/enterprise claim, or re-entry of parked scope without a new AMEND GOAL BOUNDARY."
+      affected_artifacts: ["owledge-v1-autonomous-delivery-master-plan.md", "BACKLOG.yaml", "ALL-TICKETS.md", "ALL-GATES.md", "TRACEABILITY.md", "release-updates/v0.8.0.md", "evidence/OW-080-11/v1-scope-cut-review.yaml"]
+      verification_status: owner_approved_plan_validator_green
   next_plan_reflection:
-    status: awaiting_owner_decision
+    status: approved_for_execution
     target_release: v0.8.1
     items:
       - "keep: OW-081-01 and G-081-A-ADAPTERS retain the capability/AdapterManifest boundary validated by v0.8 portable contracts."
@@ -585,7 +602,7 @@ last_commands:
   - "python tools/owledge.py test public-docs --project-root .; python tools/owledge.py test docs-contract --project-root .; python tools/owledge.py test mcp-readonly --project-root .; python tools/owledge.py test runtime-adapters --project-root . (exit 0; public-docs 0 failures, docs-contract 473 checks)"
   - "PYTHONPATH=owlib/src python -m unittest discover -s owlib/tests -v (exit 0; 10 tests, one Windows symlink integration skip)"
 checkpoint:
-  last_completed_action: "G-080-RC passed: v0.8.0 was built from clean candidate source, wheel/sdist and direct-install smokes passed, 81 focused tests plus 16 subtests passed, and a fresh v0.7.1 Host safely upgraded to v0.8.0 with Doctor 100. OW-080-11 is now the mandatory owner-alignment stop."
+  last_completed_action: "G-080-ALIGNMENT owner scope cut accepted and independently reworked: post-V1 tickets are excluded fail-closed from active gates/waves/dependencies, the Standalone/local-user-global V1 documents and gates are aligned, and OW-081-01 is the sole active ticket."
   changed_files:
     - "internal/owledge/workpackages/owledge-v1-autonomous-delivery/RUN-STATE.session.yaml"
     - "tools/owledge.py"
@@ -649,8 +666,8 @@ checkpoint:
     - "python -m unittest tests.unit.test_validate_v1_delivery_plan tests.unit.test_validate_live_work_register -q: one pre-existing downstream mismatch; test_current_control_plane_is_valid still expects zero warnings while accepted OW-080-13 intentionally emits one internal-checkpoint warning. The validator itself passed with zero errors."
     - "python tools/owledge_core.py --project-root . validate-memory --strict: 307 pre-existing legacy frontmatter failures across historical internal memory; the touched canonical plan/checklists pass the release-specific frontmatter validation inside validate_v1_delivery_plan.py."
     - "python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports: completed 36/38 on 2026-08-12; source-identity correctly rejected the dirty planning tree and upgrade-drift exposed a host-project/Kit-mode regression. Routed to OW-071-08 under F-071-24."
-  workspace_state: "G-080-RC is green; v0.8.0 technical candidate evidence is recorded. OW-080-11 is blocked awaiting explicit owner alignment. Publication, tagging, release, push, and v0.8.1 execution remain blocked."
-  next_exact_action: "Present release-updates/v0.8.0.md and collect explicit approve, adjust, or defer. Do not select OW-081-01 or publish, tag, release, push, or upload remotely."
+  workspace_state: "G-080-ALIGNMENT is owner-approved with the compact Standalone/local-user-global V1 cut. OW-081-01 is active. Publication, tagging, release, push, and remote upload remain blocked."
+  next_exact_action: "After final scope-cut QA accept, execute OW-081-01 only: define the minimal shared AdapterManifest/capability contract for Codex, Claude Code, and generic MCP/CLI."
   open_assumptions:
     - "The product owner wants the existing five-release train retained unless a later version reflection changes it."
     - "Local serial execution is the default; subagents are exceptional and justified only by independent risk reduction."

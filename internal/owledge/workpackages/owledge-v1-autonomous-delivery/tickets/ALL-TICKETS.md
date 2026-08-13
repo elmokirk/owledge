@@ -1,8 +1,8 @@
 ---
 title: "Owledge v1 Ticket Contracts"
 date: "2026-07-16"
-version: "2.3.0"
-document_version: 3
+version: "2.4.0"
+document_version: 4
 memory_id: "mem:owledge:global:owledge:task:v1-delivery-ticket-catalog"
 tenant_id: "owledge"
 customer_id: "global"
@@ -15,7 +15,7 @@ data_class: "internal"
 project: "owledge"
 scope: "v0.7.1-v1.0"
 semantic_title: "Owledge v1 delivery ticket catalog"
-summary: "Normalized implementation contracts for every ticket in the autonomous Owledge v1 release train."
+summary: "Normalized implementation contracts for every ticket in the autonomous Owledge v1 release train, including the approved Standalone/local-user-global V1 scope cut."
 concept_tags: ["tickets", "v1-roadmap", "autonomous-delivery"]
 stack_tags: ["markdown", "yaml", "python", "git"]
 problem_patterns: ["ambiguous-tickets", "dependency-drift", "self-approval"]
@@ -25,7 +25,7 @@ confidence: 0.95
 review_status: "reviewed"
 sanitization_status: "not_required"
 created_at: "2026-07-16T00:00:00Z"
-updated_at: "2026-08-12T14:32:51+02:00"
+updated_at: "2026-08-13T00:00:00+02:00"
 source_hash: ""
 owners:
   - "release-orchestrator"
@@ -38,6 +38,27 @@ edges: []
 ---
 
 # Owledge v1 Ticket Contracts
+
+## 2026-08-13 Approved V1 Scope Cut
+
+This normative amendment supersedes conflicting older ticket prose without
+erasing its decision history. V1 is the installable Standalone Core plus private
+local `user_global`/reviewed local Knowledge Base. Codex, Claude Code, and
+generic MCP/CLI are the only V1 Tier-1 profiles. Pi, Single-Organization Hub,
+LightRAG, Documentation Compiler, supply-chain manifests, and broad enterprise
+or orchestration capabilities are post-V1. `post_v1` rows remain searchable
+historical backlog and are deliberately excluded from V1 gates and waves.
+
+| Ticket | Binding disposition |
+| --- | --- |
+| OW-081-01/02/03/05 | keep; minimal shared contract, then Codex, Claude, generic MCP/CLI ASAP |
+| OW-081-04 | post-V1; Pi has no V1 adapter or Tier-1 claim |
+| OW-081-07/08 | keep; checkpoint/handoff and recall/delta/recap only, no side-effect orchestrator |
+| OW-081-09/10 | keep P0; local user-global Null-Space then three-profile journey |
+| OW-090-01/02/03/04/06/09 | keep and trim to local provenance, promotion, deny core, semantic writes, health/freshness, and tombstones |
+| OW-090-05/07/08 | post-V1; compiler, optional JSONL export, and LightRAG do not block direct local use |
+| OW-100-01/02/04/05/06/07/08/09/10 | keep and trim to Core scale, security, lifecycle, proof, and GA |
+| OW-100-03/11 | post-V1; supply-chain system and Hub Beta |
 
 This file is the compact ticket catalog referenced by `BACKLOG.yaml`. Load only the active ticket section plus the common execution contract.
 
@@ -569,16 +590,13 @@ reference profiles and capability contracts are stable.
 ### OW-081-01 - Define AdapterManifest and conformance protocol
 
 - Priority/dependencies: P0; `OW-080-11`.
-- Outcome: adapters and modules declare detect/install/inject/capture/execute/
-  resume/health/cleanup/uninstall, versions, Core compatibility, permissions,
-  profiles, migrations, limits, and degradation.
+- Outcome: the three V1 adapters declare a minimal versioned read/control,
+  context, checkpoint/handoff, Candidate-write, and explicit-degradation contract.
 - Allowed paths: runtime conformance add-on, schemas, adapter templates, tests/docs.
-- Implement: capability schema, negotiation result, fixture protocol,
-  support-tier rules, module kind, compatibility range, declared artifact
-  profiles/migrations, and health contract; define optional pre-plan lifecycle
-  capabilities for scoped idea/concept lookup, MVP-cutline handoff,
-  roadmap/idea capture, and explicit unsupported degradation without requiring
-  background writes or access to Core storage internals.
+- Implement: a compact capability schema, negotiation result, three-profile
+  fixture protocol, Core compatibility range, declared permissions, and explicit
+  unsupported degradation. Exclude Hub, Pi, supply-chain/module lifecycle, and
+  orchestration semantics; no adapter accesses Core storage internals.
 - Accept: undeclared capability cannot run; unsupported feature returns explicit structured result; adapters cannot claim automatic pre-plan inspection or durable routing unless they pass the shared fixtures.
 - Verify/evidence: manifest and negative compatibility suite; `evidence/OW-081-01/`.
 - Negative QA: version mismatch, missing permission, undeclared profile or
@@ -604,9 +622,9 @@ reference profiles and capability contracts are stable.
 - Verify/evidence: Tier-1 suite; `evidence/OW-081-03/`.
 - Negative QA: hook failure surfaces at session close and cannot mark ticket done.
 
-### OW-081-04 - Pi reference adapter
+### OW-081-04 - Pi reference adapter (post-V1 parked)
 
-- Priority/dependencies: P0; `OW-081-01`.
+- Priority/dependencies: P2; `OW-081-01`.
 - Outcome: `@owledge/pi` proves that a custom agent runtime can use Owledge for
   durable memory, scoped context, Research recall, and continuity without
   duplicating Core semantics.
@@ -652,25 +670,26 @@ checkpoint idempotency and explicit adapter permissions without owning worktrees
 ### OW-081-07 - Implement checkpoint reconciliation and cross-harness resume
 
 - Priority/dependencies: P0; `OW-080-04`, `OW-081-01`.
-- Outcome: kill/retry at every checkpoint avoids duplicate canonical records
-  and side effects while a second supported harness resumes without chat history.
+- Outcome: checkpoint hashes and handoff packs allow a second supported harness
+  to resume without chat history and without duplicate canonical records.
 - Allowed paths: checkpoint/resume core, adapter fixtures, tests/docs.
-- Implement: input/output hashes, idempotency keys, side-effect journal, reconciliation status, resume pack.
+- Implement: input/output hashes, idempotency keys, reconciliation status, and
+  a bounded resume pack; no comprehensive side-effect orchestrator.
 - Accept: second Tier-1 harness resumes exact work from checkpoint without chat history.
 - Verify/evidence: kill/retry and harness-switch matrix; `evidence/OW-081-07/`.
 - Negative QA: hash mismatch or uncertain external side effect blocks automatic resume.
 
-### OW-081-08 - Add runtime hooks and integration manifest
+### OW-081-08 - Add minimal runtime recap and Research-delta integration
 
-- Priority/dependencies: P1; `OW-081-02`, `OW-081-03`, `OW-081-04`, `OW-081-05`, `OW-081-07`.
-- Outcome: supported hooks validate mutations, create structured Session Recap
+- Priority/dependencies: P0; `OW-081-02`, `OW-081-03`, `OW-081-05`, `OW-081-07`.
+- Outcome: Codex, Claude Code, and generic MCP/CLI hooks create structured Session Recap
   Candidates, and record scopes, gates, reviews, conflicts, risks, and resumable deltas.
 - Allowed paths: adapter hooks, integration schemas, CLI/tests/docs.
 - Implement: settings-controlled pre-research recall, post-research delta
   proposal, post-tool validation, and Stop/SessionEnd recap with Outcomes,
   Decisions, Learnings, Gotchas, open questions, Evidence, affected artifacts,
-  Research Candidates, and Promotion Candidates; no raw transcript promotion;
-  explicit unsupported warnings and deterministic integration manifest.
+  Research Candidates, and Promotion Candidates; no raw transcript promotion or
+  side-effect orchestrator; explicit unsupported warnings and deterministic integration manifest.
 - Accept: invalid ticket edit cannot pass session close; the recap is private,
   source-linked, schema-valid, resumable from another harness, and remains a
   Candidate until review; integration order is reproducible.
@@ -720,38 +739,38 @@ and machine-readable errors independently of a model-specific delivery profile.
 - Accept: edge models can perform declared bounded tasks without full-plan injection; deterministic validators catch malformed output; unsupported architecture, merge, security, and cross-project actions are refused clearly.
 - Verify/evidence: 4B-class local-model smoke run plus budget, structured-output, false-pass, and fallback fixtures; `evidence/OW-081-14/`.
 - Negative QA: oversized context, hidden model downgrade, improvised unsupported action, false acceptance, or missing real-model evidence blocks the v0.8.1 claim.
-### OW-081-09 - Add scoped Owlib retrieval and hub context packs
+### OW-081-09 - Add local user-global Null-Space retrieval and context packs
 
-- Priority/dependencies: P1; `OW-071-06`, `OW-080-05`, `OW-080-11`.
-- Outcome: Owlib queries `project_user`, private `user_global`, or approved
-  `enterprise` knowledge across explicit allowlisted projects and explains every
-  scope and source selection.
-- Allowed paths: `owlib/`, hub skills/MCP/docs/tests.
-- Implement: `--projects`, exclusions, three knowledge-scope profiles,
-  principal/owner binding, orthogonal abstraction/lifecycle filters,
-  project-filter-first Research and general retrieval, reviewed-global-essence
+- Priority/dependencies: P0; `OW-071-06`, `OW-080-05`, `OW-081-01`, `OW-081-05`.
+- Outcome: Owlib queries only `project_user` and private local `user_global`
+  knowledge across explicit allowlisted projects and explains every scope and source selection.
+- Allowed paths: `owlib/`, local Core/MCP/docs/tests.
+- Implement: `--projects`, exclusions, local `project_user`/`user_global`
+  profiles, owner binding, explicit local storage/backup/erase/no-sync policy,
+  orthogonal abstraction/lifecycle filters,
+  project-filter-first Research and general retrieval, reviewed-local-essence
   first recall, explicit permission-checked project `deep_dive`, context-pack
-  budget/digest, source reasons, and separate personal-global versus enterprise
-  indexes or namespaces; add one local `user_global` reference composition that
-  at least two harnesses can query through the generic Core/MCP seam without Hub
-  upload or remote user-global synchronization.
+  budget/digest, source reasons, and separate local project/user-global
+  namespaces; add one local `user_global` reference composition that
+  at least two harnesses can query through the generic Core/MCP seam without
+  network upload or remote user-global synchronization.
 - Accept: default never scans all projects; project-user data never enters
-  another user's global or enterprise result; output identifies scope, owner,
+  another local user's global result; output identifies scope, owner,
   project, abstraction level, lifecycle, source revision, freshness, review,
   and exclusion reasons; an unavailable or unauthorized drill-down is explicit.
 - Verify/evidence: cross-project privacy/relevance fixtures; `evidence/OW-081-09/`.
 - Negative QA: unauthorized project ID, deep-dive permission bypass, missing
-  source presented as current, empty scope, mixed private/shared context, and
-  implicit Hub upload fail safely.
+  source presented as current, empty scope, mixed private/shared context,
+  implicit upload/sync, and forbidden Hub/enterprise scope fail safely.
 
-### OW-081-10 - Prove Research-to-resume golden journey and cut v0.8.1
+### OW-081-10 - Prove three-profile Research-to-resume golden journey and cut v0.8.1
 
 - Priority/dependencies: P0; `OW-081-08`, `OW-081-09`.
 - Outcome: Research recall, scoped context, deliberate interruption, structured
   Session Recap, cross-harness resume, failed review, correction, and source-linked
   report run end to end; optional autonomous delivery is measured separately.
 - Allowed paths: golden fixtures/demo, conformance kit, release/version/docs/workflows.
-- Implement: deterministic journey using Codex, Claude, Pi, and generic MCP/CLI;
+- Implement: deterministic journey using Codex, Claude Code, and generic MCP/CLI;
   prove Hermes/OpenCode generic compatibility without requiring bespoke adapters;
   clean artifact build and public support matrix.
 - Accept: fresh research is reused, stale research creates a delta brief, recap
@@ -789,13 +808,14 @@ and machine-readable errors independently of a model-specific delivery profile.
 ### OW-090-02 - Implement reviewed promotion lifecycle
 
 - Priority/dependencies: P0; `OW-090-01`.
-- Outcome: candidate, raw-inbox, reviewed, canonical, superseded,
-  rejected/archived transitions are
-  explicit, reversible, evidenced, and valid across project-user, user-global,
-  and enterprise scopes.
+- Scope cut: V1 promotion is only `project candidate -> local user_global raw ->
+  reviewed local essence/rejected/archived`; enterprise scope and Hub transfer are post-V1.
+- Outcome: local candidate, raw-inbox, reviewed local essence, superseded, and
+  rejected/archived transitions are explicit, reversible, and evidenced across
+  project-user and private local user-global scopes.
 - Allowed paths: promotion core/schemas/CLI/templates/tests/docs.
 - Implement: promotion request, a private `user_global` raw inbox excluded from
-  ordinary retrieval/RAG, stable claim/source dedupe, source-linked reusable
+  ordinary retrieval, stable claim/source dedupe, source-linked reusable
   delta capsules rather than pointer-only records or full project plans/transcripts,
   policy-controlled TTL snapshots only for volatile/non-reproducible sources,
   reviewed global-essence compilation with stable project/Evidence drill-down,
@@ -841,9 +861,9 @@ and machine-readable errors independently of a model-specific delivery profile.
 - Verify/evidence: protocol/security/idempotency suite; `evidence/OW-090-04/`.
 - Negative QA: traversal, symlink escape, confused-deputy project ID, undeclared scope, replay, oversized payload, lock theft/expiry race, injected retrieved instruction, and direct canonical edit fail.
 
-### OW-090-05 - Build source-linked Documentation Compiler
+### OW-090-05 - Build source-linked Documentation Compiler (post-V1 parked)
 
-- Priority/dependencies: P1; `OW-090-01`, `OW-090-02`.
+- Priority/dependencies: P2; `OW-090-01`, `OW-090-02`.
 - Outcome: ADRs, architecture, runbooks, onboarding, release notes, and capability catalog compile with source hashes and interpretation labels.
 - Allowed paths: documentation compiler, templates, reports, tests/docs.
 - Implement: section provenance, draft/review/current lifecycle, deterministic rebuild, impact map.
@@ -851,9 +871,9 @@ and machine-readable errors independently of a model-specific delivery profile.
 - Verify/evidence: golden compiler fixture; `evidence/OW-090-05/`.
 - Negative QA: missing or changed source hash prevents current/published status.
 
-### OW-090-06 - Add drift and impact analysis
+### OW-090-06 - Add local Knowledge Health, freshness, and review debt
 
-- Priority/dependencies: P1; `OW-090-05`.
+- Priority/dependencies: P1; `OW-090-04`.
 - Outcome: changed sources identify stale decisions, Research Memory, missing
   acceptance evidence, promotion/review debt, unresolved drill-down sources,
   and affected documents/contracts.
@@ -865,9 +885,9 @@ and machine-readable errors independently of a model-specific delivery profile.
 - Verify/evidence: drift precision fixture; `evidence/OW-090-06/`.
 - Negative QA: rebuilt view without source resolution remains stale.
 
-### OW-090-07 - Implement generic JSONL RAG export contract
+### OW-090-07 - Implement generic JSONL RAG export contract (post-V1 stretch parked)
 
-- Priority/dependencies: P0; `OW-080-08`, `OW-090-03`.
+- Priority/dependencies: P3; `OW-080-08`, `OW-090-03`.
 - Outcome: reviewed clean chunks export with separate governance metadata, stable IDs, versions, hashes, edges, and tombstones.
 - Allowed paths: RAG schemas/export core, fixtures/tests/docs.
 - Implement: deterministic projection manifest, namespaces, dedupe, incremental changes, safe portable format.
@@ -875,9 +895,9 @@ and machine-readable errors independently of a model-specific delivery profile.
 - Verify/evidence: round-trip, retrieval quality, and privacy fixtures; `evidence/OW-090-07/`.
 - Negative QA: raw frontmatter, duplicate chunk, unreviewed record, and missing tombstone fail.
 
-### OW-090-08 - Ship LightRAG reference adapter and evaluation
+### OW-090-08 - Ship LightRAG reference adapter and evaluation (post-V1 parked)
 
-- Priority/dependencies: P1; `OW-090-07`.
+- Priority/dependencies: P2; `OW-090-07`.
 - Outcome: one reference consumer ingests, updates, deletes, retrieves, and cites the generic contract without becoming canonical.
 - Allowed paths: LightRAG adapter/add-on, eval fixtures, docs/tests.
 - Implement: optional dependency boundary, dry-run export, ID mapping, keyword/vector/hybrid/graph examples, source citations, and projection variants for body-only, title+summary+body, and selective semantic tags.
@@ -888,29 +908,34 @@ and machine-readable errors independently of a model-specific delivery profile.
 ### OW-090-09 - Add incremental Owlib sync, tombstones, and freshness
 
 - Priority/dependencies: P1; `OW-081-09`, `OW-090-03`.
-- Outcome: project-user, user-global, and enterprise indexes update changed
-  records, remove deleted projections, and expose general and Research
-  freshness plus project-source availability without full rebuild.
+- Scope cut: V1 covers only local project/user-global incremental indexes,
+  tombstones, freshness, and withdrawal propagation; enterprise/Hub namespaces are post-V1.
+- Outcome: local project-user and user-global indexes update changed records,
+  remove deleted projections, and expose Research freshness plus source
+  availability without full rebuild.
 - Allowed paths: `owlib/`, sync/index schemas, tests/docs.
 - Implement: manifests, hashes, tombstones, atomic swap, interrupted-sync
   recovery, distinct scope namespaces, source-version/freshness metadata, and
   project-filter-first caches, essence-to-project source resolution, and
-  content-free health watermarks/backlog metrics; propagate policy-driven source
-  withdrawal, access revocation, and deletion through global essences,
-  drill-down availability, exports, and every derived namespace.
+  content-free health watermarks/backlog metrics; propagate local source
+  withdrawal and deletion through local essences, drill-down availability, and
+  every derived local namespace.
 - Accept: add/change/delete and interrupted sync reconcile deterministically; unavailable sources are explicitly stale, never current; de-registration tombstones every derived projection; source projects remain read-only.
 - Verify/evidence: incremental/failure/scale fixtures; `evidence/OW-090-09/`.
 - Negative QA: stale cache, missing source, partial write, and project de-registration do not leak old context.
 
 ### OW-090-10 - Cut v0.9.0 release candidate
 
-- Priority/dependencies: P0; `OW-090-04`, `OW-090-06`, `OW-090-08`, `OW-090-09`.
-- Outcome: trusted writes, living docs, RAG, and hub freshness ship as one policy-consistent release.
+- Priority/dependencies: P0; `OW-090-04`, `OW-090-06`, `OW-090-09`.
+- Scope cut: the RC proves local provenance, promotion, semantic writes,
+  Knowledge Health, and tombstones; RAG exports/adapters and Hub freshness are post-V1.
+- Outcome: trusted local writes, Knowledge Health, and local index freshness
+  ship as one policy-consistent release.
 - Allowed paths: release/version/changelog/workflows/docs/manifests.
 - Implement: cumulative security/privacy gates, migration notes, artifact build, read-only/write-profile docs.
 - Accept: `G-090-RC` passes and default install remains local/read-only unless write profile is explicitly enabled.
 - Verify/evidence: release matrix; `evidence/OW-090-10/`.
-- Negative QA: write capability without policy or missing RAG deletion proof blocks release.
+- Negative QA: write capability without policy or missing local tombstone proof blocks release.
 
 ### OW-090-11 - Align v0.9.0 with the product owner
 
@@ -950,9 +975,9 @@ and machine-readable errors independently of a model-specific delivery profile.
 - Verify/evidence: security attack suite; `evidence/OW-100-02/`.
 - Negative QA: encoded secret, instruction-like retrieved content, and cross-project PII cannot bypass policy.
 
-### OW-100-03 - Add skill/plugin permission and supply-chain manifests
+### OW-100-03 - Add skill/plugin permission and supply-chain manifests (post-V1 parked)
 
-- Priority/dependencies: P1; `OW-081-01`, `OW-100-02`.
+- Priority/dependencies: P2; `OW-081-01`, `OW-100-02`.
 - Outcome: extensions, model/provider adapters, and agent/service identities
   declare version, provenance, read/write/network/credential and knowledge
   scopes, permitted data classes/regions, updates, and compatibility tests.
@@ -969,9 +994,9 @@ and machine-readable errors independently of a model-specific delivery profile.
   manifest, undeclared migration, overwrite of user-managed content, and
   permission expansion without approval fail install/update.
 
-### OW-100-11 - Ship Single-Organization Hub Beta with external identity
+### OW-100-11 - Ship Single-Organization Hub Beta with external identity (post-V1 parked)
 
-- Priority/dependencies: P0; `OW-090-04`, `OW-090-09`, `OW-100-02`, `OW-100-03`.
+- Priority/dependencies: P1; `OW-090-04`, `OW-090-09`, `OW-100-02`, `OW-100-03`.
 - Outcome: one organization can run Owledge centrally, authenticate developers
   and agent/service identities through an existing OAuth/OIDC provider, and use
   scoped MCP/HTTP access without changing Markdown/Git source-of-truth semantics.
@@ -1001,15 +1026,16 @@ and machine-readable errors independently of a model-specific delivery profile.
 
 ### OW-100-04 - Build portable outcome evaluation suite
 
-- Priority/dependencies: P0; `OW-071-03`, `OW-080-07`, `OW-081-10`, `OW-090-10`, `OW-100-01`, `OW-100-11`.
-- Outcome: provenance accuracy, Research recall/reuse, freshness, scope
-  isolation, resume, portability, stale-doc detection, false gate passes,
-  rework, hierarchical essence-to-project retrieval, Knowledge Health, and Hub authorization are measured together.
+- Priority/dependencies: P0; `OW-071-03`, `OW-080-07`, `OW-081-10`, `OW-090-10`, `OW-100-01`.
+- Scope cut: measure the direct local Core journey and frozen regression only;
+  no broad comparative campaign, Hub authorization, or RAG strata is required.
+- Outcome: local provenance accuracy, Research recall/reuse, freshness, scope
+  isolation, resume, portability, false gate passes, rework, and Knowledge
+  Health are measured together.
 - Allowed paths: evaluation/benchmark kits, fixtures, reports, tests/docs.
-- Implement: versioned development and sealed held-out scenarios, oracle
-  sources, quality thresholds, research recall-before-search and stale/delta
-  metrics, cross-scope leak tests, adapter contract metrics, RAG
-  projection/retrieval/embedding/language strata, and no universal ROI claim.
+- Implement: versioned core-journey regression scenarios, oracle sources,
+  recall-before-search and stale/delta metrics, cross-scope leak tests, and
+  three-profile adapter contract metrics; no universal ROI claim.
 - Scope: this is the first release-wide comparative benchmark and outcome-claim
   campaign. Earlier releases retain only frozen-regression replays and
   ticket-local deterministic measurements needed to prove their behavior.
@@ -1020,11 +1046,13 @@ and machine-readable errors independently of a model-specific delivery profile.
 ### OW-100-05 - Finish CLI lifecycle and recovery UX
 
 - Priority/dependencies: P1; `OW-080-09`, `OW-100-01`.
+- Scope cut: lifecycle covers Standalone and local user-global only; Hub-owned
+  surface install/upgrade/recovery is post-V1.
 - Outcome: install/init/doctor/plan/context/why/status/resume/validate/promote/export/upgrade/uninstall are discoverable, dry-run capable where mutating, and machine-readable.
 - Allowed paths: CLI/core, packaging, tests, command/reference/troubleshooting docs.
 - Implement: short commands, JSON errors, actionable recovery, idempotency,
   uninstall preview, no orphaned canonical data, and one visible upgrade
-  transaction across Standalone, user-global, and Hub-owned surfaces:
+  transaction across Standalone and local user-global surfaces:
   preflight doctor -> dry-run/diff -> checkpoint -> apply -> postflight health
   -> receipt/recovery. Text output includes title or compact description when
   rendering IDs, while machine-readable JSON remains stable.
@@ -1035,7 +1063,7 @@ and machine-readable errors independently of a model-specific delivery profile.
 
 ### OW-100-06 - Publish support, migration, and deprecation policy
 
-- Priority/dependencies: P1; `OW-100-02`, `OW-100-03`.
+- Priority/dependencies: P1; `OW-100-02`.
 - Outcome: users know compatibility window, Tier-1 commitment, experimental status, migration support, and security process.
 - Allowed paths: governance/security/support docs, roadmap/changelog/templates.
 - Implement: core schema window, adapter support matrix, deprecation stages, vulnerability intake, telemetry/privacy statement.
@@ -1046,13 +1074,14 @@ and machine-readable errors independently of a model-specific delivery profile.
 ### OW-100-07 - Complete English v1 documentation and case studies
 
 - Priority/dependencies: P0; `OW-100-04`, `OW-100-05`, `OW-100-06`.
-- Outcome: beginner standalone, user-global power-user, Hub administrator,
+- Scope cut: document Standalone, local user-global, and Codex/Claude/generic
+  usage only; Hub admin, Pi Tier-1, and OIDC are post-V1.
+- Outcome: beginner Standalone, local user-global power-user, three-profile
   adapter-author, and maintainer paths are complete and source-linked.
 - Allowed paths: `README.md`, `docs/`, `examples/`, docs reports/assets.
-- Implement: benefits/use cases, easy standalone install, Core GA versus Hub
-  Beta architecture, Research recall, Codex/Claude/Pi/generic MCP profiles,
-  generic Hermes/OpenCode compatibility, three scopes, OIDC deployment, RAG,
-  privacy, migrations, troubleshooting, three real or controlled case studies.
+- Implement: benefits/use cases, easy Standalone install, local user-global
+  boundaries, Research recall, Codex/Claude/generic MCP profiles, privacy,
+  migrations, troubleshooting, and controlled local journeys.
 - Accept: docs match shipped commands and support tiers; user testing reaches first value and advanced setup.
 - Verify/evidence: docs gates, command extraction tests, moderated journeys; `evidence/OW-100-07/`.
 - Negative QA: stale command, missing limitation, inaccessible diagram, or unexplained term fails.
@@ -1060,14 +1089,15 @@ and machine-readable errors independently of a model-specific delivery profile.
 ### OW-100-08 - Prove final Tier-1 and evidence-only golden journey
 
 - Priority/dependencies: P0; `OW-100-04`, `OW-100-07`.
-- Outcome: Codex, Claude Code, Pi, and generic MCP/CLI reach at least 95%
+- Scope cut: the final witness is Codex, Claude Code, and generic MCP/CLI over
+  local project/user-global state; Pi, enterprise, and Hub flows are post-V1.
+- Outcome: Codex, Claude Code, and generic MCP/CLI reach at least 95%
   declared contract equivalence and evidence reconstructs the full scoped
   Research-to-resume journey without chat.
 - Allowed paths: conformance/golden fixtures, reports, release evidence/tests/docs.
-- Implement: clean cross-platform run, recall-before-research, harness switch,
-  structured Session Recap, failure/recovery, Candidate/Evidence writes,
-  reviewed promotion, docs, RAG, project-user/user-global/enterprise isolation,
-  and the Single-Org Hub Beta flow.
+- Implement: clean local run, recall-before-research, harness switch, structured
+  Session Recap, failure/recovery, Candidate/Evidence writes, reviewed local
+  promotion, docs, and project-user/user-global isolation.
 - Accept: every result links artifact, commit, gate, reviewer, and limitation; unsupported capabilities are explicit.
 - Verify/evidence: final conformance and reconstruction suite; `evidence/OW-100-08/`.
 - Negative QA: remove chat/session state and one evidence item; reconstruction must work in the first case and fail clearly in the second.
@@ -1075,13 +1105,14 @@ and machine-readable errors independently of a model-specific delivery profile.
 ### OW-100-09 - Cut and verify v1.0 general availability artifacts
 
 - Priority/dependencies: P0; `OW-100-08`.
-- Outcome: clean, reproducible Core GA wheel/sdist plus explicitly labeled
-  Single-Org Hub Beta artifact, release notes, support matrix,
-  upgrade/uninstall proof, and final gate are ready for owner-controlled publication.
+- Scope cut: cut Standalone Core GA artifacts and local user-global proof only;
+  no Hub Beta artifact, remote identity matrix, or enterprise support claim.
+- Outcome: clean, reproducible Core GA wheel/sdist, release notes, local support
+  matrix, upgrade/uninstall proof, and final gate are ready for owner-controlled publication.
 - Allowed paths: `VERSION`, `pyproject.toml`, `CHANGELOG.md`, workflows, release docs/manifests, artifact configuration.
 - Implement: clean build, artifact inspection, fresh install, upgrades from
   supported versions, uninstall, offline smoke, provenance manifest, the
-  transactional upgrade matrix for Standalone/user-global/Hub surfaces, and
+  transactional upgrade matrix for Standalone/local-user-global surfaces, and
   the deferred executed Windows/macOS/Linux wheel-only install smoke from
   `D-071-24`.
 - Accept: `G-100-GA` passes with no unresolved P0/P1, no private path/secret, and no dirty tracked source state.

@@ -1,10 +1,10 @@
 schema_version: 1
 runtime_resume_model: persisted
 session_slice:
-  active_version: v0.8.0
-  active_ticket: OW-080-11
-  current_step: "G-080-RC is green and v0.8.0 evidence is complete; OW-080-11 is blocked awaiting explicit product-owner alignment."
-  next_command: "Load only OW-080-11, G-080-ALIGNMENT, release-updates/v0.8.0.md, D-080-01, and directly referenced evidence; present the update and collect approve, adjust, or defer. Do not select OW-081-01."
+  active_version: v0.8.1
+  active_ticket: OW-081-01
+  current_step: "G-080-ALIGNMENT approved the compact Standalone/local-user-global V1 cut; OW-081-01 is the sole active ticket."
+  next_command: "Load only OW-081-01, G-081-A-ADAPTERS, D-080-02, and directly referenced evidence; implement the minimal Codex/Claude/generic capability contract."
 durable_state_ref: RUN-STATE.yaml
 durable_state_tokens: 14316
 baseline_file_content_tokens: 18940
