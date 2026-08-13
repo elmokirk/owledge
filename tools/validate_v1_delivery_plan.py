@@ -60,6 +60,14 @@ EXPECTED_BUDGET = {
     "scopes": ["project_user", "user_global"],
     "reference_adapters": ["codex", "claude_code", "generic_mcp_cli"],
 }
+CLEAN_GATE_NEXT_ACTIONS = {
+    "G-V1M-PLAN": "Select V1M-02",
+    "G-V1M-SURFACE": "Select V1M-04",
+    "G-V1M-READ": "Select V1M-06",
+    "G-V1M-LIFECYCLE": "Select V1M-08",
+    "G-V1M-ADAPTERS": "Select V1M-09",
+    "G-V1M-GA": "Present the exact V1 candidate",
+}
 REQUIRED_TICKET_LABELS = ["Priority/dependencies:", "Outcome:", "Allowed paths:", "Implement:", "Accept:", "Verify/evidence:", "Negative QA:"]
 REQUIRED_GATE_LABELS = ["Tickets:", "Commands:", "Thresholds:", "Demonstrable increment:", "Promotion:"]
 
@@ -274,9 +282,18 @@ def validate() -> dict[str, Any]:
             errors.append(f"RUN-STATE.yaml: missing top-level key {key}")
     if "plan: internal/owledge/plans/owledge-v1-minimal-core-finalization-plan.md" not in run_state:
         errors.append("RUN-STATE.yaml: active plan must be the V1 Minimal Core plan")
+    status_by_ticket = {row["id"]: row["status"] for row in rows}
     active_match = re.search(r"^active_ticket:\s*(.+)$", run_state, re.MULTILINE)
     active = active_match.group(1).strip() if active_match else ""
-    clean_gate_stop = active in {"", "null", "None"} and "last_green_gate: G-V1M-PLAN" in run_state and "Select V1M-02" in run_state
+    clean_gate_stop = False
+    if active in {"", "null", "None"}:
+        for gate, next_action in CLEAN_GATE_NEXT_ACTIONS.items():
+            if f"last_green_gate: {gate}" not in run_state or next_action not in run_state:
+                continue
+            expected_ticket_ids = gate_map.get(gate, [])
+            if expected_ticket_ids and all(status_by_ticket.get(ticket_id) == "done" for ticket_id in expected_ticket_ids):
+                clean_gate_stop = True
+                break
     if active not in known and not clean_gate_stop:
         errors.append(f"RUN-STATE.yaml: active_ticket must be active V1M ticket, got {active}")
     if active == "V1M-01" and next(row["status"] for row in rows if row["id"] == active) != "in_progress":
@@ -290,11 +307,29 @@ def validate() -> dict[str, Any]:
             manifest_text = read(manifest)
             if "status: accepted_independent_qa" not in manifest_text:
                 errors.append("G-V1M-PLAN: completed V1M-01 requires accepted_independent_qa manifest")
-        if "last_green_gate: G-V1M-PLAN" not in run_state:
-            errors.append("RUN-STATE.yaml: completed V1M-01 requires last_green_gate G-V1M-PLAN")
+        if "last_green_gate: G-V1M-" not in run_state:
+            errors.append("RUN-STATE.yaml: completed V1M-01 requires a recorded V1M promotion gate")
         v1m02_status = next((row["status"] for row in rows if row["id"] == "V1M-02"), None)
         if v1m02_status not in {"ready", "in_progress", "done"}:
             errors.append("BACKLOG.yaml: green G-V1M-PLAN requires V1M-02 ready or in_progress")
+
+    completed_gates = []
+    for gate, ticket_ids in gate_map.items():
+        if not ticket_ids or any(ticket_id not in status_by_ticket for ticket_id in ticket_ids):
+            continue
+        if not all(status_by_ticket[ticket_id] == "done" for ticket_id in ticket_ids):
+            continue
+        completed_gates.append(gate)
+        manifest = CONTROL_ROOT / "evidence" / gate / "manifest.yaml"
+        if not manifest.is_file():
+            errors.append(f"{gate}: completed tickets require a gate evidence manifest")
+        elif "status: accepted_independent_qa" not in read(manifest):
+            errors.append(f"{gate}: completed tickets require accepted_independent_qa gate evidence")
+    latest_completed_gate = completed_gates[-1] if completed_gates else None
+    latest_green_match = re.search(r"^last_green_gate:\s*(.+)$", run_state, re.MULTILINE)
+    latest_green_gate = latest_green_match.group(1).strip() if latest_green_match else ""
+    if latest_completed_gate and latest_green_gate != latest_completed_gate:
+        errors.append(f"RUN-STATE.yaml: last_green_gate must be latest completed gate {latest_completed_gate}, got {latest_green_gate}")
 
     traceability = read(TRACEABILITY)
     for ticket_id in known:

@@ -35,6 +35,17 @@ class ValidateV1MinimalCorePlanTests(unittest.TestCase):
             finally:
                 self.validator.BACKLOG = original
 
+    def validate_run_state(self, value: str):
+        original = self.validator.RUN_STATE
+        with tempfile.TemporaryDirectory() as directory:
+            temporary = pathlib.Path(directory) / "RUN-STATE.yaml"
+            temporary.write_text(value, encoding="utf-8")
+            self.validator.RUN_STATE = temporary
+            try:
+                return self.validator.validate()
+            finally:
+                self.validator.RUN_STATE = original
+
     def test_current_control_plane_is_valid(self) -> None:
         result = self.validator.validate()
         self.assertTrue(result["passed"], result["errors"])
@@ -112,6 +123,20 @@ class ValidateV1MinimalCorePlanTests(unittest.TestCase):
         result = self.validate_backlog(current.replace("policy: user_authorization_stop", "policy: sequential", 1))
         self.assertFalse(result["passed"])
         self.assertIn("BACKLOG.yaml: V1M-11 must be the final user_authorization_stop wave", result["errors"])
+
+    def test_clean_surface_gate_stop_requires_done_members_and_exact_next_action(self) -> None:
+        current = self.validator.read(self.validator.RUN_STATE)
+        self.assertIn("active_ticket: null", current)
+        self.assertIn("last_green_gate: G-V1M-SURFACE", current)
+        self.assertIn("Select V1M-04", current)
+        result = self.validate_run_state(current)
+        self.assertTrue(result["passed"], result["errors"])
+        invalid = self.validate_run_state(current.replace("Select V1M-04", "Select V1M-05", 1))
+        self.assertFalse(invalid["passed"])
+        self.assertIn("RUN-STATE.yaml: active_ticket must be active V1M ticket, got null", invalid["errors"])
+        stale_gate = self.validate_run_state(current.replace("last_green_gate: G-V1M-SURFACE", "last_green_gate: G-V1M-PLAN", 1))
+        self.assertFalse(stale_gate["passed"])
+        self.assertIn("RUN-STATE.yaml: last_green_gate must be latest completed gate G-V1M-SURFACE, got G-V1M-PLAN", stale_gate["errors"])
 
 
 if __name__ == "__main__":

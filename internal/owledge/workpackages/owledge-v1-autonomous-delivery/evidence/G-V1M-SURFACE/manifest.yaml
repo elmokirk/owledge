@@ -1,0 +1,35 @@
+gate: G-V1M-SURFACE
+status: accepted_independent_qa
+tested_integration_commit: b75503e
+environment:
+  os: windows
+  python: "3.14.0"
+  execution: "controlled local surface-contract validation"
+included_tickets: [V1M-02, V1M-03]
+ticket_evidence:
+  - "evidence/V1M-02/implementation-checkpoint.yaml"
+  - "evidence/V1M-03/implementation-checkpoint.yaml"
+verification:
+  - "python -m unittest tests.unit.test_v1m03_public_facade tests.unit.test_v1m02_minimal_profiles tests.unit.test_ow07110_install_contract tests.unit.test_ow08015_native_hooks tests.unit.test_ow08101_adapter_contracts -v: passed; 23/23"
+  - "python -m unittest tests.unit.test_validate_v1_delivery_plan -v: passed; 11/11"
+  - "python tools/validate_v1_delivery_plan.py: passed; 11 tickets / 7 gates / 11 waves / 0 errors"
+  - "python tools/owledge.py test public-docs --project-root .: passed; 257 checks"
+  - "python -m py_compile tools/owledge.py: passed"
+  - "git diff --check: passed"
+threshold_witness:
+  principles: "zero-write; an absent target is not created"
+  minimal_profile: "3 files / 1 directory in fresh host; within <=15 files / <=8 directories"
+  full_profile: "explicit full and explicit plugin requests retain compatibility behavior"
+  public_facade: "default --help has exactly init, doctor, recall, context, propose, review, sync, upgrade"
+  compatibility: "direct legacy routes deprecate; advanced routes retain parser-backed semantics"
+  negative: "propose/review/sync and a ninth operation fail closed before a write or command dispatch"
+independent_qa:
+  mode: separately_initialized_read_only_reviewer
+  result: accepted
+  status: accepted
+  findings: []
+limitations:
+  - "Wheel content is not claimed by this gate: the Windows Python 3.14 host has no usable build backend. V1M-09/V1M-10 retain the supported-build artifact and cross-platform execution proof."
+  - "propose, review and sync remain intentionally unavailable until the Candidate lifecycle gate; their visible names do not claim a write capability."
+promotion: "Permits V1M-04 only; V1M-05 remains dependency-blocked by V1M-04."
+publication_authority: not_granted

@@ -5,7 +5,7 @@ customer_id: "global"
 project_id: "owledge"
 doc_type: "task"
 artifact_type: "workpackage"
-document_version: 5
+document_version: 6
 workpackage_version: "1.0.2"
 status: "active"
 visibility: "private"
@@ -21,7 +21,7 @@ confidence: 0.97
 review_status: "reviewed"
 sanitization_status: "not_required"
 created_at: "2026-08-13T17:20:00+02:00"
-updated_at: "2026-08-13T19:00:00+02:00"
+updated_at: "2026-08-13T19:15:00+02:00"
 source_hash: ""
 reusable_lessons:
   - "A new plan enters an active release train only at a clean ticket/gate boundary."
@@ -88,7 +88,7 @@ canonical `PARK-*` reference resolution and 10/10 validator regressions.
 - [x] V1M-03 exposes exactly eight public Core verbs.
 - [x] Existing aliases either route safely or emit actionable deprecation output.
 - [x] No user-owned Markdown is removed or overwritten during upgrade.
-- [ ] Gate `G-V1M-SURFACE` green.
+- [x] Gate `G-V1M-SURFACE` green.
 
 ## Phase 3 — Local read path
 
