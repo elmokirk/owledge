@@ -324,6 +324,81 @@ def sha256_file(path: pathlib.Path) -> str:
     return digest.hexdigest()
 
 
+RESUME_RUNTIME_MODELS = {"persisted", "reset_baseline"}
+
+
+def file_content_token_count(text: str) -> int:
+    """Deterministic, dependency-free token proxy for resume-load comparisons."""
+    return len(re.findall(r"\w+|[^\w\s]", text, flags=re.UNICODE))
+
+
+def _yaml_scalar(text: str, key: str, indent: int = 0) -> str:
+    match = re.search(rf"(?m)^{re.escape(' ' * indent)}{re.escape(key)}:\s*(.+?)\s*$", text)
+    return match.group(1).strip().strip('"\'') if match else ""
+
+
+def resume_context_v1(
+    state_path: pathlib.Path,
+    control_paths: list[pathlib.Path],
+    runtime_resume_model: str,
+    already_loaded: set[str] | None = None,
+    handoff_path: pathlib.Path | None = None,
+    handoff_in_context: bool = False,
+) -> dict[str, Any]:
+    """Build a bounded, auditable resume capsule without loading full control text.
+
+    The payload contains content hashes and deterministic file-content token counts,
+    never the control-document bodies.  A baseline-reset runtime must supply the
+    latest handoff; a persisted runtime may verify an in-context handoff instead.
+    """
+    if runtime_resume_model not in RESUME_RUNTIME_MODELS:
+        return {"passed": False, "error": "resume_context.invalid_runtime_model"}
+    if not state_path.is_file() or any(not path.is_file() for path in control_paths):
+        return {"passed": False, "error": "resume_context.missing_required_input"}
+    if runtime_resume_model == "reset_baseline" and handoff_path is None:
+        return {"passed": False, "error": "resume_context.missing_handoff"}
+    if handoff_path is not None and not handoff_path.is_file():
+        return {"passed": False, "error": "resume_context.missing_handoff"}
+
+    state_text = state_path.read_text(encoding="utf-8", errors="replace")
+    loaded = already_loaded or set()
+    controls: list[dict[str, Any]] = []
+    control_tokens = 0
+    for path in control_paths:
+        text = path.read_text(encoding="utf-8", errors="replace")
+        identity = path.as_posix()
+        retained = runtime_resume_model == "persisted" and identity in loaded
+        tokens = 0 if retained else file_content_token_count(text)
+        control_tokens += tokens
+        controls.append({"path": identity, "sha256": hashlib.sha256(text.encode("utf-8")).hexdigest(), "loaded": not retained, "tokens": tokens})
+
+    handoff: dict[str, Any] | None = None
+    if handoff_path is not None:
+        handoff_text = handoff_path.read_text(encoding="utf-8", errors="replace")
+        retained = runtime_resume_model == "persisted" and handoff_in_context
+        handoff = {"path": handoff_path.as_posix(), "sha256": hashlib.sha256(handoff_text.encode("utf-8")).hexdigest(), "loaded": not retained, "tokens": 0 if retained else file_content_token_count(handoff_text)}
+
+    session_slice = {
+        "active_version": _yaml_scalar(state_text, "current_release"),
+        "active_ticket": _yaml_scalar(state_text, "active_ticket"),
+        "current_step": _yaml_scalar(state_text, "last_completed_action", indent=2),
+        "next_command": _yaml_scalar(state_text, "next_exact_action", indent=2),
+    }
+    session_tokens = file_content_token_count(json.dumps(session_slice, sort_keys=True))
+    durable_tokens = file_content_token_count(state_text)
+    handoff_tokens = int(handoff["tokens"]) if handoff else 0
+    return {
+        "passed": True,
+        "runtime_resume_model": runtime_resume_model,
+        "session_slice": session_slice,
+        "controls": controls,
+        "handoff": handoff,
+        "cold_resume_drain": session_tokens + durable_tokens + sum(file_content_token_count(path.read_text(encoding="utf-8", errors="replace")) for path in control_paths) + (file_content_token_count(handoff_path.read_text(encoding="utf-8", errors="replace")) if handoff_path else 0),
+        "warm_resume_drain": session_tokens + control_tokens + handoff_tokens,
+        "tokenizer": "owledge.regex-v1",
+    }
+
+
 def tree_hash(root: pathlib.Path, exclude_prefixes: Iterable[str] = ()) -> str:
     rows: list[str] = []
     prefixes = tuple(prefix.replace("\\", "/").rstrip("/") + "/" for prefix in exclude_prefixes)
@@ -3895,6 +3970,13 @@ def main(argv: list[str] | None = None) -> int:
     small_model_p.add_argument("--hops", default=0, type=int)
     small_model_p.add_argument("--retry-count", default=0, type=int)
     small_model_p.add_argument("--output-json", required=True)
+    resume_context_p = sub.add_parser("resume-context-v1", parents=[project_parent])
+    resume_context_p.add_argument("--state-path", required=True)
+    resume_context_p.add_argument("--runtime-resume-model", required=True, choices=sorted(RESUME_RUNTIME_MODELS))
+    resume_context_p.add_argument("--control-path", action="append", required=True)
+    resume_context_p.add_argument("--already-loaded", action="append", default=[])
+    resume_context_p.add_argument("--handoff-path")
+    resume_context_p.add_argument("--handoff-in-context", action="store_true")
 
     test_p = sub.add_parser("test", parents=[project_parent])
     test_p.add_argument(
@@ -4132,6 +4214,17 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "small-model-validate":
             output = json.loads(resolve_path(args.output_json).read_text(encoding="utf-8"))
             result = owledge_small_model_profiles.validate(args.profile, args.capsule_chars, [item for item in args.tools.split(",") if item], args.hops, args.retry_count, output)
+            print_json(result)
+            return 0 if result["passed"] else 1
+        if args.command == "resume-context-v1":
+            result = resume_context_v1(
+                resolve_path(args.state_path),
+                [resolve_path(path) for path in args.control_path],
+                args.runtime_resume_model,
+                {resolve_path(path).as_posix() for path in args.already_loaded},
+                resolve_path(args.handoff_path) if args.handoff_path else None,
+                args.handoff_in_context,
+            )
             print_json(result)
             return 0 if result["passed"] else 1
         if args.command == "test":
