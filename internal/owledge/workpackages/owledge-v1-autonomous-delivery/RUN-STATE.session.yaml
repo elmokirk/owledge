@@ -2,9 +2,9 @@ schema_version: 1
 runtime_resume_model: persisted
 session_slice:
   active_version: v0.8.1
-  active_ticket: OW-081-07
-  current_step: "OW-081-05 generic MCP/CLI profile passed independent QA; all G-081-A ticket evidence is ready for cumulative gate review while OW-081-07 starts the next critical path."
-  next_command: "Run G-081-A-ADAPTERS cumulative review, then load only OW-081-07 and its predecessor evidence for checkpoint reconciliation."
+  active_ticket: null
+  current_step: "G-081-A-ADAPTERS is accepted after independent review. The Goal task stops at this clean gate boundary pending the separate reviewed-plan handoff."
+  next_command: "Do not start OW-081-07 here. Apply the separate planning-session handoff before selecting any next ticket."
 durable_state_ref: RUN-STATE.yaml
 durable_state_tokens: 14316
 baseline_file_content_tokens: 18940

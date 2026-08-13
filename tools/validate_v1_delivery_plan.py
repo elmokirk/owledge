@@ -531,7 +531,8 @@ def validate() -> dict[str, Any]:
         errors.append("RUN-STATE.yaml: malformed merged orchestration/workspace key")
     active_match = re.search(r"^active_ticket:\s*(.+)$", run_state_text, re.MULTILINE)
     active = active_match.group(1).strip() if active_match else ""
-    if active in {"", "null", "None"} and ready != ["OW-071-01"]:
+    clean_gate_stop = bool(re.search(r'^\s+next_exact_action:\s*"?Stop\.', run_state_text, re.MULTILINE))
+    if active in {"", "null", "None"} and not clean_gate_stop and ready != ["OW-071-01"]:
         errors.append(f"Initial ready set must be ['OW-071-01'], got {ready}")
     if active not in {"", "null", "None"} and active not in known:
         errors.append(f"RUN-STATE.yaml: unknown active_ticket={active}")

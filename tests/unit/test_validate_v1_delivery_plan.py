@@ -291,6 +291,21 @@ class ValidateV1DeliveryPlanTests(unittest.TestCase):
             result["errors"],
         )
 
+    def test_explicit_clean_gate_stop_allows_no_active_ticket(self) -> None:
+        original_path = self.validator.RUN_STATE
+        current = original_path.read_text(encoding="utf-8")
+        self.assertIn("active_ticket: null", current)
+        self.assertRegex(current, r'(?m)^\s+next_exact_action: "Stop\.', "current run state must be an explicit stop")
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temporary_run_state = pathlib.Path(temp_dir) / "RUN-STATE.yaml"
+            temporary_run_state.write_text(current, encoding="utf-8")
+            self.validator.RUN_STATE = temporary_run_state
+            try:
+                result = self.validator.validate()
+            finally:
+                self.validator.RUN_STATE = original_path
+        self.assertTrue(result["passed"], result["errors"])
+
 
 if __name__ == "__main__":
     unittest.main()

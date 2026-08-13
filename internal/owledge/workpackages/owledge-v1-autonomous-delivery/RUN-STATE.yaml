@@ -1,14 +1,14 @@
 schema_version: 1
-document_version: 23
+document_version: 24
 project: owledge
 plan: internal/owledge/plans/owledge-v1-autonomous-delivery-master-plan.md
 objective: Deliver Owledge v0.7.1 through a Standalone Core GA and bounded Single-Organization Hub Beta with recall-first Research Memory and portable agent adapters.
 status: in_progress
 current_release: v0.8.1
 current_phase: 081-A
-active_ticket: OW-081-07
+active_ticket: null
 session_slice_ref: RUN-STATE.session.yaml
-last_green_gate: G-080-RC
+last_green_gate: G-081-A-ADAPTERS
 alignment:
   state: approved
   awaiting_release: null
@@ -602,7 +602,7 @@ last_commands:
   - "python tools/owledge.py test public-docs --project-root .; python tools/owledge.py test docs-contract --project-root .; python tools/owledge.py test mcp-readonly --project-root .; python tools/owledge.py test runtime-adapters --project-root . (exit 0; public-docs 0 failures, docs-contract 473 checks)"
   - "PYTHONPATH=owlib/src python -m unittest discover -s owlib/tests -v (exit 0; 10 tests, one Windows symlink integration skip)"
 checkpoint:
-  last_completed_action: "OW-081-05 generic MCP/CLI profile is accepted after independent protocol/security QA: project-bound stdio discovery, negotiation, a bounded read-only capsule, and explicit Candidate write/promotion refusal are proven."
+  last_completed_action: "G-081-A-ADAPTERS is accepted after independent review: all three V1 adapter profiles have equivalent declared local capability/degradation boundaries, and its mandatory gate evidence is committed."
   changed_files:
     - "internal/owledge/workpackages/owledge-v1-autonomous-delivery/RUN-STATE.session.yaml"
     - "tools/owledge.py"
@@ -666,8 +666,8 @@ checkpoint:
     - "python -m unittest tests.unit.test_validate_v1_delivery_plan tests.unit.test_validate_live_work_register -q: one pre-existing downstream mismatch; test_current_control_plane_is_valid still expects zero warnings while accepted OW-080-13 intentionally emits one internal-checkpoint warning. The validator itself passed with zero errors."
     - "python tools/owledge_core.py --project-root . validate-memory --strict: 307 pre-existing legacy frontmatter failures across historical internal memory; the touched canonical plan/checklists pass the release-specific frontmatter validation inside validate_v1_delivery_plan.py."
     - "python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports: completed 36/38 on 2026-08-12; source-identity correctly rejected the dirty planning tree and upgrade-drift exposed a host-project/Kit-mode regression. Routed to OW-071-08 under F-071-24."
-  workspace_state: "G-080-ALIGNMENT is owner-approved with the compact Standalone/local-user-global V1 cut. All G-081-A adapter tickets are accepted; cumulative G-081-A review remains required. OW-081-07 is active. Publication, tagging, release, push, and remote upload remain blocked."
-  next_exact_action: "Run the G-081-A-ADAPTERS cumulative evidence review, then execute OW-081-07 only: checkpoint reconciliation and cross-harness resume."
+  workspace_state: "G-081-A-ADAPTERS is green and the Goal task is intentionally stopped at the clean adapter-gate boundary. OW-081-07 remains backlog pending the separate reviewed-plan handoff. Publication, tagging, release, push, and remote upload remain blocked."
+  next_exact_action: "Stop. Do not start OW-081-07 in this Goal task; wait for the separate planning-session handoff before selecting the next ticket."
   open_assumptions:
     - "The product owner wants the existing five-release train retained unless a later version reflection changes it."
     - "Local serial execution is the default; subagents are exceptional and justified only by independent risk reduction."

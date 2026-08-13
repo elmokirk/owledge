@@ -1,0 +1,34 @@
+gate: G-081-A-ADAPTERS
+status: accepted_independent_qa
+tested_integration_commit: 734ea7de6558b93cc942bbbaf3de9c102e57a1f6
+environment:
+  os: windows
+  python: "3.14.0"
+  execution: "fresh temporary project init plus runtime-conformance add-on"
+included_tickets: [OW-081-01, OW-081-02, OW-081-03, OW-081-05]
+ticket_evidence:
+  - "evidence/OW-081-01/implementation-checkpoint.yaml: accepted_independent_qa"
+  - "evidence/OW-081-02/implementation-checkpoint.yaml: accepted_independent_qa"
+  - "evidence/OW-081-03/implementation-checkpoint.yaml: accepted_independent_qa"
+  - "evidence/OW-081-05/implementation-checkpoint.yaml: accepted_independent_qa"
+verification:
+  - "fresh init-project plus install-addon runtime-conformance-kit: passed"
+  - "python tools/runtime-conformance/run-runtime-conformance.py --project-root <fresh-host>: 3/3 Codex, Claude Code, generic MCP/CLI manifests passed"
+  - "python -m unittest tests.unit.test_ow08101_adapter_contracts tests.unit.test_ow08102_codex_adapter tests.unit.test_ow08103_claude_adapter tests.unit.test_ow08105_generic_adapter -v: 13 passed"
+  - "python tools/owledge.py test launch-readiness --project-root .: 78 passed"
+  - "python tools/validate_v1_delivery_plan.py: passed, 61 tickets / 25 gates / 41 waves"
+  - "git diff --check: passed"
+threshold_witness:
+  required_read_control_capabilities: "100%; all three manifests declare context.read, control.read, checkpoint.handoff, candidate.write"
+  explicit_degradation: "100%; automatic inspection, durable routing, direct Core storage, enterprise scope, and orchestration are structured unsupported results"
+  undeclared_scope_calls: "0 accepted; enterprise returns denied/scope_unsupported and undeclared capability returns unsupported"
+  equivalent_artifact_semantics: "Codex, Claude Code, and generic MCP/CLI each have a source-linked, project-local profile; checkpoint/handoff remains Core-owned"
+independent_qa:
+  mode: separately_initialized_read_only_reviewer
+  result: accepted
+  findings_resolved:
+    - "Missing mandatory gate manifest was added before promotion."
+limitations:
+  - "The generic baseline exposes no semantic write/promotion endpoint; OW-090-04 owns controlled MCP writes."
+  - "This gate does not authorize a release, publication, tag, push, or any subsequent ticket."
+publication_authority: not_granted
