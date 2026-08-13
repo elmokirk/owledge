@@ -1,0 +1,51 @@
+ticket: V1M-01
+status: accepted_independent_qa
+base_commit: 106e2b8
+branch: codex/v071-integration
+scope: control-plane-only
+changed_surfaces:
+  - BACKLOG.yaml rewritten as the sole active V1M selection source
+  - RUN-STATE.yaml, ticket catalog, gate catalog, execution matrix and traceability reconciled
+  - legacy master plan marked superseded; immutable V1M plan remains active
+  - deterministic validator and mutation tests enforce DAG, parking and complexity budget
+legacy_mapping:
+  unstarted_ow_tickets: 28
+  mapped_to_v1m_or_park: 28
+  unclassified: 0
+completed_evidence_reused:
+  - G-081-A-ADAPTERS/evidence manifest
+  - OW-081-01, OW-081-02, OW-081-03 and OW-081-05 adapter evidence
+complexity_budget:
+  public_cli_verbs: 8
+  mcp_tools: 5
+  scopes: 2
+  reference_adapters: 3
+  minimal_profile_max_files: 15
+  minimal_profile_max_directories: 8
+commands:
+  - command: python tools/validate_v1_delivery_plan.py
+    exit_code: 0
+    result: "11 tickets, 7 gates, 11 execution waves, 0 errors"
+  - command: python -m unittest tests.unit.test_validate_v1_delivery_plan -v
+    exit_code: 0
+    result: "10/10 passed; mutations cover parked dependency/gate, canonical PARK reference, missing disposition, 8/5/2/3 budget, footprint and publication-stop policy"
+  - command: git diff --check
+    exit_code: 0
+    result: clean
+negative_contracts:
+  - "Parked legacy ticket in active dependency fails because it is not a V1M node."
+  - "Missing legacy disposition fails coverage validation."
+  - "A ninth public verb and sixth MCP tool fail complexity-budget validation."
+  - "V1M-11 cannot become a normal sequential execution wave."
+  - "A PARK-999 reference fails against the canonical parking lot."
+known_limitations:
+  - "No runtime behavior changes were made; V1M-02 remains the next implementation ticket after gate promotion."
+  - "macOS/Linux execution proof remains a G-V1M-GA publication prerequisite, not a current platform claim."
+independent_qa:
+  required: true
+  mode: separately_initialized_read_only_reviewer
+  initial_verdict: "reject P1: PARK reference was regex-only"
+  corrective_action: "Resolve every park_ref against the canonical parking lot and add a PARK-999 regression."
+  recheck_verdict: accepted
+  status: accepted
+next_exact_action: "Record independent QA, promote G-V1M-PLAN only if no P0/P1 remains, then select V1M-02."

@@ -5,11 +5,11 @@ customer_id: "global"
 project_id: "owledge"
 doc_type: "project_context"
 artifact_type: "plan"
-status: "active"
+status: "superseded"
 visibility: "private"
 data_class: "internal"
-semantic_title: "Owledge autonomous delivery master plan through v1.0"
-summary: "Gate-driven plan for a compact installable Owledge V1: Standalone Core GA, local user-global Null-Space, recall-first knowledge lifecycle, and Codex/Claude/generic MCP/CLI adapters."
+semantic_title: "Historical Owledge autonomous delivery master plan through v1.0"
+summary: "Historical v0.7.1-v0.8.1 execution plan; its completed evidence is retained while the active V1M control plane is the minimal-Core finalization plan."
 concept_tags: ["v1-roadmap", "autonomous-delivery", "long-horizon", "agentic-coding"]
 stack_tags: ["python", "markdown", "yaml", "mcp", "git"]
 problem_patterns: ["roadmap-drift", "context-bloat", "unsafe-agent-writes", "adapter-drift"]
@@ -19,9 +19,9 @@ confidence: 0.94
 review_status: "reviewed"
 sanitization_status: "not_required"
 created_at: "2026-07-16T00:00:00Z"
-updated_at: "2026-08-13T00:00:00+02:00"
-plan_version: "2.6.0"
-document_version: 5
+updated_at: "2026-08-13T18:10:00+02:00"
+plan_version: "2.7.0"
+document_version: 6
 source_hash: ""
 reusable_lessons: []
 edges:
@@ -32,6 +32,12 @@ edges:
 ---
 
 # Owledge Autonomous Delivery Master Plan Through v1.0
+
+> Superseded for new execution by
+> [[owledge-v1-minimal-core-finalization-plan]]. This document remains a
+> non-selectable history of completed OW-071/080/081 evidence. `BACKLOG.yaml`,
+> `RUN-STATE.yaml`, the V1M ticket catalog and V1M gates are the sole active
+> execution truth.
 
 ## Outcome
 

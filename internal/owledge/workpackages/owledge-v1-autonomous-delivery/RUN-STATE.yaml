@@ -1,12 +1,12 @@
 schema_version: 1
-document_version: 24
+document_version: 25
 project: owledge
-plan: internal/owledge/plans/owledge-v1-autonomous-delivery-master-plan.md
-objective: Deliver Owledge v0.7.1 through a Standalone Core GA and bounded Single-Organization Hub Beta with recall-first Research Memory and portable agent adapters.
+plan: internal/owledge/plans/owledge-v1-minimal-core-finalization-plan.md
+objective: Deliver Owledge V1 Minimal Core: Principles, deterministic local Core, private local user-global Null-Space, and thin Codex/Claude/generic MCP/CLI adapters.
 status: in_progress
-current_release: v0.8.1
-current_phase: 081-A
-active_ticket: null
+current_release: v1.0
+current_phase: V1M-PLAN
+active_ticket: V1M-01
 session_slice_ref: RUN-STATE.session.yaml
 last_green_gate: G-081-A-ADAPTERS
 alignment:
@@ -16,8 +16,8 @@ alignment:
   user_decision: "approve — compact V1 cut and reduced OW-081-01 path"
   decided_by: product-owner
   decided_at: "2026-08-13"
-  scope: "Standalone Core GA plus private local user_global Null-Space; Codex, Claude Code, and generic MCP/CLI only."
-  constraints: "Publication, tag, release, push, remote upload, Hub, Pi Tier-1, LightRAG, Documentation Compiler, supply-chain system, enterprise scope, macOS/Linux support claims, and comparative benchmark claims remain blocked."
+  scope: "Minimal V1 Core: Principles, deterministic local Core, private local user_global Null-Space, and Codex, Claude Code, generic MCP/CLI adapters only."
+  constraints: "Eight public CLI verbs, five MCP tools, two scopes, three adapters, minimal <=15 files and <=8 directories. Publication, tag, release, push, remote upload, Hub, Pi, LightRAG, Documentation Compiler, supply-chain, enterprise scope, remote sync, macOS/Linux claims before executed evidence, and comparative benchmark claims remain blocked."
   open_questions:
     - id: Q-080-01
       source: OW-080-13-independent-qa
@@ -515,13 +515,12 @@ alignment:
       affected_artifacts: ["owledge-v1-autonomous-delivery-master-plan.md", "BACKLOG.yaml", "ALL-TICKETS.md", "ALL-GATES.md", "TRACEABILITY.md", "release-updates/v0.8.0.md", "evidence/OW-080-11/v1-scope-cut-review.yaml"]
       verification_status: owner_approved_plan_validator_green
   next_plan_reflection:
-    status: approved_for_execution
-    target_release: v0.8.1
+    status: approved_minimal_core_execution
+    target_release: v1.0
     items:
-      - "keep: OW-081-01 and G-081-A-ADAPTERS retain the capability/AdapterManifest boundary validated by v0.8 portable contracts."
-      - "keep: OW-081-02 and OW-081-05 retain Codex and generic MCP/CLI profiles; recursive Codex CLI is not required for the active Desktop Goal."
-      - "keep: OW-081-03 retains lifecycle conformance; F-080-04 is a later interactive permission-UI enhancement, not a v0.8.0 claim."
-      - "keep: OW-081-04, OW-081-07, and OW-081-08 retain the cross-harness adapter/resume sequence supported by v0.8 contracts."
+      - "reuse: G-081-A-ADAPTERS and OW-081-01/02/03/05 evidence are completed adapter inputs, not work to repeat."
+      - "execute: V1M-01 maps all unstarted legacy work to V1M scope or PARK-* before any runtime ticket."
+      - "enforce: V1M gates use only Principles, local Core, local user-global and three thin adapters."
   update_path: null
 execution_mode:
   initial_run: root_agent_sequential
@@ -536,16 +535,18 @@ orchestration:
   approved_by: product-owner
   approved_at: "2026-07-27T14:25:00Z"
   expires_at_alignment: true
-  active_dispatch: ow07108_release_candidate_after_g071c_promotion
-  pending_risk_brief: "G-071-C-COMPAT passed for bounded v0.7.1. OW-071-08 is the sole active lane and must repair/replay finalization without masking the pre-existing host/Kit upgrade-drift failure; no publication or v0.8 work is authorized."
+  active_dispatch: v1m01_control_plane_reconciliation
+  pending_risk_brief: "V1M-01 is the sole lane. It may change only planning/control-plane artifacts and validator tests; runtime implementation remains blocked until G-V1M-PLAN is green."
 workspace:
   code_root: .
   planning_root: internal/owledge/workpackages/owledge-v1-autonomous-delivery
   planning_branch: codex/v071-integration
   release_integration_branch: codex/v071-integration
-  base_commit: a25798958b3f1866c7e0e1bb6e2596adbe83bcbe
+  base_commit: 106e2b8
 blockers: []
 last_completed_actions:
+  - G-081-A-ADAPTERS accepted at 674a06b; adapter evidence is reusable input for V1M-08.
+  - Minimal-Core plan handoff integrated at d0e26a9/106e2b8 on a clean gate boundary.
   - Approved product decisions captured in the v1 autonomous delivery plan.
   - Handoff Decision Bridge mapped KEOS/Hermes findings into the existing v0.7.1-v1 ticket train.
   - Version reflection, finding/decision logging, and next-plan steering contract implemented and validated.
@@ -576,9 +577,9 @@ last_completed_actions:
   - OW-080-09 accepted through 6550744 after independent data-safety QA at 96/100 with no P0/P1; evidence is evidence/OW-080-09/manifest.yaml.
   - OW-080-16 accepted through 4cc000b after independent retrieval-contract QA at 97/100 with no P0/P1; evidence is evidence/OW-080-16/manifest.yaml.
 next_actions:
-  - Owner-approved D-080-01: defer comprehensive comparative benchmarks and final outcome claims to OW-100-04/G-100-B-PRODUCT; retain only frozen regression and ticket-local functional measurements before v1.0.
-  - OW-080-08 accepted: clean RAG Retrieval Projection v1 is recorded at evidence/OW-080-08/manifest.yaml.
-  - Retain the three-OS wheel-only fixture and collect executed macOS/Linux evidence at OW-100-09; do not issue an earlier cross-platform support claim.
+  - Complete V1M-01 only: reconcile the active control plane, validate the V1M DAG and record independent QA.
+  - Do not select V1M-02 until G-V1M-PLAN is green and committed.
+  - Retain executed macOS/Linux wheel-only proof as a GA-publication prerequisite; do not issue an earlier platform claim.
 last_commands:
   - "python tools/validate_v1_delivery_plan.py (exit 0; 64 tickets, 25 gates, 44 waves, 0 errors; one allowed OW-080-13 checkpoint warning)"
   - "python tools/validate_live_work_register.py --project-root . (exit 0; 21/21 records)"
@@ -602,7 +603,7 @@ last_commands:
   - "python tools/owledge.py test public-docs --project-root .; python tools/owledge.py test docs-contract --project-root .; python tools/owledge.py test mcp-readonly --project-root .; python tools/owledge.py test runtime-adapters --project-root . (exit 0; public-docs 0 failures, docs-contract 473 checks)"
   - "PYTHONPATH=owlib/src python -m unittest discover -s owlib/tests -v (exit 0; 10 tests, one Windows symlink integration skip)"
 checkpoint:
-  last_completed_action: "G-081-A-ADAPTERS is accepted after independent review: all three V1 adapter profiles have equivalent declared local capability/degradation boundaries, and its mandatory gate evidence is committed."
+  last_completed_action: "V1M-01 started from clean 106e2b8 after re-reading the active run state, historical G-081-A evidence and the approved Minimal-Core handoff."
   changed_files:
     - "internal/owledge/workpackages/owledge-v1-autonomous-delivery/RUN-STATE.session.yaml"
     - "tools/owledge.py"
@@ -666,14 +667,14 @@ checkpoint:
     - "python -m unittest tests.unit.test_validate_v1_delivery_plan tests.unit.test_validate_live_work_register -q: one pre-existing downstream mismatch; test_current_control_plane_is_valid still expects zero warnings while accepted OW-080-13 intentionally emits one internal-checkpoint warning. The validator itself passed with zero errors."
     - "python tools/owledge_core.py --project-root . validate-memory --strict: 307 pre-existing legacy frontmatter failures across historical internal memory; the touched canonical plan/checklists pass the release-specific frontmatter validation inside validate_v1_delivery_plan.py."
     - "python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports: completed 36/38 on 2026-08-12; source-identity correctly rejected the dirty planning tree and upgrade-drift exposed a host-project/Kit-mode regression. Routed to OW-071-08 under F-071-24."
-  workspace_state: "G-081-A-ADAPTERS is green and the Goal task is intentionally stopped at the clean adapter-gate boundary. OW-081-07 remains backlog pending the separate reviewed-plan handoff. Publication, tagging, release, push, and remote upload remain blocked."
-  next_exact_action: "Stop. Do not start OW-081-07 in this Goal task; wait for the separate planning-session handoff before selecting the next ticket."
+  workspace_state: "V1M-01 is active on codex/v071-integration. The only permitted writes are V1M-01 control-plane, validator and evidence files. Publication, tagging, release, push and remote upload remain blocked."
+  next_exact_action: "Reconcile BACKLOG.yaml, ticket/gate catalog, traceability and validator; run deterministic checks and independent QA; then close G-V1M-PLAN."
   open_assumptions:
-    - "The product owner wants the existing five-release train retained unless a later version reflection changes it."
-    - "Local serial execution is the default; subagents are exceptional and justified only by independent risk reduction."
+    - "The approved V1M plan is immutable unless the owner uses the exact AMEND GOAL BOUNDARY phrase."
+    - "Local serial execution is the default; V1M-01 requires independent control-plane QA."
   prohibited_shortcuts:
-    - "Do not start v0.8.0 before G-071-ALIGNMENT and an explicit owner approve decision."
-    - "Do not trust or publish inherited dist artifacts; rebuild from committed source at RC."
-    - "Do not broaden the accepted local HTTP profile or benchmark claims while rewriting adoption documentation."
-updated_at: "2026-08-13T00:00:00+02:00"
+    - "Do not start V1M-02 before a committed green G-V1M-PLAN manifest."
+    - "Do not reactivate a PARK-* item without exact owner phrase AMEND GOAL BOUNDARY."
+    - "Do not publish inherited or new artifacts without exact owner authorization."
+updated_at: "2026-08-13T18:10:00+02:00"
 updated_by: codex

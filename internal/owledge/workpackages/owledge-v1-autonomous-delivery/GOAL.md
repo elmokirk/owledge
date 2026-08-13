@@ -1,8 +1,8 @@
 ---
-title: "Owledge v1.0 Federated Research Memory Delivery Goal"
+title: "Owledge V1 Minimal Core Delivery Goal"
 date: "2026-08-11"
-version: "2.3.0"
-document_version: 2
+version: "3.0.0"
+document_version: 3
 memory_id: "mem:owledge:global:owledge:goal:v1-autonomous-delivery"
 tenant_id: "owledge"
 customer_id: "global"
@@ -13,9 +13,9 @@ status: "active"
 visibility: "private"
 data_class: "internal"
 project: "owledge"
-scope: "v0.7.1-v1.0"
-semantic_title: "Owledge v1 federated research memory delivery goal"
-summary: "Deliver an installable Standalone Core GA with local user-global Null-Space, recall-first Research Memory, and Codex/Claude/generic adapters."
+scope: "v1-minimal-core"
+semantic_title: "Owledge V1 minimal core delivery goal"
+summary: "Deliver the minimal Owledge V1 Core candidate: Principles, local Core, private Null-Space and thin Codex/Claude/generic adapters."
 concept_tags: ["v1-roadmap", "delivery-goal", "long-horizon"]
 stack_tags: ["markdown", "yaml", "git"]
 problem_patterns: ["scope-drift", "unsafe-autonomy"]
@@ -25,7 +25,7 @@ confidence: 0.96
 review_status: "reviewed"
 sanitization_status: "not_required"
 created_at: "2026-07-16T00:00:00Z"
-updated_at: "2026-08-13T00:00:00+02:00"
+updated_at: "2026-08-13T18:10:00+02:00"
 source_hash: ""
 owners:
   - "product-owner"
@@ -38,11 +38,17 @@ reusable_lessons: []
 edges: []
 ---
 
-# Owledge v1.0 Federated Research Memory Delivery Goal
+# Owledge V1 Minimal Core Delivery Goal
 
-Deliver the approved v0.7.1-to-v1.0 roadmap through the ticket DAG and cumulative
-gates, culminating in a Standalone Core GA and private local user-global
-Null-Space. Hub Beta is post-V1.
+The binding immutable execution envelope is
+[[owledge-v1-minimal-core-finalization-plan]] and its copy-ready handoff. This
+file is the active local pointer: select only `V1M-*` tickets from the live
+`BACKLOG.yaml`; all older unstarted `OW-*` tickets are historical mappings or
+`PARK-*` work and cannot be resumed.
+
+Deliver the approved minimal V1 through the V1M DAG and cumulative gates:
+Principles, deterministic local Core, private local user-global Null-Space and
+thin Codex/Claude/generic MCP/CLI adapters. Hub and add-ons are post-V1.
 
 The product must let Codex, Claude Code, and generic MCP/CLI harnesses reuse
 durable project and Research Memory across `project_user` and private local
@@ -63,9 +69,9 @@ turning Owledge into a trace warehouse.
 
 ## First Allowed Step
 
-Run `python tools/validate_v1_delivery_plan.py`, then resume the first active
-ticket recorded in `RUN-STATE.yaml`. After the approved v0.8.0 scope cut is
-validated and recorded, that ticket is `OW-081-01`.
+Run `python tools/validate_v1_delivery_plan.py`, then resume the active ticket
+recorded in `RUN-STATE.yaml`. The first V1M ticket is `V1M-01`; do not start a
+runtime ticket before G-V1M-PLAN is green.
 
 ## WIP and Execution Rule
 
@@ -104,7 +110,8 @@ validated and recorded, that ticket is `OW-081-01`.
   LangGraph-owned memory, or knowledge frontend in the v1 Core.
 - No silent capability fallback, privacy waiver, threshold reduction, or scope change.
 - No publication or release tag from a dirty tracked worktree.
-- No publish/tag or next-release ticket after an RC/GA until the matching user-alignment ticket is `done`.
+- No push, tag, public release, upload or publication before the owner names
+  the exact candidate commit, artifacts and external action for V1M-11.
 
 ## Escalation
 

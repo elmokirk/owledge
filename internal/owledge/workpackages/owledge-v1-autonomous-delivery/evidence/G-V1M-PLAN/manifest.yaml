@@ -1,0 +1,30 @@
+gate: G-V1M-PLAN
+status: implementation_accepted_pending_integration_binding
+tested_integration_commit: pending_v1m01_commit
+environment:
+  os: windows
+  python: "3.14.0"
+  execution: "controlled local planning-control-plane validation"
+included_tickets: [V1M-01]
+ticket_evidence:
+  - "evidence/V1M-01/implementation-checkpoint.yaml"
+reused_completed_evidence:
+  - "evidence/G-081-A-ADAPTERS/manifest.yaml"
+verification:
+  - "python tools/validate_v1_delivery_plan.py: passed; 11 tickets / 7 gates / 11 waves / 0 errors"
+  - "python -m unittest tests.unit.test_validate_v1_delivery_plan -v: passed; 10/10"
+  - "git diff --check: passed"
+threshold_witness:
+  legacy_unstarted_disposition: "28/28 mapped to V1M or PARK-*"
+  active_dag: "V1M-01 through V1M-11 only; no active legacy ticket, parked dependency or parked gate member"
+  complexity_budget: "8 public CLI verbs; 5 MCP tools; 2 scopes; 3 reference adapters; minimal <=15 files and <=8 directories"
+  adapter_evidence: "G-081-A-ADAPTERS is referenced as completed input and is not rerun"
+independent_qa:
+  mode: separately_initialized_read_only_reviewer
+  initial_verdict: "reject P1: PARK reference was regex-only"
+  corrective_action: "Canonical parking-lot resolution plus permanent regression test added."
+  recheck_verdict: accepted
+  status: accepted_pending_integration_binding
+limitations:
+  - "This gate authorizes planning-to-runtime transition only; it does not prove any minimal profile or runtime behavior."
+publication_authority: not_granted

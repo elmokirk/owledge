@@ -1,8 +1,8 @@
 ---
-title: "Owledge v1 Promotion Gates"
+title: "Owledge V1 Minimal Core Promotion Gates"
 date: "2026-08-11"
-version: "2.4.0"
-document_version: 4
+version: "3.0.0"
+document_version: 5
 memory_id: "mem:owledge:global:owledge:qa:v1-delivery-gate-catalog"
 tenant_id: "owledge"
 customer_id: "global"
@@ -13,9 +13,9 @@ status: "active"
 visibility: "private"
 data_class: "internal"
 project: "owledge"
-scope: "v0.7.1-v1.0"
-semantic_title: "Owledge v1 delivery promotion gates"
-summary: "Executable promotion contracts for the reduced Standalone/local-user-global Owledge v1 release train."
+scope: "v1-minimal-core"
+semantic_title: "Owledge V1 minimal core promotion gates"
+summary: "Executable promotion contracts for the active minimal-Core V1 train; completed OW-071/080/081 gates are evidence history."
 concept_tags: ["qa-gates", "release-promotion", "v1-roadmap"]
 stack_tags: ["markdown", "python", "git"]
 problem_patterns: ["false-promotion", "self-approval", "evidence-drift"]
@@ -37,19 +37,77 @@ reusable_lessons: []
 edges: []
 ---
 
-# Owledge v1 Promotion Gates
+# Owledge V1 Minimal Core Promotion Gates
 
-## 2026-08-13 V1 Scope-Cut Supersession
+## Active V1M gate catalog
 
-The active V1 surface is Standalone Core plus private local `user_global` and
-reviewed local Knowledge Base. Pi, Hub, LightRAG, Documentation Compiler,
-supply-chain manifests, enterprise-provider matrices, and generic JSONL export
-are post-V1. They cannot appear in a V1 gate threshold, claim, or release
-witness; older conflicting prose is retained only as historical context.
+The active V1 surface is Principles, deterministic local Core, private local
+`user_global` and Codex/Claude/generic MCP/CLI adapters. Pi, Hub, LightRAG,
+Documentation Compiler, supply-chain manifests, enterprise-provider matrices,
+and generic JSONL export are parked. They cannot appear in a V1M threshold,
+claim or release witness.
 
 ## Common Gate Contract
 
 Every gate starts from the tested integration commit and controlled environment recorded in `evidence/<gate-id>/manifest.yaml`. Entry requires all listed tickets `done`, a QA role distinct from every ticket owner, the independence mode recorded under `CONTROL-PLANE-POLICY.md`, and agreement among backlog, run state, tickets, commits, and evidence manifests. Commands run non-interactively; manual observations must be reproducible. Evidence must obey retention, redaction, and size policy. Security, privacy, data integrity, canonical-promotion, and acceptance boundaries are not silently waiverable. A release RC/GA gate authorizes only its user-alignment stop; publication and next-version execution require the matching alignment gate. Failure creates a finding and the smallest corrective ticket.
+
+### G-V1M-PLAN - Minimal Core control-plane reconciliation
+
+- Tickets: `V1M-01`.
+- Commands: `python tools/validate_v1_delivery_plan.py`; `python -m unittest tests.unit.test_validate_v1_delivery_plan -v`; deterministic frontmatter and traceability checks; `git diff --check`.
+- Thresholds: every unstarted `OW-*` ticket is mapped to one V1M ticket or a `PARK-*` record; all active gates/waves/dependencies contain only V1M tickets; active state names one plan; budget is exactly 8 CLI verbs, 5 MCP tools, 2 scopes, 3 adapters, <=15 files and <=8 directories; G-081-A evidence is referenced but not rerun.
+- Demonstrable increment: a fresh agent can select only V1M-02 after reading the compact active control plane.
+- Promotion: permits V1M-02 and V1M-03 only; it does not authorize runtime scope expansion, publication, tag, push or release.
+
+### G-V1M-SURFACE - Principles, minimal profile and public facade
+
+- Tickets: `V1M-02`, `V1M-03`.
+- Commands: fresh principles/minimal/full profile tests; default-help snapshot; package-resource and upgrade-preservation tests.
+- Thresholds: Principles has no Core installation requirement; minimal footprint is within budget; default help has exactly eight operations; full/maintainer is explicit.
+- Demonstrable increment: a new user starts Principles or installs the compact local Core without dogfood trees.
+- Promotion: permits V1M-04 and V1M-05.
+
+### G-V1M-READ - Local Null-Space, recall and context
+
+- Tickets: `V1M-04`, `V1M-05`.
+- Commands: linked two-project local fixture; direct-scan/rebuilt-index equivalence; purpose/budget/permission negative corpus.
+- Thresholds: two scopes only; no implicit discovery/network; recall and context are source-linked, deterministic and budgeted.
+- Demonstrable increment: a reviewed local fact is found across explicit projects without full-history injection.
+- Promotion: permits V1M-06 and V1M-07.
+
+### G-V1M-LIFECYCLE - Candidate, review, tombstone and health
+
+- Tickets: `V1M-06`, `V1M-07`.
+- Commands: Candidate/park/resurface, review conflict, deletion/rebuild and privacy-safe doctor fixtures.
+- Thresholds: raw/parked ordinary recall count=0; planning resurfacing has matching reason/trigger; transitions and tombstones are idempotent; health leaks no body content.
+- Demonstrable increment: a valuable deferred idea is safely preserved and later reconsidered without becoming active work.
+- Promotion: permits V1M-08.
+
+### G-V1M-ADAPTERS - Thin reference adapters
+
+- Tickets: `V1M-08`.
+- Commands: common Codex/Claude/generic conformance journey; MCP-tool allowlist; adapter boundary scan; G-081-A evidence reference review.
+- Thresholds: exactly three reference adapters and five MCP tools; no adapter forks Core search/storage/lifecycle/migration; degradation is explicit.
+- Demonstrable increment: a user resumes the same local journey from any supported harness.
+- Promotion: permits V1M-09.
+
+### G-V1M-GA - Minimal Core candidate
+
+- Tickets: `V1M-09`, `V1M-10`.
+- Commands: fresh install, preview upgrade, interrupted recovery, offline/security-negative corpus, compact journey, wheel/sdist inspection and docs claim-map.
+- Thresholds: no unresolved P0/P1; no V1 claim depends on parked work; package/prompt privacy is clean; Windows proof is executed and macOS/Linux wheel-only proof is executed before publication.
+- Demonstrable increment: a clean local GA candidate proves the complete V1 daily journey.
+- Promotion: creates the owner publication decision only; no push, tag, release, upload or publication is authorized.
+
+### G-V1M-PUBLISH - Owner-controlled external action
+
+- Tickets: `V1M-11`.
+- Commands: inspect the explicit owner authorization, candidate commit and artifact hashes.
+- Thresholds: authorization names the exact candidate and each external action; otherwise status remains blocked.
+- Demonstrable increment: external state changes are impossible through generic approval.
+- Promotion: only the exact authorized action.
+
+## Historical completed gate catalog (non-selectable evidence only)
 
 ## v0.7.1 Gates
 

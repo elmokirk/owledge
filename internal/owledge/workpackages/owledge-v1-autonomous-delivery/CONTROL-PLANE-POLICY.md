@@ -5,11 +5,12 @@ customer_id: "global"
 project_id: "owledge"
 doc_type: "project_context"
 artifact_type: "execution_policy"
+document_version: 2
 status: "active"
 visibility: "private"
 data_class: "internal"
-semantic_title: "Owledge v1 autonomous delivery control-plane policy"
-summary: "Cross-cutting policy for context loading, QA independence, evidence retention, external adapters, benchmarks, RAG, small models, and release execution."
+semantic_title: "Owledge V1 minimal core control-plane policy"
+summary: "Cross-cutting policy for the V1 Minimal Core control plane, including context loading, QA independence, evidence retention and owner-controlled release execution."
 concept_tags: ["execution-policy", "qa-independence", "context-budget", "evidence-retention"]
 stack_tags: ["git", "python", "mcp", "rag"]
 problem_patterns: ["planning-context-bloat", "self-approval", "evidence-leak", "benchmark-gaming"]
@@ -19,19 +20,28 @@ confidence: 0.94
 review_status: "reviewed"
 sanitization_status: "not_required"
 created_at: "2026-07-16T00:00:00Z"
-updated_at: "2026-07-27T00:00:00Z"
+updated_at: "2026-08-13T18:10:00+02:00"
 source_hash: ""
 reusable_lessons:
   - "Planning detail should improve resumability without becoming default prompt context."
   - "Independent QA is a property of evidence and context separation, not necessarily a second human."
 edges:
   - type: "implements"
-    target: "mem:owledge:global:owledge:plan:v1-autonomous-delivery"
+    target: "mem:owledge:global:owledge:plan:v1-minimal-core-finalization"
     confidence: 1.0
     reason: "This policy closes cross-cutting blindspots discovered after the ticket plan was created."
 ---
 
 # Owledge v1 Control-Plane Policy
+
+## V1 Minimal Core supersession
+
+The active execution envelope is [[owledge-v1-minimal-core-finalization-plan]].
+`BACKLOG.yaml` selects only `V1M-*` tickets. Completed OW-071/080/081 evidence
+is reusable history; unstarted `OW-*` tickets are mapped or parked and cannot
+be selected. The active complexity contract is exactly eight public CLI verbs,
+five MCP tools, two local scopes and three reference adapters. Any expansion
+requires the exact owner phrase `AMEND GOAL BOUNDARY`.
 
 ## Context Loading
 

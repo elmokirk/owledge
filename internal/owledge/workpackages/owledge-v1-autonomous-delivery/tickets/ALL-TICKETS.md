@@ -1,8 +1,8 @@
 ---
 title: "Owledge v1 Ticket Contracts"
 date: "2026-07-16"
-version: "2.4.0"
-document_version: 4
+version: "3.0.0"
+document_version: 5
 memory_id: "mem:owledge:global:owledge:task:v1-delivery-ticket-catalog"
 tenant_id: "owledge"
 customer_id: "global"
@@ -13,9 +13,9 @@ status: "active"
 visibility: "private"
 data_class: "internal"
 project: "owledge"
-scope: "v0.7.1-v1.0"
-semantic_title: "Owledge v1 delivery ticket catalog"
-summary: "Normalized implementation contracts for every ticket in the autonomous Owledge v1 release train, including the approved Standalone/local-user-global V1 scope cut."
+scope: "v1-minimal-core"
+semantic_title: "Owledge V1 minimal core ticket catalog"
+summary: "Active normalized implementation contracts for the minimal Owledge V1 train; prior completed ticket text is retained as non-selectable evidence history."
 concept_tags: ["tickets", "v1-roadmap", "autonomous-delivery"]
 stack_tags: ["markdown", "yaml", "python", "git"]
 problem_patterns: ["ambiguous-tickets", "dependency-drift", "self-approval"]
@@ -37,30 +37,15 @@ reusable_lessons: []
 edges: []
 ---
 
-# Owledge v1 Ticket Contracts
+# Owledge V1 Minimal Core Ticket Contracts
 
-## 2026-08-13 Approved V1 Scope Cut
+## Active V1M execution contract
 
-This normative amendment supersedes conflicting older ticket prose without
-erasing its decision history. V1 is the installable Standalone Core plus private
-local `user_global`/reviewed local Knowledge Base. Codex, Claude Code, and
-generic MCP/CLI are the only V1 Tier-1 profiles. Pi, Single-Organization Hub,
-LightRAG, Documentation Compiler, supply-chain manifests, and broad enterprise
-or orchestration capabilities are post-V1. `post_v1` rows remain searchable
-historical backlog and are deliberately excluded from V1 gates and waves.
-
-| Ticket | Binding disposition |
-| --- | --- |
-| OW-081-01/02/03/05 | keep; minimal shared contract, then Codex, Claude, generic MCP/CLI ASAP |
-| OW-081-04 | post-V1; Pi has no V1 adapter or Tier-1 claim |
-| OW-081-07/08 | keep; checkpoint/handoff and recall/delta/recap only, no side-effect orchestrator |
-| OW-081-09/10 | keep P0; local user-global Null-Space then three-profile journey |
-| OW-090-01/02/03/04/06/09 | keep and trim to local provenance, promotion, deny core, semantic writes, health/freshness, and tombstones |
-| OW-090-05/07/08 | post-V1; compiler, optional JSONL export, and LightRAG do not block direct local use |
-| OW-100-01/02/04/05/06/07/08/09/10 | keep and trim to Core scale, security, lifecycle, proof, and GA |
-| OW-100-03/11 | post-V1; supply-chain system and Hub Beta |
-
-This file is the compact ticket catalog referenced by `BACKLOG.yaml`. Load only the active ticket section plus the common execution contract.
+`BACKLOG.yaml` is the sole live selection source. It maps every unstarted
+legacy ticket either to one V1M contract or to a `PARK-*` record. V1 includes
+only Principles, deterministic local Core, private local user-global Null-Space,
+and Codex/Claude/generic MCP/CLI adapters. No historical `OW-*` section below
+is selectable for new work.
 
 ## Common Execution Contract
 
@@ -76,6 +61,120 @@ For every ticket:
 - Rollback: revert the cohesive ticket commit or disable the additive capability; migrations must retain a reversible preview or backup path.
 - QA handoff: include attack/failure cases, residual risks, and the smallest cumulative gate affected.
 - Alignment tickets: after a release RC/GA, create the required version update from `ALIGNMENT-PROTOCOL.md`, including complete finding/decision/question registers and next-version plan reflection; set the run state to `awaiting_user_alignment`, and stop. Only an explicit recorded user `approve`, `adjust`, or `defer` decision may resolve the ticket.
+
+## Active minimal-Core tickets
+
+### V1M-01 - Reconcile the live control plane and classify every surface
+
+- Priority/dependencies: P0; none.
+- Outcome: one active minimal-Core execution truth maps every unstarted legacy ticket and surface while preserving completed evidence.
+- Allowed paths: `internal/owledge/plans/owledge-v1-autonomous-delivery-master-plan.md`, `internal/owledge/workpackages/owledge-v1-autonomous-delivery/`, `internal/owledge/plans/`, `internal/owledge/decisions/`, `internal/owledge/ideas/`, `tools/validate_v1_delivery_plan.py`, and `tests/unit/test_validate_v1_delivery_plan.py`.
+- Implement: replace the live backlog DAG with V1M-01 through V1M-11; classify all legacy unstarted work as mapped or `post_v1`; make active gates, ticket sections, traceability, run state and execution guidance agree; add validator checks for the eight-verb/five-tool/two-scope/three-adapter/minimal-footprint budget. Do not change runtime behavior.
+- Accept: exactly one active backlog/run state exists; every unstarted `OW-*` ticket has a mapped V1M ID or `PARK-*` reason; no active V1M dependency/gate/wave references parked work; completed G-081-A evidence is referenced; the complexity budget and active DAG fail closed.
+- Verify/evidence: `python tools/validate_v1_delivery_plan.py`; `python -m unittest tests.unit.test_validate_v1_delivery_plan -v`; deterministic frontmatter/traceability checks; `git diff --check`; `evidence/V1M-01/implementation-checkpoint.yaml` and `evidence/G-V1M-PLAN/manifest.yaml`.
+- Negative QA: inject a parked legacy ticket into an active V1M dependency or gate, a ninth verb/sixth MCP tool/third scope/fourth adapter, and a missing legacy disposition; each must fail closed.
+
+### V1M-02 - Ship skill-only and minimal install profiles
+
+- Priority/dependencies: P0; `V1M-01`.
+- Outcome: Principles is zero-install and `minimal` is the default profile within the footprint budget.
+- Allowed paths: `tools/`, `templates/owledge/`, `skills/`, package metadata, focused tests, docs, and `evidence/V1M-02/`.
+- Implement: make schemas package resources, content directories lazy, and full/maintainer explicit; preserve user-owned files through upgrade.
+- Accept: fresh minimal profile has <=15 files and <=8 directories; Principles works without Core; full remains opt-in.
+- Verify/evidence: fresh profile footprint, upgrade preservation, package-resource smoke, and gate receipt.
+- Negative QA: missing Core on Principles path and edited user Markdown on upgrade remain safe.
+
+### V1M-03 - Freeze the eight-operation public facade
+
+- Priority/dependencies: P0; `V1M-02`.
+- Outcome: default Core help exposes exactly `init`, `doctor`, `recall`, `context`, `propose`, `review`, `sync`, and `upgrade`.
+- Allowed paths: `tools/`, package entry points, focused tests, docs, and `evidence/V1M-03/`.
+- Implement: route safe aliases behind an explicit advanced surface and make the public-facade allowlist deterministic.
+- Accept: no ninth default verb is accepted; compatible advanced paths provide actionable deprecation output.
+- Verify/evidence: default-help snapshot, parser contract tests, compatibility-smoke receipt.
+- Negative QA: an undeclared ninth operation fails without dispatch.
+
+### V1M-04 - Finish the private local user-global Null-Space
+
+- Priority/dependencies: P0; `V1M-03`.
+- Outcome: explicit local project links, allowlists, two namespaces and disposable local indexing work without network or implicit discovery.
+- Allowed paths: `tools/`, schemas, focused fixtures/tests, docs, and `evidence/V1M-04/`.
+- Implement: enforce resolved-path safety, owner/allowlist registry, no-sync policy, and direct small-vault scan.
+- Accept: only `project_user` and `user_global` are reachable; unlinked paths and network/enterprise requests fail closed.
+- Verify/evidence: two-project local fixture, direct-scan/rebuild equivalence, privacy receipt.
+- Negative QA: symlink escape, unlinked project, enterprise scope and implicit discovery fail.
+
+### V1M-05 - Consolidate recall and bounded context
+
+- Priority/dependencies: P0; `V1M-04`.
+- Outcome: source-linked deterministic recall and context packs support research/planning purposes without whole-vault injection.
+- Allowed paths: `tools/`, schemas, focused fixtures/tests, docs, and `evidence/V1M-05/`.
+- Implement: enforce scope, lifecycle, freshness, purpose, budget, source/exclusion receipts and permission-checked detail.
+- Accept: recall-before-research and recall-before-planning return essence first; context limits are deterministic.
+- Verify/evidence: purpose/budget fixtures and source-link receipts.
+- Negative QA: empty query, unauthorized detail, stale source and budget overflow fail safely.
+
+### V1M-06 - Add Candidate delta plus Park/Resurface lifecycle
+
+- Priority/dependencies: P0; `V1M-05`.
+- Outcome: typed deltas and idea parking are one Candidate lifecycle with planning-only resurfacing.
+- Allowed paths: `tools/`, schemas, focused fixtures/tests, docs, and `evidence/V1M-06/`.
+- Implement: validate parked fields, idempotent Candidate receipt, normal-recall exclusion and planned resurfacing reason/trigger.
+- Accept: adapters cannot activate a parked item; raw/parked artifacts stay outside ordinary recall.
+- Verify/evidence: candidate, park and planning-recall fixture receipts.
+- Negative QA: silent activation, incomplete parked fields and replayed delta fail closed or remain idempotent.
+
+### V1M-07 - Complete local review, promotion, tombstones, and health
+
+- Priority/dependencies: P0; `V1M-06`.
+- Outcome: reviewed local lifecycle transitions, deletion propagation and privacy-safe health are deterministic.
+- Allowed paths: `tools/`, schemas, focused fixtures/tests, docs, and `evidence/V1M-07/`.
+- Implement: enforce promote/park/reject/supersede conflict rules, tombstones and health diagnostics without body telemetry.
+- Accept: stale sources, orphan links, promotion debt, context overflow and index drift are visible without leaking contents.
+- Verify/evidence: transition/rebuild/doctor fixtures and receipt.
+- Negative QA: revision conflict and withdrawn source do not mutate canonical state.
+
+### V1M-08 - Prove the three thin adapters
+
+- Priority/dependencies: P0; `V1M-07`.
+- Outcome: Codex, Claude Code and generic MCP/CLI share Core semantics and exactly five MCP tools.
+- Allowed paths: `plugins/`, `addons/`, `tools/`, focused tests, docs, and `evidence/V1M-08/`.
+- Implement: reuse G-081-A manifests and remove duplicated adapter lifecycle/search/storage behavior.
+- Accept: three profiles have identical scopes/errors/degradation; adapters expose no sixth MCP tool.
+- Verify/evidence: common conformance journey, adapter-source boundary scan, G-081-A reference.
+- Negative QA: unsupported capability and direct storage/write bypass fail explicitly.
+
+### V1M-09 - Finalize install, upgrade, recovery, and security
+
+- Priority/dependencies: P0; `V1M-08`.
+- Outcome: local install/upgrade/recovery and core security hold on a clean offline Windows proof.
+- Allowed paths: `tools/`, package metadata, focused tests, docs, and `evidence/V1M-09/`.
+- Implement: preview/apply/recover lifecycle, path/symlink safety, no-network guard, secret/PII warnings and retrieved-instruction provenance.
+- Accept: Windows proof is executed; macOS/Linux remain wheel-only evidence required before publication, not implied support claims.
+- Verify/evidence: install, interrupted recovery, offline/security-negative and package receipt.
+- Negative QA: unsafe path, symlink, network path and stale checkpoint fail closed.
+
+### V1M-10 - Prove compact daily journey and cut GA candidate
+
+- Priority/dependencies: P0; `V1M-09`.
+- Outcome: a clean candidate proves local cross-project reuse, park/resurface and cross-harness resume without history.
+- Allowed paths: `tools/`, package metadata, docs, focused tests/fixtures, release artifacts, and `evidence/V1M-10/`.
+- Implement: run the owner journey, build wheel/sdist from clean source and align public capability claims with evidence.
+- Accept: no unresolved P0/P1; package has no private path; platform claims remain evidence-bounded.
+- Verify/evidence: GA journey, artifact inspection, docs-claim map and G-V1M-GA manifest.
+- Negative QA: ordinary recall cannot return parked content and unsupported platform claim is rejected.
+
+### V1M-11 - Owner-controlled publication
+
+- Priority/dependencies: P0; `V1M-10`.
+- Outcome: publication happens only after an owner names the exact candidate, artifacts and external action.
+- Allowed paths: release notes, `internal/owledge/workpackages/owledge-v1-autonomous-delivery/evidence/V1M-11/`, and publication receipts explicitly authorized by the owner.
+- Implement: present candidate decision; do not push, tag, publish or upload before explicit authorization.
+- Accept: absent exact authorization, this ticket remains blocked and no external state changes.
+- Verify/evidence: owner authorization and publication receipt only after authorization.
+- Negative QA: generic approval and unpinned candidate cannot unlock publication.
+
+## Historical completed and superseded ticket contracts
 
 ## v0.7.1 - Adoption, Truth, and Compatibility
 
