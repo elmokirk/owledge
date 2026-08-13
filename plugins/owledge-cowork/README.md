@@ -21,8 +21,8 @@ contract.
 
 - Python 3 available to the runtime command environment.
 - A host project initialized with `OWLEDGE.md` and `.owledge/`.
-- Local `tools/owledge_core.py` in the host project or an Owledge repo
-  checkout.
+- Local `tools/owledge_core.py` in the host project. An external kit is used
+  only with explicit `OWLEDGE_ALLOW_GLOBAL_KIT=1`.
 
 ## Install
 
@@ -42,6 +42,8 @@ The normal path is project-local:
    in that project.
 3. Let the hooks discover the project root by walking upward from the current
    directory.
+4. On `SessionStart`, use the emitted compact capsule from `OWLEDGE.md` and
+   `.owledge/indexes/memory-index.jsonl`; no registers are auto-loaded.
 
 ## Capture Policy
 
@@ -66,6 +68,7 @@ plugins/owledge-cowork/
 |-- hooks/hooks.python.json
 |-- scripts/
 |   |-- capture-claude-event.py
+|   |-- inject-owledge-context.py
 |   `-- close-runtime-session.py
 |-- tests/fixtures/
 |-- LICENSE

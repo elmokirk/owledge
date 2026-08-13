@@ -142,6 +142,7 @@ HOST_TOOL_FILES = [
     "owledge_context_compiler.py",
     "owledge_context_profiles.py",
     "owledge_rag_projection.py",
+    "owledge_run_state.py",
     "owledge_small_model_profiles.py",
     "run_small_model_smoke.py",
     "validate_benchmark_baseline.py",
@@ -813,6 +814,12 @@ def init_project(project_root: pathlib.Path, source_root: pathlib.Path, include_
                 ["tests/*"],
             )
         )
+        settings_source = source_root / "plugins" / "owledge-cowork" / "templates" / "claude-settings.json"
+        settings_target = project_root / ".claude" / "settings.json"
+        if settings_source.is_file() and copy_file_if_missing(settings_source, settings_target):
+            created.append(".claude/settings.json")
+        elif settings_target.exists():
+            skipped.append(".claude/settings.json")
 
     if include_compliance:
         build_project_folder_kit.install_compliance(source_root, project_root)

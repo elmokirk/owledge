@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python plugins/owledge-cowork/scripts/inject-owledge-context.py *)",
+      "Bash(python plugins/owledge-cowork/scripts/capture-claude-event.py *)",
+      "Bash(python plugins/owledge-cowork/scripts/close-runtime-session.py *)",
+      "Bash(python tools/owledge.py *)",
+      "Bash(python tools/owledge_core.py *)"
+    ]
+  }
+}

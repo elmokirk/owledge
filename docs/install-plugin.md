@@ -74,9 +74,22 @@ plugins/owledge-cowork/hooks/hooks.json
 plugins/owledge-cowork/scripts/
 ```
 
-Copy the full `plugins/owledge-cowork/` folder into the Claude-compatible
-plugin directory used by your local runtime. Start Claude Code from the
-initialized project root so the Python hooks can discover the local CLI.
+For the project-local path, initialize with the adapter:
+
+```bash
+python tools/owledge.py init-project --target . --include-plugin-adapter
+```
+
+This writes `plugins/owledge-cowork/` and a non-overwriting
+`.claude/settings.json` allow-list in the host project. Install that local
+plugin folder through Claude Code so `${CLAUDE_PLUGIN_ROOT}` resolves inside
+the project, then start Claude Code from the project root. `SessionStart`
+emits a compact capsule from only `OWLEDGE.md` and
+`.owledge/indexes/memory-index.jsonl`; it does not load project registers.
+
+Hooks require project-local `tools/owledge_core.py`. If the local tool is
+absent they fail soft with an `init-project` doctor hint. A global kit is used
+only when `OWLEDGE_ALLOW_GLOBAL_KIT=1` is explicitly set.
 
 Verify:
 

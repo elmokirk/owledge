@@ -5,7 +5,13 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python \"${CLAUDE_PLUGIN_ROOT}/scripts/capture-claude-event.py\""
+            "command": "python \"${CLAUDE_PLUGIN_ROOT}/scripts/inject-owledge-context.py\"",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "python \"${CLAUDE_PLUGIN_ROOT}/scripts/capture-claude-event.py\"",
+            "timeout": 15
           }
         ]
       }

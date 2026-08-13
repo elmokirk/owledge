@@ -1,0 +1,20 @@
+ticket: OW-080-15
+status: accepted_independent_qa
+scope:
+  - project-local Claude hook injection
+  - init-project local allow-list
+  - explicit global-kit fallback
+verification:
+  - "python -m unittest tests.unit.test_ow08015_native_hooks -v: 7 passed, including project-local SessionStart/UserPromptSubmit/PostToolUse/Stop lifecycle fixture with zero external-path approval prompts"
+  - "python tools/owledge.py test runtime-adapters --project-root .: passed"
+  - "python tools/validate_v1_delivery_plan.py: passed, 0 errors"
+  - "git diff --check: passed"
+coverage:
+  - "SessionStart emits only OWLEDGE.md and memory-index capsule content."
+  - "Missing project metadata fails soft without a hook crash."
+  - "Project-local init writes a non-overwriting .claude/settings.json allow-list."
+  - "External CLI fallback requires OWLEDGE_ALLOW_GLOBAL_KIT=1."
+limitations:
+  - "No live Claude Code session was invoked; the complete project-local lifecycle fixture validates the hook contract without model/runtime credential use."
+  - "docs-contract currently reports five pre-existing undocumented CLI command rows outside OW-080-15 scope."
+publication_authority: not_granted

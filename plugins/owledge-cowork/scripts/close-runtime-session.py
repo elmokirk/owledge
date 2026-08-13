@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import os
 import pathlib
 import subprocess
 import sys
@@ -48,12 +49,14 @@ def resolve_cli(root: pathlib.Path) -> pathlib.Path:
     local = root / "tools" / "owledge_core.py"
     if local.exists():
         return local
+    if os.environ.get("OWLEDGE_ALLOW_GLOBAL_KIT") != "1":
+        raise RuntimeError("Missing project-local Owledge CLI. Run `python tools/owledge.py init-project --target . --include-plugin-adapter` from the host project, or set OWLEDGE_ALLOW_GLOBAL_KIT=1 for an explicit global-kit install.")
     plugin_root = pathlib.Path(__file__).resolve().parents[1]
     repo_candidate = plugin_root.parents[1] if len(plugin_root.parents) > 1 else plugin_root
     repo_cli = repo_candidate / "tools" / "owledge_core.py"
     if repo_cli.exists():
         return repo_cli
-    raise RuntimeError("Missing Owledge CLI. Copy tools/owledge_core.py into the project or run from the Owledge repo checkout.")
+    raise RuntimeError("Missing Owledge CLI. Run init-project in this host or install the explicitly allowed global kit.")
 
 
 def session_id_from_payload(payload: str) -> str:

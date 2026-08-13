@@ -1,0 +1,29 @@
+ticket: OW-080-14
+status: accepted_independent_qa
+scope:
+  - explicit copy-only legacy RUN-STATE sharding command
+  - compact pointer manifest and version registers
+  - active-register-only cold load and explicit historical lookup
+verification:
+  - "python tools/owledge_run_state.py --legacy-state internal/owledge/workpackages/owledge-v1-autonomous-delivery/RUN-STATE.yaml --output-path <temp>: passed; live legacy SHA identical before/after"
+  - "python -m unittest tests.unit.test_ow08014_run_state_sharding tests.unit.test_ow08015_native_hooks -v: 14 passed"
+  - "python tools/owledge.py test runtime-adapters --project-root .: passed"
+  - "python tools/validate_v1_delivery_plan.py: passed, 0 errors"
+  - "python -m py_compile tools/owledge.py tools/owledge_run_state.py and hook scripts: passed"
+  - "git diff --check: passed"
+receipts:
+  live_run_state_sha256: bb484065e5efde44505e8093dac960d2e3c0e0acb1577e023b5b9f98b2e8fe8a
+  pointer_manifest_bytes: 250
+  pointer_manifest_tokens: 56
+  active_register_only: true
+coverage:
+  - "The pointer fixture is below 2KB and carries the five required pointer fields."
+  - "A cold load reads only the pointer and active v0.8.0 register; historical v0.7.1 requires explicit lookup."
+  - "A routed historic finding remains present in the active register, preserving active-version impact."
+  - "Stable F/D IDs and canonical entry content SHA survive the sharding round trip."
+  - "Traversal, missing active register, and unknown version fail closed."
+  - "Repeated migration is idempotent and never rewrites the source legacy RUN-STATE."
+limitations:
+  - "The live dogfood RUN-STATE remains flat by design; migration requires the explicit command and a separate output directory."
+  - "No automatic migration, historical auto-load, or session-slice pointer switch is enabled."
+publication_authority: not_granted

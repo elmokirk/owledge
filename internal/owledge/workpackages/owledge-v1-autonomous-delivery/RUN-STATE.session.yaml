@@ -2,11 +2,11 @@ schema_version: 1
 runtime_resume_model: persisted
 session_slice:
   active_version: v0.8.0
-  active_ticket: OW-080-14
-  current_step: "OW-080-13 is accepted; W-080-B5 runs OW-080-14 and OW-080-15 in disjoint parallel lanes."
-  next_command: "Execute OW-080-14 locally and OW-080-15 in an isolated subagent lane, then run their scoped QA before G-080-B-CONTEXT."
+  active_ticket: OW-080-10
+  current_step: "W-080-B5 is accepted and G-080-B-CONTEXT is green; OW-080-10 is the active v0.8.0 release-candidate verification ticket."
+  next_command: "Load only OW-080-10, G-080-RC, D-080-01, and directly referenced evidence; execute release-candidate verification without publication, tagging, or push."
 durable_state_ref: RUN-STATE.yaml
-durable_state_tokens: 14162
+durable_state_tokens: 14316
 baseline_file_content_tokens: 18940
 last_control_sha:
   CONTROL-PLANE-POLICY.md: 455b8bff35f61006a03834e6c2004046cbe442e4ab4b1b1dbeaadf3c2d58611c
