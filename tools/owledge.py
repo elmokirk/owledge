@@ -92,6 +92,72 @@ MEMORY_SCHEMA_VERSION = "1.0.0"
 __version__ = KIT_VERSION
 
 
+# V1 Minimal Core is intentionally small.  Keep this list next to the CLI
+# boundary rather than inferring it from the much larger maintainer toolset.
+PUBLIC_CORE_VERBS = ("init", "doctor", "recall", "context", "propose", "review", "sync", "upgrade")
+DEFERRED_CORE_VERBS = {"propose", "review", "sync"}
+COMPATIBILITY_REPLACEMENTS = {
+    "init-project": "init",
+    "research-recall": "recall",
+    "build-context-pack": "context",
+    "quickstart": "init",
+}
+
+
+def _advanced_surface_help() -> str:
+    return (
+        "Owledge advanced compatibility surface\n\n"
+        "Use `owledge advanced <legacy-operation> [arguments]` for a retained "
+        "maintainer or migration route. These operations are deliberately not "
+        "part of the V1 Core help contract and may change independently.\n\n"
+        "The V1 Core operations are: " + ", ".join(PUBLIC_CORE_VERBS) + ".\n"
+        "For a direct legacy invocation, Owledge still runs the command and "
+        "prints a migration hint on stderr."
+    )
+
+
+def _normalize_advanced_invocation(argv: list[str]) -> tuple[list[str], bool, int | None]:
+    """Strip the explicit advanced namespace before argparse sees legacy routes.
+
+    Keeping legacy parsers real (instead of forwarding through a shell) preserves
+    their existing validation and makes the transition reversible.  The wrapper
+    is intentionally narrow: public Core verbs cannot be routed through it.
+    """
+    if not argv or argv[0] != "advanced":
+        return argv, False, None
+    if len(argv) == 1 or argv[1] in {"-h", "--help"}:
+        print(_advanced_surface_help())
+        return argv, True, 0
+    if argv[1] in PUBLIC_CORE_VERBS:
+        print_json({
+            "passed": False,
+            "error": "advanced_accepts_compatibility_routes_only",
+            "operation": argv[1],
+            "next_action": f"Run `owledge {argv[1]} --help` instead.",
+        })
+        return argv, True, 2
+    return argv[1:], True, None
+
+
+def _add_init_arguments(command: argparse.ArgumentParser) -> None:
+    command.add_argument("--target", dest="target", required=True)
+    command.add_argument("--source-root", default=str(REPO_ROOT))
+    command.add_argument("--include-plugin-adapter", action="store_true")
+    command.add_argument("--include-compliance", action="store_true")
+    command.add_argument("--profile", choices=["principles", "minimal", "full"], default="minimal")
+    command.add_argument("--link-global", nargs="?", const="", default=None, help="Link a global user-memory layer. With no arg, uses OWLEDGE_GLOBAL_HOME env or ~/.owledge/global default.")
+
+
+def _add_context_arguments(command: argparse.ArgumentParser) -> None:
+    command.add_argument("--task-id", required=True)
+    command.add_argument("--agent-role", default="worker")
+    command.add_argument("--budget-chars", type=int)
+    command.add_argument("--objective")
+    command.add_argument("--pack-version", choices=["v0.7", "v1"], default="v0.7")
+    command.add_argument("--pack-type", choices=["bootstrap", "task", "reviewer", "handoff", "release", "pre_plan", "pre_research"], default="task")
+    command.add_argument("--include-reviewed-global", action="store_true", help="Explicitly permit reviewed/canonical user_global essences in a v1 pack.")
+
+
 PUBLIC_DOC_FILES = [
     "README.md",
     "docs/README.md",
@@ -4092,22 +4158,44 @@ def mcp_readonly_smoke(root: pathlib.Path) -> dict[str, Any]:
 
 
 def main(argv: list[str] | None = None) -> int:
+    raw_argv = list(sys.argv[1:] if argv is None else argv)
+    raw_argv, advanced_invocation, early_exit = _normalize_advanced_invocation(raw_argv)
+    if early_exit is not None:
+        return early_exit
+
     parser = argparse.ArgumentParser(description="Owledge Python-first CLI")
     parser.add_argument("--project-root", default=".")
     project_parent = argparse.ArgumentParser(add_help=False)
     project_parent.add_argument("--project-root", dest="command_project_root")
-    sub = parser.add_subparsers(dest="command", required=True)
+    sub = parser.add_subparsers(
+        dest="command",
+        required=True,
+        metavar="{init,doctor,recall,context,propose,review,sync,upgrade}",
+    )
 
-    doctor_p = sub.add_parser("doctor", parents=[project_parent])
+    init_parent = argparse.ArgumentParser(add_help=False)
+    _add_init_arguments(init_parent)
+    init_p = sub.add_parser("init", parents=[init_parent], help="Install the local Core with the selected profile.")
+
+    doctor_p = sub.add_parser("doctor", parents=[project_parent], help="Diagnose the installed local Core.")
     doctor_p.add_argument("--mode", choices=["auto", "kit", "host"], default="auto")
 
-    init_p = sub.add_parser("init-project")
-    init_p.add_argument("--target", dest="target", required=True)
-    init_p.add_argument("--source-root", default=str(REPO_ROOT))
-    init_p.add_argument("--include-plugin-adapter", action="store_true")
-    init_p.add_argument("--include-compliance", action="store_true")
-    init_p.add_argument("--profile", choices=["principles", "minimal", "full"], default="minimal")
-    init_p.add_argument("--link-global", nargs="?", const="", default=None, help="Link a global user-memory layer. With no arg, uses OWLEDGE_GLOBAL_HOME env or ~/.owledge/global default.")
+    recall_parent = argparse.ArgumentParser(add_help=False)
+    recall_parent.add_argument("--query", required=True)
+    recall_p = sub.add_parser("recall", parents=[project_parent, recall_parent], help="Recall local authorized knowledge before new research.")
+
+    context_parent = argparse.ArgumentParser(add_help=False)
+    _add_context_arguments(context_parent)
+    context_p = sub.add_parser("context", parents=[project_parent, context_parent], help="Build a scoped local context pack.")
+
+    for command_name, command_help in (
+        ("propose", "Reserved Candidate proposal operation; enabled with the lifecycle Core."),
+        ("review", "Reserved Candidate review operation; enabled with the lifecycle Core."),
+        ("sync", "Reserved local synchronization operation; enabled with the lifecycle Core."),
+    ):
+        sub.add_parser(command_name, parents=[project_parent], help=command_help)
+
+    init_compat_p = sub.add_parser("init-project", parents=[init_parent])
 
     quickstart_p = sub.add_parser("quickstart")
     quickstart_p.add_argument("--target", dest="target", required=True)
@@ -4145,14 +4233,7 @@ def main(argv: list[str] | None = None) -> int:
     snapshot_p.add_argument("--allow-large-context", action="store_true")
     snapshot_p.add_argument("--yes", action="store_true")
 
-    context_p = sub.add_parser("build-context-pack", parents=[project_parent])
-    context_p.add_argument("--task-id", required=True)
-    context_p.add_argument("--agent-role", default="worker")
-    context_p.add_argument("--budget-chars", type=int)
-    context_p.add_argument("--objective")
-    context_p.add_argument("--pack-version", choices=["v0.7", "v1"], default="v0.7")
-    context_p.add_argument("--pack-type", choices=["bootstrap", "task", "reviewer", "handoff", "release", "pre_plan", "pre_research"], default="task")
-    context_p.add_argument("--include-reviewed-global", action="store_true", help="Explicitly permit reviewed/canonical user_global essences in a v1 pack.")
+    context_compat_p = sub.add_parser("build-context-pack", parents=[project_parent, context_parent])
 
     work_p = sub.add_parser("work-contract", parents=[project_parent])
     work_p.add_argument("--contract", required=True)
@@ -4176,8 +4257,7 @@ def main(argv: list[str] | None = None) -> int:
     migrate_p.add_argument("--apply", action="store_true")
     migrate_p.add_argument("--plan")
     migrate_p.add_argument("--output-plan")
-    recall_p = sub.add_parser("research-recall", parents=[project_parent])
-    recall_p.add_argument("--query", required=True)
+    recall_compat_p = sub.add_parser("research-recall", parents=[project_parent, recall_parent])
     sub.add_parser("rag-projection-v1", parents=[project_parent])
     small_model_p = sub.add_parser("small-model-validate", parents=[project_parent])
     small_model_p.add_argument("--profile", required=True, choices=["4k", "8k", "16k", "standard"])
@@ -4285,7 +4365,7 @@ def main(argv: list[str] | None = None) -> int:
     sync_mode.add_argument("--dry-run", action="store_true")
     sync_mode.add_argument("--apply", action="store_true")
 
-    upgrade_p = sub.add_parser("upgrade", parents=[project_parent])
+    upgrade_p = sub.add_parser("upgrade", parents=[project_parent], help="Safely inspect or apply a local Core upgrade.")
     upgrade_mode = upgrade_p.add_mutually_exclusive_group()
     upgrade_mode.add_argument("--dry-run", action="store_true")
     upgrade_mode.add_argument("--apply", action="store_true")
@@ -4300,15 +4380,40 @@ def main(argv: list[str] | None = None) -> int:
     concept_audit_p.add_argument("--profile", default=None)
     concept_audit_p.add_argument("--format", choices=["json", "summary"], default="json")
 
-    args = parser.parse_args(argv)
+    for action in sub._choices_actions:
+        if action.dest not in PUBLIC_CORE_VERBS:
+            action.help = argparse.SUPPRESS
+
+    args = parser.parse_args(raw_argv)
     root = resolve_path(getattr(args, "command_project_root", None) or args.project_root)
 
+    if args.command not in PUBLIC_CORE_VERBS and not advanced_invocation:
+        replacement = COMPATIBILITY_REPLACEMENTS.get(args.command)
+        if replacement:
+            print(
+                f"DEPRECATION: `{args.command}` is a compatibility route. Use `owledge {replacement}` for the V1 Core, or `owledge advanced {args.command} ...` to retain the legacy route.",
+                file=sys.stderr,
+            )
+        else:
+            print(
+                f"DEPRECATION: `{args.command}` is an advanced compatibility route. Use `owledge advanced {args.command} ...`.",
+                file=sys.stderr,
+            )
+
     try:
+        if args.command in DEFERRED_CORE_VERBS:
+            print_json({
+                "passed": False,
+                "error": "operation_not_available_yet",
+                "operation": args.command,
+                "next_action": "This V1 Core operation is reserved and will become available after the local Candidate lifecycle gate.",
+            })
+            return 2
         if args.command == "doctor":
             result = core.memory_doctor(root, mode=args.mode)
             print_json(result)
             return 0 if result["passed"] else 1
-        if args.command == "init-project":
+        if args.command in {"init", "init-project"}:
             print_json(init_project(resolve_path(args.target), resolve_path(args.source_root), args.include_plugin_adapter, args.include_compliance, link_global=getattr(args, "link_global", None), profile=args.profile))
             return 0
         if args.command == "quickstart":
@@ -4363,7 +4468,7 @@ def main(argv: list[str] | None = None) -> int:
                 )
             )
             return 0
-        if args.command == "build-context-pack":
+        if args.command in {"context", "build-context-pack"}:
             if args.pack_version == "v1":
                 print_json(
                     core.build_context_pack_v1(
@@ -4436,7 +4541,7 @@ def main(argv: list[str] | None = None) -> int:
             result = owledge_migration.apply(root, source_root, plan)
             print_json(result)
             return 0 if result.get("passed") else 1
-        if args.command == "research-recall":
+        if args.command in {"recall", "research-recall"}:
             print_json(owledge_research_memory.recall(owledge_research_memory.load_local_records(root), query=args.query, allowed_scopes={"project_user"}))
             return 0
         if args.command == "rag-projection-v1":

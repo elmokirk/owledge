@@ -5,7 +5,31 @@ Owledge is Python-first. Use `tools/owledge.py` for public workflows and
 
 Package examples can be run as `uvx owledge ...` or, after `uv tool install owledge`, as `owledge ...`.
 
-## Public Owledge CLI
+## V1 Core CLI
+
+`owledge --help` intentionally exposes only these eight operations. `propose`,
+`review`, and `sync` are stable names that currently fail closed until their
+local Candidate lifecycle is available; they do not trigger an external service
+or a hidden write.
+
+| Command | Writes | Purpose |
+| --- | --- | --- |
+| `python tools/owledge.py init --target /path/to/project` | Yes | Install the Principles, minimal, or explicit full local Core profile |
+| `python tools/owledge.py doctor --project-root .` | No | Diagnose the installed local Core |
+| `python tools/owledge.py recall --project-root . --query "tool compatibility"` | No | Recall authorized local knowledge before new research |
+| `python tools/owledge.py context --project-root . --task-id task-1` | No | Build a scoped local context pack |
+| `python tools/owledge.py propose` | No | Reserved Candidate proposal boundary; fails closed until enabled |
+| `python tools/owledge.py review` | No | Reserved Candidate review boundary; fails closed until enabled |
+| `python tools/owledge.py sync` | No | Reserved local synchronization boundary; fails closed until enabled |
+| `python tools/owledge.py upgrade --dry-run --project-root .` | No | Inspect a safe local Core upgrade |
+
+## Advanced compatibility and maintainer CLI
+
+Older and maintainer routes remain available without becoming part of the V1
+Core contract. Invoke them explicitly as
+`python tools/owledge.py advanced <legacy-operation> [arguments]`. A direct
+legacy invocation still works but prints an actionable deprecation hint on
+stderr. The reference below retains those routes for existing installations.
 
 | Command | Writes | Purpose |
 | --- | --- | --- |

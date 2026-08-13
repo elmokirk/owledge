@@ -1,0 +1,43 @@
+ticket: V1M-03
+status: accepted_independent_qa
+base_commit: 4c95b9f
+branch: codex/v071-integration
+scope: eight-operation-public-facade
+implementation:
+  - "Default help exposes exactly init, doctor, recall, context, propose, review, sync and upgrade."
+  - "init, recall and context are Core aliases with the existing deterministic implementations."
+  - "propose, review and sync are named, fail-closed boundaries until the local Candidate lifecycle is implemented."
+  - "Legacy commands remain parser-backed compatibility routes; `advanced <route>` opts into the hidden maintainer surface."
+  - "Direct legacy invocation emits an actionable stderr deprecation hint without changing the legacy command semantics."
+commands:
+  - command: python -m unittest tests.unit.test_v1m03_public_facade tests.unit.test_v1m02_minimal_profiles tests.unit.test_ow07110_install_contract tests.unit.test_ow08015_native_hooks tests.unit.test_ow08101_adapter_contracts -v
+    exit_code: 0
+    result: "23/23 passed"
+  - command: python tools/validate_v1_delivery_plan.py
+    exit_code: 0
+    result: "11 tickets, 7 gates, 11 waves, 0 errors"
+  - command: python tools/owledge.py test public-docs --project-root .
+    exit_code: 0
+    result: "257 checks passed"
+  - command: python -m py_compile tools/owledge.py
+    exit_code: 0
+  - command: git diff --check
+    exit_code: 0
+positive_contracts:
+  - "Fresh minimal host accepts init, recall and context."
+  - "Direct init-project accepts the prior command line and emits a deprecation hint."
+  - "advanced research-recall succeeds without the direct-legacy deprecation hint."
+negative_contracts:
+  - "propose, review and sync return exit 2 with operation_not_available_yet and perform no write."
+  - "advanced init returns exit 2 because public Core verbs cannot be routed through the compatibility surface."
+  - "An undeclared ninth operation returns parser exit 2 before any command dispatch."
+independent_qa:
+  required: true
+  mode: separately_initialized_read_only_reviewer
+  result: accepted
+  status: accepted
+  findings: []
+known_limitations:
+  - "The three lifecycle verbs are intentionally visible but unavailable until V1M-06/V1M-07 supplies the local Candidate lifecycle; this ticket makes no write-capability claim."
+publication_authority: not_granted
+next_exact_action: "Run G-V1M-SURFACE cumulative verification, then select V1M-04 only after the green gate is committed."

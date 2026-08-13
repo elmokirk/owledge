@@ -5,7 +5,7 @@ customer_id: "global"
 project_id: "owledge"
 doc_type: "task"
 artifact_type: "workpackage"
-document_version: 4
+document_version: 5
 workpackage_version: "1.0.2"
 status: "active"
 visibility: "private"
@@ -21,7 +21,7 @@ confidence: 0.97
 review_status: "reviewed"
 sanitization_status: "not_required"
 created_at: "2026-08-13T17:20:00+02:00"
-updated_at: "2026-08-13T17:20:00+02:00"
+updated_at: "2026-08-13T19:00:00+02:00"
 source_hash: ""
 reusable_lessons:
   - "A new plan enters an active release train only at a clean ticket/gate boundary."
@@ -82,12 +82,12 @@ canonical `PARK-*` reference resolution and 10/10 validator regressions.
 
 ## Phase 2 — Minimal surface
 
-- [ ] V1M-02 passes skill-only and minimal-profile footprint tests.
-- [ ] Default fresh profile <=15 files and <=8 directories.
-- [ ] Existing large install remains explicit `full`/`maintainer`, never default.
-- [ ] V1M-03 exposes exactly eight public Core verbs.
-- [ ] Existing aliases either route safely or emit actionable deprecation output.
-- [ ] No user-owned Markdown is removed or overwritten during upgrade.
+- [x] V1M-02 passes skill-only and minimal-profile footprint tests.
+- [x] Default fresh profile <=15 files and <=8 directories.
+- [x] Existing large install remains explicit `full`/`maintainer`, never default.
+- [x] V1M-03 exposes exactly eight public Core verbs.
+- [x] Existing aliases either route safely or emit actionable deprecation output.
+- [x] No user-owned Markdown is removed or overwritten during upgrade.
 - [ ] Gate `G-V1M-SURFACE` green.
 
 ## Phase 3 — Local read path
