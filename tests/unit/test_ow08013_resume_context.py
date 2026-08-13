@@ -18,12 +18,13 @@ class ResumeContextTests(unittest.TestCase):
         for path in self.controls:
             path.write_text("# control\n" + "bounded control text " * 100 + "\n", encoding="utf-8")
         self.state = root / "RUN-STATE.yaml"
-        self.state.write_text(
-            "current_release: v0.8.0\nactive_ticket: OW-080-13\nsession:\n"
-            "  session_slice:\n    active_version: v0.8.0\n    active_ticket: OW-080-13\n"
-            "    current_step: source committed\n    next_command: run deterministic resume proof\n"
-            "  last_control_sha:\n"
-            + "".join(f"    {path.name}: {owledge.sha256_file(path)}\n" for path in self.controls),
+        self.state.write_text("durable state\n" * 1000, encoding="utf-8")
+        self.session = root / "RUN-STATE.session.yaml"
+        self.session.write_text(
+            "session_slice:\n  active_version: v0.8.0\n  active_ticket: OW-080-13\n"
+            "  current_step: source committed\n  next_command: run deterministic resume proof\n"
+            "durable_state_tokens: 10000\nbaseline_file_content_tokens: 12000\nlast_control_sha:\n"
+            + "".join(f"  {path.name}: {owledge.sha256_file(path)}\n" for path in self.controls),
             encoding="utf-8",
         )
         self.handoff = root / "handoff.md"
@@ -45,6 +46,7 @@ class ResumeContextTests(unittest.TestCase):
         self.assertEqual("OW-080-13", result["session_slice"]["active_ticket"])
         self.assertTrue(all(not row["loaded"] for row in result["controls"]))
         self.assertFalse(result["handoff"]["loaded"])
+        self.assertFalse(result["durable_state_loaded"])
         self.assertLess(result["warm_resume_drain"], result["cold_resume_drain"])
         self.assertLess(result["cold_resume_drain"], result["baseline_file_content_tokens"])
 
@@ -55,6 +57,7 @@ class ResumeContextTests(unittest.TestCase):
         self.assertTrue(result["passed"])
         self.assertTrue(all(not row["loaded"] for row in result["controls"]))
         self.assertTrue(result["handoff"]["loaded"])
+        self.assertTrue(result["durable_state_loaded"])
 
     def test_changed_control_hash_is_loaded(self) -> None:
         self.controls[0].write_text("# changed\n" + "new content " * 100 + "\n", encoding="utf-8")

@@ -361,6 +361,7 @@ def resume_context_v1(
     already_loaded: set[str] | None = None,
     handoff_path: pathlib.Path | None = None,
     handoff_in_context: bool = False,
+    session_path: pathlib.Path | None = None,
 ) -> dict[str, Any]:
     """Build a bounded, auditable resume capsule without loading full control text.
 
@@ -370,20 +371,21 @@ def resume_context_v1(
     """
     if runtime_resume_model not in RESUME_RUNTIME_MODELS:
         return {"passed": False, "error": "resume_context.invalid_runtime_model"}
-    if not state_path.is_file() or any(not path.is_file() for path in control_paths):
+    session_path = session_path or state_path.with_name(f"{state_path.stem}.session.yaml")
+    if not state_path.is_file() or not session_path.is_file() or any(not path.is_file() for path in control_paths):
         return {"passed": False, "error": "resume_context.missing_required_input"}
     if runtime_resume_model == "reset_baseline" and handoff_path is None:
         return {"passed": False, "error": "resume_context.missing_handoff"}
     if handoff_path is not None and not handoff_path.is_file():
         return {"passed": False, "error": "resume_context.missing_handoff"}
 
-    state_text = state_path.read_text(encoding="utf-8", errors="replace")
+    session_text = session_path.read_text(encoding="utf-8", errors="replace")
+    state_text = state_path.read_text(encoding="utf-8", errors="replace") if runtime_resume_model == "reset_baseline" else ""
     loaded = already_loaded or set()
-    previous_hashes = _yaml_mapping(state_text, "last_control_sha", indent=2)
+    previous_hashes = _yaml_mapping(session_text, "last_control_sha", indent=0)
     controls: list[dict[str, Any]] = []
     control_tokens = 0
     for path in control_paths:
-        text = path.read_text(encoding="utf-8", errors="replace")
         identity = path.as_posix()
         current_hash = sha256_file(path)
         previous_hash = previous_hashes.get(path.name, "")
@@ -391,24 +393,25 @@ def resume_context_v1(
         retained = runtime_resume_model == "persisted" and identity in loaded and hash_unchanged
         skip_delta = hash_unchanged and not retained
         reason = "runtime_context_retained" if retained else "hash_delta_unchanged" if skip_delta else "hash_delta_changed"
-        tokens = 0 if retained or skip_delta else file_content_token_count(text)
+        tokens = 0 if retained or skip_delta else file_content_token_count(path.read_text(encoding="utf-8", errors="replace"))
         control_tokens += tokens
         controls.append({"path": identity, "sha256": current_hash, "loaded": not (retained or skip_delta), "reason": reason, "tokens": tokens})
 
     handoff: dict[str, Any] | None = None
     if handoff_path is not None:
-        handoff_text = handoff_path.read_text(encoding="utf-8", errors="replace")
         retained = runtime_resume_model == "persisted" and handoff_in_context
-        handoff = {"path": handoff_path.as_posix(), "sha256": hashlib.sha256(handoff_text.encode("utf-8")).hexdigest(), "loaded": not retained, "tokens": 0 if retained else file_content_token_count(handoff_text)}
+        handoff_text = "" if retained else handoff_path.read_text(encoding="utf-8", errors="replace")
+        handoff = {"path": handoff_path.as_posix(), "sha256": sha256_file(handoff_path), "loaded": not retained, "tokens": 0 if retained else file_content_token_count(handoff_text)}
 
     session_slice = {
-        "active_version": _yaml_scalar(state_text, "active_version", indent=4) or _yaml_scalar(state_text, "current_release"),
-        "active_ticket": _yaml_scalar(state_text, "active_ticket", indent=4) or _yaml_scalar(state_text, "active_ticket"),
-        "current_step": _yaml_scalar(state_text, "current_step", indent=4) or _yaml_scalar(state_text, "last_completed_action", indent=2),
-        "next_command": _yaml_scalar(state_text, "next_command", indent=4) or _yaml_scalar(state_text, "next_exact_action", indent=2),
+        "active_version": _yaml_scalar(session_text, "active_version", indent=2),
+        "active_ticket": _yaml_scalar(session_text, "active_ticket", indent=2),
+        "current_step": _yaml_scalar(session_text, "current_step", indent=2),
+        "next_command": _yaml_scalar(session_text, "next_command", indent=2),
     }
     session_tokens = file_content_token_count(json.dumps(session_slice, sort_keys=True))
-    durable_tokens = file_content_token_count(state_text)
+    durable_tokens = int(_yaml_scalar(session_text, "durable_state_tokens") or "0")
+    baseline_tokens = int(_yaml_scalar(session_text, "baseline_file_content_tokens") or "0")
     handoff_tokens = int(handoff["tokens"]) if handoff else 0
     return {
         "passed": True,
@@ -416,7 +419,9 @@ def resume_context_v1(
         "session_slice": session_slice,
         "controls": controls,
         "handoff": handoff,
-        "baseline_file_content_tokens": durable_tokens + sum(file_content_token_count(path.read_text(encoding="utf-8", errors="replace")) for path in control_paths) + (file_content_token_count(handoff_path.read_text(encoding="utf-8", errors="replace")) if handoff_path else 0),
+        "session_path": session_path.as_posix(),
+        "durable_state_loaded": runtime_resume_model == "reset_baseline",
+        "baseline_file_content_tokens": baseline_tokens + (handoff_tokens if runtime_resume_model == "reset_baseline" else 0),
         "cold_resume_drain": session_tokens + durable_tokens + control_tokens + handoff_tokens,
         "warm_resume_drain": session_tokens + control_tokens + handoff_tokens,
         "tokenizer": "owledge.regex-v1",
@@ -4050,6 +4055,7 @@ def main(argv: list[str] | None = None) -> int:
     small_model_p.add_argument("--output-json", required=True)
     resume_context_p = sub.add_parser("resume-context-v1", parents=[project_parent])
     resume_context_p.add_argument("--state-path", required=True)
+    resume_context_p.add_argument("--session-path")
     resume_context_p.add_argument("--runtime-resume-model", required=True, choices=sorted(RESUME_RUNTIME_MODELS))
     resume_context_p.add_argument("--control-path", action="append", required=True)
     resume_context_p.add_argument("--already-loaded", action="append", default=[])
@@ -4306,6 +4312,7 @@ def main(argv: list[str] | None = None) -> int:
                 {resolve_path(path).as_posix() for path in args.already_loaded},
                 resolve_path(args.handoff_path) if args.handoff_path else None,
                 args.handoff_in_context,
+                resolve_path(args.session_path) if args.session_path else None,
             )
             safe_result = sanitize_generated_payload(result, root)
             if args.output_path:
