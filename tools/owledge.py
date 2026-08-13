@@ -135,6 +135,7 @@ HOST_TOOL_FILES = [
     "owledge_core.py",
     "owledge_contracts.py",
     "owledge_adapter_contracts.py",
+    "owledge_generic_adapter.py",
     "owledge_work_contract.py",
     "owledge_evidence_contracts.py",
     "owledge_health.py",

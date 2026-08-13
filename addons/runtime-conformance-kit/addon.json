@@ -28,6 +28,10 @@
       "target": ".owledge/runtime-conformance/fixtures/user-prompt.json"
     },
     {
+      "source": "fixtures/generic-mcp-cli-tier1.json",
+      "target": ".owledge/runtime-conformance/fixtures/generic-mcp-cli-tier1.json"
+    },
+    {
       "source": "tools/run-runtime-conformance.py",
       "target": "tools/runtime-conformance/run-runtime-conformance.py"
     },

@@ -372,6 +372,7 @@ REQUIRED_FILES = [
     "tools/owledge_core.py",
     "tools/owledge_contracts.py",
     "tools/owledge_adapter_contracts.py",
+    "tools/owledge_generic_adapter.py",
     "tools/owledge_work_contract.py",
     "tools/owledge_evidence_contracts.py",
     "tools/owledge_health.py",

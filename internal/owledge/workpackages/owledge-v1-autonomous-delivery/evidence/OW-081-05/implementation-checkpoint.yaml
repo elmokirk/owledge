@@ -1,0 +1,20 @@
+ticket: OW-081-05
+status: accepted_independent_qa
+scope:
+  - project-bound generic MCP/CLI stdio reference adapter
+  - generic conformance fixture, package surfaces, documentation, and protocol tests
+verification:
+  - "python -m unittest tests.unit.test_ow08105_generic_adapter -v: 2 passed"
+  - "python tools/build_project_folder_kit.py --output-path <temp> --verify: passed"
+  - "python tools/validate_v1_delivery_plan.py: passed, 0 errors"
+  - "git diff --check: passed"
+coverage:
+  - "The stdio server exposes only discovery, capability negotiation, read-only owner-invoked capsule, and Candidate boundary tools."
+  - "Negotiation uses the shared generic-mcp-cli AdapterManifest and remains project-bound."
+  - "The capsule reads only OWLEDGE.md and local memory-index.jsonl; automatic pre-plan inspection is false."
+  - "Candidate/promotion operation reports unsupported until the reviewed Core flow is implemented."
+  - "Malformed JSON-RPC, unknown tools, and enterprise scope produce structured errors or denial without server crash."
+limitations:
+  - "No generic semantic write or promotion endpoint exists in this baseline; OW-090-04 owns controlled MCP writes."
+  - "The legacy Hermes read-only MCP server remains a separate eight-tool compatibility contract."
+publication_authority: not_granted

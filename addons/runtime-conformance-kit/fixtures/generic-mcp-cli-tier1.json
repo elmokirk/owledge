@@ -1,0 +1,18 @@
+{
+  "fixture_version": "1.0",
+  "profile": "generic-mcp-cli",
+  "required_tools": [
+    "owledge_capability_discovery",
+    "owledge_negotiate_capability",
+    "owledge_preplan_capsule",
+    "owledge_candidate_boundary"
+  ],
+  "context_capsule": {
+    "loaded_sources": ["OWLEDGE.md", ".owledge/indexes/memory-index.jsonl"],
+    "automatic_preplan_inspection": false
+  },
+  "write_boundary": {
+    "write_enabled": false,
+    "promotion": "not_available"
+  }
+}
