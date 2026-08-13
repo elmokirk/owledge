@@ -6,7 +6,7 @@ objective: Deliver Owledge V1 Minimal Core: Principles, deterministic local Core
 status: in_progress
 current_release: v1.0
 current_phase: V1M-SURFACE
-active_ticket: null
+active_ticket: V1M-02
 session_slice_ref: RUN-STATE.session.yaml
 last_green_gate: G-V1M-PLAN
 alignment:
@@ -603,7 +603,7 @@ last_commands:
   - "python tools/owledge.py test public-docs --project-root .; python tools/owledge.py test docs-contract --project-root .; python tools/owledge.py test mcp-readonly --project-root .; python tools/owledge.py test runtime-adapters --project-root . (exit 0; public-docs 0 failures, docs-contract 473 checks)"
   - "PYTHONPATH=owlib/src python -m unittest discover -s owlib/tests -v (exit 0; 10 tests, one Windows symlink integration skip)"
 checkpoint:
-  last_completed_action: "V1M-01 and G-V1M-PLAN accepted at 5272dcf after independent read-only QA closed the canonical PARK-reference P1."
+  last_completed_action: "V1M-02 completed after independent install-safety QA accepted the minimal/principles/full profile contract with no P0/P1."
   changed_files:
     - "internal/owledge/workpackages/owledge-v1-autonomous-delivery/RUN-STATE.session.yaml"
     - "tools/owledge.py"
@@ -667,8 +667,8 @@ checkpoint:
     - "python -m unittest tests.unit.test_validate_v1_delivery_plan tests.unit.test_validate_live_work_register -q: one pre-existing downstream mismatch; test_current_control_plane_is_valid still expects zero warnings while accepted OW-080-13 intentionally emits one internal-checkpoint warning. The validator itself passed with zero errors."
     - "python tools/owledge_core.py --project-root . validate-memory --strict: 307 pre-existing legacy frontmatter failures across historical internal memory; the touched canonical plan/checklists pass the release-specific frontmatter validation inside validate_v1_delivery_plan.py."
     - "python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports: completed 36/38 on 2026-08-12; source-identity correctly rejected the dirty planning tree and upgrade-drift exposed a host-project/Kit-mode regression. Routed to OW-071-08 under F-071-24."
-  workspace_state: "G-V1M-PLAN is green on codex/v071-integration. No ticket is active at this clean gate boundary; V1M-02 is the sole ready implementation ticket. Publication, tagging, release, push and remote upload remain blocked."
-  next_exact_action: "Select V1M-02, set it in_progress, and implement only the Principles/minimal-profile contract under G-V1M-SURFACE."
+  workspace_state: "V1M-02 is committed for local review. No ticket is active at the atomic boundary; V1M-03 is the sole ready ticket. Publication, tagging, release, push and remote upload remain blocked."
+  next_exact_action: "Select V1M-03 and freeze the eight-operation default Core facade before attempting G-V1M-SURFACE."
   open_assumptions:
     - "The approved V1M plan is immutable unless the owner uses the exact AMEND GOAL BOUNDARY phrase."
     - "Local serial execution is the default; V1M-01 requires independent control-plane QA."

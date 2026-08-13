@@ -292,8 +292,9 @@ def validate() -> dict[str, Any]:
                 errors.append("G-V1M-PLAN: completed V1M-01 requires accepted_independent_qa manifest")
         if "last_green_gate: G-V1M-PLAN" not in run_state:
             errors.append("RUN-STATE.yaml: completed V1M-01 requires last_green_gate G-V1M-PLAN")
-        if next((row["status"] for row in rows if row["id"] == "V1M-02"), None) != "ready":
-            errors.append("BACKLOG.yaml: green G-V1M-PLAN requires V1M-02 ready")
+        v1m02_status = next((row["status"] for row in rows if row["id"] == "V1M-02"), None)
+        if v1m02_status not in {"ready", "in_progress", "done"}:
+            errors.append("BACKLOG.yaml: green G-V1M-PLAN requires V1M-02 ready or in_progress")
 
     traceability = read(TRACEABILITY)
     for ticket_id in known:

@@ -2525,11 +2525,16 @@ def memory_doctor(root: pathlib.Path, mode: str = "auto") -> dict[str, Any]:
         am_base = root / ".owledge"
         if not am_base.is_dir():
             am_base = root / "owledge"
+        minimal_profile = (am_base / "config.yaml").is_file() and "profile: minimal" in (am_base / "config.yaml").read_text(encoding="utf-8", errors="replace")
         add("owledge-entrypoint", (root / "OWLEDGE.md").exists() or (root / "OWLEDGE.md").exists(), "error", "OWLEDGE.md is present.", "Run owledge init-project or copy OWLEDGE.template.md.")
-        add("agents-md", (root / "AGENTS.md").exists(), "error", "AGENTS.md is present.", "Run bootstrap-owledge for this repo.")
-        add("claude-md", (root / "CLAUDE.md").exists(), "warning", "CLAUDE.md is present.", "Copy CLAUDE.template.md if Claude/Cowork is used.")
+        if minimal_profile:
+            add("minimal-profile", True, "info", "Minimal profile is present; skills and harness bridges remain opt-in.")
+        else:
+            add("agents-md", (root / "AGENTS.md").exists(), "error", "AGENTS.md is present.", "Run bootstrap-owledge for this repo.")
+            add("claude-md", (root / "CLAUDE.md").exists(), "warning", "CLAUDE.md is present.", "Copy CLAUDE.template.md if Claude/Cowork is used.")
     add("owledge-dir", am_base.is_dir(), "error", "Owledge memory directory is present.", "Run owledge init-project for this repo." if effective_mode == "host" else "Restore templates/owledge/ from the kit source.")
-    add("design-md", (root / "DESIGN.md").exists(), "warning", "DESIGN.md is present.", "Copy DESIGN.md from the kit if visual reports are used.")
+    if not (effective_mode == "host" and 'minimal_profile' in locals() and minimal_profile):
+        add("design-md", (root / "DESIGN.md").exists(), "warning", "DESIGN.md is present.", "Copy DESIGN.md from the kit if visual reports are used.")
     local_cli = (root / "tools" / "owledge_core.py").exists()
     external_cli = effective_mode == "host" and pathlib.Path(__file__).resolve().parent != (root / "tools").resolve()
     add(
@@ -2539,7 +2544,7 @@ def memory_doctor(root: pathlib.Path, mode: str = "auto") -> dict[str, Any]:
         "Local or installed Owledge CLI is available.",
         "Install Owledge or copy tools/owledge_core.py into the project when local tooling is required.",
     )
-    if effective_mode == "host":
+    if effective_mode == "host" and not ('minimal_profile' in locals() and minimal_profile):
         vendor_skill_root = root / "skills"
         discovery_skill_root = root / ".agents" / "skills"
         vendor_skills = {
@@ -2585,7 +2590,8 @@ def memory_doctor(root: pathlib.Path, mode: str = "auto") -> dict[str, Any]:
                 f"Planning skills missing from plugin discovery root: {missing_plugin_skills}.",
                 "Reinstall the Owledge plugin adapter or restore its planning skill mirrors.",
             )
-    add("raw-events-ignored", bool(_gitignore_contains(root, ".owledge/sessions/**/events.jsonl") or _gitignore_contains(root, ".owledge/sessions/**/events.jsonl")), "warning", "Raw runtime event logs are ignored by git.", "Add .owledge/sessions/**/events.jsonl to .gitignore for privacy.")
+    if not (effective_mode == "host" and 'minimal_profile' in locals() and minimal_profile):
+        add("raw-events-ignored", bool(_gitignore_contains(root, ".owledge/sessions/**/events.jsonl") or _gitignore_contains(root, ".owledge/sessions/**/events.jsonl")), "warning", "Raw runtime event logs are ignored by git.", "Add .owledge/sessions/**/events.jsonl to .gitignore for privacy.")
     validation = validate_memory(am_base.parent if effective_mode == "kit" else root)
     add("memory-validation", bool(validation["passed"]), "error", f"Memory validation: {validation['failedChecks']} failed of {validation['totalChecks']}.", "Run python tools/owledge_core.py --project-root . validate-memory --strict and fix reported frontmatter/edge issues.")
     version_file = root / "VERSION"

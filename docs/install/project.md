@@ -1,8 +1,8 @@
 # Project-local kit recipes
 
-Use these recipes for a coding project that needs durable plans, evidence,
-handoffs, and local validation. Both are additive: they do not change the host
-framework, package manager, or existing source files.
+Use these recipes for a coding project that needs a small durable-knowledge
+entrypoint. The default `minimal` profile is additive: it does not change the
+host framework, package manager, or existing source files.
 
 ## Package recipe
 
@@ -30,9 +30,20 @@ python tools/owledge.py init-project --target /path/to/your-project
 python tools/owledge.py doctor --project-root /path/to/your-project
 ```
 
-The checkout root supplies templates and tools; `/path/to/your-project` is the
-only host-project write target. The expected doctor output is `"passed": true`.
-Rerunning `init-project` is additive and skips existing kit files.
+The default creates only `OWLEDGE.md`, `.owledge/config.yaml`, and an install
+manifest. Schemas remain package resources; skills, local tool copies and
+adapter bundles remain out of the default footprint. The expected doctor output
+is `"passed": true`. Rerunning `init-project` is additive and skips existing
+files.
+
+### Explicit full compatibility profile
+
+Use the existing larger local-tools and discoverable-skills kit only when a
+project needs those compatibility surfaces or a source-only add-on:
+
+```bash
+python tools/owledge.py init-project --target /path/to/your-project --profile full
+```
 
 ### Source-only optional add-ons
 
@@ -49,11 +60,10 @@ optional and do not replace canonical Markdown memory.
 
 ## What both recipes create
 
-The core kit may create the files and folders listed in the
-[Installation Hub ownership table](README.md#footprint-and-ownership), including
-canonical Markdown under `.owledge/`, local tools, source skills, and
-discoverable `.agents/skills/` mirrors. The plugin adapter is absent unless you
-explicitly use `--include-plugin-adapter` from a source checkout.
+The default minimal profile creates a project router and config only. The
+explicit `full` profile may also create the larger compatibility kit, local
+tools, source skills and discoverable `.agents/skills/` mirrors. Requesting a
+plugin or compliance add-on also selects that explicit compatibility surface.
 
 ## Upgrade, recovery, and uninstall
 

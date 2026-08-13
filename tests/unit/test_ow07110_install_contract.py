@@ -29,9 +29,9 @@ class OW07110InstallContractTests(unittest.TestCase):
     def test_source_recipe_is_additive_and_idempotent(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ow07110-") as temporary:
             target = pathlib.Path(temporary) / "project"
-            first = run_cli("init-project", "--target", str(target))
+            first = run_cli("init-project", "--target", str(target), "--profile", "full")
             doctor = run_cli("doctor", "--project-root", str(target))
-            second = run_cli("init-project", "--target", str(target))
+            second = run_cli("init-project", "--target", str(target), "--profile", "full")
 
             self.assertTrue(first["doctor_passed"])
             self.assertTrue(doctor["passed"])

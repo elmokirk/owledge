@@ -1,0 +1,5 @@
+profile: minimal
+scopes: [project_user, user_global]
+storage: markdown
+network: disabled
+derived_indexes: lazy

@@ -1,0 +1,40 @@
+ticket: V1M-02
+status: accepted_independent_qa
+base_commit: 3c17f5a
+branch: codex/v071-integration
+scope: principles-and-install-profiles
+implementation:
+  - "init-project defaults to minimal: OWLEDGE.md, .owledge/config.yaml and kit-manifest.json only."
+  - "principles profile is zero-write and does not create a target directory."
+  - "full profile preserves the previous local-tool, schema and skill-copy compatibility behavior."
+  - "explicit plugin/compliance requests select the full compatibility profile."
+  - "minimal profile uses package resources, has a profile-aware manifest/upgrade inventory, and passes a profile-aware doctor."
+footprint_witness:
+  minimal_files: 3
+  minimal_directories: 1
+  limits: "<=15 files; <=8 directories"
+commands:
+  - command: python -m py_compile tools/owledge.py tools/owledge_core.py
+    exit_code: 0
+  - command: python -m unittest tests.unit.test_v1m02_minimal_profiles tests.unit.test_ow07110_install_contract tests.unit.test_ow08015_native_hooks tests.unit.test_ow08101_adapter_contracts -v
+    exit_code: 0
+    result: "20/20 passed"
+  - command: python tools/validate_v1_delivery_plan.py
+    exit_code: 0
+    result: "11 tickets, 7 gates, 11 waves, 0 errors"
+  - command: git diff --check
+    exit_code: 0
+negative_contracts:
+  - "principles does not create the supplied absent target."
+  - "minimal has no copied tools or project-local schemas."
+  - "full profile retains an installed runtime-conformance add-on path."
+  - "user-edited OWLEDGE.md remains unchanged through safe upgrade."
+known_limitations:
+  - "build-project-kit remains a legacy/full compatibility builder and is not the default minimal init route; its public-facade treatment belongs to V1M-03."
+independent_qa:
+  required: true
+  mode: separately_initialized_read_only_reviewer
+  result: accepted
+  residual_p2: "Wheel-content inspection needs a supported build fixture; Python 3.14 host lacks usable build backend. pyproject package-data declaration is verified, but no wheel claim is made."
+  status: accepted
+next_exact_action: "Independent install-safety QA; fix any P0/P1 before marking V1M-02 done."

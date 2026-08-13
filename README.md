@@ -168,9 +168,10 @@ Source checkout path:
 python tools/owledge.py init-project --target /path/to/your-project
 ```
 
-This is the primary setup path. It adds project-local Markdown memory and
-Python tools without changing the host framework, package manager, or source
-tree.
+This is the primary setup path. By default it creates only a compact project
+router and local config; deterministic Python operations are provided by the
+installed Owledge Core, not copied into the project. Use `--profile full` from
+a source checkout only for the larger compatibility/tool-and-skill kit.
 
 Best next read: [Project quickstart](docs/quickstart.md)
 

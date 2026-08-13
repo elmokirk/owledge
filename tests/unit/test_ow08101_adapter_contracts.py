@@ -90,7 +90,7 @@ class AdapterManifestTests(unittest.TestCase):
             root = pathlib.Path(temp)
             initialized = subprocess.run(
                 [sys.executable, str(ROOT / "tools" / "owledge.py"), "init-project", "--target", str(root),
-                 "--source-root", str(ROOT)],
+                 "--source-root", str(ROOT), "--profile", "full"],
                 cwd=ROOT, capture_output=True, text=True, check=False,
             )
             self.assertEqual(initialized.returncode, 0, initialized.stderr)

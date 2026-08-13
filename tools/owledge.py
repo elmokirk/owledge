@@ -584,9 +584,17 @@ def parse_json_stdout(process: subprocess.CompletedProcess[str]) -> Any:
     return json.loads(process.stdout)
 
 
-def _collect_kit_files(source_root: pathlib.Path, project_root: pathlib.Path) -> list[dict[str, str]]:
+def _collect_kit_files(source_root: pathlib.Path, project_root: pathlib.Path, profile: str = "full") -> list[dict[str, str]]:
     entries: list[dict[str, str]] = []
     seen: set[str] = set()
+    if profile == "minimal":
+        minimal_root = source_root / "templates" / "owledge" / "minimal"
+        for source_rel, target_rel in [("OWLEDGE.md", "OWLEDGE.md"), ("config.yaml", ".owledge/config.yaml")]:
+            target = project_root / target_rel
+            source = minimal_root / source_rel
+            if target.is_file():
+                entries.append({"path": target_rel, "sha256_installed": sha256_file(target), "sha256_original": sha256_file(source) if source.is_file() else ""})
+        return entries
     for rel in ROOT_FILE_MAP:
         source = source_root / rel[0]
         target = project_root / rel[1]
@@ -656,7 +664,7 @@ def _collect_kit_files(source_root: pathlib.Path, project_root: pathlib.Path) ->
     return entries
 
 
-def _current_kit_inventory(source_root: pathlib.Path) -> dict[str, str]:
+def _current_kit_inventory(source_root: pathlib.Path, profile: str = "full") -> dict[str, str]:
     """Return every additive file supplied by the current host kit."""
     inventory: dict[str, str] = {}
 
@@ -664,6 +672,10 @@ def _current_kit_inventory(source_root: pathlib.Path) -> dict[str, str]:
         if source.is_file():
             inventory[rel_posix] = sha256_file(source)
 
+    if profile == "minimal":
+        add("OWLEDGE.md", source_root / "templates" / "owledge" / "minimal" / "OWLEDGE.md")
+        add(".owledge/config.yaml", source_root / "templates" / "owledge" / "minimal" / "config.yaml")
+        return inventory
     for source_rel, target_rel in ROOT_FILE_MAP:
         add(target_rel, source_root / source_rel)
     template_root = _product_template_dir(source_root)
@@ -687,14 +699,15 @@ def _current_kit_inventory(source_root: pathlib.Path) -> dict[str, str]:
     return inventory
 
 
-def _write_kit_manifest(project_root: pathlib.Path, source_root: pathlib.Path) -> None:
+def _write_kit_manifest(project_root: pathlib.Path, source_root: pathlib.Path, profile: str = "full") -> None:
     import datetime as _dt
-    entries = _collect_kit_files(source_root, project_root)
+    entries = _collect_kit_files(source_root, project_root, profile=profile)
     manifest = {
         "kit_version": KIT_VERSION,
         "memory_schema_version": MEMORY_SCHEMA_VERSION,
         "generated_at": _dt.datetime.now(_dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
         "source_version": KIT_VERSION,
+        "profile": profile,
         "files": entries,
     }
     (project_root / "kit-manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
@@ -769,29 +782,49 @@ def sync_dogfood(root: pathlib.Path, dry_run: bool = True) -> dict[str, Any]:
     }
 
 
-def init_project(project_root: pathlib.Path, source_root: pathlib.Path, include_plugin_adapter: bool, include_compliance: bool, link_global: str | None = None) -> dict[str, Any]:
+def init_project(project_root: pathlib.Path, source_root: pathlib.Path, include_plugin_adapter: bool, include_compliance: bool, link_global: str | None = None, profile: str = "minimal") -> dict[str, Any]:
+    if profile == "principles":
+        if include_plugin_adapter or include_compliance or link_global is not None:
+            raise ValueError("principles profile is zero-install; choose --profile full for add-ons or user-global linking")
+        return {"project_root": str(project_root), "profile": profile, "created": [], "skipped_existing": [], "doctor_passed": None, "kit_version": KIT_VERSION, "global_link": None}
+    if profile not in {"minimal", "full"}:
+        raise ValueError(f"Unsupported install profile: {profile}")
+    if profile == "minimal" and (include_plugin_adapter or include_compliance):
+        # An add-on is an explicit request for the legacy compatibility surface;
+        # keep callers safe while leaving the unflagged default minimal.
+        profile = "full"
     project_root.mkdir(parents=True, exist_ok=True)
     created: list[str] = []
     skipped: list[str] = []
 
-    for source_rel, target_rel in ROOT_FILE_MAP:
+    if profile == "minimal":
+        minimal_root = source_root / "templates" / "owledge" / "minimal"
+        for source_rel, target_rel in [("OWLEDGE.md", "OWLEDGE.md"), ("config.yaml", ".owledge/config.yaml")]:
+            if copy_file_if_missing(minimal_root / source_rel, project_root / target_rel):
+                created.append(target_rel)
+            else:
+                skipped.append(target_rel)
+    else:
+      for source_rel, target_rel in ROOT_FILE_MAP:
         source = source_root / source_rel
         target = project_root / target_rel
-        if copy_file_if_missing(source, target):
-            created.append(target_rel)
-        else:
-            skipped.append(target_rel)
+        if profile == "full":
+            if copy_file_if_missing(source, target):
+                created.append(target_rel)
+            else:
+                skipped.append(target_rel)
 
     gitignore = project_root / ".gitignore"
-    if not gitignore.exists() and (source_root / ".gitignore").exists():
+    if profile == "full" and not gitignore.exists() and (source_root / ".gitignore").exists():
         copy_file_if_missing(source_root / ".gitignore", gitignore)
         created.append(".gitignore")
 
-    copy_tree_missing(_product_template_dir(source_root), project_root / ".owledge")
-    build_project_folder_kit.ensure_gitkeep(project_root / ".owledge", build_project_folder_kit.AGENT_DIRS)
+    if profile == "full":
+        copy_tree_missing(_product_template_dir(source_root), project_root / ".owledge")
+        build_project_folder_kit.ensure_gitkeep(project_root / ".owledge", build_project_folder_kit.AGENT_DIRS)
 
     tool_dir = project_root / "tools"
-    for tool in HOST_TOOL_FILES:
+    for tool in HOST_TOOL_FILES if profile == "full" else []:
         source = source_root / "tools" / tool
         if source.exists():
             rel = f"tools/{tool}"
@@ -800,7 +833,7 @@ def init_project(project_root: pathlib.Path, source_root: pathlib.Path, include_
             else:
                 skipped.append(rel)
 
-    for skill in HOST_SKILL_DIRS:
+    for skill in HOST_SKILL_DIRS if profile == "full" else []:
         source = source_root / skill
         if source.exists():
             created.extend(copy_tree_missing(source, project_root / skill))
@@ -827,8 +860,8 @@ def init_project(project_root: pathlib.Path, source_root: pathlib.Path, include_
         build_project_folder_kit.install_compliance(source_root, project_root)
         created.append(".owledge/compliance/")
 
-    doctor = core.memory_doctor(project_root, mode="host")
-    _write_kit_manifest(project_root, source_root)
+    doctor = core.memory_doctor(project_root, mode="host") if profile == "full" else {"passed": (project_root / "OWLEDGE.md").is_file() and (project_root / ".owledge" / "config.yaml").is_file()}
+    _write_kit_manifest(project_root, source_root, profile=profile)
     global_link_info = None
     if link_global is not None:
         global_link_info = _resolve_global_link(link_global, source_root)
@@ -837,6 +870,7 @@ def init_project(project_root: pathlib.Path, source_root: pathlib.Path, include_
         )
     return {
         "project_root": str(project_root),
+        "profile": profile,
         "created": sorted(set(created)),
         "skipped_existing": sorted(set(skipped)),
         "include_plugin_adapter": include_plugin_adapter,
@@ -947,7 +981,8 @@ def upgrade_project(root: pathlib.Path, source_root: pathlib.Path, dry_run: bool
         for entry in manifest.get("files", []) or []
         if str(entry.get("path") or "")
     }
-    current_inventory = _current_kit_inventory(source_root)
+    install_profile = str(manifest.get("profile") or "full")
+    current_inventory = _current_kit_inventory(source_root, profile=install_profile)
     inventory_paths = list(manifest_entries)
     inventory_paths.extend(path for path in current_inventory if path not in manifest_entries)
 
@@ -1148,7 +1183,7 @@ def upgrade_project(root: pathlib.Path, source_root: pathlib.Path, dry_run: bool
             shutil.copy2(source_path, target_path)
             created.append(rel)
 
-        _write_kit_manifest(root, source_root)
+        _write_kit_manifest(root, source_root, profile=install_profile)
         manifest_out_path = root / "kit-manifest.json"
         try:
             manifest_out = json.loads(manifest_out_path.read_text(encoding="utf-8", errors="replace"))
@@ -4071,6 +4106,7 @@ def main(argv: list[str] | None = None) -> int:
     init_p.add_argument("--source-root", default=str(REPO_ROOT))
     init_p.add_argument("--include-plugin-adapter", action="store_true")
     init_p.add_argument("--include-compliance", action="store_true")
+    init_p.add_argument("--profile", choices=["principles", "minimal", "full"], default="minimal")
     init_p.add_argument("--link-global", nargs="?", const="", default=None, help="Link a global user-memory layer. With no arg, uses OWLEDGE_GLOBAL_HOME env or ~/.owledge/global default.")
 
     quickstart_p = sub.add_parser("quickstart")
@@ -4273,7 +4309,7 @@ def main(argv: list[str] | None = None) -> int:
             print_json(result)
             return 0 if result["passed"] else 1
         if args.command == "init-project":
-            print_json(init_project(resolve_path(args.target), resolve_path(args.source_root), args.include_plugin_adapter, args.include_compliance, link_global=getattr(args, "link_global", None)))
+            print_json(init_project(resolve_path(args.target), resolve_path(args.source_root), args.include_plugin_adapter, args.include_compliance, link_global=getattr(args, "link_global", None), profile=args.profile))
             return 0
         if args.command == "quickstart":
             result = quickstart_project(resolve_path(args.target), resolve_path(args.source_root), args.include_plugin_adapter)

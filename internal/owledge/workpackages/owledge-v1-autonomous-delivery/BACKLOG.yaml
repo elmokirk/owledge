@@ -76,8 +76,8 @@ execution_waves:
   - {id: W-V1M-PUBLISH, release: v1.0, tickets: [V1M-11], policy: user_authorization_stop}
 tickets:
   - {id: V1M-01, release: v1.0, phase: V1M-PLAN, status: done, priority: P0, owner_role: release-orchestrator, qa_role: control-plane-reviewer, estimated_turns: 2, depends_on: [], gate: G-V1M-PLAN, path: "tickets/ALL-TICKETS.md#v1m-01"}
-  - {id: V1M-02, release: v1.0, phase: V1M-SURFACE, status: ready, priority: P0, owner_role: profile-engineer, qa_role: install-safety-reviewer, estimated_turns: 3, depends_on: [V1M-01], gate: G-V1M-SURFACE, path: "tickets/ALL-TICKETS.md#v1m-02"}
-  - {id: V1M-03, release: v1.0, phase: V1M-SURFACE, status: backlog, priority: P0, owner_role: core-facade-engineer, qa_role: public-contract-reviewer, estimated_turns: 3, depends_on: [V1M-02], gate: G-V1M-SURFACE, path: "tickets/ALL-TICKETS.md#v1m-03"}
+  - {id: V1M-02, release: v1.0, phase: V1M-SURFACE, status: done, priority: P0, owner_role: profile-engineer, qa_role: install-safety-reviewer, estimated_turns: 3, depends_on: [V1M-01], gate: G-V1M-SURFACE, path: "tickets/ALL-TICKETS.md#v1m-02"}
+  - {id: V1M-03, release: v1.0, phase: V1M-SURFACE, status: ready, priority: P0, owner_role: core-facade-engineer, qa_role: public-contract-reviewer, estimated_turns: 3, depends_on: [V1M-02], gate: G-V1M-SURFACE, path: "tickets/ALL-TICKETS.md#v1m-03"}
   - {id: V1M-04, release: v1.0, phase: V1M-READ, status: backlog, priority: P0, owner_role: null-space-engineer, qa_role: privacy-reviewer, estimated_turns: 3, depends_on: [V1M-03], gate: G-V1M-READ, path: "tickets/ALL-TICKETS.md#v1m-04"}
   - {id: V1M-05, release: v1.0, phase: V1M-READ, status: backlog, priority: P0, owner_role: retrieval-engineer, qa_role: retrieval-contract-reviewer, estimated_turns: 3, depends_on: [V1M-04], gate: G-V1M-READ, path: "tickets/ALL-TICKETS.md#v1m-05"}
   - {id: V1M-06, release: v1.0, phase: V1M-LIFECYCLE, status: backlog, priority: P0, owner_role: lifecycle-engineer, qa_role: state-machine-reviewer, estimated_turns: 3, depends_on: [V1M-05], gate: G-V1M-LIFECYCLE, path: "tickets/ALL-TICKETS.md#v1m-06"}
