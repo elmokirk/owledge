@@ -31,6 +31,12 @@ alignment:
       impact: "Claude Code cannot execute the three required read-only checks in its current dontAsk/allowlist configuration."
       safe_default: "Do not use bypass permissions; preserve the runtime-evidence blocker and do not accept OW-080-13."
       status: resolved_safe_mode_allowlist
+    - id: Q-080-03
+      source: OW-080-13-codex-independent-qa
+      question: "May the agent run the remaining transcript-visible OW-080-13 acceptance checks in both Claude Code and Codex, including model_auto_compact provenance, golden digest/diff equality, stale-handoff rejection, capped/reconstructed payload output, and owner-alignment-stop verification?"
+      impact: "The two current three-command harness receipts are genuine but partial; accepting the ticket without the explicit Verify-clause evidence would weaken G-080-B-CONTEXT."
+      safe_default: "Do not spend further model credentials or accept OW-080-13; retain partial evidence and wait for owner direction."
+      status: awaiting_product_owner
   findings:
     - id: F-071-01
       source: v0.7.1-v1-version-reflection-contract-2026-07-27
@@ -276,11 +282,20 @@ alignment:
       source: OW-080-13-independent-qa
       evidence: "evidence/OW-080-13/implementation-checkpoint.yaml; evidence/OW-080-13/codex-cli-availability.yaml; independent QA review after local deterministic contract replay"
       severity: high
-      user_impact: "The bounded resume implementation and Claude Code harness are ready, but its required Codex runtime behavior is not yet independently demonstrated because the desktop binary is inaccessible and the npm CLI lacks its Windows optional dependency."
+      user_impact: "The bounded resume implementation, Claude Code harness, and an initial Codex CLI 0.147.0 / GPT-5.5 harness are available, but the full runtime acceptance contract is not yet independently demonstrated."
       release_impact: "OW-080-13 and G-080-B-CONTEXT remain blocked; no context-profile promotion or downstream ticket activation is allowed."
-      options: ["authorize global repair of the local Codex npm CLI then one bounded GPT-5.5 harness run", "owner-amend the ticket/gate to accept Claude plus deterministic CLI evidence", "defer the ticket and retain the current context lane blocked"]
-      recommendation: "Authorize the minimal npm repair, then run exactly one bounded Codex harness proof; preserve the Claude receipt and do not re-run it."
-      safe_default: "Do not mutate global npm state, spend Codex credentials/cost, or accept the ticket until an explicit owner decision is recorded."
+      options: ["authorize the remaining acceptance checks in both harnesses", "owner-amend the ticket/gate to accept the partial evidence", "defer the ticket and retain the current context lane blocked"]
+      recommendation: "Authorize one bounded, transcript-visible completion campaign in both harnesses; preserve the existing receipts and do not repeat their already-passing checks."
+      safe_default: "Do not spend further model credentials/cost or accept the ticket until an explicit owner decision is recorded."
+      status: open
+    - id: F-080-03
+      source: OW-080-13-independent-qa
+      evidence: "evidence/OW-080-13/codex-initial-harness-receipt.yaml; implementation-checkpoint.yaml"
+      severity: high
+      user_impact: "The current Codex and Claude transcripts show the three selected commands, but omit several ticket-mandated acceptance proofs and their required transcript detail."
+      release_impact: "OW-080-13 and G-080-B-CONTEXT must remain blocked; no downstream context ticket may activate."
+      recommendation: "Run the minimum remaining acceptance checks once in each runtime, with a compact sanitised transcript excerpt and immutable input hashes."
+      safe_default: "Do not infer full gate success from the current partial receipts."
       status: open
     - id: F-080-02
       source: OW-080-13-claude-code-harness-attempts
@@ -558,7 +573,7 @@ last_commands:
   - "python tools/owledge.py test public-docs --project-root .; python tools/owledge.py test docs-contract --project-root .; python tools/owledge.py test mcp-readonly --project-root .; python tools/owledge.py test runtime-adapters --project-root . (exit 0; public-docs 0 failures, docs-contract 473 checks)"
   - "PYTHONPATH=owlib/src python -m unittest discover -s owlib/tests -v (exit 0; 10 tests, one Windows symlink integration skip)"
 checkpoint:
-  last_completed_action: "OW-080-13 Claude Code 2.1.228 Safe-Mode harness receipt passed all three constrained checks; Q-080-02 and F-080-02 are resolved. F-080-01 remains open because the desktop Codex binary is inaccessible and the local npm CLI lacks its Windows optional dependency."
+  last_completed_action: "OW-080-13 Codex CLI 0.147.0 / GPT-5.5 partial harness receipt passed the same three core checks as Claude Code. Independent QA found missing explicit Verify-clause evidence, so Q-080-03/F-080-03 remain open and the ticket is not accepted."
   changed_files:
     - "internal/owledge/workpackages/owledge-v1-autonomous-delivery/RUN-STATE.session.yaml"
     - "tools/owledge.py"
@@ -623,7 +638,7 @@ checkpoint:
     - "python tools/owledge_core.py --project-root . validate-memory --strict: 307 pre-existing legacy frontmatter failures across historical internal memory; the touched canonical plan/checklists pass the release-specific frontmatter validation inside validate_v1_delivery_plan.py."
     - "python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports: completed 36/38 on 2026-08-12; source-identity correctly rejected the dirty planning tree and upgrade-drift exposed a host-project/Kit-mode regression. Routed to OW-071-08 under F-071-24."
   workspace_state: "G-071-ALIGNMENT is promoted; OW-080-01 through OW-080-09 and OW-080-16 are accepted. OW-080-07 is independently accepted; OW-080-13 is the sole active v0.8 context lane. Publication, tagging, release, and push remain blocked."
-  next_exact_action: "Await explicit owner authority to repair the global Codex npm CLI, then collect the required Codex /goal v0.128+ transcript-visible receipt; do not activate OW-080-14 or OW-080-15."
+  next_exact_action: "Await the owner decision on Q-080-03 before any additional model-backed acceptance run; do not activate OW-080-14 or OW-080-15."
   open_assumptions:
     - "The product owner wants the existing five-release train retained unless a later version reflection changes it."
     - "Local serial execution is the default; subagents are exceptional and justified only by independent risk reduction."

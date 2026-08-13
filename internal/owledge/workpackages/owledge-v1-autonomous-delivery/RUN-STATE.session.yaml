@@ -3,11 +3,11 @@ runtime_resume_model: persisted
 session_slice:
   active_version: v0.8.0
   active_ticket: OW-080-13
-  current_step: "Claude Code evidence passed; the desktop Codex binary is inaccessible and the local npm CLI lacks its Windows optional dependency."
-  next_command: "Await explicit authority to repair the global Codex npm CLI, then collect the Codex /goal receipt; do not activate downstream tickets."
+  current_step: "Claude and Codex core evidence passed, but independent QA found missing explicit OW-080-13 Verify-clause proofs."
+  next_command: "Await owner decision Q-080-03 before another model-backed acceptance campaign; do not activate downstream tickets."
 durable_state_ref: RUN-STATE.yaml
-durable_state_tokens: 13745
-baseline_file_content_tokens: 18523
+durable_state_tokens: 14017
+baseline_file_content_tokens: 18795
 last_control_sha:
   CONTROL-PLANE-POLICY.md: 455b8bff35f61006a03834e6c2004046cbe442e4ab4b1b1dbeaadf3c2d58611c
   ALIGNMENT-PROTOCOL.md: 079f2b07e852bd7b5f41217d02bad9575951a4acc5284e4904a59377f6c73af7

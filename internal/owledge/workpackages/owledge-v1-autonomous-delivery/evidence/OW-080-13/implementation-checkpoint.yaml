@@ -1,5 +1,5 @@
 ticket: OW-080-13
-status: implementation_complete_pending_codex_runtime_evidence
+status: implementation_complete_pending_full_runtime_acceptance
 source_commits: [d7c7b4f, 4110daf, b12f2a0, ea2f97d, 38871c0, ab997dd]
 verification:
   - "python -m unittest tests.unit.test_ow08013_resume_context: 6 passed"
@@ -12,12 +12,13 @@ receipts:
   gate_sidecar: {path: gate-sidecar.json, sha256: fca90f3e879c2a53d97be6cef6da1964e7e6844f1e3caf2aa55b45c59c93504a}
   gate_sidecar_receipt: {path: gate-sidecar-receipt.json, sha256: b2356d20904d909b6f4616a9c9506e2724f506b5c0bb4a8d0c91fa52bb9bd408}
   claude_harness: {path: claude-harness-receipt.yaml, sha256: d01e4bdadfd49310818115b315f43cb1de4d8cb4c748c5c59d16eb21cc1d4f51}
+  codex_initial_harness: {path: codex-initial-harness-receipt.yaml, sha256: 9f1bb48ebf97e3519bdfb5464420976a02a995eb29ece5f898c343cfd47f7e0b}
 coverage:
   - "Persisted runtime reads the separate session slice only; it skips hash-verified controls and does not load durable state or an in-context handoff."
   - "Baseline-reset runtime requires and loads the handoff, then skips unchanged controls by recorded hash."
   - "Changed control hash, unknown runtime, absent handoff, capped payload, and exact sidecar reconstruction have deterministic negative/positive tests."
 limitations:
-  - "The deterministic receipts and one executed Claude Code 2.1.228 Safe-Mode run prove the runtime-neutral CLI contract; the required Codex /goal v0.128+ transcript remains absent."
-  - "Do not accept OW-080-13 or promote G-080-B-CONTEXT until the Codex harness has transcript-visible evidence or the ticket/gate is owner-amended."
+  - "The deterministic receipts, one Claude Code run, and one Codex CLI 0.147.0 / GPT-5.5 run prove three core commands in both harnesses; they do not yet cover every explicit Verify clause."
+  - "Do not accept OW-080-13 or promote G-080-B-CONTEXT until both runtime evidence campaigns cover the remaining Verify clauses or the ticket/gate is owner-amended."
   - "Claude Code initially exhausted 0.25 USD and 0.50/1.00 USD non-Safe-Mode caps, then passed at low effort with a 1.00 USD Safe-Mode cap and exact Bash allowlist. Raw transcripts are intentionally not retained or committed."
 publication_authority: not_granted

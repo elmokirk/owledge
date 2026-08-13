@@ -1,5 +1,5 @@
 ticket: OW-080-13
-status: blocked_local_cli_installation
+status: resolved_cli_available
 observed_at: 2026-08-13
 candidates:
   - path: "C:/Program Files/WindowsApps/OpenAI.Codex_26.803.10989.0_x64__2p2nqsd0c76g0/app/resources/codex.exe"
@@ -12,4 +12,5 @@ candidates:
 required_evidence: "Codex /goal v0.128+ transcript-visible receipt"
 safe_default: "Do not mutate global npm state or attempt a Codex runtime run."
 remediation_requires_owner_authority: "npm install -g @openai/codex@latest, then one bounded local Codex run with GPT-5.5 and no publish/tag/push/network project action."
+resolution: "The owner installed the global npm CLI. Codex CLI 0.147.0 then executed the bounded GPT-5.5 partial harness run; full ticket acceptance remains separately blocked by F-080-03."
 publication_authority: not_granted
