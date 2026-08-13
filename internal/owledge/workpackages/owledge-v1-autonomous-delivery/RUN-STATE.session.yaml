@@ -3,11 +3,11 @@ runtime_resume_model: persisted
 session_slice:
   active_version: v0.8.0
   active_ticket: OW-080-13
-  current_step: "Claude Code 2.1.228 Safe-Mode evidence passed; the required Codex /goal receipt remains the sole OW-080-13 blocker."
-  next_command: "Collect the Codex /goal v0.128+ receipt or obtain an owner amendment; do not activate downstream context tickets."
+  current_step: "Claude Code evidence passed; the desktop Codex binary is inaccessible and the local npm CLI lacks its Windows optional dependency."
+  next_command: "Await explicit authority to repair the global Codex npm CLI, then collect the Codex /goal receipt; do not activate downstream tickets."
 durable_state_ref: RUN-STATE.yaml
-durable_state_tokens: 13683
-baseline_file_content_tokens: 18461
+durable_state_tokens: 13745
+baseline_file_content_tokens: 18523
 last_control_sha:
   CONTROL-PLANE-POLICY.md: 455b8bff35f61006a03834e6c2004046cbe442e4ab4b1b1dbeaadf3c2d58611c
   ALIGNMENT-PROTOCOL.md: 079f2b07e852bd7b5f41217d02bad9575951a4acc5284e4904a59377f6c73af7
