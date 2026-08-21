@@ -1,11 +1,12 @@
 ticket: V1M-10
-status: implementation_complete_pending_candidate_build
-base_commit: 5179ff3
+status: accepted_pending_gate_manifest
+base_commit: 423714e
 branch: codex/v071-integration
 scope: compact-daily-journey-candidate-claims-and-artifact-readiness
 implementation:
   - "A fresh-process daily journey proves minimal install, explicit local user-global setup, reviewed research reuse across two allowlisted projects, and park/resurface behavior."
   - "Codex, Claude Code and generic MCP/CLI reuse the same project-local Core state without chat-history dependence; Generic remains exactly five tools."
+  - "The explicit full Core profile ships its own validated Generic manifest at .owledge/runtime-conformance/generic-mcp-cli.json, so the V1M-10 Generic journey does not depend on a source-checkout add-on."
   - "The public entry docs and capability registry now identify the V1 Minimal Core and mark legacy Cowork/OpenCode/Hub surfaces outside the V1 reference-adapter/default path."
   - "Package metadata uses modern SPDX-style MIT license metadata to remove the upstream setuptools deprecation warning from the candidate build."
   - "The V1 source distribution and package-data declaration exclude optional add-ons, benchmark corpora, plugins, examples, nonessential docs, standalone bundles, tests and legacy Owlib so the GA artifact budget measures the Minimal Core rather than parked payload."
@@ -14,10 +15,13 @@ required_verification:
   - "Focused V1M-10 journey and bounded-claims suite passes."
   - "Public documentation, runtime adapter and V1M control-plane gates pass."
   - "A clean committed source builds wheel and sdist; artifact members and content have no private paths or internal dogfood payloads."
+  - "Two clean local builds normalize to byte-identical artifacts: wheel SHA-256 d34b3d1baaea8aafdcf5c103772b0ecaef3ef635c795c406ab40392ac31054b8 (310530 bytes); sdist SHA-256 24c81e3b38d9cc181d2bdfa6bd55f43964777092220daf267bfd824aab527343 (250580 bytes)."
+  - "The normalized wheel has 181 members and the normalized sdist 272; each contains only the nine declared Core Python modules, no private path members, and no forbidden add-on, benchmark, plugin, standalone, internal, test, Owlib or global-memory payload."
+  - "A fresh offline CPython 3.13 environment installed the normalized wheel through uv pip --offline --no-index --no-deps; the imported tools package resolved from site-packages and minimal init plus doctor passed."
 negative_contracts:
   - "Ordinary recall excludes the parked feature while planning recall returns its reason and reconsideration trigger."
   - "The V1 docs do not claim publication, marketplace certification, remote sync, enterprise scope, or unexecuted macOS/Linux support."
 known_limitations:
-  - "The candidate remains local controlled evidence; external publication and platform claims remain blocked pending the G-V1M-GA decision."
+  - "The candidate remains local controlled Windows evidence; macOS and Linux wheel execution remains a mandatory publication prerequisite, not a V1 platform claim."
 publication_authority: not_granted
-next_exact_action: "Commit the V1M-10 journey and claims changes, build artifacts from that clean source commit, then run independent final-release QA and G-V1M-GA."
+next_exact_action: "Record independent final-release QA and the G-V1M-GA manifest; do not start V1M-11 or perform external release actions."

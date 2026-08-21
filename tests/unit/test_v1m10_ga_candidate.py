@@ -66,11 +66,7 @@ class V1M10CandidateJourneyTests(unittest.TestCase):
 
             self._init_full(project_a, global_root)
             self._init_full(project_b, global_root)
-            addon = self._run([
-                sys.executable, str(ROOT / "tools" / "owledge.py"), "install-addon",
-                "--project-root", str(project_b), "--addon", "runtime-conformance-kit", "--source-root", str(ROOT),
-            ])
-            self.assertTrue(addon["passed"])
+            self.assertTrue((project_b / ".owledge" / "runtime-conformance" / "generic-mcp-cli.json").is_file())
 
             research = "v1m10 reviewed research reuse"
             proposed = self._host_cli(project_a, "propose", "--kind", "research", "--summary", research, "--source-ref", "research:local-v1m10")

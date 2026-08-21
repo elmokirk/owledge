@@ -1,0 +1,37 @@
+candidate:
+  package_version: "0.8.0"
+  source_commit: "423714e"
+  branch: "codex/v071-integration"
+  publication_status: "local_candidate_only"
+  publication_authority: "not_granted"
+artifact_contract:
+  normalized_wheel:
+    filename: "owledge-0.8.0-py3-none-any.whl"
+    sha256: "d34b3d1baaea8aafdcf5c103772b0ecaef3ef635c795c406ab40392ac31054b8"
+    bytes: 310530
+    members: 181
+  normalized_sdist:
+    filename: "owledge-0.8.0.tar.gz"
+    sha256: "24c81e3b38d9cc181d2bdfa6bd55f43964777092220daf267bfd824aab527343"
+    bytes: 250580
+    members: 272
+  reproducibility: "Two clean local builds normalized with the standard-library artifact normalizer produced byte-identical wheel and sdist hashes."
+  inventory: "Only __init__.py, owledge.py, owledge_core.py, owledge_adapter_contracts.py, owledge_generic_adapter.py, owledge_null_space.py, owledge_v1_retrieval.py, owledge_v1_lifecycle.py and build_project_folder_kit.py are shipped below tools/."
+  privacy: "Archive member names contain no internal dogfood, global-memory, add-on, benchmark, plugin, standalone, test, Owlib or private user-path payload."
+public_claims:
+  - claim: "Eight local public CLI operations: init, doctor, recall, context, propose, review, sync and upgrade."
+    evidence: "docs/v1-minimal-core.md; tests/unit/test_v1m03_public_facade.py"
+  - claim: "Two local scopes only: project_user and explicitly linked user_global."
+    evidence: "docs/v1-minimal-core.md; tests/unit/test_v1m04_null_space.py; tests/unit/test_v1m05_retrieval.py"
+  - claim: "Codex, Claude Code and Generic MCP/CLI are the three V1 reference adapters; Generic exposes exactly five Core-delegating tools."
+    evidence: "docs/harness-plugin-matrix.md; tests/unit/test_v1m08_adapter_conformance.py; evidence/G-V1M-ADAPTERS/manifest.yaml"
+  - claim: "Candidate, park/resurface and reviewed promotion work across fresh project-local harness bridges without chat-history dependence."
+    evidence: "tests/unit/test_v1m10_ga_candidate.py"
+non_claims:
+  - "No package publication, tag, remote upload, marketplace certification or interactive external-harness certification."
+  - "No Hub, Pi reference adapter, LightRAG, Documentation Compiler, supply-chain system, enterprise scope, remote sync or broad benchmark claim."
+  - "No macOS or Linux support claim before those wheel-only executions are recorded for publication."
+platform_evidence:
+  executed: "Windows controlled local build proof; offline install smoke on CPython 3.13."
+  publication_prerequisite: "Execute macOS and Linux wheel-only evidence before any public release action."
+next_owner_decision: "V1M-11 is blocked pending an explicit owner authorization naming push, tag, publish and/or release actions."

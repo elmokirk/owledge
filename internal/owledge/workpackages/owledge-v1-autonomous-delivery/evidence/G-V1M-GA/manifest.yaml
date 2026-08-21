@@ -1,0 +1,38 @@
+gate: G-V1M-GA
+status: accepted_pending_independent_qa
+tested_integration_commit: "423714e"
+environment:
+  os: windows
+  build_python: "3.14.0"
+  offline_install_python: "3.13.12"
+  execution: "controlled local final candidate validation"
+included_tickets: [V1M-09, V1M-10]
+ticket_evidence:
+  - "evidence/V1M-09/implementation-checkpoint.yaml"
+  - "evidence/V1M-10/implementation-checkpoint.yaml"
+  - "evidence/V1M-10/claim-map.yaml"
+verification:
+  - "Focused V1M-02 through V1M-10, adapter and validator suite: passed; expected Windows symlink skips remain documented."
+  - "python tools/owledge.py test public-docs --project-root .: passed; 258 checks, 0 failures."
+  - "python tools/owledge.py test runtime-adapters --project-root .: passed."
+  - "python tools/validate_v1_delivery_plan.py: passed; 11 tickets / 7 gates / 11 waves / 0 errors."
+  - "git diff --check: passed."
+  - "Two clean local builds normalized to identical wheel SHA-256 d34b3d1baaea8aafdcf5c103772b0ecaef3ef635c795c406ab40392ac31054b8 (310530 bytes) and sdist SHA-256 24c81e3b38d9cc181d2bdfa6bd55f43964777092220daf267bfd824aab527343 (250580 bytes)."
+  - "Normalized archive inspection passed: 181 wheel and 272 sdist members; only nine declared Core Python tools; no forbidden or private-path member."
+  - "Fresh CPython 3.13 offline install through uv pip --offline --no-index --no-deps resolved tools from site-packages; minimal init and doctor passed."
+  - "Normalized sdist rebuilt offline to a Core-only wheel."
+threshold_witness:
+  journey: "Fresh minimal install, explicit local user-global link, reviewed Research reuse from Project A to Project B, ordinary-recall parked exclusion, planning resurface and stateless Codex/Claude/Generic bridges are executed in the V1M-10 journey fixture."
+security: "V1M-09 proves local/reparse-safe init and upgrade boundaries, explicit recovery, offline Core verbs, untrusted retrieved-content provenance, privacy-safe diagnostics and archive inspection."
+artifact_scope: "Build hooks and package-data exclusions enforce the nine-tool Minimal Core boundary in wheel and sdist; retained maintainer compatibility code is source-checkout-only."
+claims: "Public docs state only local V1 Core claims and explicit post-V1/non-claim boundaries."
+platform: "Windows proof is executed. macOS/Linux execution is a pre-publication prerequisite and is not represented as a current support claim."
+independent_qa:
+  mode: separately_initialized_read_only_final_release_reviewer
+  status: pending
+  result: pending
+limitations:
+  - "Windows symlink/junction attack fixtures are capability-skipped on this host; their fail-closed code paths and deterministic probes are covered, but this is not cross-platform execution evidence."
+  - "No marketplace, remote service, push, tag, publication, artifact upload or public release was performed."
+promotion: "On accepted independent QA, G-V1M-GA permits only the owner decision at V1M-11; no external release action is authorized by this manifest."
+publication_authority: not_granted
