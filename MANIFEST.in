@@ -16,6 +16,7 @@ include USER_CONTEXT.template.md
 include VERSION
 include .gitignore
 exclude OWLEDGE.legacy.template.md
+prune docs
 recursive-include templates *
 include docs/upgrade-notes-schema.json
 include docs/upgrading.md
@@ -30,7 +31,6 @@ prune plugins
 prune standalone-skills
 prune tests
 prune owlib
-prune docs/archive
 recursive-exclude .agent-control *
 recursive-exclude .git *
 recursive-exclude internal *
