@@ -1197,7 +1197,7 @@ def upgrade_project(root: pathlib.Path, source_root: pathlib.Path, dry_run: bool
     try:
         root = _validate_local_project_root(root, label="project_root", require_exists=True)
         source_root = _validate_local_project_root(source_root, label="source_root", require_exists=True)
-        manifest_path = _safe_project_target(root, "kit-manifest.json", label="upgrade_manifest", require_exists=True)
+        manifest_path = _safe_project_target(root, "kit-manifest.json", label="upgrade_manifest")
     except ValueError as exc:
         return {"passed": False, "error": str(exc), "project": str(root)}
     if not manifest_path.is_file():
