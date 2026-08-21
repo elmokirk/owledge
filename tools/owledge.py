@@ -707,12 +707,16 @@ def _collect_kit_files(source_root: pathlib.Path, project_root: pathlib.Path, pr
             if not path.is_file() or "__pycache__" in path.parts:
                 continue
             rel_posix = path.relative_to(project_root).as_posix()
+            src = agent_src / pathlib.Path(rel_posix).relative_to(".owledge")
+            if not src.is_file():
+                # Manifests own only files supplied by the kit. User memory and
+                # transient upgrade state must never become upgrade inventory.
+                continue
             if rel_posix in seen:
                 continue
             seen.add(rel_posix)
             sha_installed = sha256_file(path)
-            src = agent_src / pathlib.Path(rel_posix).relative_to(".owledge")
-            sha_original = sha256_file(src) if src.is_file() else ""
+            sha_original = sha256_file(src)
             entries.append({"path": rel_posix, "sha256_installed": sha_installed, "sha256_original": sha_original})
     for tool in HOST_TOOL_FILES:
         target = project_root / "tools" / tool
