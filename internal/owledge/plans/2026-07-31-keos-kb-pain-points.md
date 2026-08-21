@@ -25,11 +25,12 @@ evidence:
 supersedes: null
 edges:
   - type: "relates_to"
-    target: "[[PLAN-v2.3]]"
+    target: "external KEOS vault: PLAN-v2.3"
     weight: 1.0
   - type: "relates_to"
-    target: "[[KEOS-Strategieplan-v1]]"
+    target: "external KEOS vault: KEOS-Strategieplan-v1"
     weight: 0.8
+external_reference_scope: "Historical KEOS strategy references live in the separate KEOS vault, not this repository."
 ---
 
 # Pain Points History
