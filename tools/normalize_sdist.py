@@ -7,6 +7,7 @@ import gzip
 import io
 import pathlib
 import tarfile
+import zipfile
 
 
 DEFAULT_EPOCH = 315532800  # 1980-01-01: valid for ZIP-adjacent release tooling.
@@ -52,14 +53,39 @@ def normalize_sdist(source: pathlib.Path, output: pathlib.Path, *, epoch: int = 
     return {"passed": True, "members": written, "epoch": epoch, "output": output.name}
 
 
+def normalize_wheel(source: pathlib.Path, output: pathlib.Path, *, epoch: int = DEFAULT_EPOCH) -> dict[str, object]:
+    """Normalize ZIP metadata without changing the signed-off wheel payload."""
+    if epoch < DEFAULT_EPOCH:
+        raise ValueError("epoch_before_zip_safe_minimum")
+    if not source.is_file() or source.suffix != ".whl":
+        raise ValueError("wheel_source_invalid")
+    output.parent.mkdir(parents=True, exist_ok=True)
+    written = 0
+    with zipfile.ZipFile(source, "r") as archive:
+        members = sorted(archive.infolist(), key=lambda member: member.filename)
+        names = [_safe_name(member.filename) for member in members]
+        if len(names) != len(set(names)):
+            raise ValueError("archive_member_duplicate")
+        payloads = [(name, archive.read(member), member.external_attr) for name, member in zip(names, members)]
+    with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as target:
+        for name, content, external_attr in payloads:
+            info = zipfile.ZipInfo(name, date_time=(1980, 1, 1, 0, 0, 0))
+            info.compress_type = zipfile.ZIP_DEFLATED
+            info.external_attr = external_attr
+            target.writestr(info, content, compress_type=zipfile.ZIP_DEFLATED, compresslevel=9)
+            written += 1
+    return {"passed": True, "members": written, "epoch": epoch, "output": output.name}
+
+
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Normalize an Owledge source distribution for deterministic local release QA.")
+    parser = argparse.ArgumentParser(description="Normalize an Owledge wheel or source distribution for deterministic local release QA.")
     parser.add_argument("--source", required=True)
     parser.add_argument("--output", required=True)
     parser.add_argument("--epoch", type=int, default=DEFAULT_EPOCH)
     args = parser.parse_args(argv)
     try:
-        result = normalize_sdist(pathlib.Path(args.source), pathlib.Path(args.output), epoch=args.epoch)
+        source = pathlib.Path(args.source)
+        result = normalize_wheel(source, pathlib.Path(args.output), epoch=args.epoch) if source.suffix == ".whl" else normalize_sdist(source, pathlib.Path(args.output), epoch=args.epoch)
     except ValueError as exc:
         print('{"passed": false, "error": "' + str(exc) + '"}')
         return 2

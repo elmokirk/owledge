@@ -9,7 +9,7 @@ implementation:
   - "The public entry docs and capability registry now identify the V1 Minimal Core and mark legacy Cowork/OpenCode/Hub surfaces outside the V1 reference-adapter/default path."
   - "Package metadata uses modern SPDX-style MIT license metadata to remove the upstream setuptools deprecation warning from the candidate build."
   - "The V1 source distribution and package-data declaration exclude optional add-ons, benchmark corpora, plugins, examples, nonessential docs, standalone bundles, tests and legacy Owlib so the GA artifact budget measures the Minimal Core rather than parked payload."
-  - "A local standard-library Sdist normalizer fixes source-archive metadata to a ZIP-safe epoch after the build, rejects unsafe archive member names, and makes the release candidate byte-reproducible."
+  - "A local standard-library artifact normalizer fixes wheel and Sdist metadata to a ZIP-safe epoch after the build, rejects unsafe or duplicate archive member names, and makes the release candidate byte-reproducible."
 required_verification:
   - "Focused V1M-10 journey and bounded-claims suite passes."
   - "Public documentation, runtime adapter and V1M control-plane gates pass."
