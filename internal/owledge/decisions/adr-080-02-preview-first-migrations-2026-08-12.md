@@ -6,18 +6,30 @@ project_id: "owledge"
 doc_type: "project_context"
 artifact_type: "architecture_decision_record"
 document_version: 1
-status: "accepted"
+status: "active"
 visibility: "private"
 data_class: "internal"
 semantic_title: "ADR-080-02 Preview-first migration and compatibility"
 summary: "Defines non-destructive, receipt-backed migration boundaries and compatibility behavior for Owledge-managed artifacts."
 concept_tags: ["adr", "migration", "compatibility", "rollback", "revision"]
 stack_tags: ["markdown", "yaml", "json"]
+problem_patterns: ["silent-in-place-migration", "lossy-compatibility-fallback", "unrecoverable-partial-apply"]
+architecture_patterns: ["preview-first-migration", "checkpointed-transaction", "immutable-migration-receipt"]
+failure_modes: ["apply-without-preview", "user-content-overwrite", "ambiguous-mapping-accepted"]
+reusable_lessons:
+  - "A migration is safe only when its preview, checkpoint, postflight result, and receipt are independently inspectable."
+  - "Compatibility must preserve stable identity and lifecycle history without making legacy writes permanent."
+confidence: 0.98
 review_status: "reviewed"
 sanitization_status: "not_required"
 created_at: "2026-08-12T16:00:00+02:00"
 updated_at: "2026-08-12T16:00:00+02:00"
 source_hash: ""
+edges:
+  - type: "depends_on"
+    target: "mem:owledge:global:owledge:decision:adr-080-01-core-contract-boundaries-2026-08-12"
+    confidence: 1.0
+    reason: "Applies the Core identity, revision, authority, and compatibility boundaries to migrations."
 ---
 
 # ADR-080-02: Preview-First Migrations

@@ -6,7 +6,7 @@ project_id: "owledge"
 doc_type: "task"
 artifact_type: "post_release_ticket"
 document_version: 1
-status: "proposed"
+status: "draft"
 priority: "P1"
 visibility: "private"
 data_class: "internal"
@@ -14,14 +14,19 @@ semantic_title: "Enforce a knowledge-routing matrix for agents and users"
 summary: "Replace ambiguous folder choice with one project-scoped routing policy, explicit scope approval and an ask-user default."
 concept_tags: ["post-v1", "routing", "agents", "knowledge-lifecycle"]
 stack_tags: ["markdown", "python", "cli", "mcp"]
+problem_patterns: ["ambiguous-knowledge-destination", "agent-infers-global-scope", "handoff-misclassified-as-lesson"]
+architecture_patterns: ["versioned-routing-policy", "pure-route-classifier", "owner-approved-global-promotion"]
+failure_modes: ["direct-write-outside-route", "ambiguous-content-auto-routed", "ninth-v1-verb-added"]
+reusable_lessons:
+  - "Ambiguous or mixed-scope knowledge should ask for an owner decision instead of choosing a durable destination."
 confidence: 0.95
-review_status: "owner_requested"
+review_status: "unreviewed"
 sanitization_status: "not_required"
 created_at: "2026-08-21T00:00:00+02:00"
 updated_at: "2026-08-21T00:00:00+02:00"
 source_hash: ""
 edges:
-  - type: "parks"
+  - type: "relates_to"
     target: "mem:owledge:global:owledge:project_context:post-v1-feature-parking-lot"
     confidence: 1.0
     reason: "PARK-025 holds the work outside the released minimal Core."

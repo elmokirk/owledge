@@ -6,18 +6,30 @@ project_id: "owledge"
 doc_type: "project_context"
 artifact_type: "architecture_decision_record"
 document_version: 1
-status: "accepted"
+status: "active"
 visibility: "private"
 data_class: "internal"
 semantic_title: "ADR-080-01 Core contract boundaries"
 summary: "Locks the small transport-neutral Core contract, version separation, authority axes, and explicit V1 non-goals before schema implementation."
 concept_tags: ["adr", "core-contract", "schema-registry", "authority", "migration"]
 stack_tags: ["markdown", "yaml", "json", "mcp"]
+problem_patterns: ["transport-owned-policy", "ambiguous-authority", "silent-revision-rewrite"]
+architecture_patterns: ["transport-neutral-core", "orthogonal-authority-axes", "fail-closed-capability-envelope"]
+failure_modes: ["adapter-bypasses-core", "global-scope-implies-drilldown", "migration-erases-revision-history"]
+reusable_lessons:
+  - "Transport adapters may narrow Core policy but must never establish a competing authority model."
+  - "Identity, revision, authority scope, knowledge abstraction, and lifecycle need independent contracts."
+confidence: 0.98
 review_status: "reviewed"
 sanitization_status: "not_required"
 created_at: "2026-08-12T16:00:00+02:00"
 updated_at: "2026-08-12T16:00:00+02:00"
 source_hash: ""
+edges:
+  - type: "derived_from"
+    target: "mem:owledge:global:owledge:decision:v1-schema-global-knowledge-health-matrix-2026-08-12"
+    confidence: 1.0
+    reason: "Implements the owner-locked 1B+/2C+/3B architecture baseline."
 ---
 
 # ADR-080-01: Core Contract Boundaries
