@@ -817,10 +817,10 @@ def _resolve_global_link(arg_value: str, source_root: pathlib.Path) -> dict[str,
     if not arg_value:
         raise ValueError("link_global_requires_explicit_path")
     selected = pathlib.Path(arg_value).expanduser()
-    if not selected.is_absolute():
-        raise ValueError("link_global_requires_absolute_path")
     if str(selected).startswith(("\\\\", "//")):
         raise ValueError("link_global_requires_local_path")
+    if not selected.is_absolute():
+        raise ValueError("link_global_requires_absolute_path")
     resolved = selected.resolve()
     kit_version = KIT_VERSION
     return {
