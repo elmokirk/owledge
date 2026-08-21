@@ -76,8 +76,14 @@ jobs:
           VERSION="$(tr -d '\r\n' < VERSION)"
           WHEEL="dist/owledge-$VERSION-py3-none-any.whl"
           uvx --from "$WHEEL" owledge --help
+          minimal=$(mktemp -d /tmp/owledge-wheel-minimal-XXXXXX)
+          uvx --from "$WHEEL" owledge init --target "$minimal"
+          test -f "$minimal/OWLEDGE.md"
+          test -d "$minimal/.owledge"
+          test ! -d "$minimal/tools"
+          test ! -d "$minimal/skills"
           tmp=$(mktemp -d /tmp/owledge-wheel-XXXXXX)
-          uvx --from "$WHEEL" owledge quickstart --target "$tmp"
+          uvx --from "$WHEEL" owledge init --target "$tmp" --profile full
           test -f "$tmp/OWLEDGE.md"
           test -d "$tmp/.owledge"
           python - "$tmp" <<'PY'
