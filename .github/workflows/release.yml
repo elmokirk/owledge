@@ -38,7 +38,7 @@ jobs:
           set -euo pipefail
           VERSION="$(tr -d '\r\n' < VERSION)"
           test "$RELEASE_REF" = "release/v$VERSION"
-          git fetch origin main --tags
+          git fetch origin +refs/heads/main:refs/remotes/origin/main --tags
           git merge-base --is-ancestor origin/main HEAD
           test -z "$(git ls-remote --tags origin "refs/tags/v$VERSION")"
           python - "$VERSION" "$(git show origin/main:VERSION | tr -d '\r\n')" <<'PY'
@@ -187,7 +187,7 @@ jobs:
         run: |
           set -euo pipefail
           VERSION="$(tr -d '\r\n' < VERSION)"
-          git fetch origin main --tags
+          git fetch origin +refs/heads/main:refs/remotes/origin/main --tags
           git merge-base --is-ancestor origin/main HEAD
           git push origin HEAD:refs/heads/main
           git tag -a "v$VERSION" -m "Owledge v$VERSION"

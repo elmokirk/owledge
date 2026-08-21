@@ -26,9 +26,11 @@ open_non_blocking_followup:
   status: open
   limitation: "macOS/Linux wheel-only execution is not yet performed and must not be claimed as supported."
 external_status:
-  state: pending_authenticated_remote
-  initial_probe: "GitHub CLI default token reported invalid; sandbox network access to GitHub was denied."
-  safe_next_action: "Reauthenticate GitHub CLI, permit network access, push release/v0.8.0 and dispatch .github/workflows/release.yml."
+  state: workflow_preflight_failed_fix_in_progress
+  release_branch: "release/v0.8.0 pushed to origin at 31d34d8"
+  workflow_run: "https://github.com/elmokirk/owledge/actions/runs/32479615397"
+  failure: "The release workflow fetched main only into FETCH_HEAD then checked stale/nonexistent origin/main; no build, PyPI upload, tag, main promotion or public release ran."
+  safe_next_action: "Commit the explicit main tracking-ref fetch fix, push it to release/v0.8.0 and rerun the release workflow."
 prohibited_shortcuts:
   - "Do not create a tag or public release before the configured PyPI-confirmed workflow succeeds."
   - "Do not claim macOS/Linux support before POST-V1-PLATFORM-001 evidence exists."
