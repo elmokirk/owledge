@@ -119,6 +119,8 @@ class AgentIntegrationContractTests(unittest.TestCase):
             "owledge_doctor",
             "owledge_search_memory",
             "owledge_build_context_pack",
+            "owledge_context_synopsis",
+            "owledge_active_tools",
             "owledge_list_tasks",
             "owledge_list_reviews",
         })

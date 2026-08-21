@@ -17,7 +17,7 @@ class OW07104AdoptionDocsTests(unittest.TestCase):
             "agents lose project context",
             "Markdown handoff",
             "not a hosted Team Hub",
-            "understand the model",
+            "read the [V1 Minimal Core boundary]",
         ]:
             self.assertIn(required, first_screen)
         self.assertNotIn("```bash", first_screen)
