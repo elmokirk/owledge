@@ -5,7 +5,7 @@ customer_id: "global"
 project_id: "owledge"
 doc_type: "task"
 artifact_type: "workpackage"
-document_version: 14
+document_version: 15
 workpackage_version: "1.0.2"
 status: "active"
 visibility: "private"
@@ -21,7 +21,7 @@ confidence: 0.97
 review_status: "reviewed"
 sanitization_status: "not_required"
 created_at: "2026-08-13T17:20:00+02:00"
-updated_at: "2026-08-21T13:30:00+02:00"
+updated_at: "2026-08-21T00:00:00+02:00"
 source_hash: ""
 reusable_lessons:
   - "A new plan enters an active release train only at a clean ticket/gate boundary."
@@ -132,8 +132,9 @@ cannot create symlinks.
 - [x] V1M-10 passes the owner daily journey including park/resurface and
   cross-harness resume without chat history.
 - [x] Default wheel stays <=500 KB or an explicit owner-reviewed exception exists.
-- [ ] Windows, macOS and Linux wheel-only evidence is fully executed before publication;
-  Windows candidate proof is executed, while macOS/Linux remain the explicit V1M-11 prerequisite.
+- [x] Windows wheel-only evidence is executed. Owner decision D-V1-PUB-001 permits
+  publication without macOS/Linux execution; `POST-V1-PLATFORM-001` retains both
+  receipts as an open follow-up and no support claim is permitted.
 - [x] Public docs show Principles, minimal project, and local user-global paths;
   internal dogfood and parked products are not presented as default features.
 - [x] Build wheel/sdist from a clean source commit and inspect artifact contents.
@@ -141,11 +142,13 @@ cannot create symlinks.
 
 ## Phase 7 — Publication stop
 
-- [ ] Present exact candidate commit and artifact hashes.
-- [ ] Present shipped scope, known limitations, support window and parking lot.
-- [ ] Confirm no personal/private paths, prompts, transcripts or credentials.
-- [ ] Wait for explicit owner authorization naming push/tag/publish/release.
-- [ ] V1M-11 performs only the authorized external actions.
+- [x] Present exact candidate commit and artifact hashes.
+- [x] Present shipped scope, known limitations, support window and parking lot.
+- [x] Confirm no personal/private paths, prompts, transcripts or credentials.
+- [x] Owner authorizes a `release/v0.8.0` push and the existing PyPI-confirmed
+  tag/public-release workflow.
+- [ ] V1M-11 performs only the authorized external workflow; any remote auth,
+  PyPI, upload or network failure remains an explicit blocker receipt.
 - [ ] Record publication receipts and final closeout.
 
 ## Global safeguards

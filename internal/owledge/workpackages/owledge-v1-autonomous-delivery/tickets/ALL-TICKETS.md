@@ -2,7 +2,7 @@
 title: "Owledge v1 Ticket Contracts"
 date: "2026-07-16"
 version: "3.0.0"
-document_version: 5
+document_version: 6
 memory_id: "mem:owledge:global:owledge:task:v1-delivery-ticket-catalog"
 tenant_id: "owledge"
 customer_id: "global"
@@ -25,7 +25,7 @@ confidence: 0.95
 review_status: "reviewed"
 sanitization_status: "not_required"
 created_at: "2026-07-16T00:00:00Z"
-updated_at: "2026-08-13T00:00:00+02:00"
+updated_at: "2026-08-21T00:00:00+02:00"
 source_hash: ""
 owners:
   - "release-orchestrator"
@@ -169,8 +169,13 @@ For every ticket:
 - Priority/dependencies: P0; `V1M-10`.
 - Outcome: publication happens only after an owner names the exact candidate, artifacts and external action.
 - Allowed paths: release notes, `internal/owledge/workpackages/owledge-v1-autonomous-delivery/evidence/V1M-11/`, and publication receipts explicitly authorized by the owner.
-- Implement: present candidate decision; do not push, tag, publish or upload before explicit authorization.
-- Accept: absent exact authorization, this ticket remains blocked and no external state changes.
+- Implement: the owner authorized the clean V1 candidate for a `release/v0.8.0`
+  push and the existing PyPI-confirmed tag/public-release workflow on 2026-08-21.
+  Link the V1M-11 receipt to
+  `v1-publication-cross-platform-followup-2026-08-21` and leave
+  `POST-V1-PLATFORM-001` open without a macOS/Linux support claim.
+- Accept: record remote commit/tag/release/artifact receipts. An authentication,
+  upload or network failure is a bounded V1M-11 blocker, never a false release.
 - Verify/evidence: owner authorization and publication receipt only after authorization.
 - Negative QA: generic approval and unpinned candidate cannot unlock publication.
 

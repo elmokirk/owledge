@@ -1,23 +1,23 @@
 schema_version: 1
-document_version: 38
+document_version: 39
 project: owledge
 plan: internal/owledge/plans/owledge-v1-minimal-core-finalization-plan.md
 objective: Deliver Owledge V1 Minimal Core: Principles, deterministic local Core, private local user-global Null-Space, and thin Codex/Claude/generic MCP/CLI adapters.
 status: in_progress
 current_release: v1.0
-current_phase: V1M-GATE-GA
-active_ticket: null
+current_phase: V1M-PUBLISH
+active_ticket: V1M-11
 session_slice_ref: RUN-STATE.session.yaml
 last_green_gate: G-V1M-GA
 alignment:
   state: approved
-  awaiting_release: "V1M-11 owner-controlled publication decision only"
+  awaiting_release: "V1M-11 external release execution; owner authorized release/v0.8.0 push and the existing PyPI-confirmed tag/public-release workflow."
   active_alignment_ticket: null
-  user_decision: "approve — compact V1 cut and reduced OW-081-01 path"
+  user_decision: "approve — V1M-11 release/v0.8.0 push and PyPI-confirmed tag/publish/release workflow; macOS/Linux wheel proof tracked as non-blocking POST-V1-PLATFORM-001 with no support claim"
   decided_by: product-owner
-  decided_at: "2026-08-13"
+  decided_at: "2026-08-21"
   scope: "Minimal V1 Core: Principles, deterministic local Core, private local user_global Null-Space, and Codex, Claude Code, generic MCP/CLI adapters only."
-  constraints: "Eight public CLI verbs, five MCP tools, two scopes, three adapters, minimal <=15 files and <=8 directories. Publication, tag, release, push, remote upload, Hub, Pi, LightRAG, Documentation Compiler, supply-chain, enterprise scope, remote sync, macOS/Linux claims before executed evidence, and comparative benchmark claims remain blocked."
+  constraints: "Eight public CLI verbs, five MCP tools, two scopes, three adapters, minimal <=15 files and <=8 directories. V1M-11 release/v0.8.0 push and the existing PyPI-confirmed tag/public-release workflow are owner-authorized. Hub, Pi, LightRAG, Documentation Compiler, supply-chain, enterprise scope, remote sync, macOS/Linux support claims before executed evidence, and comparative benchmark claims remain blocked."
   open_questions:
     - id: Q-080-01
       source: OW-080-13-independent-qa
@@ -674,8 +674,8 @@ checkpoint:
     - "python -m unittest tests.unit.test_validate_v1_delivery_plan tests.unit.test_validate_live_work_register -q: one pre-existing downstream mismatch; test_current_control_plane_is_valid still expects zero warnings while accepted OW-080-13 intentionally emits one internal-checkpoint warning. The validator itself passed with zero errors."
     - "python tools/owledge_core.py --project-root . validate-memory --strict: 307 pre-existing legacy frontmatter failures across historical internal memory; the touched canonical plan/checklists pass the release-specific frontmatter validation inside validate_v1_delivery_plan.py."
     - "python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports: completed 36/38 on 2026-08-12; source-identity correctly rejected the dirty planning tree and upgrade-drift exposed a host-project/Kit-mode regression. Routed to OW-071-08 under F-071-24."
-  workspace_state: "G-V1M-GA is green on codex/v071-integration. V1M-11 is blocked for the exact owner publication decision; publication, tagging, release, push and remote upload remain prohibited until that decision."
-  next_exact_action: "Present the exact V1 candidate"
+  workspace_state: "G-V1M-GA is green on codex/v071-integration. V1M-11 is in progress under the 2026-08-21 owner authorization. POST-V1-PLATFORM-001 retains macOS/Linux wheel proof as open non-blocking follow-up; no unexecuted platform claim is permitted."
+  next_exact_action: "Create and push release/v0.8.0, dispatch the existing release workflow, then record exact PyPI/main/tag/release receipts or a bounded external blocker."
   open_assumptions:
     - "The approved V1M plan is immutable unless the owner uses the exact AMEND GOAL BOUNDARY phrase."
     - "Local serial execution is the default; V1M-01 requires independent control-plane QA."
