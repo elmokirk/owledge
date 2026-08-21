@@ -57,7 +57,7 @@ def test_skill_finds_its_own_gaps_against_v060(tmp_path):
     assert hits >= 4, f"skill rubric only references {hits}/6 named findings (need >=4): {required_phrases}"
     project = tmp_path / "v060-state"
     project.mkdir()
-    init = run_owledge(["init-project", "--target", str(project)])
+    init = run_owledge(["init-project", "--target", str(project), "--profile", "full"])
     assert init.returncode == 0
     (project / "kit-manifest.json").unlink(missing_ok=True)
     skills_dir = project / "skills" / "concept-blindspot-audit"

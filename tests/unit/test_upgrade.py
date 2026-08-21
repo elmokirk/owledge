@@ -89,7 +89,17 @@ def test_manual_patch_is_git_applyable(tmp_path):
     (fake_src / "templates" / "owledge" / "templates" / "task-card-template.md").write_text(old_template, encoding="utf-8", newline="\n")
     project = tmp_path / "patch-project"
     project.mkdir()
-    init = run_owledge(["init-project", "--target", str(project), "--source-root", str(fake_src)])
+    init = run_owledge(
+        [
+            "init-project",
+            "--target",
+            str(project),
+            "--source-root",
+            str(fake_src),
+            "--profile",
+            "full",
+        ]
+    )
     assert init.returncode == 0, f"init from fake source failed: {init.stderr}"
     set_manifest_kit_version(project, "0.6.0")
     result = run_owledge(["upgrade", "--dry-run", "--mode=manual", "--source-root", str(REPO_ROOT)], project)
