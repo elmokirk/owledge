@@ -5,11 +5,11 @@
 [![Version](https://img.shields.io/badge/version-0.8.0-blue)](VERSION)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Storage: Markdown](https://img.shields.io/badge/storage-Markdown-black)](docs/quickstart.md)
-[![Runtime support](https://img.shields.io/badge/runtimes-Codex%20%7C%20Claude%20Code%20%7C%20Cowork%20%7C%20OpenCode-orange)](docs/harness-plugin-matrix.md)
+[![V1 candidate](https://img.shields.io/badge/V1-local%20minimal%20Core-orange)](docs/v1-minimal-core.md)
 [![CI](https://github.com/elmokirk/owledge/actions/workflows/ci.yml/badge.svg)](https://github.com/elmokirk/owledge/actions/workflows/ci.yml)
 [![Docs](https://github.com/elmokirk/owledge/actions/workflows/docs.yml/badge.svg)](https://github.com/elmokirk/owledge/actions/workflows/docs.yml)
 
-Owledge gives agents durable local Markdown artifacts: plans, evidence, reviews, handoffs, and decisions that stay readable across sessions, tools, teams, and existing vaults.
+Owledge gives agents durable local Markdown artifacts: plans, evidence, reviews, handoffs, and decisions that stay readable across sessions and existing vaults.
 
 Use it when agents lose project context, plans get stuck in chat, or a Markdown repository needs a reviewable handoff surface. It is additive: existing files stay yours.
 
@@ -21,9 +21,9 @@ Use it when agents lose project context, plans get stuck in chat, or a Markdown 
 | A plan needs to survive implementation and review | Evidence-linked plans, checks, and explicit stop points. |
 | You want structure without migrating a repo or vault | An additive local layer; Markdown remains canonical. |
 
-**Boundary:** Owledge is not a hosted Team Hub, a background agent scheduler, or a replacement for your issue tracker. The current HTTP adapter is [local experimental and loopback-only](docs/security/local-http-control-plane.md).
+**V1 boundary:** the local Minimal Core supports Principles, `project_user`, an explicitly linked private `user_global`, and Codex, Claude Code, or generic MCP/CLI bridges. It is not a hosted Team Hub, remote sync, a background scheduler, or a replacement for your issue tracker. The current HTTP adapter is [local experimental and loopback-only](docs/security/local-http-control-plane.md).
 
-**Next action:** [understand the model](docs/what-is-owledge.md), then choose a [smallest integration](docs/integration-decision-guide.md). Install only when that path calls for it.
+**Next action:** read the [V1 Minimal Core boundary](docs/v1-minimal-core.md), then choose a [smallest integration](docs/integration-decision-guide.md). Install only when that path calls for it.
 
 ## The mental model
 
@@ -193,15 +193,16 @@ Verify any initialized project:
 python tools/owledge.py doctor --project-root /path/to/your-project
 ```
 
-### Optional: Plugin / Harness Setup
+### Optional: Reference Harness Setup
 
-Use the ready-to-install Cowork / Claude-compatible plugin bundle:
+Use the project-local Codex, Claude Code, or generic MCP/CLI bridge only after
+the local Core journey is working. These reference bridges reuse Core behavior;
+they do not create another memory store.
 
-```text
-plugins/owledge-cowork/
-```
+The canonical legacy plugin path is `plugins/owledge-cowork/`; it is retained
+for compatibility but is not a V1 reference-adapter claim.
 
-Best next read: [Plugin install guide](docs/install-plugin.md)
+Best next read: [V1 harness boundary](docs/harness-plugin-matrix.md)
 
 ### Optional: Project Snapshot Kit
 
@@ -281,8 +282,7 @@ Owledge is a memory layer around agent runtimes. It does not replace the runtime
 | Principles-only coding agents | First-class support | Instructions or `owledge-principles` skill |
 | Codex | Local adapter support | Local CLI, skills, optional plugin adapter |
 | Claude Code | Local adapter support | Skill/plugin copy path plus project-local memory rules |
-| Cowork / Claude-compatible | Local adapter support | `plugins/owledge-cowork/` |
-| OpenCode-style agents | Instruction-based support | Repo-link integration via `AGENTS.md` and local scripts |
+| Generic MCP/CLI | Local reference adapter | Project-local bridge with five tools; Candidate-only write |
 | Existing Markdown / Obsidian KBs | Primary supported path | `tools/build_kb_module.py`, `owledge-map.json`, and `wikilink-audit` |
 | PI agents | Advanced optional path | Candidate-only QA, workspace checks, and intelligence artifacts |
 
@@ -295,7 +295,7 @@ Full matrix: [Harness and plugin matrix](docs/harness-plugin-matrix.md)
 | Principles-only | Agent instructions adopt the Owledge memory contract without adding a plugin; no plugin, generator, wrapper, or OS-specific setup is required | Existing coding agents and mature repos |
 | Project-local kit | Adds `OWLEDGE.md`, `.owledge/`, local Python tools, and optional runtime adapter files | Coding projects that want durable memory in-repo |
 | Knowledgebase module | Adds an Owledge-owned module or mapped folders beside an existing Markdown KB | Obsidian-style vaults and LLM wikis |
-| Runtime adapter | Adds optional plugin hooks and commands around the same Markdown source of truth | Claude/Cowork/Codex-compatible local workflows |
+| Reference adapter | Bridges the same local Core into Codex, Claude Code, or generic MCP/CLI | Local workflows that need a supported harness surface |
 
 ## Performance And Token Model
 
@@ -333,18 +333,24 @@ flowchart LR
     B --> F["Agent reads scoped project truth"]
 ```
 
-### Read-Only MCP
+### Generic MCP/CLI bridge
 
-Owledge ships a read-only MCP surface in v0.8.0.
+The V1 generic bridge exposes five Core tools: capabilities, recall, context,
+propose, and revision-bound review. Only `propose` can create a private
+Candidate; promotion remains an explicit Core review.
+
+Historical v0.7 material calls the compatibility route a **read-only MCP**
+surface. That route is retained under advanced compatibility only; it is not
+the V1 generic MCP/CLI contract.
 
 ```mermaid
 flowchart LR
-    A["Agent harness"] --> B["Owledge read-only MCP"]
+    A["Agent harness"] --> B["Owledge generic MCP/CLI bridge"]
     B --> C["Read OWLEDGE.md"]
     B --> D["Search memory"]
     B --> E["Build context pack"]
-    B --> F["List tasks and reviews"]
-    C --> G["No write tools in P0"]
+    B --> F["Propose or review Candidate"]
+    C --> G["No direct storage or remote write"]
 ```
 
 ### Planning, Review, Research
@@ -420,10 +426,10 @@ flowchart LR
 | Symptom | Check |
 | --- | --- |
 | `owledge` command not found | Run `uvx owledge --help` or `uv tool install owledge`. |
-| Fresh project has old `OWLEDGE.md`/`.owledge/` | Re-run `owledge quickstart --target <path>` with v0.8.0 and check for `OWLEDGE.md` plus `.owledge/`. |
+| Fresh project has old `OWLEDGE.md`/`.owledge/` | Re-run the documented `owledge init --target <path>` profile and check for `OWLEDGE.md` plus `.owledge/`. |
 | Wikilink audit fails | Run `owledge wikilink-audit --project-root .` and fix unresolved or ambiguous targets. Code blocks and inline code are ignored. |
 | Local benchmark refuses to run | Install `benchmark-kit`, then pass explicit scale mode, model, and consent: `python tools/benchmark-kit/run-benchmark-kit.py --mode local --scale-mode small --models gemma4:latest --yes`. |
-| MCP integration should not write | Use `tools/owledge_mcp.py`; v0.8.0 exposes read-only tools only. |
+| Generic MCP/CLI needs a write | Use only the explicit Candidate proposal tool; review/promotion stays revision-bound and Core-owned. |
 | Docs look stale after code changes | Run `owledge test public-docs`, `owledge test release-trust`, and `owledge wikilink-audit --check`. |
 
 ## Not This

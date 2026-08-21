@@ -1,19 +1,20 @@
 # Harness And Plugin Matrix
 
-Owledge is a memory and planning layer around agent runtimes. The release
-boundary is **local adapter support**: repo-installable files, skills, hooks,
-and Python commands that can be verified locally. It is not a marketplace
-certification for every runtime.
+Owledge is a memory and planning layer around agent runtimes. The V1 release
+boundary is **local reference-adapter support**: project-local files and Python
+commands that can be verified locally. It is not a marketplace certification
+for every runtime.
 
 | Harness | Status | Install path | Notes |
 | --- | --- | --- | --- |
 | Principles-only coding agents | First-class support | Instructions or `owledge-principles` skill | No plugin, generated kit, wrapper, or OS-specific setup required. |
-| Codex | Local adapter support | `.agents/skills/`, or `.codex-plugin` plus local CLI | `init-project` materializes repo-scoped skills; verify with `doctor`. |
-| Claude Code | Local adapter support | `.claude-plugin` or configured skills copy path | Start from project root when possible; plugin skills are mirrored under the plugin root. |
-| Cowork / Claude-compatible | Local adapter support | `plugins/owledge-cowork/` | Private runtime capture and durable summaries. |
-| OpenCode-style agents | Instruction-based support | Repo link plus local instructions | No marketplace dependency required. |
-| Generic agents | Instruction-based support | `AGENTS.md` plus local scripts | Good fit for repo-link onboarding. |
-| MCP-compatible agents | Read-only P0 support | `tools/owledge_mcp.py` | Exposes entrypoint, doctor, search, context pack, tasks, and reviews; no write tools. |
+| Codex | V1 reference adapter | `.agents/skills/` or `.codex-plugin` plus local Core CLI | Uses the project-local Core contract; no direct storage. |
+| Claude Code | V1 reference adapter | `.claude-plugin` or configured skills copy path | Uses the project-local Core contract; no direct storage. |
+| Generic MCP/CLI | V1 reference adapter | `tools/owledge_generic_adapter.py` | Exactly five Core tools; explicit Candidate-only write. |
+| Cowork / Claude-compatible | Post-V1/legacy add-on | `plugins/owledge-cowork/` | Not a V1 reference-adapter claim. |
+| OpenCode-style agents | Post-V1 instruction integration | Repo link plus local instructions | May use the generic contract; no V1 Tier-1 claim. |
+| Generic agents | Generic contract consumer | `AGENTS.md` plus local scripts | Must implement the bounded generic MCP/CLI contract. |
+| Legacy read-only MCP | Advanced compatibility route | `tools/owledge_mcp.py` | Not the V1 generic MCP/CLI contract. |
 | Existing Markdown / Obsidian KBs | Primary supported path | `tools/build_kb_module.py` or `owledge-map.json` | Additive by default, no wiki-link rewrite. |
 | PI agents | Advanced optional path | PI skills and candidate artifacts | Candidate-only checks; never auto-promotes. |
 | Superpowers users | Companion | Read-only coexistence | Superpowers executes, Owledge keeps durable memory. |
@@ -21,8 +22,8 @@ certification for every runtime.
 
 ## Release Boundary
 
-- Local adapter support means repo-installable and covered by local smoke or
-  scenario gates.
+- V1 reference-adapter support means project-local and covered by controlled
+  local conformance evidence.
 - Marketplace listing is not required for this release.
 - The Markdown source-of-truth model does not change across harnesses.
 - Project-root `skills/` is a shipped source/vendor bundle, not a universal
@@ -30,5 +31,6 @@ certification for every runtime.
 - The [skills and agent integrations guide](skills-and-agent-integrations.md)
   defines skill selection, instruction/hook/CLI precedence, host proof, and
   recovery for missing or drifting mirrors.
-- Harness benchmarks for Claude Code, Codex, OpenCode, Cursor, and Zed are roadmap work, not a v0.7.0 claim.
-- Write-enabled MCP is roadmap work. v0.7.0 intentionally ships read-only MCP first.
+- Harness benchmarks and marketplace certification remain post-V1 work.
+- The V1 generic MCP/CLI bridge has one bounded Candidate write; it is not a
+  direct storage, promotion, remote-sync, or hosted-service API.

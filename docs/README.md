@@ -4,6 +4,11 @@ Owledge is an **Agentic Engineering Context & Planning Layer**: it keeps project
 
 Start by understanding the [product model, boundaries, and capability maturity](what-is-owledge.md). Owledge is additive and local by default; it is not a hosted Team Hub or an automatic background worker.
 
+For the current candidate's exact shipped surface, start with the
+[V1 Minimal Core boundary](v1-minimal-core.md). It is the authority for the
+two local scopes and three V1 reference adapters; legacy and parked material
+below is not a default V1 path.
+
 Then read [How Owledge works](how-owledge-works.md) for the canonical lifecycle,
 privacy boundary, and human authority model.
 
@@ -41,14 +46,15 @@ separates no-install, package, source, adapter, and add-on paths.
 - Try the bounded [vibecoding golden demo](vibecoding-golden-demo.md)
 - Then read [command-reference.md](command-reference.md)
 - Use `uvx owledge quickstart --target <path>` for the package-first path
-- Expect `OWLEDGE.md` and `.owledge/` in new v0.8.0 projects
+- Expect `OWLEDGE.md` and `.owledge/` in a new local project
 
 ## I want plugin or harness setup
 
 - Read [install-plugin.md](install-plugin.md)
 - Then read [harness-plugin-matrix.md](harness-plugin-matrix.md)
 - Use the [skills and agent integrations guide](skills-and-agent-integrations.md) to select a verified policy, workflow, or adapter path
-- Read-only MCP is available through `tools/owledge_mcp.py`; write-enabled MCP and harness benchmarks are roadmap items
+- The generic V1 MCP/CLI bridge has exactly five tools and one Candidate-only
+  write; marketplace certification and harness benchmarks are post-V1 work
 
 ## I want an optional project cockpit
 
@@ -58,9 +64,10 @@ separates no-install, package, source, adapter, and add-on paths.
 
 ## Reference, quality, and maintainer material
 
-**Owledge v0.8.0** is the current release candidate. The canonical release
-version is [../VERSION](../VERSION); use [quickstart.md](quickstart.md) for new
-installs and [upgrading.md](upgrading.md) for existing projects.
+The local V1 Minimal Core candidate is not yet a published release. The
+canonical package version is [../VERSION](../VERSION); use
+[v1-minimal-core.md](v1-minimal-core.md) for its bounded evidence and
+[upgrading.md](upgrading.md) for existing projects.
 
 Maintainers: [distribution.md](distribution.md) defines the release-branch,
 PyPI confirmation, main-promotion, and release-evidence contract.
