@@ -7,7 +7,7 @@ data_class: "internal"
 semantic_title: "CI, documentation, packaging and CLI pipeline repair"
 summary: "Root-cause repair plan for the general CI and Docs workflows after the v0.8.0 PyPI artifact hotfix."
 created_at: "2026-08-21T00:00:00+02:00"
-updated_at: "2026-08-21T00:00:00+02:00"
+updated_at: "2026-08-21T23:30:00+02:00"
 branch: "codex/fix/ci-cli-pipeline"
 base_commit: "2e82c93fc093ea1439ff1c0fc04eb1160abbca45"
 ---
@@ -105,3 +105,13 @@ evidence and an explicit risk statement.
 
 Resume from the first unchecked item in the paired checklist. If interrupted
 mid-phase, rerun that phase's gate before continuing and record fresh evidence.
+
+## Current Decision Gate
+
+The remaining local blocker is a June-era `launch-readiness` assertion that
+requires `MANIFEST.in` to recursively include add-ons, all docs, and all tools.
+The August V1 package boundary intentionally prunes those optional surfaces and
+ships only the Minimal Core; the clean built Sdist independently passes
+`sdist-clean`. Correcting the stale assertion changes a release-gate contract,
+so implementation is paused pending explicit owner approval rather than adding
+redundant manifest directives or weakening the V1 artifact boundary.
