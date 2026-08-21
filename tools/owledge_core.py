@@ -39,10 +39,6 @@ import urllib.parse
 import uuid
 from typing import Any
 
-import owledge_context_compiler
-import owledge_rag_projection
-
-
 UTC = getattr(dt, "UTC", dt.timezone.utc)
 
 
@@ -1894,6 +1890,9 @@ def build_context_pack_v1(
     allowed_scopes = {"project_user"}
     if allow_reviewed_global:
         allowed_scopes.add("user_global")
+    # This compiler is a source-checkout-only compatibility route and is not
+    # bundled in the bounded V1 wheel.
+    import owledge_context_compiler
     result = owledge_context_compiler.compile_pack(
         records,
         pack_type=pack_type,
@@ -3233,6 +3232,9 @@ def export_rag_projection_v1(root: pathlib.Path) -> dict[str, Any]:
         if source_hash and source_hash in source_seen:
             rejected["duplicate_source"] = rejected.get("duplicate_source", 0) + 1
             continue
+        # RAG projection is a retained post-V1 compatibility route, loaded
+        # only when the explicit legacy export is requested.
+        import owledge_rag_projection
         chunks = owledge_rag_projection.project(record)
         if not chunks:
             rejected["not_projectable"] = rejected.get("not_projectable", 0) + 1

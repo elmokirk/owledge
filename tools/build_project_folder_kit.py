@@ -112,27 +112,12 @@ GLOBAL_DIRS = [
 CORE_TOOLS = [
     "owledge.py",
     "owledge_core.py",
-    "owledge_contracts.py",
     "owledge_adapter_contracts.py",
     "owledge_generic_adapter.py",
-    "owledge_work_contract.py",
-    "owledge_evidence_contracts.py",
-    "owledge_health.py",
-    "owledge_migration.py",
-    "owledge_research_memory.py",
     "owledge_null_space.py",
     "owledge_v1_retrieval.py",
     "owledge_v1_lifecycle.py",
-    "owledge_context_compiler.py",
-    "owledge_context_profiles.py",
-    "owledge_rag_projection.py",
-    "owledge_run_state.py",
-    "owledge_small_model_profiles.py",
-    "run_small_model_smoke.py",
-    "validate_benchmark_baseline.py",
-    "validate_upgrade_notes.py",
     "build_project_folder_kit.py",
-    "build_kb_module.py",
 ]
 
 SKILL_DIRS = [

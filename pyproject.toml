@@ -45,8 +45,14 @@ packages = ["tools"]
 py-modules = []
 include-package-data = true
 
-[tool.setuptools.package-data]
-tools = ["*.py"]
+[tool.setuptools.cmdclass]
+build_py = "owledge_build.V1CoreBuildPy"
+sdist = "owledge_build.V1CoreSdist"
+
+[tool.setuptools.exclude-package-data]
+# Python modules are selected by V1CoreBuildPy.  No incidental maintainer
+# files below tools/ may be smuggled into the wheel as package data.
+tools = ["*"]
 
 # Ship root files + templates/ + skills/ alongside the package so that
 # ``owledge init-project`` works from a pip-installed package.
@@ -123,13 +129,3 @@ tools = ["*.py"]
 "skills/concept-blindspot-audit/references" = ["skills/concept-blindspot-audit/references/*.md", "skills/concept-blindspot-audit/references/*.json"]
 "skills/owledge-autonomous-delivery" = ["skills/owledge-autonomous-delivery/*.md"]
 "skills/owledge-autonomous-delivery/agents" = ["skills/owledge-autonomous-delivery/agents/*.yaml"]
-"standalone-skills/owledge-agentic-review" = ["standalone-skills/owledge-agentic-review/*.md"]
-"standalone-skills/owledge-agentic-review/agents" = ["standalone-skills/owledge-agentic-review/agents/*.yaml"]
-"standalone-skills/owledge-blindspot-audit" = ["standalone-skills/owledge-blindspot-audit/*.md"]
-"standalone-skills/owledge-blindspot-audit/references" = ["standalone-skills/owledge-blindspot-audit/references/*.md", "standalone-skills/owledge-blindspot-audit/references/*.json"]
-"standalone-skills/owledge-brainstorm" = ["standalone-skills/owledge-brainstorm/*.md"]
-"standalone-skills/owledge-long-horizon-delivery" = ["standalone-skills/owledge-long-horizon-delivery/*.md"]
-"standalone-skills/owledge-long-horizon-delivery/agents" = ["standalone-skills/owledge-long-horizon-delivery/agents/*.yaml"]
-"standalone-skills/owledge-long-horizon-delivery/references" = ["standalone-skills/owledge-long-horizon-delivery/references/*.md"]
-"standalone-skills/owledge-planning-layer" = ["standalone-skills/owledge-planning-layer/*.md"]
-"standalone-skills/owledge-planning-layer/references" = ["standalone-skills/owledge-planning-layer/references/*.md"]

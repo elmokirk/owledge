@@ -13,6 +13,7 @@ import datetime as dt
 import fnmatch
 import hashlib
 import html
+import importlib
 import json
 import os
 import pathlib
@@ -68,19 +69,36 @@ if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
 import owledge_core as core  # noqa: E402
-import owledge_work_contract as work_contract  # noqa: E402
-import owledge_evidence_contracts as evidence_contracts  # noqa: E402
-import owledge_health  # noqa: E402
-import owledge_migration  # noqa: E402
-import owledge_research_memory  # noqa: E402
 import owledge_null_space  # noqa: E402
 import owledge_v1_retrieval  # noqa: E402
 import owledge_v1_lifecycle  # noqa: E402
-import owledge_small_model_profiles  # noqa: E402
-import build_kb_module  # noqa: E402
 import build_project_folder_kit  # noqa: E402
-import validate_benchmark_baseline as benchmark_baseline  # noqa: E402
-import validate_upgrade_notes as upgrade_notes  # noqa: E402
+
+
+def _legacy_module(name: str) -> Any:
+    """Load a source-checkout-only compatibility module on explicit demand."""
+    return importlib.import_module(name)
+
+
+class _LazyLegacyModule:
+    """Keep source-checkout compatibility imports out of the V1 import path."""
+
+    def __init__(self, name: str) -> None:
+        self._name = name
+
+    def __getattr__(self, attribute: str) -> Any:
+        return getattr(_legacy_module(self._name), attribute)
+
+
+work_contract = _LazyLegacyModule("owledge_work_contract")
+evidence_contracts = _LazyLegacyModule("owledge_evidence_contracts")
+owledge_health = _LazyLegacyModule("owledge_health")
+owledge_migration = _LazyLegacyModule("owledge_migration")
+owledge_research_memory = _LazyLegacyModule("owledge_research_memory")
+owledge_small_model_profiles = _LazyLegacyModule("owledge_small_model_profiles")
+build_kb_module = _LazyLegacyModule("build_kb_module")
+benchmark_baseline = _LazyLegacyModule("validate_benchmark_baseline")
+upgrade_notes = _LazyLegacyModule("validate_upgrade_notes")
 
 
 def _read_version_file() -> str:
@@ -210,26 +228,11 @@ ROOT_FILE_MAP = [
 HOST_TOOL_FILES = [
     "owledge.py",
     "owledge_core.py",
-    "owledge_contracts.py",
     "owledge_adapter_contracts.py",
     "owledge_generic_adapter.py",
-    "owledge_work_contract.py",
-    "owledge_evidence_contracts.py",
-    "owledge_health.py",
-    "owledge_migration.py",
-    "owledge_research_memory.py",
     "owledge_null_space.py",
     "owledge_v1_retrieval.py",
     "owledge_v1_lifecycle.py",
-    "owledge_context_compiler.py",
-    "owledge_context_profiles.py",
-    "owledge_rag_projection.py",
-    "owledge_run_state.py",
-    "owledge_small_model_profiles.py",
-    "run_small_model_smoke.py",
-    "validate_benchmark_baseline.py",
-    "validate_upgrade_notes.py",
-    "build_kb_module.py",
     "build_project_folder_kit.py",
 ]
 

@@ -133,7 +133,31 @@ class V1M10CandidateJourneyTests(unittest.TestCase):
         manifest = (ROOT / "MANIFEST.in").read_text(encoding="utf-8")
         for optional_surface in ("addons", "benchmarks", "plugins", "standalone-skills", "tests", "owlib", "docs"):
             self.assertIn(f"prune {optional_surface}", manifest)
-        self.assertNotIn('"standalone-skills" =', (ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+        pyproject = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
+        self.assertNotIn("standalone-skills/", pyproject)
+        self.assertNotIn('[tool.setuptools.package-data]', pyproject)
+        self.assertIn('[tool.setuptools.exclude-package-data]', pyproject)
+        setup_hook = (ROOT / "owledge_build.py").read_text(encoding="utf-8")
+        for core_module in (
+            "owledge.py",
+            "owledge_core.py",
+            "owledge_adapter_contracts.py",
+            "owledge_generic_adapter.py",
+            "owledge_null_space.py",
+            "owledge_v1_retrieval.py",
+            "owledge_v1_lifecycle.py",
+            "build_project_folder_kit.py",
+        ):
+            self.assertIn(f'"{core_module}"', setup_hook)
+        for parked_module in (
+            "owledge_context_compiler.py",
+            "owledge_rag_projection.py",
+            "owledge_mcp.py",
+            "run_small_model_smoke.py",
+            "validate_benchmark_baseline.py",
+            "build_kb_module.py",
+        ):
+            self.assertNotIn(f'"{parked_module}"', setup_hook)
 
 
 if __name__ == "__main__":

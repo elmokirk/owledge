@@ -15,6 +15,7 @@ include SECURITY.md
 include USER_CONTEXT.template.md
 include VERSION
 include .gitignore
+include owledge_build.py
 exclude OWLEDGE.legacy.template.md
 prune docs
 recursive-include templates *
@@ -22,7 +23,15 @@ include docs/upgrade-notes-schema.json
 include docs/upgrading.md
 include docs/v1-minimal-core.md
 recursive-include skills *
-recursive-include tools *
+include tools/__init__.py
+include tools/owledge.py
+include tools/owledge_core.py
+include tools/owledge_adapter_contracts.py
+include tools/owledge_generic_adapter.py
+include tools/owledge_null_space.py
+include tools/owledge_v1_retrieval.py
+include tools/owledge_v1_lifecycle.py
+include tools/build_project_folder_kit.py
 prune addons
 prune assets
 prune benchmarks
