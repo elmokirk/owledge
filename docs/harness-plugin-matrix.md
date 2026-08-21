@@ -28,6 +28,9 @@ for every runtime.
 - The Markdown source-of-truth model does not change across harnesses.
 - Project-root `skills/` is a shipped source/vendor bundle, not a universal
   automatic discovery path. `.owledge/skills/` is not used for discovery.
+- Shared references copied into the legacy plugin or `standalone-skills/` must
+  remain synchronized with the canonical skill. Mirror maintenance does not
+  change a runtime's maturity or permission boundary.
 - The [skills and agent integrations guide](skills-and-agent-integrations.md)
   defines skill selection, instruction/hook/CLI precedence, host proof, and
   recovery for missing or drifting mirrors.

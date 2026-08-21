@@ -224,6 +224,11 @@ Benchmark Kit proof assets. Decision trace, cross-project hub, swarm
 coordination, and positioning kits remain optional power-user proof layers;
 they do not become core dependencies.
 
+For packaging, the gate reads active `MANIFEST.in` directives exactly. It
+requires the direct V1 docs, shipped skills, and allowlisted Core tool modules;
+it also requires explicit pruning of optional, generated, private, test, and
+post-V1 surfaces and rejects broad recursive includes that reopen them.
+
 ## Benchmark Kit
 
 Benchmark Kit is an optional add-on. It supports deterministic CI proof and
