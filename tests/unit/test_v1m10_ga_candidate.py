@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import io
 import json
 import pathlib
 import subprocess
 import sys
+import tarfile
 import tempfile
 import unittest
 from unittest import mock
@@ -12,6 +14,7 @@ from unittest import mock
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "tools"))
 import owledge  # noqa: E402
+import owledge_core  # noqa: E402
 
 EXPECTED_TOOLS = {
     "owledge_capabilities",
@@ -172,6 +175,27 @@ class V1M10CandidateJourneyTests(unittest.TestCase):
                 local.parent.mkdir(parents=True)
                 local.write_text("# explicit checkout\n", encoding="utf-8")
                 self.assertEqual(owledge._source_tool_file(checkout, "owledge.py"), local)
+
+    def test_sdist_clean_allows_v1_core_without_optional_addons(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="v1m10-sdist-") as temporary:
+            root = pathlib.Path(temporary)
+            (root / "VERSION").write_text("0.8.0\n", encoding="utf-8")
+            dist = root / "dist"
+            dist.mkdir()
+            archive = dist / "owledge-0.8.0.tar.gz"
+            names = [
+                "CHANGELOG.md", "CONTRIBUTING.md", "README.md", "LICENSE", "SECURITY.md", "PRIVACY.md", "VERSION",
+                "templates/owledge/minimal/OWLEDGE.md", "skills/owledge-principles/SKILL.md", "tools/owledge.py",
+            ]
+            with tarfile.open(archive, "w:gz") as tar:
+                for relative in names:
+                    payload = b"v1-core\n"
+                    member = tarfile.TarInfo(f"owledge-0.8.0/{relative}")
+                    member.size = len(payload)
+                    tar.addfile(member, io.BytesIO(payload))
+            result = owledge_core.sdist_clean_check(root)
+            self.assertTrue(result["passed"], result)
+            self.assertNotIn("addons/", result["missing_trees"])
 
 
 if __name__ == "__main__":

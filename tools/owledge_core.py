@@ -6246,7 +6246,8 @@ def sdist_clean_check(root: pathlib.Path, sdist_glob: str = "dist/owledge-*.tar.
        may ship their own decision-trace fixtures, so those are allowed).
     3. Required root release docs are present (CHANGELOG, CONTRIBUTING, README,
        LICENSE, SECURITY, PRIVACY, VERSION).
-    4. Core product trees are present (templates/, skills/, tools/, addons/).
+    4. V1 Core product trees are present (templates/, skills/, tools/). Optional
+       add-ons are deliberately excluded from the Minimal Core distribution.
     """
     import tarfile as _tarfile
     import glob as _glob
@@ -6302,7 +6303,7 @@ def sdist_clean_check(root: pathlib.Path, sdist_glob: str = "dist/owledge-*.tar.
         if not any(c in names for c in candidates):
             missing_root.append(rel)
 
-    required_trees = ["templates/", "skills/", "tools/", "addons/"]
+    required_trees = ["templates/", "skills/", "tools/"]
     missing_trees: list[str] = []
     for tree in required_trees:
         tree_prefix = (prefix or "") + tree

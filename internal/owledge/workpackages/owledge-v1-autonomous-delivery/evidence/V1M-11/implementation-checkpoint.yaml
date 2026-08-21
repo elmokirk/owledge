@@ -30,13 +30,14 @@ open_non_blocking_followup:
   status: open
   limitation: "macOS/Linux wheel-only execution is not yet performed and must not be claimed as supported."
 external_status:
-  state: ready_to_rerun_after_wheel_smoke_profile_correction
+  state: ready_to_rerun_after_v1_sdist_inventory_correction
   release_branch: "release/v0.8.0"
   workflow_attempts:
     - "32479615397: stopped before build/publish because main was fetched only to FETCH_HEAD; fixed by explicit origin/main tracking-ref fetch."
     - "32479848218: stopped before build/publish because current origin/main was not yet integrated; fixed by merge commit 2c27620."
     - "32480988072: build and twine checks passed; wheel smoke incorrectly paired the intentional minimal default with Full-profile skill assertions. No publication, main promotion or tag occurred."
-  safe_next_action: "Push the profile-aware wheel-smoke correction and rerun .github/workflows/release.yml; release pipeline remains the sole authority for PyPI, main promotion, annotated tag and public release."
+    - "32481435141: profile-aware wheel smoke and release contracts passed; legacy sdist-clean still required excluded addons/. No publication, main promotion or tag occurred."
+  safe_next_action: "Push the V1-Core sdist inventory correction and rerun .github/workflows/release.yml; release pipeline remains the sole authority for PyPI, main promotion, annotated tag and public release."
 prohibited_shortcuts:
   - "Do not create a tag or public release before the configured PyPI-confirmed workflow succeeds."
   - "Do not claim macOS/Linux support before POST-V1-PLATFORM-001 evidence exists."

@@ -38,7 +38,8 @@ engine, database, daemon, or hosted service.
 - Run `python tools/owledge.py wikilink-audit --project-root . --check`.
 - Install the optional `benchmark-kit` add-on and run `python tools/benchmark-kit/run-benchmark-kit.py --mode ci --scale-mode small --yes`.
 - Build source and wheel distributions.
-- Smoke the wheel with `uvx --from dist/<wheel> owledge quickstart --target <tmp>`.
+- Smoke the wheel with the default minimal `owledge init --target <tmp>` and
+  an explicit `owledge init --target <tmp> --profile full` compatibility path.
 - Attach release ZIP and checksum files when publishing GitHub artifacts.
 - Link CI workflow runs from the release notes.
 - Keep raw sessions, generated local reports, temp outputs, and private memory out of release artifacts.
@@ -58,14 +59,16 @@ uv-first.
 
 ## Release Artifact Policy
 
-Release artifacts may include:
+The V1 Minimal Core wheel and sdist include:
 
-- Core Python CLI files.
-- Templates, schemas, docs, skills, and plugin adapter files.
-- Optional add-ons under `addons/`.
-- Example vaults and demo fixtures.
+- The bounded Core Python CLI modules, templates, schemas, and shipped skills.
+- The data needed for local minimal and explicit Full-profile initialization.
 
-Release artifacts must not include:
+They deliberately exclude optional add-ons, plugins, benchmark corpora,
+standalone skill bundles, example fixtures, and the `internal/` dogfood
+workspace. Those remain source-checkout or post-V1 material.
+
+Release artifacts must never include:
 
 - Raw runtime event logs.
 - Local secrets.
@@ -85,7 +88,7 @@ This repository contains two distinct memory trees:
 
 A CI `kit-integrity` gate verifies that built kits contain zero files from the
 dogfood tree. A `sdist-clean` gate verifies that the PyPI source distribution
-contains no `internal/` paths, no non-addon dogfood decision traces, and all
-required root release docs plus the core product trees. A
+contains no `internal/` paths, no dogfood decision traces, and all required
+root release docs plus the V1 Core product trees. A
 `source-vs-target-audit` gate verifies `templates/owledge/` has all core
 directories and no leaked dogfood.
