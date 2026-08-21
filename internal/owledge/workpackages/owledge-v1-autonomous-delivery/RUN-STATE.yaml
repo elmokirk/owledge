@@ -1,5 +1,5 @@
 schema_version: 1
-document_version: 40
+document_version: 41
 project: owledge
 plan: internal/owledge/plans/owledge-v1-minimal-core-finalization-plan.md
 objective: Deliver Owledge V1 Minimal Core: Principles, deterministic local Core, private local user-global Null-Space, and thin Codex/Claude/generic MCP/CLI adapters.
@@ -674,7 +674,7 @@ checkpoint:
     - "python -m unittest tests.unit.test_validate_v1_delivery_plan tests.unit.test_validate_live_work_register -q: one pre-existing downstream mismatch; test_current_control_plane_is_valid still expects zero warnings while accepted OW-080-13 intentionally emits one internal-checkpoint warning. The validator itself passed with zero errors."
     - "python tools/owledge_core.py --project-root . validate-memory --strict: 307 pre-existing legacy frontmatter failures across historical internal memory; the touched canonical plan/checklists pass the release-specific frontmatter validation inside validate_v1_delivery_plan.py."
     - "python tools/owledge.py finalization-gates --project-root . --include-compliance --include-exports: completed 36/38 on 2026-08-12; source-identity correctly rejected the dirty planning tree and upgrade-drift exposed a host-project/Kit-mode regression. Routed to OW-071-08 under F-071-24."
-  workspace_state: "V1M-11 is in progress on release/v0.8.0. The first two external workflow attempts failed before build/publish (stale main ref, then missing current-main ancestry); both fixes are integrated. Fresh local V1M, release-contract, runtime-adapter and artifact checks are green. POST-V1-PLATFORM-001 retains macOS/Linux wheel proof as open non-blocking follow-up; no unexecuted platform claim is permitted."
+  workspace_state: "V1M-11 is in progress on release/v0.8.0. The first two external workflow attempts failed before build/publish (stale main ref, then missing current-main ancestry); both fixes are integrated. Fresh local V1M, release-contract, runtime-adapter and artifact checks are green. Two clean normalized rebuilds on c35ecd3 produced identical wheel/sdist hashes. POST-V1-PLATFORM-001 retains macOS/Linux wheel proof as open non-blocking follow-up; no unexecuted platform claim is permitted."
   next_exact_action: "Commit and push the integration/release-contract fixes, dispatch the existing release workflow, then record exact PyPI/main/tag/release receipts or a bounded external blocker."
   open_assumptions:
     - "The approved V1M plan is immutable unless the owner uses the exact AMEND GOAL BOUNDARY phrase."

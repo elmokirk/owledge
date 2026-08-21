@@ -5,7 +5,7 @@ customer_id: "global"
 project_id: "owledge"
 doc_type: "release_update"
 artifact_type: "release_notes"
-document_version: 2
+document_version: 3
 status: "approved_for_publication"
 visibility: "public"
 data_class: "public"
@@ -46,7 +46,7 @@ Null-Space, and thin Codex, Claude Code, and generic MCP/CLI adapters.
 
 ## Release evidence
 
-- Reconciled candidate source: `2c27620`; original V1 GA gate record: `230fc0f`.
+- Reconciled candidate source: `c35ecd3`; original V1 GA gate record: `230fc0f`.
 - Normalized wheel SHA-256: `b0b8f2842608cdbea399ea0b46cc43e0e5c02b31eac201c6354a4cf0fba8d679` (311,592 bytes).
 - Normalized sdist SHA-256: `f76d841c06a47965778e2aa760476467ec09a0e67bc8371d1879346cd78d4301` (251,389 bytes).
 - Independent GA QA: accepted, 95/100, no P0/P1/P2 findings.

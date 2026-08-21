@@ -12,7 +12,7 @@ owner_authorization:
 candidate:
   package_version: "0.8.0"
   product_boundary: "V1 Minimal Core"
-  source_commit: "2c27620"
+  source_commit: "c35ecd3"
   ga_gate_commit: "230fc0f"
   wheel_sha256: "b0b8f2842608cdbea399ea0b46cc43e0e5c02b31eac201c6354a4cf0fba8d679"
   wheel_bytes: 311592
@@ -24,7 +24,7 @@ local_preflight:
   - "python tools/owledge.py test public-docs --project-root .: passed (258/258)"
   - "git diff --check: passed"
   - "After integrating current main: V1M-08/09 focused suite passed (11/11); V1M-10 focused suite passed (3/3); isolated release-contract suite passed (4/4); CI release-qa preflight, runtime-adapters and plan validator passed."
-  - "Fresh temporary uv build normalized to 182-member wheel and 274-member sdist with the listed hashes."
+  - "Two independent temporary uv builds from c35ecd3 normalized to identical 182-member wheel and 274-member sdist with the listed hashes."
 open_non_blocking_followup:
   id: POST-V1-PLATFORM-001
   status: open
