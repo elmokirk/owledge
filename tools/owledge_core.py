@@ -627,6 +627,10 @@ SECRET_VALUE_PATTERNS = [
     re.compile(r"\bgh[pousr]_[A-Za-z0-9_]{8,}\b"),
     re.compile(r"(?i)\b(api[_-]?key|secret|token|authorization|password)\s*[:=]\s*['\"]?[^'\"\s,;]+"),
 ]
+PII_WARNING_PATTERNS = [
+    ("email_address", re.compile(r"(?i)\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b")),
+    ("phone_number", re.compile(r"(?<!\w)(?:\+?\d[\d ()-]{7,}\d)(?!\w)")),
+]
 LARGE_CAPTURE_KEYS = {
     "content",
     "diff",
@@ -2455,6 +2459,20 @@ def scan_sensitive_data(root: pathlib.Path) -> dict[str, Any]:
                             "recommended_action": "review_sensitive_field",
                         }
                     )
+                else:
+                    for pii_kind, pattern in PII_WARNING_PATTERNS:
+                        if pattern.search(scan_line):
+                            findings.append(
+                                {
+                                    "severity": "warning",
+                                    "kind": "pii_" + pii_kind,
+                                    "memory_id": memory_id,
+                                    "source_path": rel,
+                                    "line": line_no,
+                                    "recommended_action": "review_pii_before_export_or_promotion",
+                                }
+                            )
+                            break
     for path in memory_markdown_files(root, include_sessions=True):
         text = path.read_text(encoding="utf-8", errors="replace")
         meta = parse_frontmatter(text)

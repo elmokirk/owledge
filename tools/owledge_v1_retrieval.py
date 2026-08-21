@@ -13,6 +13,17 @@ PURPOSES = {"research", "planning"}
 EXCLUDED_LIFECYCLES = {"candidate", "raw", "parked", "promoted", "rejected", "superseded", "tombstoned"}
 
 
+def _instruction_provenance(record: dict[str, Any]) -> dict[str, str]:
+    """Mark retrieved Markdown as display-only data, never executable instruction."""
+    return {
+        "origin": "local_retrieved_markdown",
+        "trust": "untrusted_content",
+        "execution": "never_auto_execute",
+        "source": str(record.get("source") or ""),
+        "source_revision": str(record.get("source_revision") or record.get("source_hash") or ""),
+    }
+
+
 def _requested_scopes(scopes: set[str] | None, include_user_global: bool) -> tuple[set[str] | None, dict[str, Any] | None]:
     selected = set(scopes or {"project_user"})
     if not selected.issubset(set(null_space.ALLOWED_SCOPES)):
@@ -75,6 +86,7 @@ def recall(project_root: pathlib.Path, *, query: str, purpose: str = "research",
                     "source_revision": str(record.get("source_revision") or record.get("source_hash") or ""),
                     "freshness": freshness, "lifecycle": lifecycle, "match_score": score,
                     "park_reason": str(record.get("park_reason") or ""), "reconsider_when": str(record.get("reconsider_when") or ""),
+                    "instruction_provenance": _instruction_provenance(record),
                 })
                 continue
         if lifecycle in EXCLUDED_LIFECYCLES:
@@ -93,6 +105,7 @@ def recall(project_root: pathlib.Path, *, query: str, purpose: str = "research",
             "source_reason": str(record.get("source_reason") or ""),
             "source_revision": str(record.get("source_revision") or record.get("source_hash") or ""),
             "freshness": freshness, "lifecycle": lifecycle, "match_score": score,
+            "instruction_provenance": _instruction_provenance(record),
         })
     results.sort(key=lambda item: (-int(item["match_score"]), item["scope"], item["stable_id"], item["source"]))
     selected_results = results[:max(1, limit)]
@@ -133,7 +146,7 @@ def detail(project_root: pathlib.Path, *, detail_id: str, scopes: set[str] | Non
         except (OSError, ValueError):
             return {"passed": False, "error": "detail_source_unavailable", "detail_id": detail_id}
         body = core.markdown_body(text)
-        return {"passed": True, "detail_id": detail_id, "scope": record["scope"], "source": record["source"], "source_revision": record.get("source_revision") or record.get("source_hash"), "content": body[:4000], "truncated": len(body) > 4000}
+        return {"passed": True, "detail_id": detail_id, "scope": record["scope"], "source": record["source"], "source_revision": record.get("source_revision") or record.get("source_hash"), "instruction_provenance": _instruction_provenance(record), "content": body[:4000], "truncated": len(body) > 4000}
     return {"passed": False, "error": "detail_not_authorized", "detail_id": detail_id}
 
 
@@ -154,9 +167,9 @@ def build_context_pack(project_root: pathlib.Path, *, task_id: str, objective: s
             exclusions.append({"stable_id": record["stable_id"], "reason": "context_budget"})
             continue
         text = essence[:remaining]
-        context.append({"detail_id": record["detail_id"], "text": text, "source": record["source"], "source_revision": record["source_revision"], "reason": record["source_reason"], "truncated": len(text) < len(essence)})
+        context.append({"detail_id": record["detail_id"], "text": text, "source": record["source"], "source_revision": record["source_revision"], "reason": record["source_reason"], "instruction_provenance": record["instruction_provenance"], "truncated": len(text) < len(essence)})
         used += len(text)
         if len(text) < len(essence):
             exclusions.append({"stable_id": record["stable_id"], "reason": "context_budget"})
             break
-    return {"passed": True, "task_id": task_id, "objective": objective, "purpose": purpose, "budget_chars": budget_chars, "included_chars": used, "context": context, "source_receipts": [{"detail_id": item["detail_id"], "source": item["source"], "source_revision": item["source_revision"]} for item in context], "exclusions": sorted(exclusions, key=lambda item: (item["stable_id"], item["reason"])), "network": "disabled", "implicit_discovery": False}
+    return {"passed": True, "task_id": task_id, "objective": objective, "purpose": purpose, "budget_chars": budget_chars, "included_chars": used, "context": context, "source_receipts": [{"detail_id": item["detail_id"], "source": item["source"], "source_revision": item["source_revision"], "instruction_provenance": item["instruction_provenance"]} for item in context], "exclusions": sorted(exclusions, key=lambda item: (item["stable_id"], item["reason"])), "network": "disabled", "implicit_discovery": False}

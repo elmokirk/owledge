@@ -5,7 +5,7 @@ customer_id: "global"
 project_id: "owledge"
 doc_type: "task"
 artifact_type: "workpackage"
-document_version: 12
+document_version: 13
 workpackage_version: "1.0.2"
 status: "active"
 visibility: "private"
@@ -21,7 +21,7 @@ confidence: 0.97
 review_status: "reviewed"
 sanitization_status: "not_required"
 created_at: "2026-08-13T17:20:00+02:00"
-updated_at: "2026-08-13T22:10:00+02:00"
+updated_at: "2026-08-21T12:00:00+02:00"
 source_hash: ""
 reusable_lessons:
   - "A new plan enters an active release train only at a clean ticket/gate boundary."
@@ -127,7 +127,7 @@ cannot create symlinks.
 
 ## Phase 6 — GA hardening
 
-- [ ] V1M-09 passes clean install, upgrade, interrupted recovery, offline and
+- [x] V1M-09 passes clean install, upgrade, interrupted recovery, offline and
   security-negative tests.
 - [ ] V1M-10 passes the owner daily journey including park/resurface and
   cross-harness resume without chat history.

@@ -18,7 +18,7 @@ The `version-drift` check compares the manifest's `kit_version` against the runn
 | --- | --- | --- |
 | `safe` (default) | Updates only pristine files; skips user-edited files with a warning | Yes |
 | `force-templates` | Updates every updatable file except never-touch list; requires `--yes` or interactive confirmation on a TTY | Yes |
-| `manual` | Emits a `git apply`-able patch to `.owledge/exports/upgrade-pending.patch`; always dry-run (`--apply` is rejected) | Yes |
+| `manual` | Emits a `git apply`-able generated preview patch to `.owledge/exports/upgrade-pending.patch`; always dry-run (`--apply` is rejected) | Yes |
 
 Use `safe` for routine additive upgrades where you have lightly customized a few
 shipped files and want to preserve your edits. Use `force-templates` when you
@@ -27,8 +27,9 @@ version (for example after merging upstream fixes into a fork); it never touches
 the never-touch list, so project memory and user-content files remain intact.
 Use `manual` in CI or review workflows where you want to inspect the proposed
 diff as a single `git apply`-able patch before deciding whether to apply it.
-`manual` mode is always dry-run: `--apply --mode=manual` is rejected with exit
-code 2 (manual emits a patch, never writes).
+`manual` mode is always dry-run with respect to shipped files: `--apply
+--mode=manual` is rejected with exit code 2. Its only generated output is the
+review patch under `.owledge/exports/`.
 
 ## Never-touch list (hardcoded, no flag bypasses)
 
@@ -43,14 +44,22 @@ python tools/owledge.py upgrade --dry-run                    # default: show wha
 python tools/owledge.py upgrade --dry-run --mode=manual      # emit a git-apply-able patch
 python tools/owledge.py upgrade --apply                      # safe mode apply
 python tools/owledge.py upgrade --apply --mode=force-templates --yes  # force apply
+python tools/owledge.py upgrade --recover                    # complete a verified interrupted upgrade
 ```
 
 ## Recovery
 
-If an upgrade goes wrong:
-1. `git checkout -- kit-manifest.json` (restore the prior manifest)
-2. `python tools/owledge.py upgrade --dry-run` (see the diff)
-3. `git checkout -- <files>` to revert any file
+Every apply writes a local transaction journal before an atomic same-directory
+replacement. If an apply is interrupted, Owledge refuses a new apply until its
+recorded source hashes can be verified and completed:
+
+1. `python tools/owledge.py upgrade --recover`
+2. `python tools/owledge.py doctor --project-root .`
+3. If recovery reports a user-edit conflict, inspect the JSON result; no file is
+   overwritten until you choose a reviewed manual or safe path.
+
+Init and upgrade accept only local, non-network paths and reject symlink or
+Windows junction/reparse traversal for their write targets.
 
 ## Preview-first migration
 

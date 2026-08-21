@@ -1,0 +1,36 @@
+ticket: V1M-09
+status: accepted_independent_qa
+base_commit: 36ed1d7
+branch: codex/v071-integration
+scope: local-install-upgrade-recovery-and-core-security
+implementation:
+  - "Init and upgrade now reject network, symlink and Windows junction/reparse traversal before any project write."
+  - "Upgrade manifest paths must be project-relative and owned by the canonical current-kit inventory; duplicate, absolute, drive-qualified, parent-escape and injected project-local entries fail closed."
+  - "Apply preflights all sources and targets, records a local transaction journal, uses same-directory atomic replacement, and exposes `upgrade --recover` for verified completion after interruption."
+  - "Recall, detail and context receipts label retrieved Markdown as untrusted content that is never auto-executed."
+  - "Sensitive scanning retains secret errors and adds class-only email/phone PII warnings without raw values in the finding."
+  - "Distributed runtime fixtures use portable workspace paths rather than a user-home placeholder."
+verification:
+  - "Focused V1M-09/V1M-05/adapter suite passed on controlled Windows Python 3.14: path escape/reparse rejection, interrupted recovery, offline public verbs, untrusted provenance, PII redaction and fixture privacy."
+  - "Offline local build produced one wheel and one sdist; archive members excluded internal/, global-memory/, .agent-control/ and .git/."
+  - "Fresh local CPython 3.13 virtual environment installed the wheel with --offline --no-index --no-deps, then minimal init and doctor both passed."
+negative_contracts:
+  - "UNC, reparse-root, parent-escape and injected-but-unowned manifest inputs fail before project writes."
+  - "Interrupted upgrade remains blocked until explicit verified recovery; unknown changed targets fail closed as recovery conflicts."
+  - "The isolated public Core CLI exercise opens no socket or URL connection."
+  - "Retrieved prompt-like Markdown remains source-bound display data and cannot alter tool or permission selection."
+known_limitations:
+  - "Windows execution is proven; macOS/Linux wheel-only execution remains a publication prerequisite and is not claimed."
+  - "Symlink/junction attack coverage uses deterministic reparse detection; this Windows host cannot create all symlink fixtures directly."
+  - "The current package metadata emits upstream setuptools license deprecation warnings; this is recorded for V1M-10 release metadata review and does not affect the generated artifacts."
+independent_qa:
+  reviewer: separately_initialized_security_release_reviewer
+  result: accepted
+  score: 92
+  closed_findings:
+    - "The public `upgrade --recover` path now performs verified recovery rather than silently selecting dry-run mode."
+    - "Tampered manifest paths are rejected unless they are owned by the canonical current-kit inventory."
+  residual_limitations:
+    - "This controlled Windows proof does not claim interactive marketplace or cross-platform certification."
+publication_authority: not_granted
+next_exact_action: "Advance only to V1M-10; G-V1M-GA remains pending until its compact candidate validation and independent final-release QA are complete."

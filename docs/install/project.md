@@ -135,7 +135,10 @@ plugin or compliance add-on also selects that explicit compatibility surface.
 
 Use [Upgrading Owledge](../upgrading.md) for an installed kit: `safe` preserves
 user-edited files, `manual` emits a reviewable patch, and `force-templates`
-requires explicit confirmation. If a recipe fails, keep the JSON output, verify
+requires explicit confirmation. An interrupted apply must be completed with
+`python tools/owledge.py upgrade --recover`; it verifies its local transaction
+before changing anything. Init and upgrade reject network, symlink and Windows
+junction/reparse write paths. If a recipe fails, keep the JSON output, verify
 the checkout and target roots, and rerun `doctor` before retrying.
 
 To retire the kit, first preserve any project-owned canonical records. Then

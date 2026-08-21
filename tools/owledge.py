@@ -9,6 +9,7 @@ owledge_core.py and the focused builders next to this file.
 from __future__ import annotations
 
 import argparse
+import datetime as dt
 import fnmatch
 import hashlib
 import html
@@ -812,6 +813,77 @@ def _resolve_global_link(arg_value: str, source_root: pathlib.Path) -> dict[str,
     }
 
 
+def _is_reparse_or_link(path: pathlib.Path) -> bool:
+    """Return whether an existing component redirects filesystem traversal."""
+    if path.is_symlink():
+        return True
+    is_junction = getattr(path, "is_junction", None)
+    return bool(callable(is_junction) and is_junction())
+
+
+def _validate_local_project_root(value: pathlib.Path, *, label: str, require_exists: bool = False) -> pathlib.Path:
+    """Resolve a local directory without following a symlink or Windows junction.
+
+    Init and upgrade are write-capable public paths.  They must not accept a
+    network/reparse root even when no user-global link is requested.
+    """
+    expanded = value.expanduser()
+    if str(expanded).startswith(("\\\\", "//")):
+        raise ValueError(f"{label}_network_path_denied")
+    for candidate in (expanded, *expanded.parents):
+        if candidate.exists() and _is_reparse_or_link(candidate):
+            raise ValueError(f"{label}_reparse_path_denied")
+    resolved = expanded.resolve()
+    if require_exists and not resolved.exists():
+        raise ValueError(f"{label}_missing")
+    if resolved.exists() and not resolved.is_dir():
+        raise ValueError(f"{label}_not_directory")
+    return resolved
+
+
+def _safe_project_relative_path(raw_value: str) -> pathlib.PurePosixPath:
+    """Fail closed on a manifest path that cannot name a project-local file."""
+    raw = str(raw_value or "").replace("\\", "/")
+    path = pathlib.PurePosixPath(raw)
+    windows_path = pathlib.PureWindowsPath(raw)
+    if not raw or path.is_absolute() or windows_path.is_absolute() or windows_path.drive or ".." in path.parts:
+        raise ValueError("upgrade_manifest_path_denied")
+    return path
+
+
+def _safe_project_target(root: pathlib.Path, rel_value: str, *, label: str, require_exists: bool = False) -> pathlib.Path:
+    """Return a confined project target without traversing reparse components."""
+    rel = _safe_project_relative_path(rel_value)
+    target = root.joinpath(*rel.parts)
+    for candidate in (target, *target.parents):
+        if candidate.exists() and _is_reparse_or_link(candidate):
+            raise ValueError(f"{label}_reparse_path_denied")
+        if candidate == root:
+            break
+    resolved_parent = target.parent.resolve()
+    try:
+        resolved_parent.relative_to(root)
+    except ValueError as exc:
+        raise ValueError(f"{label}_path_escape") from exc
+    if require_exists and not target.exists():
+        raise ValueError(f"{label}_missing")
+    if target.exists() and _is_reparse_or_link(target):
+        raise ValueError(f"{label}_reparse_path_denied")
+    return target
+
+
+def _safe_source_file(source_root: pathlib.Path, path: pathlib.Path) -> pathlib.Path:
+    """Allow only a regular file physically inside the selected local source."""
+    try:
+        resolved = path.resolve(strict=True)
+        resolved.relative_to(source_root)
+    except (OSError, ValueError) as exc:
+        raise ValueError("upgrade_source_path_denied") from exc
+    if not resolved.is_file() or _is_reparse_or_link(path):
+        raise ValueError("upgrade_source_path_denied")
+    return resolved
+
+
 def sync_dogfood(root: pathlib.Path, dry_run: bool = True) -> dict[str, Any]:
     source_dir = _product_template_dir(root) / "templates"
     internal_dir = root / "internal" / "owledge" / "templates"
@@ -864,6 +936,8 @@ def init_project(project_root: pathlib.Path, source_root: pathlib.Path, include_
         return {"project_root": str(project_root), "profile": profile, "created": [], "skipped_existing": [], "doctor_passed": None, "kit_version": KIT_VERSION, "global_link": None}
     if profile not in {"minimal", "full"}:
         raise ValueError(f"Unsupported install profile: {profile}")
+    project_root = _validate_local_project_root(project_root, label="project_root")
+    source_root = _validate_local_project_root(source_root, label="source_root", require_exists=True)
     if profile == "minimal" and (include_plugin_adapter or include_compliance):
         # An add-on is an explicit request for the legacy compatibility surface;
         # keep callers safe while leaving the unflagged default minimal.
@@ -872,7 +946,6 @@ def init_project(project_root: pathlib.Path, source_root: pathlib.Path, include_
     if link_global is not None:
         # Validate before any project file is created: a local user-global link
         # must never use a UNC/network project location.
-        owledge_null_space._safe_local_directory(project_root, label="project_root")
         resolved_global_link = _resolve_global_link(link_global, source_root)
     project_root.mkdir(parents=True, exist_ok=True)
     created: list[str] = []
@@ -1042,11 +1115,73 @@ def _read_upgrade_notes(root: pathlib.Path) -> str:
     return "breaking" if value == "yes" else "unknown"
 
 
-def upgrade_project(root: pathlib.Path, source_root: pathlib.Path, dry_run: bool, mode: str, yes: bool, author: str = "owledge-cli") -> dict[str, Any]:
+def _atomic_copy(source: pathlib.Path, target: pathlib.Path) -> None:
+    """Copy a prepared local source using same-directory replace semantics."""
+    target.parent.mkdir(parents=True, exist_ok=True)
+    descriptor, temporary_name = tempfile.mkstemp(prefix=".owledge-upgrade-", dir=str(target.parent))
+    temporary = pathlib.Path(temporary_name)
+    try:
+        with os.fdopen(descriptor, "wb") as handle, source.open("rb") as stream:
+            shutil.copyfileobj(stream, handle)
+        shutil.copystat(source, temporary)
+        os.replace(temporary, target)
+    finally:
+        if temporary.exists():
+            temporary.unlink(missing_ok=True)
+
+
+def _write_upgrade_journal(path: pathlib.Path, payload: dict[str, Any]) -> None:
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+    os.replace(temporary, path)
+
+
+def _recover_upgrade(root: pathlib.Path, source_root: pathlib.Path, manifest_path: pathlib.Path, profile: str, journal_path: pathlib.Path, author: str) -> dict[str, Any]:
+    """Complete a verified interrupted upgrade; refuse unknown local mutations."""
+    try:
+        journal = json.loads(journal_path.read_text(encoding="utf-8"))
+        operations = journal.get("operations")
+        if not isinstance(operations, list):
+            raise ValueError("upgrade_recovery_journal_invalid")
+        for operation in operations:
+            if not isinstance(operation, dict):
+                raise ValueError("upgrade_recovery_journal_invalid")
+            rel = _safe_project_relative_path(str(operation.get("path") or "")).as_posix()
+            target = _safe_project_target(root, rel, label="upgrade_recovery_target")
+            source = _safe_source_file(source_root, _resolve_source_path(rel, source_root))
+            expected = str(operation.get("source_sha256") or "")
+            if not expected or sha256_file(source) != expected:
+                raise ValueError("upgrade_recovery_source_changed")
+            current = sha256_file(target) if target.is_file() else ""
+            old_hash = str(operation.get("old_sha256") or "")
+            if current == expected:
+                continue
+            if current not in {old_hash, ""}:
+                raise ValueError("upgrade_recovery_conflict_user_edited")
+            _atomic_copy(source, target)
+        _write_kit_manifest(root, source_root, profile=profile)
+        manifest_out = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest_out["upgraded_at"] = dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+        manifest_out["upgraded_by"] = author
+        manifest_out["recovered_from_interrupted_upgrade"] = True
+        manifest_path.write_text(json.dumps(manifest_out, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+        journal_path.unlink(missing_ok=True)
+        return {"passed": True, "recovered": True, "project": str(root), "operations": len(operations), "network": "disabled"}
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        return {"passed": False, "error": str(exc), "recovered": False, "project": str(root), "network": "disabled"}
+
+
+def upgrade_project(root: pathlib.Path, source_root: pathlib.Path, dry_run: bool, mode: str, yes: bool, author: str = "owledge-cli", recover: bool = False) -> dict[str, Any]:
     import datetime as _dt
     import difflib
 
-    manifest_path = root / "kit-manifest.json"
+    try:
+        root = _validate_local_project_root(root, label="project_root", require_exists=True)
+        source_root = _validate_local_project_root(source_root, label="source_root", require_exists=True)
+        manifest_path = _safe_project_target(root, "kit-manifest.json", label="upgrade_manifest", require_exists=True)
+    except ValueError as exc:
+        return {"passed": False, "error": str(exc), "project": str(root)}
     if not manifest_path.is_file():
         return {"passed": False, "error": "No kit-manifest.json found; run 'owledge init-project' first.", "project": str(root)}
     try:
@@ -1059,13 +1194,32 @@ def upgrade_project(root: pathlib.Path, source_root: pathlib.Path, dry_run: bool
     version_mismatch = bool(manifest_kit and target_kit and manifest_kit != target_kit)
     alert_level = _read_upgrade_notes(source_root) if version_mismatch else "current"
 
-    manifest_entries = {
-        str(entry.get("path") or ""): entry
-        for entry in manifest.get("files", []) or []
-        if str(entry.get("path") or "")
-    }
+    manifest_entries: dict[str, dict[str, Any]] = {}
+    for entry in manifest.get("files", []) or []:
+        if not isinstance(entry, dict):
+            return {"passed": False, "error": "upgrade_manifest_entry_invalid", "project": str(root)}
+        raw_path = str(entry.get("path") or "")
+        if not raw_path:
+            continue
+        try:
+            rel_path = _safe_project_relative_path(raw_path).as_posix()
+        except ValueError as exc:
+            return {"passed": False, "error": str(exc), "project": str(root)}
+        if rel_path in manifest_entries:
+            return {"passed": False, "error": "upgrade_manifest_duplicate_path", "project": str(root)}
+        manifest_entries[rel_path] = entry
     install_profile = str(manifest.get("profile") or "full")
+    if install_profile not in {"minimal", "full"}:
+        return {"passed": False, "error": "upgrade_manifest_profile_invalid", "project": str(root)}
     current_inventory = _current_kit_inventory(source_root, profile=install_profile)
+    unknown_manifest_paths = sorted(set(manifest_entries) - set(current_inventory))
+    if unknown_manifest_paths:
+        return {
+            "passed": False,
+            "error": "upgrade_manifest_path_not_owned",
+            "paths": unknown_manifest_paths,
+            "project": str(root),
+        }
     inventory_paths = list(manifest_entries)
     inventory_paths.extend(path for path in current_inventory if path not in manifest_entries)
 
@@ -1075,7 +1229,10 @@ def upgrade_project(root: pathlib.Path, source_root: pathlib.Path, dry_run: bool
         rel_posix = str(entry.get("path") or path_key)
         is_additive = rel_posix not in manifest_entries
         sha_original = str(entry.get("sha256_original") or current_inventory.get(rel_posix) or "")
-        current_path = root / rel_posix
+        try:
+            current_path = _safe_project_target(root, rel_posix, label="upgrade_target")
+        except ValueError as exc:
+            return {"passed": False, "error": str(exc), "project": str(root)}
         state = "missing"
         current_hash = ""
         if current_path.is_file():
@@ -1113,8 +1270,14 @@ def upgrade_project(root: pathlib.Path, source_root: pathlib.Path, dry_run: bool
         else:
             return {"passed": False, "error": "force-templates mode requires --yes (or interactive confirmation via a TTY)", "project": str(root)}
 
-    lock_path = _active_memory_dir(root) / ".upgrade.lock"
+    try:
+        lock_path = _safe_project_target(root, ".owledge/.upgrade.lock", label="upgrade_lock")
+        journal_path = _safe_project_target(root, ".owledge/upgrade-transaction.json", label="upgrade_journal")
+    except ValueError as exc:
+        return {"passed": False, "error": str(exc), "project": str(root)}
     if not dry_run:
+        if journal_path.is_file() and not recover:
+            return {"passed": False, "error": "upgrade_recovery_required", "project": str(root), "recovery_command": "owledge upgrade --recover"}
         if lock_path.is_file():
             try:
                 lock_data = json.loads(lock_path.read_text(encoding="utf-8", errors="replace"))
@@ -1123,6 +1286,8 @@ def upgrade_project(root: pathlib.Path, source_root: pathlib.Path, dry_run: bool
             held_pid = int(lock_data.get("pid") or 0)
             if held_pid and _pid_running(held_pid):
                 return {"passed": False, "error": f"Upgrade in progress (lock held by PID {held_pid}). Remove {_active_memory_dir(root).relative_to(root).as_posix()}/.upgrade.lock if stale.", "project": str(root)}
+        if recover:
+            return _recover_upgrade(root, source_root, manifest_path, install_profile, journal_path, author) if journal_path.is_file() else {"passed": False, "error": "upgrade_recovery_not_available", "project": str(root)}
 
     def select_targets() -> tuple[list[str], list[str], list[str]]:
         update_list: list[str] = []
@@ -1169,10 +1334,10 @@ def upgrade_project(root: pathlib.Path, source_root: pathlib.Path, dry_run: bool
     if mode == "manual":
         diff_chunks: list[str] = []
         for rel in update_targets + create_targets:
-            source_path = _resolve_source_path(rel, source_root)
+            source_path = _safe_source_file(source_root, _resolve_source_path(rel, source_root))
             if not source_path.is_file():
                 continue
-            current_path = root / rel
+            current_path = _safe_project_target(root, rel, label="upgrade_target")
             try:
                 source_lines = source_path.read_text(encoding="utf-8", errors="replace").splitlines()
             except OSError:
@@ -1197,9 +1362,9 @@ def upgrade_project(root: pathlib.Path, source_root: pathlib.Path, dry_run: bool
                 diff_chunks.append("\n".join(header_lines + diff_lines))
         patch_text = "\n".join(diff_chunks)
         if dry_run:
-            patch_dir = _active_memory_dir(root) / "exports"
-            patch_dir.mkdir(parents=True, exist_ok=True)
-            (patch_dir / "upgrade-pending.patch").write_text(patch_text + "\n", encoding="utf-8", newline="\n")
+            patch_path = _safe_project_target(root, ".owledge/exports/upgrade-pending.patch", label="upgrade_patch")
+            patch_path.parent.mkdir(parents=True, exist_ok=True)
+            patch_path.write_text(patch_text + "\n", encoding="utf-8", newline="\n")
 
     if dry_run:
         report: dict[str, Any] = {
@@ -1219,7 +1384,7 @@ def upgrade_project(root: pathlib.Path, source_root: pathlib.Path, dry_run: bool
         }
         if mode == "manual":
             report["patch"] = patch_text
-            report["patch_path"] = str((_active_memory_dir(root) / "exports" / "upgrade-pending.patch"))
+            report["patch_path"] = str(_safe_project_target(root, ".owledge/exports/upgrade-pending.patch", label="upgrade_patch"))
         return report
 
     lock_held_by_us = False
@@ -1236,38 +1401,57 @@ def upgrade_project(root: pathlib.Path, source_root: pathlib.Path, dry_run: bool
             source_path = _resolve_source_path(rel, source_root)
             if rel.startswith(f"{DISCOVERABLE_SKILL_ROOT.as_posix()}/"):
                 discovery_rel = pathlib.PurePosixPath(rel).relative_to(DISCOVERABLE_SKILL_ROOT.as_posix())
-                installed_canonical = root / "skills" / pathlib.Path(discovery_rel)
+                installed_canonical = _safe_project_target(root, f"skills/{discovery_rel.as_posix()}", label="upgrade_source")
                 if installed_canonical.is_file():
                     return installed_canonical
-            return source_path
+            return _safe_source_file(source_root, source_path)
 
-        for rel in update_targets:
-            assert not _is_never_touch(rel), f"refuse to write never-touch file: {rel}"
+        planned = update_targets + create_targets
+        operations: list[dict[str, str]] = []
+        prepared: dict[str, tuple[pathlib.Path, pathlib.Path]] = {}
+        for rel in planned:
+            if _is_never_touch(rel):
+                raise ValueError("upgrade_never_touch_denied")
             source_path = installed_upgrade_source(rel)
             if not source_path.is_file():
+                continue
+            target_path = _safe_project_target(root, rel, label="upgrade_target")
+            prepared[rel] = (source_path, target_path)
+            operations.append({
+                "path": rel,
+                "old_sha256": sha256_file(target_path) if target_path.is_file() else "",
+                "source_sha256": sha256_file(source_path),
+            })
+        _write_upgrade_journal(journal_path, {
+            "schema_version": 1,
+            "status": "prepared",
+            "project": str(root),
+            "profile": install_profile,
+            "operations": operations,
+            "network": "disabled",
+        })
+
+        for rel in update_targets:
+            if rel not in prepared:
                 skipped.append(f"{rel} (source missing)")
                 continue
-            target_path = root / rel
-            target_path.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(source_path, target_path)
+            source_path, target_path = prepared[rel]
+            _atomic_copy(source_path, target_path)
             updated.append(rel)
 
         for rel in create_targets:
-            assert not _is_never_touch(rel), f"refuse to write never-touch file: {rel}"
-            source_path = installed_upgrade_source(rel)
-            if not source_path.is_file():
+            if rel not in prepared:
                 skipped.append(f"{rel} (source missing)")
                 continue
-            target_path = root / rel
+            source_path, target_path = prepared[rel]
             if target_path.exists():
                 skipped.append(f"{rel} (already exists)")
                 continue
-            target_path.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(source_path, target_path)
+            _atomic_copy(source_path, target_path)
             created.append(rel)
 
         _write_kit_manifest(root, source_root, profile=install_profile)
-        manifest_out_path = root / "kit-manifest.json"
+        manifest_out_path = _safe_project_target(root, "kit-manifest.json", label="upgrade_manifest", require_exists=True)
         try:
             manifest_out = json.loads(manifest_out_path.read_text(encoding="utf-8", errors="replace"))
             manifest_out["upgraded_at"] = _dt.datetime.now(_dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
@@ -1275,6 +1459,8 @@ def upgrade_project(root: pathlib.Path, source_root: pathlib.Path, dry_run: bool
             manifest_out_path.write_text(json.dumps(manifest_out, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
         except (OSError, ValueError):
             pass
+
+        journal_path.unlink(missing_ok=True)
 
         return {
             "passed": True,
@@ -1290,6 +1476,8 @@ def upgrade_project(root: pathlib.Path, source_root: pathlib.Path, dry_run: bool
             "skipped": skipped,
             "outdated_files": outdated_paths,
         }
+    except (OSError, ValueError) as exc:
+        return {"passed": False, "error": "upgrade_interrupted_recover_required", "detail": str(exc), "project": str(root), "recovery_command": "owledge upgrade --recover", "network": "disabled"}
     finally:
         if lock_held_by_us and lock_path.is_file():
             try:
@@ -4400,6 +4588,7 @@ def main(argv: list[str] | None = None) -> int:
     upgrade_mode = upgrade_p.add_mutually_exclusive_group()
     upgrade_mode.add_argument("--dry-run", action="store_true")
     upgrade_mode.add_argument("--apply", action="store_true")
+    upgrade_mode.add_argument("--recover", action="store_true", help="Complete a verified interrupted local upgrade transaction.")
     upgrade_p.add_argument("--mode", choices=["safe", "force-templates", "manual"], default="safe")
     upgrade_p.add_argument("--yes", action="store_true")
     upgrade_p.add_argument("--source-root", default=str(REPO_ROOT))
@@ -4749,8 +4938,8 @@ def main(argv: list[str] | None = None) -> int:
             if args.mode == "manual" and args.apply:
                 print_json({"passed": False, "error": "manual mode is always dry-run; --apply ignored. Use --dry-run --mode=manual to emit a patch, or --mode=safe/force-templates for --apply."})
                 return 2
-            dry_run = bool(args.dry_run or not args.apply)
-            result = upgrade_project(root, resolve_path(args.source_root), dry_run=dry_run, mode=args.mode, yes=args.yes, author=args.author)
+            dry_run = bool(args.dry_run or (not args.apply and not args.recover))
+            result = upgrade_project(root, resolve_path(args.source_root), dry_run=dry_run, mode=args.mode, yes=args.yes, author=args.author, recover=args.recover)
             if args.format == "summary":
                 lines = []
                 lines.append(f"mode: {result.get('mode')}  dry_run: {result.get('dry_run')}")
