@@ -2133,8 +2133,64 @@ def launch_readiness_gate(root: pathlib.Path) -> dict[str, Any]:
     results.add("packaging:manifest", manifest.exists(), "Source distribution manifest exists.")
     if manifest.exists():
         text = manifest.read_text(encoding="utf-8", errors="replace")
-        for required in ["recursive-include addons", "recursive-include docs", "recursive-include skills", "recursive-include tools"]:
-            results.add(f"packaging:manifest:{required}", required in text, "Source distribution includes required launch/core files.")
+        rules = {
+            line.strip()
+            for line in text.splitlines()
+            if line.strip() and not line.lstrip().startswith("#")
+        }
+        required_v1_includes = [
+            "include docs/upgrade-notes-schema.json",
+            "include docs/upgrading.md",
+            "include docs/v1-minimal-core.md",
+            "recursive-include skills *",
+            "include tools/__init__.py",
+            "include tools/owledge.py",
+            "include tools/owledge_core.py",
+            "include tools/owledge_adapter_contracts.py",
+            "include tools/owledge_generic_adapter.py",
+            "include tools/owledge_null_space.py",
+            "include tools/owledge_v1_retrieval.py",
+            "include tools/owledge_v1_lifecycle.py",
+            "include tools/build_project_folder_kit.py",
+        ]
+        for required in required_v1_includes:
+            results.add(
+                f"packaging:manifest:v1-include:{required}",
+                required in rules,
+                "Source distribution explicitly includes a required V1 Minimal Core file tree.",
+            )
+        required_v1_exclusions = [
+            "prune addons",
+            "prune assets",
+            "prune benchmarks",
+            "prune docs",
+            "prune examples",
+            "prune owlib",
+            "prune plugins",
+            "prune standalone-skills",
+            "prune tests",
+            "recursive-exclude .agent-control *",
+            "recursive-exclude .git *",
+            "recursive-exclude global-memory *",
+            "recursive-exclude internal *",
+        ]
+        for required in required_v1_exclusions:
+            results.add(
+                f"packaging:manifest:v1-exclude:{required}",
+                required in rules,
+                "Source distribution explicitly excludes optional, generated, or private source surfaces.",
+            )
+        for forbidden in [
+            "recursive-include addons *",
+            "recursive-include docs *",
+            "recursive-include standalone-skills *",
+            "recursive-include tools *",
+        ]:
+            results.add(
+                f"packaging:manifest:no-broad-include:{forbidden}",
+                forbidden not in rules,
+                "Source distribution does not re-open a surface outside the V1 Minimal Core boundary.",
+            )
 
     return results.payload(project=str(root), target_score="95+")
 

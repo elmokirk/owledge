@@ -162,6 +162,9 @@ class V1M10CandidateJourneyTests(unittest.TestCase):
         ):
             self.assertNotIn(f'"{parked_module}"', setup_hook)
 
+        readiness = owledge.launch_readiness_gate(ROOT)
+        self.assertTrue(readiness["passed"], readiness.get("failed"))
+
     def test_release_workflow_keeps_publish_input_clean_and_can_create_annotated_tag(self) -> None:
         release_workflow = (ROOT / ".github" / "workflows" / "release.yml").read_text(encoding="utf-8")
 
