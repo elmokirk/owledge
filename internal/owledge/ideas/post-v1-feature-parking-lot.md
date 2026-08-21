@@ -5,7 +5,7 @@ customer_id: "global"
 project_id: "owledge"
 doc_type: "project_context"
 artifact_type: "roadmap"
-document_version: 1
+document_version: 2
 status: "active"
 visibility: "private"
 data_class: "internal"
@@ -20,7 +20,7 @@ confidence: 0.96
 review_status: "reviewed"
 sanitization_status: "not_required"
 created_at: "2026-08-13T17:20:00+02:00"
-updated_at: "2026-08-13T17:20:00+02:00"
+updated_at: "2026-08-21T00:00:00+02:00"
 source_hash: ""
 reusable_lessons:
   - "A parked feature is durable only when its future evaluation trigger and original reasoning are explicit."
@@ -86,6 +86,7 @@ Decision: [[v1-minimal-core-and-product-surfaces-2026-08-13]].
 | PARK-022 | Advanced comparative benchmarks, broad case studies and ROI claims | V1.x add-on | Core GA needs bounded proof, not a research campaign | Stable V1 release exists and claims need public comparison | trimmed `OW-100-04` |
 | PARK-023 | Full profile/module decomposition into separately published packages | Research only | Premature packaging split increases release burden before contracts stabilize | V1 usage proves independent versioning or dependency needs | [[owledge-v1-minimal-core-finalization-plan]] |
 | PARK-024 | Remote user-global synchronization | Future product | Private local user-global is the V1 promise; remote sync changes trust model | Users explicitly request multi-device sharing and encryption/identity are designed | prior scope decision |
+| PARK-025 | Enforced knowledge-routing matrix | V1.1 candidate | V1 has lifecycle boundaries but no single agent-and-user routing authority for legacy folders, lessons, handoffs and uncertain writes | Dogfooding confirms repeated routing ambiguity or an owner approves the bounded policy contract | `POST-V1-ROUTING-001` |
 
 ## Retained V1 items that must not be parked accidentally
 
