@@ -6,9 +6,13 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "tools"))
+import owledge  # noqa: E402
+
 EXPECTED_TOOLS = {
     "owledge_capabilities",
     "owledge_recall",
@@ -154,6 +158,20 @@ class V1M10CandidateJourneyTests(unittest.TestCase):
             "build_kb_module.py",
         ):
             self.assertNotIn(f'"{parked_module}"', setup_hook)
+
+    def test_core_tool_lookup_uses_installed_package_only_after_explicit_checkout(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="v1m10-tool-source-") as temporary:
+            base = pathlib.Path(temporary)
+            checkout, package = base / "checkout", base / "site-packages" / "tools"
+            package.mkdir(parents=True)
+            packaged = package / "owledge.py"
+            packaged.write_text("# installed core\n", encoding="utf-8")
+            with mock.patch.object(owledge, "SCRIPT_DIR", package):
+                self.assertEqual(owledge._source_tool_file(checkout, "owledge.py"), packaged)
+                local = checkout / "tools" / "owledge.py"
+                local.parent.mkdir(parents=True)
+                local.write_text("# explicit checkout\n", encoding="utf-8")
+                self.assertEqual(owledge._source_tool_file(checkout, "owledge.py"), local)
 
 
 if __name__ == "__main__":

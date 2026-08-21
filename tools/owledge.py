@@ -43,6 +43,17 @@ def _product_template_dir(root: pathlib.Path) -> pathlib.Path:
     return root / "templates" / "owledge"
 
 
+def _source_tool_file(source_root: pathlib.Path, tool: str) -> pathlib.Path:
+    """Locate a V1 Core tool in an explicit checkout or installed package."""
+    checkout_tool = source_root / "tools" / tool
+    if checkout_tool.is_file():
+        return checkout_tool
+    packaged_tool = SCRIPT_DIR / tool
+    if packaged_tool.is_file():
+        return packaged_tool
+    return checkout_tool
+
+
 def _active_memory_dir(root: pathlib.Path) -> pathlib.Path:
     for candidate in (root / ".owledge", root / "internal" / ".owledge", root / "internal" / "owledge", root / "owledge"):
         if candidate.is_dir():
@@ -705,7 +716,7 @@ def _collect_kit_files(source_root: pathlib.Path, project_root: pathlib.Path, pr
             entries.append({"path": rel_posix, "sha256_installed": sha_installed, "sha256_original": sha_original})
     for tool in HOST_TOOL_FILES:
         target = project_root / "tools" / tool
-        source = source_root / "tools" / tool
+        source = _source_tool_file(source_root, tool)
         if target.is_file():
             rel_posix = f"tools/{tool}"
             if rel_posix in seen:
@@ -767,7 +778,7 @@ def _current_kit_inventory(source_root: pathlib.Path, profile: str = "full") -> 
             if source.is_file() and "__pycache__" not in source.parts:
                 add(f".owledge/{source.relative_to(template_root).as_posix()}", source)
     for tool in HOST_TOOL_FILES:
-        add(f"tools/{tool}", source_root / "tools" / tool)
+        add(f"tools/{tool}", _source_tool_file(source_root, tool))
     for skill_dir in HOST_SKILL_DIRS:
         source_skill = source_root / skill_dir
         if not source_skill.is_dir():
@@ -982,7 +993,7 @@ def init_project(project_root: pathlib.Path, source_root: pathlib.Path, include_
 
     tool_dir = project_root / "tools"
     for tool in HOST_TOOL_FILES if profile == "full" else []:
-        source = source_root / "tools" / tool
+        source = _source_tool_file(source_root, tool)
         if source.exists():
             rel = f"tools/{tool}"
             if copy_file_if_missing(source, tool_dir / tool):
