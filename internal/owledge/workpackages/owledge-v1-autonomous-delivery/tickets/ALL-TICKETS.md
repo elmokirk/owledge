@@ -2,7 +2,7 @@
 title: "Owledge v1 Ticket Contracts"
 date: "2026-07-16"
 version: "3.0.0"
-document_version: 6
+document_version: 7
 memory_id: "mem:owledge:global:owledge:task:v1-delivery-ticket-catalog"
 tenant_id: "owledge"
 customer_id: "global"
@@ -178,6 +178,10 @@ For every ticket:
   upload or network failure is a bounded V1M-11 blocker, never a false release.
 - Verify/evidence: owner authorization and publication receipt only after authorization.
 - Negative QA: generic approval and unpinned candidate cannot unlock publication.
+- Completion receipt: PyPI `owledge==0.8.0`, `origin/main` and annotated `v0.8.0`
+  resolve to `e7dd500`; public GitHub release assets are bound in
+  `evidence/G-V1M-PUBLISH/manifest.yaml`. `POST-V1-PLATFORM-001` remains open
+  and non-blocking without a macOS/Linux support claim.
 
 ## Historical completed and superseded ticket contracts
 

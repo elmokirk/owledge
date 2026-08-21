@@ -5,7 +5,7 @@ customer_id: "global"
 project_id: "owledge"
 doc_type: "task"
 artifact_type: "workpackage"
-document_version: 15
+document_version: 16
 workpackage_version: "1.0.2"
 status: "active"
 visibility: "private"
@@ -21,7 +21,7 @@ confidence: 0.97
 review_status: "reviewed"
 sanitization_status: "not_required"
 created_at: "2026-08-13T17:20:00+02:00"
-updated_at: "2026-08-21T00:00:00+02:00"
+updated_at: "2026-08-21T14:50:00+02:00"
 source_hash: ""
 reusable_lessons:
   - "A new plan enters an active release train only at a clean ticket/gate boundary."
@@ -147,9 +147,10 @@ cannot create symlinks.
 - [x] Confirm no personal/private paths, prompts, transcripts or credentials.
 - [x] Owner authorizes a `release/v0.8.0` push and the existing PyPI-confirmed
   tag/public-release workflow.
-- [ ] V1M-11 performs only the authorized external workflow; any remote auth,
-  PyPI, upload or network failure remains an explicit blocker receipt.
-- [ ] Record publication receipts and final closeout.
+- [x] V1M-11 performed only the authorized external workflow. PyPI publication
+  succeeded; the runner identity-only tag failure was recovered on the exact
+  published/main commit with an annotated tag and public GitHub release.
+- [x] Record publication receipts and final closeout.
 
 ## Global safeguards
 

@@ -1,6 +1,6 @@
 ticket: V1M-11
-status: in_progress
-branch: codex/v071-integration
+status: accepted
+branch: release/v0.8.0
 scope: owner-authorized-publication
 owner_authorization:
   decided_at: "2026-08-21"
@@ -12,12 +12,12 @@ owner_authorization:
 candidate:
   package_version: "0.8.0"
   product_boundary: "V1 Minimal Core"
-  source_commit: "c35ecd3"
+  source_commit: "e7dd5005f8a0c8aec5348d1df9b881c154bbebd1"
   ga_gate_commit: "230fc0f"
-  wheel_sha256: "b0b8f2842608cdbea399ea0b46cc43e0e5c02b31eac201c6354a4cf0fba8d679"
-  wheel_bytes: 311592
-  sdist_sha256: "f76d841c06a47965778e2aa760476467ec09a0e67bc8371d1879346cd78d4301"
-  sdist_bytes: 251389
+  wheel_sha256: "795cd5291d4d54ea1d77bdff2a11aa44d946b1ae00ebb2a3a94e4b7b433bf3bd"
+  wheel_bytes: 312318
+  sdist_sha256: "4794b168f8477e5d8fc62613ca294cfef7bcf78af1a8e4c4abdaaf4f6d1855aa"
+  sdist_bytes: 257579
 local_preflight:
   - "python tools/validate_v1_delivery_plan.py: passed (11 tickets, 7 gates, 11 waves, 0 errors)"
   - "python -m unittest tests.unit.test_validate_v1_delivery_plan -v: passed (11/11)"
@@ -30,7 +30,7 @@ open_non_blocking_followup:
   status: open
   limitation: "macOS/Linux wheel-only execution is not yet performed and must not be claimed as supported."
 external_status:
-  state: ready_to_rerun_after_publish_artifact_separation
+  state: published_and_reconciled
   release_branch: "release/v0.8.0"
   workflow_attempts:
     - "32479615397: stopped before build/publish because main was fetched only to FETCH_HEAD; fixed by explicit origin/main tracking-ref fetch."
@@ -38,7 +38,18 @@ external_status:
     - "32480988072: build and twine checks passed; wheel smoke incorrectly paired the intentional minimal default with Full-profile skill assertions. No publication, main promotion or tag occurred."
     - "32481435141: profile-aware wheel smoke and release contracts passed; legacy sdist-clean still required excluded addons/. No publication, main promotion or tag occurred."
     - "32481718941: candidate gates and 10-minute PyPI approval wait passed; PyPI action rejected dist/release-evidence.json as a non-distribution input. No package was uploaded, main was not promoted and no tag was created."
-  safe_next_action: "Push the release-evidence artifact separation and rerun .github/workflows/release.yml; release pipeline remains the sole authority for PyPI, main promotion, annotated tag and public release."
+    - "32482707510: all candidate gates passed; PyPI 0.8.0 upload and confirmation passed; main was fast-forwarded to e7dd500. The runner then failed only while creating its local annotated tag because no committer identity was configured."
+  recovery:
+    - "Annotated v0.8.0 tag d29fbfbe4689b8699c26baa13def2326295b34eb was created on e7dd500 with the conventional github-actions bot identity after remote main/PyPI reconciliation."
+    - "Public GitHub release https://github.com/elmokirk/owledge/releases/tag/v0.8.0 is published with the listed wheel and sdist assets."
+    - "The workflow now configures that tag identity before the release tag command for future releases."
+  receipts:
+    pypi: "https://pypi.org/project/owledge/0.8.0/"
+    workflow: "https://github.com/elmokirk/owledge/actions/runs/32482707510"
+    main_commit: "e7dd5005f8a0c8aec5348d1df9b881c154bbebd1"
+    tag_object: "d29fbfbe4689b8699c26baa13def2326295b34eb"
+    release: "https://github.com/elmokirk/owledge/releases/tag/v0.8.0"
+  safe_next_action: "Stop — publication is complete. Keep POST-V1-PLATFORM-001 open until macOS and Linux wheel-only receipts exist."
 prohibited_shortcuts:
   - "Do not create a tag or public release before the configured PyPI-confirmed workflow succeeds."
   - "Do not claim macOS/Linux support before POST-V1-PLATFORM-001 evidence exists."

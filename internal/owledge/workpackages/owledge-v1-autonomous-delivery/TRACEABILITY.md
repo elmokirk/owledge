@@ -2,7 +2,7 @@
 title: "Owledge V1 Minimal Core Traceability"
 date: "2026-08-11"
 version: "3.0.0"
-document_version: 5
+document_version: 6
 memory_id: "mem:owledge:global:owledge:compiled:v1-delivery-traceability"
 tenant_id: "owledge"
 customer_id: "global"
@@ -53,7 +53,7 @@ export are parked and cannot justify V1M gate completion or product claims.
 | Candidate delta, park/resurface, review, tombstones and health | V1M-06, V1M-07 | G-V1M-LIFECYCLE |
 | Codex, Claude Code and generic MCP/CLI capability/degradation contract | V1M-08 | G-V1M-ADAPTERS; G-081-A-ADAPTERS evidence |
 | Install/upgrade/recovery/security and compact GA journey | V1M-09, V1M-10 | G-V1M-GA |
-| Exact owner-controlled external publication | V1M-11 | G-V1M-PUBLISH |
+| Exact owner-controlled external publication | V1M-11 | G-V1M-PUBLISH accepted; PyPI v0.8.0, main/tag e7dd500 and public release reconciled |
 
 ## Appendix A — Historical Superseded Matrix (Post-V1 Reference Only)
 

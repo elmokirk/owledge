@@ -67,6 +67,7 @@ CLEAN_GATE_NEXT_ACTIONS = {
     "G-V1M-LIFECYCLE": "Select V1M-08",
     "G-V1M-ADAPTERS": "Select V1M-09",
     "G-V1M-GA": "Present the exact V1 candidate",
+    "G-V1M-PUBLISH": "Stop — V1 Minimal Core is released as v0.8.0.",
 }
 REQUIRED_TICKET_LABELS = ["Priority/dependencies:", "Outcome:", "Allowed paths:", "Implement:", "Accept:", "Verify/evidence:", "Negative QA:"]
 REQUIRED_GATE_LABELS = ["Tickets:", "Commands:", "Thresholds:", "Demonstrable increment:", "Promotion:"]
@@ -323,8 +324,10 @@ def validate() -> dict[str, Any]:
         manifest = CONTROL_ROOT / "evidence" / gate / "manifest.yaml"
         if not manifest.is_file():
             errors.append(f"{gate}: completed tickets require a gate evidence manifest")
-        elif "status: accepted_independent_qa" not in read(manifest):
-            errors.append(f"{gate}: completed tickets require accepted_independent_qa gate evidence")
+        else:
+            required_status = "accepted" if gate == "G-V1M-PUBLISH" else "accepted_independent_qa"
+            if f"status: {required_status}" not in read(manifest):
+                errors.append(f"{gate}: completed tickets require {required_status} gate evidence")
     latest_completed_gate = completed_gates[-1] if completed_gates else None
     latest_green_match = re.search(r"^last_green_gate:\s*(.+)$", run_state, re.MULTILINE)
     latest_green_gate = latest_green_match.group(1).strip() if latest_green_match else ""

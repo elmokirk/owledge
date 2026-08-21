@@ -201,6 +201,8 @@ jobs:
         run: |
           set -euo pipefail
           VERSION="$(tr -d '\r\n' < VERSION)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git fetch origin +refs/heads/main:refs/remotes/origin/main --tags
           git merge-base --is-ancestor origin/main HEAD
           git push origin HEAD:refs/heads/main

@@ -1,0 +1,26 @@
+gate: G-V1M-PUBLISH
+status: accepted
+tested_integration_commit: "e7dd5005f8a0c8aec5348d1df9b881c154bbebd1"
+environment:
+  execution: "GitHub Actions release workflow plus owner-authorized tag recovery"
+  candidate_workflow: "https://github.com/elmokirk/owledge/actions/runs/32482707510"
+included_tickets: [V1M-11]
+owner_authority:
+  decision: "v1-publication-cross-platform-followup-2026-08-21"
+  authorization: "push, tag, PyPI publication and public GitHub release for v0.8.0"
+verification:
+  - "Candidate workflow build, wheel smoke, release contract and V1-Core sdist gate: passed."
+  - "PyPI independently returned owledge==0.8.0."
+  - "origin/main and annotated v0.8.0^{ } resolve to e7dd5005f8a0c8aec5348d1df9b881c154bbebd1."
+  - "Public GitHub release is published with uploaded wheel and sdist assets."
+artifacts:
+  wheel: {name: "owledge-0.8.0-py3-none-any.whl", sha256: "795cd5291d4d54ea1d77bdff2a11aa44d946b1ae00ebb2a3a94e4b7b433bf3bd", bytes: 312318}
+  sdist: {name: "owledge-0.8.0.tar.gz", sha256: "4794b168f8477e5d8fc62613ca294cfef7bcf78af1a8e4c4abdaaf4f6d1855aa", bytes: 257579}
+receipts:
+  pypi: "https://pypi.org/project/owledge/0.8.0/"
+  release: "https://github.com/elmokirk/owledge/releases/tag/v0.8.0"
+  tag_object: "d29fbfbe4689b8699c26baa13def2326295b34eb"
+limitations:
+  - "POST-V1-PLATFORM-001 remains open: macOS and Linux wheel-only execution has not been performed; no cross-platform support claim is made."
+  - "The workflow run is marked failed only because it lacked a local tag committer identity after PyPI and main promotion; the configured identity fix and exact-commit annotated-tag recovery are recorded above."
+next_action: "Stop at the released V1 boundary; start only an explicitly owner-approved post-V1 plan or POST-V1-PLATFORM-001."
