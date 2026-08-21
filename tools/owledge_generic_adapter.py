@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-"""Bounded stdio JSON-RPC reference adapter for generic Owledge harnesses.
+"""Thin stdio JSON-RPC reference adapter for generic Owledge V1 harnesses.
 
-The adapter is intentionally read-only.  It exposes capability negotiation and
-an owner-invoked pre-plan capsule; Candidate writes remain a Core-owned,
-reviewed boundary even though the shared manifest can declare that capability.
+It exposes exactly the five V1 MCP operations and delegates every read or
+lifecycle request to the local Core. It owns no storage, index or transition.
 """
 
 from __future__ import annotations
@@ -20,13 +19,16 @@ if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
 import owledge_adapter_contracts as contracts  # noqa: E402
+import owledge_v1_lifecycle as lifecycle  # noqa: E402
+import owledge_v1_retrieval as retrieval  # noqa: E402
 
 
 TOOLS = [
-    {"name": "owledge_capability_discovery", "description": "Read the bound generic MCP/CLI AdapterManifest v1.", "inputSchema": {"type": "object", "properties": {}}},
-    {"name": "owledge_negotiate_capability", "description": "Negotiate one declared capability without granting implicit authority.", "inputSchema": {"type": "object", "required": ["capability_id", "scope", "permissions"], "properties": {"capability_id": {"type": "string"}, "scope": {"type": "string"}, "permissions": {"type": "array", "items": {"type": "string"}}}}},
-    {"name": "owledge_preplan_capsule", "description": "Read a bounded owner-invoked project capsule; this does not inspect or route a plan automatically.", "inputSchema": {"type": "object", "properties": {}}},
-    {"name": "owledge_candidate_boundary", "description": "Describe the explicit Candidate and promotion boundary without performing a write.", "inputSchema": {"type": "object", "properties": {}}},
+    {"name": "owledge_capabilities", "description": "Read the bound V1 Core capabilities and adapter manifest.", "inputSchema": {"type": "object", "properties": {}}},
+    {"name": "owledge_recall", "description": "Delegate deterministic scoped recall to the local Core.", "inputSchema": {"type": "object", "required": ["query"], "properties": {"query": {"type": "string"}, "purpose": {"type": "string", "enum": ["research", "planning"]}, "scopes": {"type": "array", "items": {"type": "string"}}, "include_user_global": {"type": "boolean"}}}},
+    {"name": "owledge_context", "description": "Delegate a bounded local context pack to the Core.", "inputSchema": {"type": "object", "required": ["task_id"], "properties": {"task_id": {"type": "string"}, "objective": {"type": "string"}, "purpose": {"type": "string", "enum": ["research", "planning"]}, "budget_chars": {"type": "integer"}, "scopes": {"type": "array", "items": {"type": "string"}}, "include_user_global": {"type": "boolean"}}}},
+    {"name": "owledge_propose", "description": "Delegate one explicit private project Candidate to the Core.", "inputSchema": {"type": "object", "required": ["kind", "summary", "source_refs"], "properties": {"kind": {"type": "string"}, "summary": {"type": "string"}, "source_refs": {"type": "array", "items": {"type": "string"}}, "park": {"type": "boolean"}, "park_reason": {"type": "string"}, "reconsider_when": {"type": "string"}}}},
+    {"name": "owledge_review", "description": "Delegate an explicit revision-bound Candidate review to the Core.", "inputSchema": {"type": "object", "required": ["candidate_id", "action", "expected_revision"], "properties": {"candidate_id": {"type": "string"}, "action": {"type": "string", "enum": sorted(lifecycle.REVIEW_ACTIONS)}, "expected_revision": {"type": "string"}, "reason": {"type": "string"}, "reconsider_when": {"type": "string"}, "superseded_by": {"type": "string"}}}},
 ]
 
 
@@ -49,37 +51,37 @@ def _load_manifest(path: pathlib.Path) -> dict[str, Any]:
         raise ValueError("manifest_invalid: " + ",".join(errors))
     if payload.get("adapter_id") != "generic-mcp-cli":
         raise ValueError("manifest_profile_mismatch")
+    if not contracts.core_version_compatible(payload["core_api_range"]):
+        raise ValueError("core_api_incompatible")
     return payload
 
 
-def _capsule(root: pathlib.Path) -> dict[str, Any]:
-    sources = [root / "OWLEDGE.md", root / ".owledge" / "indexes" / "memory-index.jsonl"]
-    rows: list[dict[str, str]] = []
-    for source in sources:
-        if source.is_file():
-            text = source.read_text(encoding="utf-8", errors="replace")[:2000]
-            rows.append({"path": source.relative_to(root).as_posix(), "text": text})
-    return {
-        "result": "supported",
-        "reason_code": "owner_invoked_read_only",
-        "automatic_preplan_inspection": False,
-        "loaded_sources": [row["path"] for row in rows],
-        "sources": rows,
-    }
+def _scopes(arguments: dict[str, Any]) -> set[str] | None:
+    value = arguments.get("scopes")
+    if value is None:
+        return None
+    if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
+        raise ValueError("invalid_scopes")
+    return set(value)
 
 
 def call_tool(name: str, arguments: dict[str, Any], root: pathlib.Path, manifest: dict[str, Any]) -> dict[str, Any]:
-    if name == "owledge_capability_discovery":
-        return _content({"manifest": manifest, "write_enabled": False})
-    if name == "owledge_negotiate_capability":
-        permissions = arguments.get("permissions")
-        if not isinstance(permissions, list) or not all(isinstance(value, str) for value in permissions):
-            raise ValueError("invalid_permissions")
-        return _content(contracts.negotiate(manifest, capability_id=str(arguments.get("capability_id", "")), scope=str(arguments.get("scope", "")), requested_permissions=permissions))
-    if name == "owledge_preplan_capsule":
-        return _content(_capsule(root))
-    if name == "owledge_candidate_boundary":
-        return _content({"result": "unsupported", "reason_code": "candidate_write_requires_core_review_flow", "write_enabled": False, "promotion": "not_available"})
+    if name == "owledge_capabilities":
+        return _content({"passed": True, "manifest": manifest, "mcp_tools": [item["name"].removeprefix("owledge_") for item in TOOLS], "scopes": ["project_user", "user_global"], "delegation": "core_owned", "network": "disabled"})
+    if name == "owledge_recall":
+        return _content(retrieval.recall(root, query=str(arguments.get("query") or ""), purpose=str(arguments.get("purpose") or "research"), scopes=_scopes(arguments), include_user_global=bool(arguments.get("include_user_global", False))))
+    if name == "owledge_context":
+        budget = arguments.get("budget_chars", 4000)
+        if not isinstance(budget, int):
+            raise ValueError("invalid_budget_chars")
+        return _content(retrieval.build_context_pack(root, task_id=str(arguments.get("task_id") or ""), objective=str(arguments.get("objective") or ""), purpose=str(arguments.get("purpose") or "research"), budget_chars=budget, scopes=_scopes(arguments), include_user_global=bool(arguments.get("include_user_global", False))))
+    if name == "owledge_propose":
+        source_refs = arguments.get("source_refs")
+        if not isinstance(source_refs, list) or not all(isinstance(item, str) for item in source_refs):
+            raise ValueError("invalid_source_refs")
+        return _content(lifecycle.propose(root, kind=str(arguments.get("kind") or ""), summary=str(arguments.get("summary") or ""), source_refs=source_refs, park=bool(arguments.get("park", False)), park_reason=str(arguments.get("park_reason") or ""), reconsider_when=str(arguments.get("reconsider_when") or "")))
+    if name == "owledge_review":
+        return _content(lifecycle.review(root, candidate_id=str(arguments.get("candidate_id") or ""), action=str(arguments.get("action") or ""), expected_revision=str(arguments.get("expected_revision") or ""), reason=str(arguments.get("reason") or ""), reconsider_when=str(arguments.get("reconsider_when") or ""), superseded_by=str(arguments.get("superseded_by") or "")))
     raise ValueError(f"tool_mismatch: {name}")
 
 
@@ -108,14 +110,16 @@ def handle(message: Any, root: pathlib.Path, manifest: dict[str, Any]) -> dict[s
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Generic read-only Owledge MCP/CLI stdio adapter")
+    parser = argparse.ArgumentParser(description="Generic Owledge MCP/CLI stdio adapter with Candidate-only writes")
     parser.add_argument("--project-root", required=True)
     parser.add_argument("--manifest", default=None)
     args = parser.parse_args(argv)
     root = pathlib.Path(args.project_root).expanduser().resolve()
     try:
         _ensure_bound_project(root)
-        manifest_path = pathlib.Path(args.manifest).resolve() if args.manifest else root / ".owledge" / "runtime-conformance" / "generic-mcp-cli.json"
+        manifest_path = (root / ".owledge" / "runtime-conformance" / "generic-mcp-cli.json").resolve()
+        if args.manifest and pathlib.Path(args.manifest).expanduser().resolve() != manifest_path:
+            raise ValueError("manifest_override_denied")
         manifest = _load_manifest(manifest_path)
     except ValueError as exc:
         parser.error(str(exc))

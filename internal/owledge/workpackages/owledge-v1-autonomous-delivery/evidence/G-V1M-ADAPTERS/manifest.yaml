@@ -1,0 +1,34 @@
+gate: G-V1M-ADAPTERS
+status: accepted_independent_qa
+tested_integration_commit: pending_atomic_commit
+environment:
+  os: windows
+  python: "3.14.0"
+  execution: "controlled local three-adapter Core-conformance validation"
+included_tickets: [V1M-08]
+ticket_evidence:
+  - "evidence/V1M-08/implementation-checkpoint.yaml"
+  - "evidence/G-081-A-ADAPTERS/manifest.yaml"
+verification:
+  - "python -m unittest tests.unit.test_v1m08_adapter_conformance tests.unit.test_ow08102_codex_adapter tests.unit.test_ow08103_claude_adapter tests.unit.test_ow08105_generic_adapter -v: passed; common Candidate journey, exact Generic five-tool allowlist and manifest-bound Core compatibility proved"
+  - "python tools/owledge.py test runtime-adapters --project-root .: passed"
+  - "python tools/validate_v1_delivery_plan.py: passed; 11 tickets / 7 gates / 11 waves / 0 errors"
+  - "git diff --check: passed"
+threshold_witness:
+  profiles: "Exactly Codex, Claude Code and Generic MCP/CLI declare the same two local scopes, required permissions, capabilities and explicit degradations."
+  journey: "Fresh full hosts run propose, ordinary-recall exclusion, bounded context and unlinked promotion denial through Codex/Claude project-local CLI bridges and the Generic MCP bridge."
+  tools: "Generic MCP exposes exactly capabilities, recall, context, propose and review; a sixth or unknown tool is rejected."
+  core_boundary: "All bridges delegate to installed project-local Core modules; no adapter implements direct storage, index, search, lifecycle or migration behavior."
+  manifest_boundary: "Generic rejects arbitrary external manifest overrides and incompatible Core API ranges before serving."
+independent_qa:
+  mode: separately_initialized_read_only_runtime_conformance_reviewer
+  result: accepted
+  status: accepted
+  findings:
+    - "P1 external/incompatible Generic manifest selection corrected fail-closed."
+    - "P1 common three-adapter lifecycle journey added and executed."
+    - "P2 legacy Generic fixture wording corrected to Core-delegation wording; CLI help and add-on metadata now accurately declare Candidate-only, Core-controlled writes."
+limitations:
+  - "Evidence is deterministic local contract proof, not interactive marketplace certification or a cross-platform harness claim."
+promotion: "Permits V1M-09 only; publication authority remains blocked."
+publication_authority: not_granted

@@ -1,7 +1,7 @@
 {
   "name": "runtime-conformance-kit",
   "version": "0.2.0",
-  "description": "Optional read-only AdapterManifest v1 fixtures for Codex, Claude Code, and generic MCP/CLI adapters.",
+  "description": "Optional AdapterManifest v1 fixtures for Codex, Claude Code, and generic MCP/CLI adapters; Candidate writes remain Core-controlled.",
   "install_directories": [
     ".owledge/runtime-conformance",
     "tools/runtime-conformance"

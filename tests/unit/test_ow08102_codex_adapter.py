@@ -18,7 +18,7 @@ class CodexAdapterTests(unittest.TestCase):
             project = pathlib.Path(temp)
             init = subprocess.run(
                 [sys.executable, str(ROOT / "tools" / "owledge.py"), "init-project", "--target", str(project),
-                 "--source-root", str(ROOT)], cwd=ROOT, capture_output=True, text=True, check=False,
+                 "--source-root", str(ROOT), "--profile", "full"], cwd=ROOT, capture_output=True, text=True, check=False,
             )
             self.assertEqual(init.returncode, 0, init.stdout + init.stderr)
             self.assertTrue((project / "AGENTS.md").is_file())

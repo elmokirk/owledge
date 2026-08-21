@@ -1,5 +1,5 @@
 schema_version: 2
-document_version: 34
+document_version: 35
 project: owledge
 source_of_truth: internal/owledge/workpackages/owledge-v1-autonomous-delivery/tickets/ALL-TICKETS.md
 active_plan: internal/owledge/plans/owledge-v1-minimal-core-finalization-plan.md
@@ -82,7 +82,7 @@ tickets:
   - {id: V1M-05, release: v1.0, phase: V1M-READ, status: done, priority: P0, owner_role: retrieval-engineer, qa_role: retrieval-contract-reviewer, estimated_turns: 3, depends_on: [V1M-04], gate: G-V1M-READ, path: "tickets/ALL-TICKETS.md#v1m-05"}
   - {id: V1M-06, release: v1.0, phase: V1M-LIFECYCLE, status: done, priority: P0, owner_role: lifecycle-engineer, qa_role: state-machine-reviewer, estimated_turns: 3, depends_on: [V1M-05], gate: G-V1M-LIFECYCLE, path: "tickets/ALL-TICKETS.md#v1m-06"}
   - {id: V1M-07, release: v1.0, phase: V1M-LIFECYCLE, status: done, priority: P0, owner_role: knowledge-health-engineer, qa_role: data-safety-reviewer, estimated_turns: 3, depends_on: [V1M-06], gate: G-V1M-LIFECYCLE, path: "tickets/ALL-TICKETS.md#v1m-07"}
-  - {id: V1M-08, release: v1.0, phase: V1M-ADAPTERS, status: in_progress, priority: P0, owner_role: adapter-engineer, qa_role: runtime-conformance-reviewer, estimated_turns: 2, depends_on: [V1M-07], gate: G-V1M-ADAPTERS, path: "tickets/ALL-TICKETS.md#v1m-08"}
-  - {id: V1M-09, release: v1.0, phase: V1M-GA, status: backlog, priority: P0, owner_role: release-security-engineer, qa_role: security-release-reviewer, estimated_turns: 3, depends_on: [V1M-08], gate: G-V1M-GA, path: "tickets/ALL-TICKETS.md#v1m-09"}
+  - {id: V1M-08, release: v1.0, phase: V1M-ADAPTERS, status: done, priority: P0, owner_role: adapter-engineer, qa_role: runtime-conformance-reviewer, estimated_turns: 2, depends_on: [V1M-07], gate: G-V1M-ADAPTERS, path: "tickets/ALL-TICKETS.md#v1m-08"}
+  - {id: V1M-09, release: v1.0, phase: V1M-GA, status: in_progress, priority: P0, owner_role: release-security-engineer, qa_role: security-release-reviewer, estimated_turns: 3, depends_on: [V1M-08], gate: G-V1M-GA, path: "tickets/ALL-TICKETS.md#v1m-09"}
   - {id: V1M-10, release: v1.0, phase: V1M-GA, status: backlog, priority: P0, owner_role: ga-engineer, qa_role: final-release-reviewer, estimated_turns: 3, depends_on: [V1M-09], gate: G-V1M-GA, path: "tickets/ALL-TICKETS.md#v1m-10"}
   - {id: V1M-11, release: v1.0, phase: V1M-PUBLISH, status: blocked, priority: P0, owner_role: release-orchestrator, qa_role: owner-authority-reviewer, estimated_turns: 1, depends_on: [V1M-10], gate: G-V1M-PUBLISH, path: "tickets/ALL-TICKETS.md#v1m-11"}

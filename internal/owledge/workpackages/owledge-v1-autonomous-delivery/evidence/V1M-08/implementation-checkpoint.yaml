@@ -1,0 +1,31 @@
+ticket: V1M-08
+status: accepted_independent_qa
+base_commit: 0679033
+branch: codex/v071-integration
+scope: three-thin-adapters-and-five-tool-generic-mcp-surface
+implementation:
+  - "The generic MCP/CLI adapter now exposes exactly capabilities, recall, context, propose and review."
+  - "Each Generic MCP operation delegates to the installed project-local V1 Core; the adapter has no storage, index, search or lifecycle implementation."
+  - "Codex and Claude Code retain the same AdapterManifest boundary, local scopes, explicit degradation and Core-owned storage/handoff routes from G-081-A."
+  - "Generic MCP/CLI requires an explicit full host profile because the intentionally tool-free minimal profile cannot contain a project-local Core runner."
+required_verification:
+  - "Fresh full host plus Runtime Conformance add-on has all three valid manifests and the installed Generic MCP adapter lists exactly five tools."
+  - "Generic propose/recall/context/review routes return Core semantics, including Candidate recall exclusion and unlinked promotion denial."
+  - "Three profiles retain identical local scopes, permissions, capabilities and structured degradation."
+negative_contracts:
+  - "A sixth or unknown tool is rejected as tool_mismatch."
+  - "Enterprise scope and malformed JSON-RPC remain structured denials."
+  - "Generic adapter source contains no direct storage primitives; it only delegates to Core modules."
+independent_qa:
+  required: true
+  mode: separately_initialized_read_only_runtime_conformance_reviewer
+  status: accepted
+  result: accepted
+  findings:
+    - "Initial P1: an arbitrary external or incompatible adapter manifest could be selected. The runner now binds only to the exact project-local manifest and rejects an incompatible Core API range before serving."
+    - "Initial P1: Codex and Claude had only static/negotiation evidence. A fresh-host common Candidate journey now proves their declared project-local CLI bridge alongside the Generic MCP five-tool journey."
+    - "Initial P2: the shipped Generic fixture described a legacy capsule. It now declares only bounded Core delegation receipts; the Generic CLI help and add-on metadata likewise describe Candidate-only, Core-controlled writes rather than a read-only adapter."
+known_limitations:
+  - "This is local deterministic contract evidence, not a claim of marketplace certification or interactive external-harness execution."
+publication_authority: not_granted
+next_exact_action: "Record G-V1M-ADAPTERS evidence, advance only to V1M-09 and retain the GA publication stop."

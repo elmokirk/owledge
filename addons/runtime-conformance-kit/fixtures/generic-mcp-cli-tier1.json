@@ -2,17 +2,19 @@
   "fixture_version": "1.0",
   "profile": "generic-mcp-cli",
   "required_tools": [
-    "owledge_capability_discovery",
-    "owledge_negotiate_capability",
-    "owledge_preplan_capsule",
-    "owledge_candidate_boundary"
+    "owledge_capabilities",
+    "owledge_recall",
+    "owledge_context",
+    "owledge_propose",
+    "owledge_review"
   ],
-  "context_capsule": {
-    "loaded_sources": ["OWLEDGE.md", ".owledge/indexes/memory-index.jsonl"],
+  "core_delegation": {
+    "context": "bounded_receipt_from_project_local_core",
+    "recall": "deterministic_scoped_result_from_project_local_core",
     "automatic_preplan_inspection": false
   },
   "write_boundary": {
-    "write_enabled": false,
-    "promotion": "not_available"
+    "write_enabled": "candidate_only",
+    "promotion": "explicit_review_via_core"
   }
 }

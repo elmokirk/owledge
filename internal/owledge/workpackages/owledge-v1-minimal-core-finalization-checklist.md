@@ -5,7 +5,7 @@ customer_id: "global"
 project_id: "owledge"
 doc_type: "task"
 artifact_type: "workpackage"
-document_version: 11
+document_version: 12
 workpackage_version: "1.0.2"
 status: "active"
 visibility: "private"
@@ -21,7 +21,7 @@ confidence: 0.97
 review_status: "reviewed"
 sanitization_status: "not_required"
 created_at: "2026-08-13T17:20:00+02:00"
-updated_at: "2026-08-13T21:25:00+02:00"
+updated_at: "2026-08-13T22:10:00+02:00"
 source_hash: ""
 reusable_lessons:
   - "A new plan enters an active release train only at a clean ticket/gate boundary."
@@ -118,12 +118,12 @@ cannot create symlinks.
 
 ## Phase 5 — Thin adapters
 
-- [ ] Reuse `OW-081-01/02/03/05` evidence.
-- [ ] V1M-08 limits default MCP to five tools.
-- [ ] Codex, Claude Code and generic MCP/CLI pass the same common journey.
-- [ ] Search, storage, lifecycle and migration logic exist only in Core.
-- [ ] Unsupported capabilities degrade explicitly.
-- [ ] Gate `G-V1M-ADAPTERS` green.
+- [x] Reuse `OW-081-01/02/03/05` evidence.
+- [x] V1M-08 limits default MCP to five tools.
+- [x] Codex, Claude Code and generic MCP/CLI pass the same common journey.
+- [x] Search, storage, lifecycle and migration logic exist only in Core.
+- [x] Unsupported capabilities degrade explicitly.
+- [x] Gate `G-V1M-ADAPTERS` green.
 
 ## Phase 6 — GA hardening
 

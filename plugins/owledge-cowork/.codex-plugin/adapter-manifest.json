@@ -6,6 +6,10 @@
     "read_control": "python tools/owledge_adapter_contracts.py negotiate",
     "context_and_handoff": "owner_invoked_project_local_cli"
   },
+  "v1_core_bridge": {
+    "type": "project_local_cli",
+    "operations": ["capabilities", "recall", "context", "propose", "review"]
+  },
   "hook_capability": {
     "result": "unsupported",
     "reason_code": "codex_native_lifecycle_hook_not_declared"

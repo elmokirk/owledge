@@ -17,6 +17,10 @@
     "persistence": "core_owned",
     "raw_transcript_promotion": false
   },
+  "v1_core_bridge": {
+    "type": "project_local_cli",
+    "operations": ["capabilities", "recall", "context", "propose", "review"]
+  },
   "failure_visibility": {
     "hook_error_log": ".agent-control/logs/plugin-errors.jsonl",
     "ticket_completion": "blocked_until_error_resolved"
