@@ -19,6 +19,23 @@ python tools/owledge.py test public-docs --project-root .
 python tools/owledge.py finalization-gates --project-root internal --include-compliance
 ```
 
+Before committing a product, documentation, contract, or workflow change, run
+the CI-equivalent preflight locally:
+
+```bash
+python tools/ci_preflight.py --scope core
+```
+
+For release and documentation contracts alone, use
+`python tools/ci_preflight.py --scope release-qa`. Before merging contract or
+workflow changes, run that scope in each supported Linux interpreter:
+
+```bash
+docker run --rm -v "$PWD:/workspace:ro" -w /workspace python:3.10 python tools/ci_preflight.py --scope release-qa
+docker run --rm -v "$PWD:/workspace:ro" -w /workspace python:3.11 python tools/ci_preflight.py --scope release-qa
+docker run --rm -v "$PWD:/workspace:ro" -w /workspace python:3.12 python tools/ci_preflight.py --scope release-qa
+```
+
 ## Pull Request Rules
 
 - Product-surface changes must update every documentation file mapped by

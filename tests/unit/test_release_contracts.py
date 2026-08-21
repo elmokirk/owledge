@@ -16,6 +16,7 @@ def make_contract_root(tmp_path: pathlib.Path) -> pathlib.Path:
     root = tmp_path / "contract-root"
     (root / "contracts").mkdir(parents=True)
     (root / "docs").mkdir()
+    (root / "docs" / "archive").mkdir()
     (root / "tools").mkdir()
     (root / "plugins" / "test-plugin" / ".claude-plugin").mkdir(parents=True)
     (root / "plugins" / "test-plugin" / ".codex-plugin").mkdir(parents=True)
@@ -26,6 +27,7 @@ def make_contract_root(tmp_path: pathlib.Path) -> pathlib.Path:
     (root / "README.md").write_text("[![Version](https://x/version-1.2.3-blue)]\nproject-local\nuvx owledge quickstart --target /path/to/your-project\n", encoding="utf-8")
     (root / "CHANGELOG.md").write_text("## 1.2.3\n", encoding="utf-8")
     (root / "docs" / "README.md").write_text("Current release v1.2.3\n", encoding="utf-8")
+    (root / "docs" / "archive" / "legacy.md").write_text("Current release v0.5.0\n", encoding="utf-8")
     (root / "docs" / "command-reference.md").write_text("doctor\nPython-first\n", encoding="utf-8")
     (root / "tools" / "owledge.py").write_text('sub.add_parser("doctor")\n', encoding="utf-8")
     (root / "docs" / "harness-plugin-matrix.md").write_text("Local adapter support\n", encoding="utf-8")
@@ -47,7 +49,7 @@ def make_contract_root(tmp_path: pathlib.Path) -> pathlib.Path:
             {"path": "plugins/test-plugin/.claude-plugin/plugin.json", "kind": "json-version"},
             {"path": "plugins/test-plugin/.codex-plugin/plugin.json", "kind": "json-version"},
         ],
-        "public_docs": {"include": ["README.md", "docs/**/*.md"], "exclude": [], "historical_marker": "Historical"},
+        "public_docs": {"include": ["README.md", "docs/**/*.md"], "exclude": ["docs/archive/**"], "historical_marker": "Historical"},
         "features": [{"id": "cli", "source_globs": ["tools/owledge.py"], "docs": ["README.md", "docs/command-reference.md"], "tests": ["contracts"]}],
     }
     (root / "contracts" / "release-surface.json").write_text(json.dumps(contract), encoding="utf-8")
@@ -89,3 +91,10 @@ def test_release_contract_writes_machine_readable_evidence(tmp_path):
     result = owledge.release_contract_gate(root, evidence_path=str(evidence_path))
     assert result["passed"] is True
     assert json.loads(evidence_path.read_text(encoding="utf-8"))["version"] == "1.2.3"
+
+
+def test_docs_contract_excludes_historical_archive_files_on_all_platforms(tmp_path):
+    root = make_contract_root(tmp_path)
+    result = owledge.docs_contract_gate(root)
+    assert "docs/archive/legacy.md" not in result["docs"]
+    assert result["passed"] is True
