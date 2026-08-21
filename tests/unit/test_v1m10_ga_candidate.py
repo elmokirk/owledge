@@ -130,6 +130,9 @@ class V1M10CandidateJourneyTests(unittest.TestCase):
         self.assertEqual(capabilities["cross-project-hub-kit"]["maturity"], "post-v1")
         self.assertEqual(capabilities["private-global-layer"]["maturity"], "available")
         self.assertIn('license = "MIT"', (ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+        manifest = (ROOT / "MANIFEST.in").read_text(encoding="utf-8")
+        for optional_surface in ("addons", "benchmarks", "plugins", "standalone-skills", "tests", "owlib"):
+            self.assertIn(f"prune {optional_surface}", manifest)
 
 
 if __name__ == "__main__":

@@ -1,3 +1,6 @@
+# V1 Minimal Core sdist: ship only package inputs and direct user documentation.
+# Optional add-ons, benchmark corpora, plugins, examples, and standalone skill
+# bundles remain source-checkout/post-V1 material rather than hidden GA payload.
 include AGENTS.template.md
 include CHANGELOG.md
 include CLAUDE.template.md
@@ -13,17 +16,21 @@ include USER_CONTEXT.template.md
 include VERSION
 include .gitignore
 exclude OWLEDGE.legacy.template.md
-recursive-include addons *
 recursive-include templates *
-recursive-exclude docs/archive/pre-v0.7-template *
-recursive-include assets *
-recursive-include benchmarks *
-recursive-include docs *
-recursive-include examples *
-recursive-include plugins *
+include docs/upgrade-notes-schema.json
+include docs/upgrading.md
+include docs/v1-minimal-core.md
 recursive-include skills *
-recursive-include standalone-skills *
 recursive-include tools *
+prune addons
+prune assets
+prune benchmarks
+prune examples
+prune plugins
+prune standalone-skills
+prune tests
+prune owlib
+prune docs/archive
 recursive-exclude .agent-control *
 recursive-exclude .git *
 recursive-exclude internal *
