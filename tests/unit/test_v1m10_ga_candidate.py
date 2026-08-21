@@ -161,10 +161,20 @@ class V1M10CandidateJourneyTests(unittest.TestCase):
             "build_kb_module.py",
         ):
             self.assertNotIn(f'"{parked_module}"', setup_hook)
+
+    def test_release_workflow_keeps_publish_input_clean_and_can_create_annotated_tag(self) -> None:
         release_workflow = (ROOT / ".github" / "workflows" / "release.yml").read_text(encoding="utf-8")
+
         self.assertIn("--evidence-path release-evidence.json", release_workflow)
-        self.assertIn("name: release-contract-evidence", release_workflow)
         self.assertNotIn("--evidence-path dist/release-evidence.json", release_workflow)
+        self.assertIn("name: release-contract-evidence", release_workflow)
+        self.assertIn("dist/*.whl", release_workflow)
+        self.assertIn("dist/*.tar.gz", release_workflow)
+        self.assertNotIn("path: dist/*", release_workflow)
+
+        identity_position = release_workflow.index('git config user.name "github-actions[bot]"')
+        tag_position = release_workflow.index('git tag -a "v$VERSION"')
+        self.assertLess(identity_position, tag_position)
 
     def test_core_tool_lookup_uses_installed_package_only_after_explicit_checkout(self) -> None:
         with tempfile.TemporaryDirectory(prefix="v1m10-tool-source-") as temporary:

@@ -106,6 +106,13 @@ work, agents must use release-engineering discipline:
   frozen.
 - Run release gates from a clean source state, then rebuild wheel/sdist and run
   install smoke tests.
+- Keep `dist/` limited to publishable wheels and source distributions. Write
+  release evidence, reports, and other JSON outside `dist/`, and upload the
+  publish artifact with explicit `*.whl` and `*.tar.gz` allowlists because the
+  PyPI publisher validates every downloaded file as a distribution.
+- Configure a repository-local Git user name and email before creating an
+  annotated tag in CI. Keep a regression test that proves the identity setup
+  occurs before `git tag -a`.
 - Keep docs last when interfaces, CLI commands, gates, or package paths are
   still changing.
 - Orchestrator owns central README, CI, release notes, and final tasklists;
