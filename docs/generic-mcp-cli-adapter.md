@@ -1,6 +1,7 @@
 # Generic MCP/CLI adapter (V1)
 
 The generic V1 profile is a project-bound stdio JSON-RPC reference adapter. It
+implements MCP `2026-07-28` discovery and per-request protocol metadata. It
 has no runtime-specific files and does not make any Tier-1 claim for Hermes,
 OpenCode, or Pi.
 
@@ -11,8 +12,11 @@ then start it from the host project:
 python tools/owledge_generic_adapter.py --project-root .
 ```
 
-The server exposes capability discovery, explicit capability negotiation, an
-owner-invoked read-only pre-plan capsule, and a Candidate boundary report. It
-never writes a Candidate or promotes content. A later reviewed Core flow owns
-those operations. The bound project cannot be changed through JSON-RPC, and
-malformed requests return structured errors without stopping the server.
+Start with `server/discover` and supply
+`_meta.io.modelcontextprotocol/protocolVersion: "2026-07-28"` on every modern
+request. The server exposes exactly five Core-owned tools: capabilities,
+recall, context, propose and review. Candidate writes and reviews remain
+revision-bound; the adapter cannot access storage directly, change its bound
+project, use the network, or promote content without an explicit `review`
+request. Legacy `2024-11-05` stdio clients remain supported as a compatibility
+path, but new clients should use discovery.

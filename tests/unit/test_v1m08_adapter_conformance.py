@@ -16,6 +16,7 @@ import owledge_adapter_contracts as contracts
 PROFILES = ("codex", "claude-code", "generic-mcp-cli")
 EXPECTED_MCP_TOOLS = {"owledge_capabilities", "owledge_recall", "owledge_context", "owledge_propose", "owledge_review"}
 EXPECTED_CORE_OPERATIONS = ["capabilities", "recall", "context", "propose", "review"]
+CURRENT_MCP_VERSION = "2026-07-28"
 
 
 class V1M08AdapterConformanceTests(unittest.TestCase):
@@ -65,10 +66,32 @@ class V1M08AdapterConformanceTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="v1m08-") as temporary:
             project = pathlib.Path(temporary) / "host"
             self._prepare_full_host(project)
-            listed = subprocess.run([sys.executable, str(project / "tools" / "owledge_generic_adapter.py"), "--project-root", str(project)], input=json.dumps({"jsonrpc": "2.0", "id": 1, "method": "tools/list"}) + "\n", cwd=ROOT, capture_output=True, text=True, check=False)
+            listed = subprocess.run([sys.executable, str(project / "tools" / "owledge_generic_adapter.py"), "--project-root", str(project)], input="\n".join(json.dumps(message) for message in [
+                {"jsonrpc": "2.0", "id": 1, "method": "server/discover", "params": {"_meta": {"io.modelcontextprotocol/protocolVersion": CURRENT_MCP_VERSION, "io.modelcontextprotocol/clientInfo": {"name": "test", "version": "1"}, "io.modelcontextprotocol/clientCapabilities": {}}}},
+                {"jsonrpc": "2.0", "id": 2, "method": "tools/list", "params": {"_meta": {"io.modelcontextprotocol/protocolVersion": CURRENT_MCP_VERSION}}},
+            ]) + "\n", cwd=ROOT, capture_output=True, text=True, check=False)
             self.assertEqual(listed.returncode, 0, listed.stderr)
-            response = json.loads(listed.stdout)
+            discovery, response = [json.loads(line) for line in listed.stdout.splitlines()]
+            self.assertEqual(discovery["result"]["supportedVersions"], [CURRENT_MCP_VERSION])
+            self.assertEqual(discovery["result"]["cacheScope"], "private")
             self.assertEqual({item["name"] for item in response["result"]["tools"]}, EXPECTED_MCP_TOOLS)
+
+    def test_generic_adapter_discovery_enforces_modern_metadata_and_preserves_legacy_stdio(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="v1m08-mcp-version-") as temporary:
+            project = pathlib.Path(temporary) / "host"
+            self._prepare_full_host(project)
+            messages = self._generic_call(project, [
+                {"jsonrpc": "2.0", "id": 1, "method": "tools/list"},
+                {"jsonrpc": "2.0", "id": 2, "method": "server/discover", "params": {"_meta": {"io.modelcontextprotocol/protocolVersion": "1900-01-01"}}},
+                {"jsonrpc": "2.0", "id": 3, "method": "server/discover", "params": {"_meta": {"io.modelcontextprotocol/protocolVersion": CURRENT_MCP_VERSION, "io.modelcontextprotocol/clientInfo": {"name": "test", "version": "1"}, "io.modelcontextprotocol/clientCapabilities": {}}}},
+                {"jsonrpc": "2.0", "id": 4, "method": "tools/list"},
+                {"jsonrpc": "2.0", "id": 5, "method": "tools/list", "params": {"_meta": {"io.modelcontextprotocol/protocolVersion": CURRENT_MCP_VERSION}}},
+            ])
+            self.assertEqual({item["name"] for item in messages[0]["result"]["tools"]}, EXPECTED_MCP_TOOLS)
+            self.assertEqual(messages[1]["error"]["data"]["supported"], [CURRENT_MCP_VERSION, "2024-11-05"])
+            self.assertEqual(messages[2]["result"]["supportedVersions"], [CURRENT_MCP_VERSION])
+            self.assertEqual(messages[3]["error"]["code"], -32022)
+            self.assertEqual({item["name"] for item in messages[4]["result"]["tools"]}, EXPECTED_MCP_TOOLS)
 
     def test_three_adapter_bridges_complete_the_same_candidate_lifecycle_journey(self) -> None:
         plugin = ROOT / "plugins" / "owledge-cowork"
