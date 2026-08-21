@@ -1,6 +1,6 @@
 gate: G-V1M-GA
-status: accepted_pending_independent_qa
-tested_integration_commit: "423714e"
+status: accepted_independent_qa
+tested_integration_commit: "ec28349"
 environment:
   os: windows
   build_python: "3.14.0"
@@ -17,9 +17,9 @@ verification:
   - "python tools/owledge.py test runtime-adapters --project-root .: passed."
   - "python tools/validate_v1_delivery_plan.py: passed; 11 tickets / 7 gates / 11 waves / 0 errors."
   - "git diff --check: passed."
-  - "Two clean local builds normalized to identical wheel SHA-256 d34b3d1baaea8aafdcf5c103772b0ecaef3ef635c795c406ab40392ac31054b8 (310530 bytes) and sdist SHA-256 24c81e3b38d9cc181d2bdfa6bd55f43964777092220daf267bfd824aab527343 (250580 bytes)."
-  - "Normalized archive inspection passed: 181 wheel and 272 sdist members; only nine declared Core Python tools; no forbidden or private-path member."
-  - "Fresh CPython 3.13 offline install through uv pip --offline --no-index --no-deps resolved tools from site-packages; minimal init and doctor passed."
+  - "Two clean local builds normalized to identical wheel SHA-256 8e36323a565a9ffd04cdd8635ed6c1bd074ebadf6f38f678e270c56b98a79a91 (311389 bytes) and sdist SHA-256 8e634a58d2e918d4607462add8120e77fe29109cab0597d971a1b312be8a458e (250932 bytes)."
+  - "Normalized archive inspection passed: 182 wheel and 274 sdist members; only nine declared Core Python tools; no forbidden or private-path member."
+  - "Fresh CPython 3.13 offline install through uv pip --offline --no-index --no-deps resolved tools from site-packages; full init, Generic five-tool bridge and doctor passed."
   - "Normalized sdist rebuilt offline to a Core-only wheel."
 threshold_witness:
   journey: "Fresh minimal install, explicit local user-global link, reviewed Research reuse from Project A to Project B, ordinary-recall parked exclusion, planning resurface and stateless Codex/Claude/Generic bridges are executed in the V1M-10 journey fixture."
@@ -29,8 +29,10 @@ claims: "Public docs state only local V1 Core claims and explicit post-V1/non-cl
 platform: "Windows proof is executed. macOS/Linux execution is a pre-publication prerequisite and is not represented as a current support claim."
 independent_qa:
   mode: separately_initialized_read_only_final_release_reviewer
-  status: pending
-  result: pending
+  status: accepted
+  result: accepted
+  score: 95
+  findings: []
 limitations:
   - "Windows symlink/junction attack fixtures are capability-skipped on this host; their fail-closed code paths and deterministic probes are covered, but this is not cross-platform execution evidence."
   - "No marketplace, remote service, push, tag, publication, artifact upload or public release was performed."

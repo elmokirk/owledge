@@ -1,20 +1,20 @@
 candidate:
   package_version: "0.8.0"
-  source_commit: "423714e"
+  source_commit: "ec28349"
   branch: "codex/v071-integration"
   publication_status: "local_candidate_only"
   publication_authority: "not_granted"
 artifact_contract:
   normalized_wheel:
     filename: "owledge-0.8.0-py3-none-any.whl"
-    sha256: "d34b3d1baaea8aafdcf5c103772b0ecaef3ef635c795c406ab40392ac31054b8"
-    bytes: 310530
-    members: 181
+    sha256: "8e36323a565a9ffd04cdd8635ed6c1bd074ebadf6f38f678e270c56b98a79a91"
+    bytes: 311389
+    members: 182
   normalized_sdist:
     filename: "owledge-0.8.0.tar.gz"
-    sha256: "24c81e3b38d9cc181d2bdfa6bd55f43964777092220daf267bfd824aab527343"
-    bytes: 250580
-    members: 272
+    sha256: "8e634a58d2e918d4607462add8120e77fe29109cab0597d971a1b312be8a458e"
+    bytes: 250932
+    members: 274
   reproducibility: "Two clean local builds normalized with the standard-library artifact normalizer produced byte-identical wheel and sdist hashes."
   inventory: "Only __init__.py, owledge.py, owledge_core.py, owledge_adapter_contracts.py, owledge_generic_adapter.py, owledge_null_space.py, owledge_v1_retrieval.py, owledge_v1_lifecycle.py and build_project_folder_kit.py are shipped below tools/."
   privacy: "Archive member names contain no internal dogfood, global-memory, add-on, benchmark, plugin, standalone, test, Owlib or private user-path payload."

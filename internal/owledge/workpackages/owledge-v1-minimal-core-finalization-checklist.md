@@ -5,7 +5,7 @@ customer_id: "global"
 project_id: "owledge"
 doc_type: "task"
 artifact_type: "workpackage"
-document_version: 13
+document_version: 14
 workpackage_version: "1.0.2"
 status: "active"
 visibility: "private"
@@ -21,7 +21,7 @@ confidence: 0.97
 review_status: "reviewed"
 sanitization_status: "not_required"
 created_at: "2026-08-13T17:20:00+02:00"
-updated_at: "2026-08-21T12:00:00+02:00"
+updated_at: "2026-08-21T13:30:00+02:00"
 source_hash: ""
 reusable_lessons:
   - "A new plan enters an active release train only at a clean ticket/gate boundary."
@@ -129,14 +129,15 @@ cannot create symlinks.
 
 - [x] V1M-09 passes clean install, upgrade, interrupted recovery, offline and
   security-negative tests.
-- [ ] V1M-10 passes the owner daily journey including park/resurface and
+- [x] V1M-10 passes the owner daily journey including park/resurface and
   cross-harness resume without chat history.
-- [ ] Default wheel stays <=500 KB or an explicit owner-reviewed exception exists.
-- [ ] Windows, macOS and Linux wheel-only GA evidence is executed, not inferred.
-- [ ] Public docs show Principles, minimal project, and local user-global paths;
+- [x] Default wheel stays <=500 KB or an explicit owner-reviewed exception exists.
+- [ ] Windows, macOS and Linux wheel-only evidence is fully executed before publication;
+  Windows candidate proof is executed, while macOS/Linux remain the explicit V1M-11 prerequisite.
+- [x] Public docs show Principles, minimal project, and local user-global paths;
   internal dogfood and parked products are not presented as default features.
-- [ ] Build wheel/sdist from a clean source commit and inspect artifact contents.
-- [ ] Gate `G-V1M-GA` green.
+- [x] Build wheel/sdist from a clean source commit and inspect artifact contents.
+- [x] Gate `G-V1M-GA` green.
 
 ## Phase 7 — Publication stop
 

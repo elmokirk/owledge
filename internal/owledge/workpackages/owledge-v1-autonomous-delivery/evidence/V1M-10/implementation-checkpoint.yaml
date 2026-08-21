@@ -1,6 +1,6 @@
 ticket: V1M-10
-status: accepted_pending_gate_manifest
-base_commit: 423714e
+status: accepted_independent_qa
+base_commit: ec28349
 branch: codex/v071-integration
 scope: compact-daily-journey-candidate-claims-and-artifact-readiness
 implementation:
@@ -15,13 +15,17 @@ required_verification:
   - "Focused V1M-10 journey and bounded-claims suite passes."
   - "Public documentation, runtime adapter and V1M control-plane gates pass."
   - "A clean committed source builds wheel and sdist; artifact members and content have no private paths or internal dogfood payloads."
-  - "Two clean local builds normalize to byte-identical artifacts: wheel SHA-256 d34b3d1baaea8aafdcf5c103772b0ecaef3ef635c795c406ab40392ac31054b8 (310530 bytes); sdist SHA-256 24c81e3b38d9cc181d2bdfa6bd55f43964777092220daf267bfd824aab527343 (250580 bytes)."
-  - "The normalized wheel has 181 members and the normalized sdist 272; each contains only the nine declared Core Python modules, no private path members, and no forbidden add-on, benchmark, plugin, standalone, internal, test, Owlib or global-memory payload."
-  - "A fresh offline CPython 3.13 environment installed the normalized wheel through uv pip --offline --no-index --no-deps; the imported tools package resolved from site-packages and minimal init plus doctor passed."
+  - "Two clean local builds normalize to byte-identical artifacts: wheel SHA-256 8e36323a565a9ffd04cdd8635ed6c1bd074ebadf6f38f678e270c56b98a79a91 (311389 bytes); sdist SHA-256 8e634a58d2e918d4607462add8120e77fe29109cab0597d971a1b312be8a458e (250932 bytes)."
+  - "The normalized wheel has 182 members and the normalized sdist 274; each contains only the nine declared Core Python modules, no private path members, and no forbidden add-on, benchmark, plugin, standalone, internal, test, Owlib or global-memory payload."
+  - "A fresh offline CPython 3.13 environment installed the normalized wheel through uv pip --offline --no-index --no-deps; the imported tools package resolved from site-packages and full init, Generic five-tool bridge, and doctor passed. The normalized sdist rebuilt offline to a Core-only wheel."
 negative_contracts:
   - "Ordinary recall excludes the parked feature while planning recall returns its reason and reconsideration trigger."
   - "The V1 docs do not claim publication, marketplace certification, remote sync, enterprise scope, or unexecuted macOS/Linux support."
 known_limitations:
   - "The candidate remains local controlled Windows evidence; macOS and Linux wheel execution remains a mandatory publication prerequisite, not a V1 platform claim."
 publication_authority: not_granted
-next_exact_action: "Record independent final-release QA and the G-V1M-GA manifest; do not start V1M-11 or perform external release actions."
+independent_qa:
+  result: accepted
+  score: 95
+  findings: []
+next_exact_action: "Stop at G-V1M-GA and present the exact V1 candidate; do not start V1M-11 or perform external release actions."
