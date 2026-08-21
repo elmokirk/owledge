@@ -12,25 +12,30 @@ owner_authorization:
 candidate:
   package_version: "0.8.0"
   product_boundary: "V1 Minimal Core"
-  source_commit: "ec28349"
+  source_commit: "2c27620"
   ga_gate_commit: "230fc0f"
-  wheel_sha256: "8e36323a565a9ffd04cdd8635ed6c1bd074ebadf6f38f678e270c56b98a79a91"
-  sdist_sha256: "8e634a58d2e918d4607462add8120e77fe29109cab0597d971a1b312be8a458e"
+  wheel_sha256: "b0b8f2842608cdbea399ea0b46cc43e0e5c02b31eac201c6354a4cf0fba8d679"
+  wheel_bytes: 311592
+  sdist_sha256: "f76d841c06a47965778e2aa760476467ec09a0e67bc8371d1879346cd78d4301"
+  sdist_bytes: 251389
 local_preflight:
   - "python tools/validate_v1_delivery_plan.py: passed (11 tickets, 7 gates, 11 waves, 0 errors)"
   - "python -m unittest tests.unit.test_validate_v1_delivery_plan -v: passed (11/11)"
   - "python tools/owledge.py test public-docs --project-root .: passed (258/258)"
   - "git diff --check: passed"
+  - "After integrating current main: V1M-08/09 focused suite passed (11/11); V1M-10 focused suite passed (3/3); isolated release-contract suite passed (4/4); CI release-qa preflight, runtime-adapters and plan validator passed."
+  - "Fresh temporary uv build normalized to 182-member wheel and 274-member sdist with the listed hashes."
 open_non_blocking_followup:
   id: POST-V1-PLATFORM-001
   status: open
   limitation: "macOS/Linux wheel-only execution is not yet performed and must not be claimed as supported."
 external_status:
-  state: workflow_preflight_failed_fix_in_progress
-  release_branch: "release/v0.8.0 pushed to origin at 31d34d8"
-  workflow_run: "https://github.com/elmokirk/owledge/actions/runs/32479615397"
-  failure: "The release workflow fetched main only into FETCH_HEAD then checked stale/nonexistent origin/main; no build, PyPI upload, tag, main promotion or public release ran."
-  safe_next_action: "Commit the explicit main tracking-ref fetch fix, push it to release/v0.8.0 and rerun the release workflow."
+  state: ready_to_rerun_after_local_release_reconciliation
+  release_branch: "release/v0.8.0"
+  workflow_attempts:
+    - "32479615397: stopped before build/publish because main was fetched only to FETCH_HEAD; fixed by explicit origin/main tracking-ref fetch."
+    - "32479848218: stopped before build/publish because current origin/main was not yet integrated; fixed by merge commit 2c27620."
+  safe_next_action: "Push the release reconciliation commit and rerun .github/workflows/release.yml; release pipeline remains the sole authority for PyPI, main promotion, annotated tag and public release."
 prohibited_shortcuts:
   - "Do not create a tag or public release before the configured PyPI-confirmed workflow succeeds."
   - "Do not claim macOS/Linux support before POST-V1-PLATFORM-001 evidence exists."

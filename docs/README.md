@@ -64,8 +64,9 @@ separates no-install, package, source, adapter, and add-on paths.
 
 ## Reference, quality, and maintainer material
 
-The local V1 Minimal Core candidate is not yet a published release. The
-canonical package version is [../VERSION](../VERSION); use
+Current release: **v0.8.0**. The V1 Minimal Core is a local-first product
+boundary; publication receipts remain tracked separately. The canonical package
+version is [../VERSION](../VERSION); use
 [v1-minimal-core.md](v1-minimal-core.md) for its bounded evidence and
 [upgrading.md](upgrading.md) for existing projects.
 

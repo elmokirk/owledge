@@ -1,7 +1,7 @@
 # Harness And Plugin Matrix
 
-Owledge is a memory and planning layer around agent runtimes. The V1 release
-boundary is **local reference-adapter support**: project-local files and Python
+Owledge is a memory and planning layer around agent runtimes. **Local adapter support**
+is the V1 release boundary: project-local files and Python
 commands that can be verified locally. It is not a marketplace certification
 for every runtime.
 

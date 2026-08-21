@@ -25,10 +25,29 @@ def make_contract_root(tmp_path: pathlib.Path) -> pathlib.Path:
     (root / "VERSION").write_text("1.2.3\n", encoding="utf-8")
     (root / "pyproject.toml").write_text('[project]\nversion = "1.2.3"\n', encoding="utf-8")
     (root / "README.md").write_text("[![Version](https://x/version-1.2.3-blue)]\nproject-local\nuvx owledge quickstart --target /path/to/your-project\n", encoding="utf-8")
-    (root / "CHANGELOG.md").write_text("## 1.2.3\n", encoding="utf-8")
+    (root / "CHANGELOG.md").write_text(
+        "## 1.2.3\n\n### Upgrade notes\n\n```json\n"
+        '{"breaking":"no","summary":"fixture upgrade note"}\n'
+        "```\n",
+        encoding="utf-8",
+    )
     (root / "docs" / "README.md").write_text("Current release v1.2.3\n", encoding="utf-8")
     (root / "docs" / "archive" / "legacy.md").write_text("Current release v0.5.0\n", encoding="utf-8")
     (root / "docs" / "command-reference.md").write_text("doctor\nPython-first\n", encoding="utf-8")
+    (root / "docs" / "upgrade-notes-schema.json").write_text(
+        json.dumps(
+            {
+                "type": "object",
+                "additionalProperties": False,
+                "required": ["breaking", "summary"],
+                "properties": {
+                    "breaking": {"type": "string", "enum": ["yes", "no", "additive"]},
+                    "summary": {"type": "string", "minLength": 1},
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
     (root / "tools" / "owledge.py").write_text('sub.add_parser("doctor")\n', encoding="utf-8")
     (root / "docs" / "harness-plugin-matrix.md").write_text("Local adapter support\n", encoding="utf-8")
     (root / "SECURITY.md").write_text("This local kit is not yet certified.\n", encoding="utf-8")
