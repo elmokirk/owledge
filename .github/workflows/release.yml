@@ -125,7 +125,7 @@ jobs:
           PY
 
       - name: Release contracts and evidence
-        run: python tools/owledge.py test release-contract --project-root . --require-dist --evidence-path dist/release-evidence.json
+        run: python tools/owledge.py test release-contract --project-root . --require-dist --evidence-path release-evidence.json
 
       - name: Verify sdist is clean
         run: |
@@ -137,6 +137,14 @@ jobs:
         with:
           name: release-dist
           path: dist/*
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload release contract evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-contract-evidence
+          path: release-evidence.json
           if-no-files-found: error
           retention-days: 30
 

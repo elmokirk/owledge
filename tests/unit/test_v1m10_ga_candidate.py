@@ -161,6 +161,10 @@ class V1M10CandidateJourneyTests(unittest.TestCase):
             "build_kb_module.py",
         ):
             self.assertNotIn(f'"{parked_module}"', setup_hook)
+        release_workflow = (ROOT / ".github" / "workflows" / "release.yml").read_text(encoding="utf-8")
+        self.assertIn("--evidence-path release-evidence.json", release_workflow)
+        self.assertIn("name: release-contract-evidence", release_workflow)
+        self.assertNotIn("--evidence-path dist/release-evidence.json", release_workflow)
 
     def test_core_tool_lookup_uses_installed_package_only_after_explicit_checkout(self) -> None:
         with tempfile.TemporaryDirectory(prefix="v1m10-tool-source-") as temporary:
