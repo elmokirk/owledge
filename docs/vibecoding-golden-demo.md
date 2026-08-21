@@ -56,7 +56,7 @@ Verify the scratch project:
 
 ```bash
 owledge doctor --project-root ./owledge-filter-demo --mode host
-owledge build-context-pack --project-root ./owledge-filter-demo \
+owledge context --project-root ./owledge-filter-demo \
   --task-id filter-request --agent-role worker \
   --objective "Verify the completed-item filter without widening scope"
 ```
@@ -75,7 +75,7 @@ Start a new agent session in the scratch project and give it this prompt:
 
 ```text
 Do not use chat history. Read OWLEDGE.md, then
-.owledge/handoffs/filter-request-resume.md. Use `owledge build-context-pack`
+.owledge/handoffs/filter-request-resume.md. Use `owledge context`
 for task `filter-request` before proposing work. Report the scope, the three
 recorded checks, and the next safe action. Do not add sync, accounts, deletion,
 or remote-runtime work.

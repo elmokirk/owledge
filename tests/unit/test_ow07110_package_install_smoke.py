@@ -142,7 +142,7 @@ class OW07110PackageInstallSmokeTests(unittest.TestCase):
             doctor = run([str(cli), "doctor", "--project-root", str(target), "--mode", "host"], cwd=temporary_root)
             context = run(
                 [
-                    str(cli), "build-context-pack", "--project-root", str(target),
+                    str(cli), "context", "--project-root", str(target),
                     "--task-id", "filter-request", "--agent-role", "worker",
                     "--objective", "Verify the completed-item filter without widening scope",
                 ],
@@ -155,7 +155,8 @@ class OW07110PackageInstallSmokeTests(unittest.TestCase):
             self.assertTrue(json.loads(first.stdout)["passed"])
             self.assertTrue(json.loads(second.stdout)["init"]["skipped_existing"])
             self.assertTrue(json.loads(doctor.stdout)["passed"])
-            self.assertIn("filter-request.md", json.loads(context.stdout)["content"])
+            context_sources = {item["source"] for item in json.loads(context.stdout)["context"]}
+            self.assertTrue(any(source.endswith("filter-request.md") for source in context_sources))
             self.assertNotIn("plugins", {path.name for path in target.iterdir()})
             self.assertIn("without changing stored data", request)
             self.assertIn("Unfinished item remains visible", evidence)
