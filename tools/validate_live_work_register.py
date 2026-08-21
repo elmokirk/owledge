@@ -25,6 +25,10 @@ REGISTER_REL = (
 BACKLOG_REL = (
     "internal/owledge/workpackages/owledge-v1-autonomous-delivery/BACKLOG.yaml"
 )
+TICKET_CATALOG_REL = (
+    "internal/owledge/workpackages/owledge-v1-autonomous-delivery/"
+    "tickets/ALL-TICKETS.md"
+)
 
 EXPECTED_IDS = tuple(f"FB-{number:03d}" for number in range(1, 22))
 ALLOWED_STATES = ("shipped", "open", "superseded", "deferred")
@@ -58,6 +62,7 @@ CHECKLIST_SOURCES = (
 APPROVED_SOURCES = (*PRIMARY_SOURCES, *CHECKLIST_SOURCES)
 
 TICKET_ID_RE = re.compile(r"^  - \{id: (OW-\d{3}-\d{2}),", re.MULTILINE)
+TICKET_CATALOG_ID_RE = re.compile(r"^### (OW-\d{3}-\d{2})\b", re.MULTILINE)
 FEEDBACK_HEADING_RE = re.compile(r"^### (FB-\d{3}):", re.MULTILINE)
 VERSION_RE = re.compile(r"^v?(\d+)\.(\d+)(?:\.(\d+))?$")
 
@@ -307,8 +312,13 @@ def validate_register(
 
     known_tickets: set[str] = set()
     try:
-        known_tickets = set(
+        known_tickets.update(
             TICKET_ID_RE.findall(_read_text(root, BACKLOG_REL, text_overrides))
+        )
+        known_tickets.update(
+            TICKET_CATALOG_ID_RE.findall(
+                _read_text(root, TICKET_CATALOG_REL, text_overrides)
+            )
         )
     except OSError as exc:
         errors.append(f"replacement_reference: unable to read ticket registry: {exc}")

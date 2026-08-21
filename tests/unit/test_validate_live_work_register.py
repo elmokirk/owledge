@@ -100,8 +100,17 @@ class ValidateLiveWorkRegisterTests(unittest.TestCase):
             f"missing {fragment!r} in {result['errors']}",
         )
 
-    def test_current_register_is_valid_and_finite(self) -> None:
-        result = self.validator.validate_register(REPO_ROOT)
+    def test_historical_register_snapshot_is_valid_and_finite(self) -> None:
+        pyproject = (REPO_ROOT / "pyproject.toml").read_text(encoding="utf-8")
+        result = self.validate_payload(
+            copy.deepcopy(self.valid_register),
+            text_overrides={
+                "VERSION": "0.7.0\n",
+                "pyproject.toml": pyproject.replace(
+                    'version = "0.8.0"', 'version = "0.7.0"', 1
+                ),
+            },
+        )
         self.assertTrue(result["passed"], result["errors"])
         self.assertEqual(result["counts"]["items"], 21)
         self.assertEqual(
