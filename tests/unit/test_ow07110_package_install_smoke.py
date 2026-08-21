@@ -14,6 +14,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 GOLDEN_DEMO_SEED = ROOT / "examples" / "vibecoding-golden-demo" / "seed"
 PACKAGE_ROOT_FILES = (
     "pyproject.toml",
+    "owledge_build.py",
     "README.md",
     "OWLEDGE.template.md",
     "AGENTS.template.md",
