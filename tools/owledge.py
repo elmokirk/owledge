@@ -5117,7 +5117,7 @@ def main(argv: list[str] | None = None) -> int:
             profile = None
             if getattr(args, "profile", None):
                 profile = json.loads(pathlib.Path(args.profile).read_text(encoding="utf-8"))
-            result = core.concept_audit(root, profile=profile)
+            result = core.concept_audit(root, profile=profile, source_root=REPO_ROOT)
             if args.dimension:
                 result["dimensions"] = [d for d in result.get("dimensions", []) if d.get("name") == args.dimension]
             if args.format == "summary":
