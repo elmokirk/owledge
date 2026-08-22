@@ -2041,6 +2041,71 @@ def release_trust_gate(root: pathlib.Path) -> dict[str, Any]:
     return results.payload(project=str(root), version=version)
 
 
+_V1_MANIFEST_RECURSIVE_INCLUDES = {
+    "recursive-include skills *",
+    "recursive-include templates *",
+}
+
+_V1_MANIFEST_SELECTIVE_INCLUDES = {
+    "include docs/upgrade-notes-schema.json",
+    "include docs/upgrading.md",
+    "include docs/v1-minimal-core.md",
+    "include tools/__init__.py",
+    "include tools/owledge.py",
+    "include tools/owledge_core.py",
+    "include tools/owledge_adapter_contracts.py",
+    "include tools/owledge_generic_adapter.py",
+    "include tools/owledge_null_space.py",
+    "include tools/owledge_v1_retrieval.py",
+    "include tools/owledge_v1_lifecycle.py",
+    "include tools/build_project_folder_kit.py",
+}
+
+_V1_MANIFEST_BOUNDED_ROOTS = {
+    ".agent-control",
+    ".git",
+    "addons",
+    "assets",
+    "benchmarks",
+    "docs",
+    "examples",
+    "global-memory",
+    "internal",
+    "owlib",
+    "plugins",
+    "standalone-skills",
+    "tests",
+    "tools",
+}
+
+
+def _manifest_unapproved_population_rules(text: str) -> list[str]:
+    """Return MANIFEST.in population rules outside the reviewed V1 boundary."""
+    unexpected: list[str] = []
+    for raw_line in text.splitlines():
+        rule = raw_line.strip()
+        if not rule or rule.startswith("#"):
+            continue
+        parts = rule.split()
+        command = parts[0]
+        if command in {"graft", "global-include"}:
+            unexpected.append(rule)
+            continue
+        if command == "recursive-include":
+            if rule not in _V1_MANIFEST_RECURSIVE_INCLUDES:
+                unexpected.append(rule)
+            continue
+        if command != "include" or rule in _V1_MANIFEST_SELECTIVE_INCLUDES:
+            continue
+        included_roots = {
+            path.replace("\\", "/").split("/", 1)[0]
+            for path in parts[1:]
+        }
+        if included_roots & _V1_MANIFEST_BOUNDED_ROOTS:
+            unexpected.append(rule)
+    return sorted(set(unexpected))
+
+
 def launch_readiness_gate(root: pathlib.Path) -> dict[str, Any]:
     results = ResultSet()
     required_addons = [
@@ -2191,6 +2256,17 @@ def launch_readiness_gate(root: pathlib.Path) -> dict[str, Any]:
                 forbidden not in rules,
                 "Source distribution does not re-open a surface outside the V1 Minimal Core boundary.",
             )
+        unapproved_population = _manifest_unapproved_population_rules(text)
+        results.add(
+            "packaging:manifest:no-unapproved-population",
+            not unapproved_population,
+            (
+                "Every source-distribution population directive stays inside the reviewed V1 boundary."
+                if not unapproved_population
+                else "Unapproved source-distribution population directives: "
+                + ", ".join(unapproved_population)
+            ),
+        )
 
     return results.payload(project=str(root), target_score="95+")
 

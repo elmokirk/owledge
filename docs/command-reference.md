@@ -227,7 +227,9 @@ they do not become core dependencies.
 For packaging, the gate reads active `MANIFEST.in` directives exactly. It
 requires the direct V1 docs, shipped skills, and allowlisted Core tool modules;
 it also requires explicit pruning of optional, generated, private, test, and
-post-V1 surfaces and rejects broad recursive includes that reopen them.
+post-V1 surfaces and rejects any unapproved manifest population directive that
+could reopen them, including broad recursive includes, `graft`, and
+`global-include`.
 
 ## Benchmark Kit
 

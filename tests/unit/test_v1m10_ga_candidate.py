@@ -214,6 +214,25 @@ class V1M10CandidateJourneyTests(unittest.TestCase):
             self.assertTrue(result["passed"], result)
             self.assertNotIn("addons/", result["missing_trees"])
 
+    def test_manifest_population_contract_rejects_every_reopen_directive(self) -> None:
+        manifest = (ROOT / "MANIFEST.in").read_text(encoding="utf-8")
+        self.assertEqual([], owledge._manifest_unapproved_population_rules(manifest))
+        for population_rule in (
+            "graft addons",
+            "graft global-memory",
+            "global-include *.md",
+            "recursive-include docs *.md",
+            "include tools/owledge_mcp.py",
+            "include internal/owledge/private.md",
+        ):
+            with self.subTest(population_rule=population_rule):
+                self.assertEqual(
+                    [population_rule],
+                    owledge._manifest_unapproved_population_rules(
+                        manifest + "\n" + population_rule + "\n"
+                    ),
+                )
+
 
 if __name__ == "__main__":
     unittest.main()
