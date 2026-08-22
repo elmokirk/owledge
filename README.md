@@ -469,8 +469,9 @@ The core stays small. Broad-launch proof is handled by optional add-ons:
 
 Launch scoring and pass/fail criteria: [Launch readiness rubric](docs/launch-readiness.md). Distribution path: [Distribution and release](docs/distribution.md).
 
-The V1 wheel and source archive include the direct V1 documentation, shipped
-skills, and an explicit allowlist of Core tool modules. Optional add-ons,
+The V1 wheel includes its runtime schema/data, shipped skills and templates,
+and the explicit Core tool allowlist. The source archive additionally includes
+the direct V1 documentation. Optional add-ons,
 plugins, benchmarks, tests, standalone skill bundles, and private maintainer
 state remain outside the artifact. `launch-readiness` verifies both the required
 includes and the required exclusions instead of treating the full source

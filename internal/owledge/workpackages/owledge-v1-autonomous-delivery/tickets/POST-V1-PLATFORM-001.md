@@ -42,7 +42,9 @@ user-global link, Generic five-tool bridge, doctor, and artifact hash match.
 
 ## Boundary
 
-- Status: **open**, post-release follow-up; it is not a V1M gate dependency.
+- Ticket lifecycle: **active**; contract review: **reviewed**; implementation
+  acceptance: **open**. Reviewing this ticket does not accept platform evidence.
+- This is a post-release follow-up, not a V1M gate dependency.
 - Do not add a macOS/Linux support claim until both receipts are accepted.
 - Use the published release artifact or a byte-identical hash match; do not
   substitute a source checkout proof.
