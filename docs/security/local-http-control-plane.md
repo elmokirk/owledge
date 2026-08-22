@@ -39,6 +39,11 @@ These are process-local controls for the experimental adapter. They do not
 replace operating-system access control or protect against an already
 compromised local account.
 
+The concept-audit lifecycle check runs an upgrade dry-run as a local subprocess
+and passes the canonical Owledge source root explicitly. That check does not
+start this HTTP adapter, make a network request, or relax the existing
+project/source path validation.
+
 ## Explicitly unsupported
 
 TLS termination, non-loopback deployment, administrator-token rotation or
