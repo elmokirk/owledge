@@ -2,8 +2,8 @@
   "schema_version": 1,
   "document_version": 1,
   "register_id": "owledge-feedback-live-work-v1",
-  "current_product_version": "0.7.0",
-  "active_delivery_release": "v0.7.1",
+  "current_product_version": "0.8.0",
+  "active_delivery_release": "v0.8.0",
   "allowed_states": [
     "shipped",
     "open",

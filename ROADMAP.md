@@ -1,12 +1,12 @@
 # Roadmap
 
 Roadmap version: **2.3.0**
-Last updated: **2026-08-12T14:32:51+02:00**
+Last updated: **2026-08-22T00:00:00+02:00**
 
 ## Current Release Goal
 
-Prepare v0.7.1 as the adoption, truth, and compatibility release while
-preserving v0.7.0 as the currently shipped package baseline.
+Maintain v0.8.0 as the current V1 Minimal Core product baseline while
+post-release evidence and explicitly tracked follow-up work remain bounded.
 
 The machine-readable
 [`LIVE-WORK-REGISTER.yaml`](internal/owledge/workpackages/owledge-v1-autonomous-delivery/LIVE-WORK-REGISTER.yaml)
