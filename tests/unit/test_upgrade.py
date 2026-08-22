@@ -89,7 +89,17 @@ def test_manual_patch_is_git_applyable(tmp_path):
     (fake_src / "templates" / "owledge" / "templates" / "task-card-template.md").write_text(old_template, encoding="utf-8", newline="\n")
     project = tmp_path / "patch-project"
     project.mkdir()
-    init = run_owledge(["init-project", "--target", str(project), "--source-root", str(fake_src)])
+    init = run_owledge(
+        [
+            "init-project",
+            "--target",
+            str(project),
+            "--source-root",
+            str(fake_src),
+            "--profile",
+            "full",
+        ]
+    )
     assert init.returncode == 0, f"init from fake source failed: {init.stderr}"
     set_manifest_kit_version(project, "0.6.0")
     result = run_owledge(["upgrade", "--dry-run", "--mode=manual", "--source-root", str(REPO_ROOT)], project)
@@ -145,6 +155,12 @@ def test_idempotent(fresh_project):
     first = run_owledge(["upgrade", "--apply", "--mode=safe"], project)
     assert first.returncode == 0
     first_json = json.loads(first.stdout)
+    manifest_paths = {
+        row["path"]
+        for row in json.loads((project / "kit-manifest.json").read_text(encoding="utf-8"))["files"]
+    }
+    assert ".owledge/.upgrade.lock" not in manifest_paths
+    assert ".owledge/upgrade-transaction.json" not in manifest_paths
     second = run_owledge(["upgrade", "--apply", "--mode=safe"], project)
     assert second.returncode == 0
     second_json = json.loads(second.stdout)

@@ -10,6 +10,7 @@ import sys
 import tempfile
 
 from conftest import run_owledge, run_cli, REPO_ROOT
+from tools import owledge_core
 
 
 SIX_NAMED_FINDINGS = [
@@ -57,7 +58,7 @@ def test_skill_finds_its_own_gaps_against_v060(tmp_path):
     assert hits >= 4, f"skill rubric only references {hits}/6 named findings (need >=4): {required_phrases}"
     project = tmp_path / "v060-state"
     project.mkdir()
-    init = run_owledge(["init-project", "--target", str(project)])
+    init = run_owledge(["init-project", "--target", str(project), "--profile", "full"])
     assert init.returncode == 0
     (project / "kit-manifest.json").unlink(missing_ok=True)
     skills_dir = project / "skills" / "concept-blindspot-audit"
@@ -81,6 +82,24 @@ def test_skill_clean_on_v061(fresh_project):
     lifecycle = next((d for d in out.get("dimensions", []) if d["name"] == "lifecycle"), None)
     assert lifecycle is not None, "no lifecycle dimension in concept-audit output"
     assert lifecycle["score"] == 10, f"lifecycle dim scored {lifecycle['score']} on a clean v0.6.1 project: {lifecycle.get('findings')}"
+
+
+def test_concept_audit_passes_an_explicit_upgrade_source(tmp_path, monkeypatch):
+    project = tmp_path / "project"
+    (project / "tools").mkdir(parents=True)
+    (project / "tools" / "owledge.py").write_text("# fixture\n", encoding="utf-8")
+    (project / "kit-manifest.json").write_text("{}\n", encoding="utf-8")
+    observed: list[str] = []
+
+    def fake_run(args, **kwargs):
+        del kwargs
+        observed.extend(str(value) for value in args)
+        return subprocess.CompletedProcess(args, 0, "{}\n", "")
+
+    monkeypatch.setattr(subprocess, "run", fake_run)
+    assert owledge_core._owledge_upgrade_dry_run(project, REPO_ROOT)
+    source_position = observed.index("--source-root")
+    assert pathlib.Path(observed[source_position + 1]) == REPO_ROOT.resolve()
 
 
 def test_skill_adapts_to_mode(fresh_project):

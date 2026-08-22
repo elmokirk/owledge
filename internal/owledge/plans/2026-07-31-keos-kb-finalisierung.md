@@ -11,28 +11,29 @@ scope: "C:\\Users\\Kirk\\Documents\\KEOS_KB\\ + rag-wiki + Nextcloud"
 universality: "🟢"
 hardening: "3-Subagent-Review integriert: Red Team + Blindspot + Senior Engineer. 4 blocking fixes (B1-B4), 16 non-blocking fixes (NB1-NB16). Plan-Freeze: keine v2.4."
 related:
-  - "[[kb-plan-v2.2]]"
-  - "[[KEOS-Finalisierungsplan-v2]]"
-  - "[[KEOS-Strategieplan-v1]]"
-  - "[[KEOS-Agent-Primitive]]"
-  - "[[rag-wiki-Stack-Gap-Briefing]]"
-  - "[[PolyGraphVault-Syncer]]"
-  - "[[Frontmatter-Pollution-Learning-K25]]"
+  - "external KEOS vault: kb-plan-v2.2"
+  - "external KEOS vault: KEOS-Finalisierungsplan-v2"
+  - "external KEOS vault: KEOS-Strategieplan-v1"
+  - "external KEOS vault: KEOS-Agent-Primitive"
+  - "external KEOS vault: rag-wiki-Stack-Gap-Briefing"
+  - "external KEOS vault: PolyGraphVault-Syncer"
+  - "external KEOS vault: Frontmatter-Pollution-Learning-K25"
+external_reference_scope: "Historical references point to the separate KEOS vault and are not Owledge repository links."
 concept_tags: [knowledge-base, rag, graphrag, rag-wiki, nextcloud, frontmatter-parser, keos-integration]
 stack_tags: [rag-wiki, lightrag, neo4j, qdrant, tei, bge-m3, nextcloud, ollama, docker, mcp]
 confidence: 0.9
 edges:
   - type: "derived_from"
-    target: "[[kb-plan-v2.2]]"
+    target: "external KEOS vault: kb-plan-v2.2"
     weight: 1.0
   - type: "relates_to"
-    target: "[[KEOS-Finalisierungsplan-v2]]"
+    target: "external KEOS vault: KEOS-Finalisierungsplan-v2"
     weight: 0.95
   - type: "relates_to"
-    target: "[[KEOS-Agent-Primitive]]"
+    target: "external KEOS vault: KEOS-Agent-Primitive"
     weight: 0.9
   - type: "relates_to"
-    target: "[[rag-wiki-Stack-Gap-Briefing]]"
+    target: "external KEOS vault: rag-wiki-Stack-Gap-Briefing"
     weight: 0.85
 ---
 

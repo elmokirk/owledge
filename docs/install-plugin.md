@@ -39,6 +39,12 @@ Standard initialization also materializes project-local Codex skills under
 `.agents/skills/`. The project-root `skills/` tree remains the Owledge
 source/vendor bundle. `.owledge/skills/` is not an automatic discovery path.
 
+When a shared skill reference is present in the canonical `skills/` tree, the
+legacy plugin, and `standalone-skills/`, those copies are distribution mirrors
+and must remain synchronized. The project-local Markdown and canonical skill
+contract remain authoritative; synchronizing a mirror does not widen plugin
+permissions or change its V1 maturity classification.
+
 ## Codex
 
 Install shape:

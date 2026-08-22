@@ -78,7 +78,7 @@ class RunStateShardingTests(unittest.TestCase):
         self.assertTrue(__import__("json").loads(process.stdout)["legacy_unchanged"])
         self.assertEqual(self.before, hashlib.sha256(self.legacy.read_bytes()).hexdigest())
 
-    def test_project_kit_includes_explicit_migration_tool(self) -> None:
+    def test_v1_project_kit_excludes_post_v1_migration_tool(self) -> None:
         import build_project_folder_kit
         with tempfile.TemporaryDirectory() as tmp:
             output = pathlib.Path(tmp) / "kit"
@@ -87,7 +87,7 @@ class RunStateShardingTests(unittest.TestCase):
                 include_global_memory=False, include_plugin_adapter=False,
                 include_compliance=False, plugin_hook_profile="python", verify=True,
             ))
-            self.assertTrue((output / "tools" / "owledge_run_state.py").is_file())
+            self.assertFalse((output / "tools" / "owledge_run_state.py").exists())
 
 
 if __name__ == "__main__":

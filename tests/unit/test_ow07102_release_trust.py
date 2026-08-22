@@ -139,7 +139,7 @@ class UpgradeNotesContractTests(unittest.TestCase):
     def test_current_repository_note_and_release_trust_gate_pass(self) -> None:
         direct = UPGRADE_NOTES.validate_upgrade_notes(REPO_ROOT)
         self.assertTrue(direct["passed"], direct["errors"])
-        self.assertEqual(OWLEDGE._read_upgrade_notes(REPO_ROOT), "breaking")
+        self.assertEqual(OWLEDGE._read_upgrade_notes(REPO_ROOT), "additive")
         gate = OWLEDGE.release_trust_gate(REPO_ROOT)
         matching = [
             row for row in gate["results"] if row["name"] == "upgrade-notes-contract"

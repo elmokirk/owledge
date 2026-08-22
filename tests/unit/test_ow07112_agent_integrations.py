@@ -66,7 +66,20 @@ class AgentIntegrationContractTests(unittest.TestCase):
     def test_fresh_host_has_hash_matching_discovery_mirrors_and_doctor_detects_drift(self) -> None:
         with tempfile.TemporaryDirectory(prefix="ow07112-host-") as temp_dir:
             target = Path(temp_dir) / "host"
-            init = subprocess.run([sys.executable, "tools/owledge.py", "init-project", "--target", str(target)], cwd=ROOT, text=True, capture_output=True)
+            init = subprocess.run(
+                [
+                    sys.executable,
+                    "tools/owledge.py",
+                    "init-project",
+                    "--target",
+                    str(target),
+                    "--profile",
+                    "full",
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+            )
             self.assertEqual(init.returncode, 0, init.stderr)
             manifest = json.loads((target / "kit-manifest.json").read_text(encoding="utf-8"))
             rows = {row["path"]: row for row in manifest["files"]}
@@ -106,6 +119,8 @@ class AgentIntegrationContractTests(unittest.TestCase):
             "owledge_doctor",
             "owledge_search_memory",
             "owledge_build_context_pack",
+            "owledge_context_synopsis",
+            "owledge_active_tools",
             "owledge_list_tasks",
             "owledge_list_reviews",
         })

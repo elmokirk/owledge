@@ -46,10 +46,10 @@ class ContextCompilerTests(unittest.TestCase):
         schema = json.loads((ROOT / "templates/owledge/schemas/context-pack-v1.schema.json").read_text(encoding="utf-8"))
         self.assertEqual(schema["properties"]["pack_version"]["const"], result["pack_version"])
 
-    def test_generated_project_kits_include_the_context_compiler(self) -> None:
-        self.assertIn("owledge_context_compiler.py", project_kit.CORE_TOOLS)
-        self.assertIn("validate_benchmark_baseline.py", project_kit.CORE_TOOLS)
-        self.assertIn("validate_upgrade_notes.py", project_kit.CORE_TOOLS)
+    def test_generated_v1_project_kits_exclude_parked_maintainer_tools(self) -> None:
+        self.assertNotIn("owledge_context_compiler.py", project_kit.CORE_TOOLS)
+        self.assertNotIn("validate_benchmark_baseline.py", project_kit.CORE_TOOLS)
+        self.assertNotIn("validate_upgrade_notes.py", project_kit.CORE_TOOLS)
 
 
 if __name__ == "__main__":

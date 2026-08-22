@@ -39,7 +39,7 @@ class OW07105GoldenDemoTests(unittest.TestCase):
         package_section = demo.split("## Proof 2:", 1)[1].split("## Proof 3:", 1)[0]
         self.assertIn("uvx owledge quickstart", package_section)
         self.assertIn("owledge doctor", package_section)
-        self.assertIn("owledge build-context-pack", package_section)
+        self.assertIn("owledge context", package_section)
         self.assertNotIn("install-addon", package_section)
         self.assertIn("source-checkout add-on", demo)
 
@@ -57,7 +57,7 @@ class OW07105GoldenDemoTests(unittest.TestCase):
                 shutil.copy2(SEED / name, destination)
 
             context = run_cli(
-                "build-context-pack",
+                "context",
                 "--project-root",
                 str(target),
                 "--task-id",
@@ -77,7 +77,8 @@ class OW07105GoldenDemoTests(unittest.TestCase):
 
             self.assertTrue(quickstart["passed"])
             self.assertEqual(0, validation.returncode, f"{validation.stderr}\n{validation.stdout}")
-            self.assertIn("filter-request.md", context["content"])
+            context_sources = {item["source"] for item in context["context"]}
+            self.assertTrue(any(source.endswith("filter-request.md") for source in context_sources))
             self.assertIn("filter-request-check.md", (destinations["filter-request-resume.md"]).read_text(encoding="utf-8"))
             self.assertIn("filter-request.md", (destinations["filter-request-check.md"]).read_text(encoding="utf-8"))
 

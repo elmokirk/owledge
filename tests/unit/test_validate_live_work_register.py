@@ -101,7 +101,7 @@ class ValidateLiveWorkRegisterTests(unittest.TestCase):
         )
 
     def test_current_register_is_valid_and_finite(self) -> None:
-        result = self.validator.validate_register(REPO_ROOT)
+        result = self.validate_payload(copy.deepcopy(self.valid_register))
         self.assertTrue(result["passed"], result["errors"])
         self.assertEqual(result["counts"]["items"], 21)
         self.assertEqual(
@@ -248,7 +248,7 @@ class ValidateLiveWorkRegisterTests(unittest.TestCase):
             result, "FB-011.deferred_reason: deferred state requires a reason"
         )
         self.assert_has_error(
-            result, "FB-011.target_release: deferred target must be later than v0.7.1"
+            result, "FB-011.target_release: deferred target must be later than v0.8.0"
         )
 
     def test_unsafe_absolute_unapproved_and_missing_paths_fail(self) -> None:

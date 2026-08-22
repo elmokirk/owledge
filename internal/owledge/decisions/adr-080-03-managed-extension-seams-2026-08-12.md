@@ -6,18 +6,30 @@ project_id: "owledge"
 doc_type: "project_context"
 artifact_type: "architecture_decision_record"
 document_version: 1
-status: "accepted"
+status: "active"
 visibility: "private"
 data_class: "internal"
 semantic_title: "ADR-080-03 Managed surfaces and extension seams"
 summary: "Defines the minimal managed-surface, module, resource, and health contracts without creating a plugin marketplace or binary store."
 concept_tags: ["adr", "managed-surface", "module-manifest", "resource-ref", "health"]
 stack_tags: ["markdown", "json", "mcp"]
+problem_patterns: ["extension-core-coupling", "binary-content-in-canonical-memory", "self-authorized-module-health"]
+architecture_patterns: ["managed-surface-manifest", "capability-bounded-module", "external-resource-reference"]
+failure_modes: ["extension-widens-core-policy", "resource-reference-becomes-binary-store", "module-self-certifies-compatibility"]
+reusable_lessons:
+  - "Extension seams should declare compatibility and permissions without exposing Core-internal storage semantics."
+  - "Resource references preserve provenance without pulling binary storage into the Minimal Core."
+confidence: 0.97
 review_status: "reviewed"
 sanitization_status: "not_required"
 created_at: "2026-08-12T16:00:00+02:00"
 updated_at: "2026-08-12T16:00:00+02:00"
 source_hash: ""
+edges:
+  - type: "derived_from"
+    target: "mem:owledge:global:owledge:decision:post-v1-erasure-extensibility-resource-link-2026-08-12"
+    confidence: 1.0
+    reason: "Turns the accepted post-V1 extensibility boundary into explicit compatibility seams."
 ---
 
 # ADR-080-03: Managed Surfaces and Extension Seams

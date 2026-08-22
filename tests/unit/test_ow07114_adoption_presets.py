@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import datetime
 import json
 import unittest
 from pathlib import Path
@@ -44,8 +45,8 @@ class AdoptionPresetContractTests(unittest.TestCase):
 
     def test_registry_exposes_documented_global_hub_and_future_maturity(self) -> None:
         rows = {row["id"]: row for row in REGISTRY["capabilities"]}
-        self.assertEqual(rows["private-global-layer"]["maturity"], "preview")
-        self.assertEqual(rows["cross-project-hub-kit"]["maturity"], "available")
+        self.assertEqual(rows["private-global-layer"]["maturity"], "available")
+        self.assertEqual(rows["cross-project-hub-kit"]["maturity"], "post-v1")
         self.assertEqual(rows["owlib-compatibility"]["maturity"], "preview")
         self.assertEqual(rows["team-hub-and-sync"]["maturity"], "post-v1")
         for capability_id in (
@@ -58,7 +59,8 @@ class AdoptionPresetContractTests(unittest.TestCase):
         for row in rows.values():
             self.assertTrue(row.get("documentation"))
             self.assertTrue(row.get("evidence"))
-            self.assertLessEqual(row["source_retrieved_at"], "2026-07-29")
+            self.assertRegex(row["source_retrieved_at"], r"^20\d{2}-\d{2}-\d{2}$")
+            self.assertLessEqual(row["source_retrieved_at"], datetime.date.today().isoformat())
 
     def test_decision_examples_route_remote_team_need_to_roadmap(self) -> None:
         self.assertIn("A client wants a remote shared service", DOC)

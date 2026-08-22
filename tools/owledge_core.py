@@ -6394,7 +6394,10 @@ def _owledge_subcommand_help(root: pathlib.Path, subcommand: str) -> bool:
         return False
 
 
-def _owledge_upgrade_dry_run(root: pathlib.Path) -> bool:
+def _owledge_upgrade_dry_run(
+    root: pathlib.Path,
+    source_root: pathlib.Path | None = None,
+) -> bool:
     """Verify the project's own upgrade path executes cleanly.
 
     Runs ``upgrade --dry-run`` against the audited project itself (which carries a
@@ -6411,9 +6414,19 @@ def _owledge_upgrade_dry_run(root: pathlib.Path) -> bool:
         return False
     if not (root / "kit-manifest.json").is_file():
         return False
+    canonical_source = (source_root or pathlib.Path(__file__).resolve().parents[1]).resolve()
     try:
         upgrade_proc = _sp.run(
-            [sys.executable, str(cli), "upgrade", "--dry-run", "--project-root", str(root)],
+            [
+                sys.executable,
+                str(cli),
+                "upgrade",
+                "--dry-run",
+                "--project-root",
+                str(root),
+                "--source-root",
+                str(canonical_source),
+            ],
             capture_output=True,
             text=True,
             timeout=60,
@@ -6441,7 +6454,11 @@ def _count_owledge_subcommands(root: pathlib.Path) -> list[str]:
     return seen
 
 
-def _concept_audit_dimension_1(root: pathlib.Path, project_mode: str) -> dict[str, Any]:
+def _concept_audit_dimension_1(
+    root: pathlib.Path,
+    project_mode: str,
+    source_root: pathlib.Path | None = None,
+) -> dict[str, Any]:
     findings: list[dict[str, str]] = []
     upgrade_ok = _owledge_subcommand_help(root, "upgrade")
     doctor_ok = _owledge_subcommand_help(root, "doctor")
@@ -6490,7 +6507,7 @@ def _concept_audit_dimension_1(root: pathlib.Path, project_mode: str) -> dict[st
             "evidence": str(manifest_path),
         })
     if _project_mode_at_least(project_mode, "mvp"):
-        upgrade_dry_ok = _owledge_upgrade_dry_run(root)
+        upgrade_dry_ok = _owledge_upgrade_dry_run(root, source_root)
         findings.append({
             "severity": "info" if upgrade_dry_ok else "warning",
             "detail": "upgrade --dry-run on the project succeeds" if upgrade_dry_ok else "upgrade --dry-run on the project failed",
@@ -6736,7 +6753,11 @@ def _concept_audit_guided_checklists(project_mode: str) -> dict[str, list[str]]:
     }
 
 
-def concept_audit(root: pathlib.Path, profile: dict[str, Any] | None = None) -> dict[str, Any]:
+def concept_audit(
+    root: pathlib.Path,
+    profile: dict[str, Any] | None = None,
+    source_root: pathlib.Path | None = None,
+) -> dict[str, Any]:
     """Run the 4 mechanical concept-audit dimensions and emit guided checklists for dims 5-8.
 
     Dimensions 1-4 are scored here. Dimensions 5-8 are guided: the caller (agent
@@ -6756,7 +6777,7 @@ def concept_audit(root: pathlib.Path, profile: dict[str, Any] | None = None) -> 
     if planning_mode not in {"supervised", "approve-automatically", "full-access"}:
         planning_mode = "supervised"
 
-    dim1 = _concept_audit_dimension_1(root, project_mode)
+    dim1 = _concept_audit_dimension_1(root, project_mode, source_root)
     dim2 = _concept_audit_dimension_2(root, project_mode)
     dim3 = _concept_audit_dimension_3(root, project_mode)
     dim4 = _concept_audit_dimension_4(root, project_mode)

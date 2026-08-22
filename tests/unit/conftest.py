@@ -37,11 +37,19 @@ def repo_root() -> pathlib.Path:
 
 @pytest.fixture()
 def fresh_project(tmp_path) -> pathlib.Path:
-    """Init a fresh project into a temp dir and yield its path."""
+    """Init the full compatibility kit used by the legacy stress tests."""
     target = tmp_path / "fresh-project"
     target.mkdir()
     result = subprocess.run(
-        [sys.executable, str(REPO_ROOT / "tools" / "owledge.py"), "init-project", "--target", str(target)],
+        [
+            sys.executable,
+            str(REPO_ROOT / "tools" / "owledge.py"),
+            "init-project",
+            "--target",
+            str(target),
+            "--profile",
+            "full",
+        ],
         capture_output=True,
         text=True,
         cwd=str(REPO_ROOT),

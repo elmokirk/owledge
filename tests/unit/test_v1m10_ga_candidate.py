@@ -162,6 +162,9 @@ class V1M10CandidateJourneyTests(unittest.TestCase):
         ):
             self.assertNotIn(f'"{parked_module}"', setup_hook)
 
+        readiness = owledge.launch_readiness_gate(ROOT)
+        self.assertTrue(readiness["passed"], readiness.get("failed"))
+
     def test_release_workflow_keeps_publish_input_clean_and_can_create_annotated_tag(self) -> None:
         release_workflow = (ROOT / ".github" / "workflows" / "release.yml").read_text(encoding="utf-8")
 
@@ -210,6 +213,25 @@ class V1M10CandidateJourneyTests(unittest.TestCase):
             result = owledge_core.sdist_clean_check(root)
             self.assertTrue(result["passed"], result)
             self.assertNotIn("addons/", result["missing_trees"])
+
+    def test_manifest_population_contract_rejects_every_reopen_directive(self) -> None:
+        manifest = (ROOT / "MANIFEST.in").read_text(encoding="utf-8")
+        self.assertEqual([], owledge._manifest_unapproved_population_rules(manifest))
+        for population_rule in (
+            "graft addons",
+            "graft global-memory",
+            "global-include *.md",
+            "recursive-include docs *.md",
+            "include tools/owledge_mcp.py",
+            "include internal/owledge/private.md",
+        ):
+            with self.subTest(population_rule=population_rule):
+                self.assertEqual(
+                    [population_rule],
+                    owledge._manifest_unapproved_population_rules(
+                        manifest + "\n" + population_rule + "\n"
+                    ),
+                )
 
 
 if __name__ == "__main__":

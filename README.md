@@ -201,6 +201,10 @@ they do not create another memory store.
 
 The canonical legacy plugin path is `plugins/owledge-cowork/`; it is retained
 for compatibility but is not a V1 reference-adapter claim.
+Shared skill references under the canonical `skills/` tree, the legacy plugin,
+and `standalone-skills/` are distribution mirrors. They must stay synchronized;
+mirror maintenance does not promote the plugin or standalone bundle into the V1
+reference-adapter boundary.
 
 Best next read: [V1 harness boundary](docs/harness-plugin-matrix.md)
 
@@ -464,6 +468,14 @@ The core stays small. Broad-launch proof is handled by optional add-ons:
 | `poweruser-positioning-kit` | Snapshot-first positioning scorecard for adjacent AI-agent tool categories. |
 
 Launch scoring and pass/fail criteria: [Launch readiness rubric](docs/launch-readiness.md). Distribution path: [Distribution and release](docs/distribution.md).
+
+The V1 wheel includes its runtime schema/data, shipped skills and templates,
+and the explicit Core tool allowlist. The source archive additionally includes
+the direct V1 documentation. Optional add-ons,
+plugins, benchmarks, tests, standalone skill bundles, and private maintainer
+state remain outside the artifact. `launch-readiness` verifies both the required
+includes and the required exclusions instead of treating the full source
+checkout as the package boundary.
 
 ## Quality Gates
 

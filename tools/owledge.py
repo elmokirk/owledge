@@ -707,12 +707,16 @@ def _collect_kit_files(source_root: pathlib.Path, project_root: pathlib.Path, pr
             if not path.is_file() or "__pycache__" in path.parts:
                 continue
             rel_posix = path.relative_to(project_root).as_posix()
+            src = agent_src / pathlib.Path(rel_posix).relative_to(".owledge")
+            if not src.is_file():
+                # Manifests own only files supplied by the kit. User memory and
+                # transient upgrade state must never become upgrade inventory.
+                continue
             if rel_posix in seen:
                 continue
             seen.add(rel_posix)
             sha_installed = sha256_file(path)
-            src = agent_src / pathlib.Path(rel_posix).relative_to(".owledge")
-            sha_original = sha256_file(src) if src.is_file() else ""
+            sha_original = sha256_file(src)
             entries.append({"path": rel_posix, "sha256_installed": sha_installed, "sha256_original": sha_original})
     for tool in HOST_TOOL_FILES:
         target = project_root / "tools" / tool
@@ -813,10 +817,10 @@ def _resolve_global_link(arg_value: str, source_root: pathlib.Path) -> dict[str,
     if not arg_value:
         raise ValueError("link_global_requires_explicit_path")
     selected = pathlib.Path(arg_value).expanduser()
-    if not selected.is_absolute():
-        raise ValueError("link_global_requires_absolute_path")
     if str(selected).startswith(("\\\\", "//")):
         raise ValueError("link_global_requires_local_path")
+    if not selected.is_absolute():
+        raise ValueError("link_global_requires_absolute_path")
     resolved = selected.resolve()
     kit_version = KIT_VERSION
     return {
@@ -1193,7 +1197,7 @@ def upgrade_project(root: pathlib.Path, source_root: pathlib.Path, dry_run: bool
     try:
         root = _validate_local_project_root(root, label="project_root", require_exists=True)
         source_root = _validate_local_project_root(source_root, label="source_root", require_exists=True)
-        manifest_path = _safe_project_target(root, "kit-manifest.json", label="upgrade_manifest", require_exists=True)
+        manifest_path = _safe_project_target(root, "kit-manifest.json", label="upgrade_manifest")
     except ValueError as exc:
         return {"passed": False, "error": str(exc), "project": str(root)}
     if not manifest_path.is_file():
@@ -2037,6 +2041,71 @@ def release_trust_gate(root: pathlib.Path) -> dict[str, Any]:
     return results.payload(project=str(root), version=version)
 
 
+_V1_MANIFEST_RECURSIVE_INCLUDES = {
+    "recursive-include skills *",
+    "recursive-include templates *",
+}
+
+_V1_MANIFEST_SELECTIVE_INCLUDES = {
+    "include docs/upgrade-notes-schema.json",
+    "include docs/upgrading.md",
+    "include docs/v1-minimal-core.md",
+    "include tools/__init__.py",
+    "include tools/owledge.py",
+    "include tools/owledge_core.py",
+    "include tools/owledge_adapter_contracts.py",
+    "include tools/owledge_generic_adapter.py",
+    "include tools/owledge_null_space.py",
+    "include tools/owledge_v1_retrieval.py",
+    "include tools/owledge_v1_lifecycle.py",
+    "include tools/build_project_folder_kit.py",
+}
+
+_V1_MANIFEST_BOUNDED_ROOTS = {
+    ".agent-control",
+    ".git",
+    "addons",
+    "assets",
+    "benchmarks",
+    "docs",
+    "examples",
+    "global-memory",
+    "internal",
+    "owlib",
+    "plugins",
+    "standalone-skills",
+    "tests",
+    "tools",
+}
+
+
+def _manifest_unapproved_population_rules(text: str) -> list[str]:
+    """Return MANIFEST.in population rules outside the reviewed V1 boundary."""
+    unexpected: list[str] = []
+    for raw_line in text.splitlines():
+        rule = raw_line.strip()
+        if not rule or rule.startswith("#"):
+            continue
+        parts = rule.split()
+        command = parts[0]
+        if command in {"graft", "global-include"}:
+            unexpected.append(rule)
+            continue
+        if command == "recursive-include":
+            if rule not in _V1_MANIFEST_RECURSIVE_INCLUDES:
+                unexpected.append(rule)
+            continue
+        if command != "include" or rule in _V1_MANIFEST_SELECTIVE_INCLUDES:
+            continue
+        included_roots = {
+            path.replace("\\", "/").split("/", 1)[0]
+            for path in parts[1:]
+        }
+        if included_roots & _V1_MANIFEST_BOUNDED_ROOTS:
+            unexpected.append(rule)
+    return sorted(set(unexpected))
+
+
 def launch_readiness_gate(root: pathlib.Path) -> dict[str, Any]:
     results = ResultSet()
     required_addons = [
@@ -2129,8 +2198,75 @@ def launch_readiness_gate(root: pathlib.Path) -> dict[str, Any]:
     results.add("packaging:manifest", manifest.exists(), "Source distribution manifest exists.")
     if manifest.exists():
         text = manifest.read_text(encoding="utf-8", errors="replace")
-        for required in ["recursive-include addons", "recursive-include docs", "recursive-include skills", "recursive-include tools"]:
-            results.add(f"packaging:manifest:{required}", required in text, "Source distribution includes required launch/core files.")
+        rules = {
+            line.strip()
+            for line in text.splitlines()
+            if line.strip() and not line.lstrip().startswith("#")
+        }
+        required_v1_includes = [
+            "include docs/upgrade-notes-schema.json",
+            "include docs/upgrading.md",
+            "include docs/v1-minimal-core.md",
+            "recursive-include skills *",
+            "include tools/__init__.py",
+            "include tools/owledge.py",
+            "include tools/owledge_core.py",
+            "include tools/owledge_adapter_contracts.py",
+            "include tools/owledge_generic_adapter.py",
+            "include tools/owledge_null_space.py",
+            "include tools/owledge_v1_retrieval.py",
+            "include tools/owledge_v1_lifecycle.py",
+            "include tools/build_project_folder_kit.py",
+        ]
+        for required in required_v1_includes:
+            results.add(
+                f"packaging:manifest:v1-include:{required}",
+                required in rules,
+                "Source distribution explicitly includes a required V1 Minimal Core file tree.",
+            )
+        required_v1_exclusions = [
+            "prune addons",
+            "prune assets",
+            "prune benchmarks",
+            "prune docs",
+            "prune examples",
+            "prune owlib",
+            "prune plugins",
+            "prune standalone-skills",
+            "prune tests",
+            "recursive-exclude .agent-control *",
+            "recursive-exclude .git *",
+            "recursive-exclude global-memory *",
+            "recursive-exclude internal *",
+        ]
+        for required in required_v1_exclusions:
+            results.add(
+                f"packaging:manifest:v1-exclude:{required}",
+                required in rules,
+                "Source distribution explicitly excludes optional, generated, or private source surfaces.",
+            )
+        for forbidden in [
+            "recursive-include addons *",
+            "recursive-include docs *",
+            "recursive-include standalone-skills *",
+            "recursive-include tools *",
+        ]:
+            results.add(
+                f"packaging:manifest:no-broad-include:{forbidden}",
+                forbidden not in rules,
+                "Source distribution does not re-open a surface outside the V1 Minimal Core boundary.",
+            )
+        unapproved_population = _manifest_unapproved_population_rules(text)
+        results.add(
+            "packaging:manifest:no-unapproved-population",
+            not unapproved_population,
+            (
+                "Every source-distribution population directive stays inside the reviewed V1 boundary."
+                if not unapproved_population
+                else "Unapproved source-distribution population directives: "
+                + ", ".join(unapproved_population)
+            ),
+        )
 
     return results.payload(project=str(root), target_score="95+")
 
@@ -4981,7 +5117,7 @@ def main(argv: list[str] | None = None) -> int:
             profile = None
             if getattr(args, "profile", None):
                 profile = json.loads(pathlib.Path(args.profile).read_text(encoding="utf-8"))
-            result = core.concept_audit(root, profile=profile)
+            result = core.concept_audit(root, profile=profile, source_root=REPO_ROOT)
             if args.dimension:
                 result["dimensions"] = [d for d in result.get("dimensions", []) if d.get("name") == args.dimension]
             if args.format == "summary":

@@ -2,14 +2,24 @@
 title: "KEOS Knowledge Base — Pain Points History"
 description: "Kirks dokumentierte Schmerzpunkte aus 6 Monaten KEOS-Nutzung. Grundlage für KEOS_KB v2.3. Extrahiert aus Planning-Session 31.07.2026."
 type: lesson
+memory_id: "mem:owledge:global:owledge:lesson:keos-kb-pain-points-2026-07-31"
+tenant_id: "owledge"
+customer_id: "global"
+project_id: "owledge"
 doc_type: lesson
 status: active
-visibility: shared
+visibility: private
 data_class: internal
 semantic_title: "Pain Points: warum die aktuelle KB unbrauchbar wurde"
 summary: "8 dokumentierte Schmerzpunkte aus 6 Monaten KEOS: fehlender zentraler Wissenszugriff, halbfertige Projekte, verloren Learnings, statische KB ohne Execution, Ideen-Logging schwierig, keine Mission-Control, Dateien zu lang, keine Parallelen-Erkennung."
 concept_tags: [pain-points, keos, knowledge-base, migration]
 stack_tags: []
+problem_patterns: ["fragmented-agent-knowledge", "duplicate-project-effort", "static-knowledge-without-execution"]
+architecture_patterns: ["project-registry", "reviewed-learning-loop", "retrieval-contract"]
+failure_modes: ["repeated-context-explanation", "untracked-harness-learning", "context-pollution"]
+reusable_lessons:
+  - "A knowledge base creates value only when agents can retrieve scoped knowledge and feed reviewed learnings back into it."
+  - "Registries and routing contracts are required to turn accumulated notes into execution."
 confidence: 1.0
 universality: "🟢"
 version: "1.0"
@@ -17,6 +27,8 @@ created_at: "2026-07-31T14:00:00Z"
 updated_at: "2026-07-31T14:00:00Z"
 source_agent: human
 source_hash: ""
+review_status: reviewed
+sanitization_status: not_required
 area: business
 scope: global
 evidence:
@@ -25,11 +37,12 @@ evidence:
 supersedes: null
 edges:
   - type: "relates_to"
-    target: "[[PLAN-v2.3]]"
+    target: "external KEOS vault: PLAN-v2.3"
     weight: 1.0
   - type: "relates_to"
-    target: "[[KEOS-Strategieplan-v1]]"
+    target: "external KEOS vault: KEOS-Strategieplan-v1"
     weight: 0.8
+external_reference_scope: "Historical KEOS strategy references live in the separate KEOS vault, not this repository."
 ---
 
 # Pain Points History
