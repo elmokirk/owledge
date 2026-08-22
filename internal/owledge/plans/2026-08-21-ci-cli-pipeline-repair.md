@@ -7,7 +7,7 @@ data_class: "internal"
 semantic_title: "CI, documentation, packaging and CLI pipeline repair"
 summary: "Root-cause repair plan for the general CI and Docs workflows after the v0.8.0 PyPI artifact hotfix."
 created_at: "2026-08-21T00:00:00+02:00"
-updated_at: "2026-08-21T23:30:00+02:00"
+updated_at: "2026-08-22T00:00:00+02:00"
 branch: "codex/fix/ci-cli-pipeline"
 base_commit: "2e82c93fc093ea1439ff1c0fc04eb1160abbca45"
 ---
@@ -108,10 +108,21 @@ mid-phase, rerun that phase's gate before continuing and record fresh evidence.
 
 ## Current Decision Gate
 
-The remaining local blocker is a June-era `launch-readiness` assertion that
-requires `MANIFEST.in` to recursively include add-ons, all docs, and all tools.
-The August V1 package boundary intentionally prunes those optional surfaces and
-ships only the Minimal Core; the clean built Sdist independently passes
-`sdist-clean`. Correcting the stale assertion changes a release-gate contract,
-so implementation is paused pending explicit owner approval rather than adding
-redundant manifest directives or weakening the V1 artifact boundary.
+The owner approved the V1-aligned release-gate correction. Launch readiness now
+requires the direct Minimal Core inputs and all exclusion rules, rejects every
+unapproved population directive that could reopen a pruned surface, and retains
+the existing negative checks. Independent QA findings were repaired with
+focused regressions; the remaining boundary is remote branch validation after a
+fresh base-commit check.
+
+## Mandatory Next-Start Work
+
+Feature work after this repair is blocked on two owner-prioritized P0 tickets:
+
+- `POST-V1-REPOSITORY-CONSOLIDATION-001`: repository truth, lifecycle, package,
+  and CI cleanup.
+- `POST-V1-CODE-ARCHITECTURE-REVIEW-001`: expert-level source and architecture
+  review followed by small evidence-backed refactoring packages.
+
+These tickets record the next session's scope; they do not authorize an
+unbounded cleanup inside this CI repair.
