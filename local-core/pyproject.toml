@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "owledge"
+version = "0.9.0rc1"
+description = "Local reviewed knowledge for people and agents"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+
+[project.scripts]
+owledge = "owledge_adapters.cli:entry"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["owledge_core*", "owledge_adapters*", "owledge_connectors*"]
+
+[tool.setuptools.package-data]
+owledge_adapters = ["samples/*.md", "skills/owledge-local-memory/*.md"]
+owledge_core = ["resources/*.json"]

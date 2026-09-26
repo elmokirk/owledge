@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0.0",
+  "bundle_id": "owledge-core-contract-bundle-vnext-1",
+  "authority": "contracts/vnext/core-contract-bundle-v1.json",
+  "resources": [
+    {"logical_name": "artifact-routing-v1", "relative_path": "contracts/vnext/artifact-routing-v1.json", "sha256": "8a73b7f0ba69a341f7c1b92dab43d1b8c80c06c7d6caddce79fdd8b8be3bd1a2"},
+    {"logical_name": "reason-codes-v1", "relative_path": "contracts/vnext/reason-codes-v1.json", "sha256": "79e6a046c2fb623a7d3f56368cd5ee2be2199b6ae830b8d64493b2f1d15ab56f"},
+    {"logical_name": "schema-registry-v1", "relative_path": "contracts/vnext/schema-registry-v1.json", "sha256": "47cbd4fbae3b7b6114a91fa8598fa760aeac13cf8212cc4101a43b84dbab4b84"},
+    {"logical_name": "settings-registry-v1", "relative_path": "contracts/vnext/settings-registry-v1.json", "sha256": "bf3b251081dfbc10018853658e1fde1e3558654e8bac439c8c217a916509fa99"}
+  ]
+}

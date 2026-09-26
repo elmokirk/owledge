@@ -1,0 +1,2 @@
+include tests/mvp/test_rw_mvp_workspace_archive.py
+include tests/mvp/test_rw_mvp_paired_restore.py

@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0.0",
+  "registry_id": "owledge-settings-registry-vnext-1",
+  "status": "active",
+  "keys": [
+    {"key": "recall_default", "type": "enum", "domain": ["focused", "expanded", "audit"], "scopes": ["user-global", "project"], "default": "focused", "precedence": "project_over_global_over_catalog", "meaning": "Initial bounded recall page allowance.", "deprecated": false, "migration": "explicit_owner_repair"},
+    {"key": "recall_max_auto", "type": "enum", "domain": ["focused", "expanded", "audit"], "scopes": ["user-global", "project"], "default": "focused", "precedence": "project_over_global_over_catalog", "meaning": "Maximum automatic recall escalation.", "deprecated": false, "migration": "explicit_owner_repair"},
+    {"key": "research_default", "type": "enum", "domain": ["none", "targeted", "deep"], "scopes": ["user-global", "project"], "default": "none", "precedence": "project_over_global_over_catalog", "meaning": "Initial Skill-owned research method depth.", "deprecated": false, "migration": "explicit_owner_repair"},
+    {"key": "research_max_auto", "type": "enum", "domain": ["none", "targeted", "deep"], "scopes": ["user-global", "project"], "default": "none", "precedence": "project_over_global_over_catalog", "meaning": "Maximum Skill-owned automatic research escalation.", "deprecated": false, "migration": "explicit_owner_repair"}
+  ]
+}
