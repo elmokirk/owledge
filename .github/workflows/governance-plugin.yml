@@ -1,0 +1,88 @@
+name: Governance plugin
+on:
+  push:
+    branches: [main, feat/owledge-governance-plugins]
+    paths:
+      - 'plugins/owledge-governance/**'
+      - '.claude-plugin/marketplace.json'
+      - '.agents/plugins/marketplace.json'
+      - 'tests/governance_plugin/**'
+      - 'tools/build_governance_plugin.py'
+      - '.github/workflows/governance-plugin.yml'
+  pull_request:
+    paths:
+      - 'plugins/owledge-governance/**'
+      - '.claude-plugin/marketplace.json'
+      - '.agents/plugins/marketplace.json'
+      - 'tests/governance_plugin/**'
+      - 'tools/build_governance_plugin.py'
+      - '.github/workflows/governance-plugin.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  package-and-hook:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Show environment
+        run: |
+          python --version
+          node --version
+      - name: Test standalone package and optional reminder
+        run: python -B -m unittest discover -s tests/governance_plugin -p "test_*.py" -v
+      - name: Build archives
+        run: python tools/build_governance_plugin.py --output "${{ runner.temp }}/owledge-governance-artifacts"
+  publish-community-prerelease:
+    needs: package-and-hook
+    if: github.event_name == 'push' && github.ref == 'refs/heads/feat/owledge-governance-plugins' && contains(github.event.head_commit.message, '[publish-governance]')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build frozen standalone package
+        run: python tools/build_governance_plugin.py --output "${{ runner.temp }}/owledge-governance-artifacts"
+      - name: Create separate community prerelease
+        uses: actions/github-script@v7
+        env:
+          ARTIFACT_DIR: ${{ runner.temp }}/owledge-governance-artifacts
+        with:
+          script: |
+            const fs = require('node:fs');
+            const path = require('node:path');
+            const version = JSON.parse(fs.readFileSync('plugins/owledge-governance/plugin.json', 'utf8')).version;
+            const tag = `owledge-governance-v${version}`;
+            try {
+              await github.rest.repos.getReleaseByTag({...context.repo, tag});
+              throw new Error(`Refusing to overwrite existing release ${tag}`);
+            } catch (error) {
+              if (error.status !== 404) throw error;
+            }
+            const release = await github.rest.repos.createRelease({
+              ...context.repo, tag_name: tag, target_commitish: context.sha,
+              name: `Owledge Governance ${version}`, draft: false, prerelease: true,
+              make_latest: 'false',
+              body: `Standalone governance skill packaged for Claude Code and Codex.\n\nNo Owledge runtime, project folders, MCP server or extra permissions. Optional reminder hook is disabled.\n\nDedicated Linux/Windows package-and-hook jobs passed before this prerelease. Native Claude/Codex installation and real GBrain/OpenKnowledge scenarios still require acceptance; no official directory listing is claimed.\n\nSource commit: ${context.sha}\n\nSee plugins/owledge-governance/README.md and VALIDATION.md for installation and limits.`,
+            });
+            for (const name of [`owledge-governance-${version}.zip`, `owledge-marketplace-${version}.zip`, 'SHA256SUMS.txt']) {
+              const data = fs.readFileSync(path.join(process.env.ARTIFACT_DIR, name));
+              await github.rest.repos.uploadReleaseAsset({
+                ...context.repo, release_id: release.data.id, name, data,
+                headers: {'content-type': name.endsWith('.zip') ? 'application/zip' : 'text/plain', 'content-length': data.length},
+              });
+            }
+            core.notice(`Community prerelease: ${release.data.html_url}`);

@@ -1,0 +1,13 @@
+{
+  "name": "owledge-labs",
+  "owner": {
+    "name": "elmokirk"
+  },
+  "plugins": [
+    {
+      "name": "owledge-governance",
+      "source": "./plugins/owledge-governance",
+      "description": "Standalone-Governance-Skill. Community-Prerelease, nicht offiziell gelistet."
+    }
+  ]
+}
