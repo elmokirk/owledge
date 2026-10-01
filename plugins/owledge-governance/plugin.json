@@ -1,0 +1,20 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "owledge-governance",
+  "version": "0.1.0-rc.1",
+  "description": "Quellen belegen, Vorschlaege getrennt pruefen und Wissen gegen den aktuellen Stand aendern. Ohne Owledge-Runtime.",
+  "author": {
+    "name": "elmokirk",
+    "url": "https://github.com/elmokirk/owledge"
+  },
+  "homepage": "https://github.com/elmokirk/owledge/tree/feat/owledge-governance-plugins/plugins/owledge-governance",
+  "repository": "https://github.com/elmokirk/owledge",
+  "license": "MIT",
+  "keywords": [
+    "knowledge",
+    "governance",
+    "gbrain",
+    "openknowledge",
+    "okf"
+  ]
+}

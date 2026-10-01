@@ -1,0 +1,20 @@
+{
+  "name": "owledge-labs",
+  "interface": {
+    "displayName": "Owledge Labs"
+  },
+  "plugins": [
+    {
+      "name": "owledge-governance",
+      "source": {
+        "source": "local",
+        "path": "./plugins/owledge-governance"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}
